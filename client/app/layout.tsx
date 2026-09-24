@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond } from "next/font/google";
+import { Inter, Cormorant_Garamond, Cairo } from "next/font/google";
 
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -10,6 +10,12 @@ const cormorant = Cormorant_Garamond({
   variable: "--font-heading",
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
+});
+
+const cairo = Cairo({
+  subsets: ["arabic", "latin"],
+  variable: "--font-arabic",
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 const inter = Inter({
@@ -31,7 +37,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", inter.variable, cormorant.variable, "font-sans")}
+      className={cn("antialiased", inter.variable, cormorant.variable, cairo.variable, "font-sans")}
     >
       <body className="min-h-screen bg-background text-foreground">
         <Providers>{children}</Providers>

@@ -5,37 +5,37 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    --background: #FBF9F5;
-    --foreground: #141416;
-    --card: #FFFFFF;
-    --card-foreground: #141416;
-    --popover: #FFFFFF;
-    --popover-foreground: #141416;
-    --primary: #141416;
-    --primary-foreground: #FFFFFF;
-    --secondary: #F3EFEA;
-    --secondary-foreground: #141416;
-    --muted: #F3EFEA;
-    --muted-foreground: #76736E;
-    --accent: #141416;
-    --accent-foreground: #FFFFFF;
+    --background: #F4EEE5;
+    --foreground: #1C1917;
+    --card: #FAF6F0;
+    --card-foreground: #1C1917;
+    --popover: #FAF6F0;
+    --popover-foreground: #1C1917;
+    --primary: #1C1917;
+    --primary-foreground: #FAF7F2;
+    --secondary: #EBE3D7;
+    --secondary-foreground: #1C1917;
+    --muted: #EDE6DB;
+    --muted-foreground: #78716C;
+    --accent: #E5DDD1;
+    --accent-foreground: #1C1917;
     --destructive: #B91C1C;
-    --destructive-foreground: #FFFFFF;
-    --border: #EBE6DF;
-    --input: #EBE6DF;
-    --ring: #141416;
+    --destructive-foreground: #FAF7F2;
+    --border: #E2D7C8;
+    --input: #E8DFD3;
+    --ring: #1C1917;
     --success: #2F6F4E;
     --warning: #B45309;
     --info: #3B5B7A;
     --radius: 0.85rem;
-    --sidebar: #FBF9F5;
-    --sidebar-foreground: #141416;
-    --sidebar-primary: #141416;
-    --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #F3EFEA;
-    --sidebar-accent-foreground: #141416;
-    --sidebar-border: #EBE6DF;
-    --sidebar-ring: #141416;
+    --sidebar: #EFE9DF;
+    --sidebar-foreground: #1C1917;
+    --sidebar-primary: #1C1917;
+    --sidebar-primary-foreground: #FAF7F2;
+    --sidebar-accent: #E5DCD0;
+    --sidebar-accent-foreground: #1C1917;
+    --sidebar-border: #E2D7C8;
+    --sidebar-ring: #1C1917;
 }
 
 .dark {
@@ -111,11 +111,11 @@
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
-    background-color: #FBF9F5;
+    background-color: #F4EEE5;
     background-image: 
-      radial-gradient(ellipse 70% 50% at 85% -5%, rgba(226, 218, 206, 0.45) 0%, transparent 70%),
-      radial-gradient(ellipse 55% 50% at 5% 100%, rgba(232, 224, 212, 0.35) 0%, transparent 65%),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'%3E%3Cpath d='M-100,120 C180,240 340,50 620,170 C840,270 940,190 1100,250' fill='none' stroke='%23141416' stroke-width='0.75' stroke-opacity='0.035'/%3E%3Cpath d='M-80,210 C210,330 370,140 660,260 C870,360 970,280 1120,340' fill='none' stroke='%23141416' stroke-width='0.75' stroke-opacity='0.03'/%3E%3Cpath d='M-60,300 C240,420 400,230 700,350 C900,450 1000,370 1140,430' fill='none' stroke='%23141416' stroke-width='0.75' stroke-opacity='0.025'/%3E%3Cpath d='M-100,390 C170,510 430,320 740,440 C930,540 1030,460 1160,520' fill='none' stroke='%23141416' stroke-width='0.75' stroke-opacity='0.03'/%3E%3Cpath d='M-120,480 C140,600 460,410 780,530 C960,630 1060,550 1180,610' fill='none' stroke='%23141416' stroke-width='0.75' stroke-opacity='0.025'/%3E%3C/svg%3E");
+      radial-gradient(ellipse 80% 60% at 85% -10%, rgba(218, 205, 188, 0.45) 0%, transparent 70%),
+      radial-gradient(ellipse 65% 55% at 5% 100%, rgba(225, 213, 198, 0.40) 0%, transparent 65%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'%3E%3Cpath d='M-100,120 C180,240 340,50 620,170 C840,270 940,190 1100,250' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.035'/%3E%3Cpath d='M-80,210 C210,330 370,140 660,260 C870,360 970,280 1120,340' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.03'/%3E%3Cpath d='M-60,300 C240,420 400,230 700,350 C900,450 1000,370 1140,430' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.025'/%3E%3Cpath d='M-100,390 C170,510 430,320 740,440 C930,540 1030,460 1160,520' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.03'/%3E%3Cpath d='M-120,480 C140,600 460,410 780,530 C960,630 1060,550 1180,610' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.025'/%3E%3C/svg%3E");
     background-attachment: fixed;
   }
   html {
@@ -124,14 +124,20 @@
   h1, h2, h3, .font-serif {
     font-family: var(--font-heading), Georgia, serif;
   }
+  [dir="rtl"] {
+    font-family: var(--font-arabic), var(--font-sans), sans-serif;
+  }
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] .font-serif {
+    font-family: var(--font-arabic), var(--font-heading), serif;
+  }
 }
 
 @utility glass-warm {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(250, 246, 240, 0.88);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 20px 50px -10px rgba(18, 18, 20, 0.06), 0 2px 8px rgba(18, 18, 20, 0.02);
+  border: 1px solid rgba(226, 215, 200, 0.7);
+  box-shadow: 0 20px 50px -10px rgba(28, 25, 23, 0.05), 0 2px 8px rgba(28, 25, 23, 0.02);
 }
 
 @utility card-depth {

@@ -8,21 +8,17 @@ import {
   ArrowRight,
   PencilSimple,
   CheckCircle,
-  FolderOpen,
-  HouseLine,
-  PaintBrushBroad,
-  Cube,
+  SquaresFour,
   User,
 } from "@phosphor-icons/react";
-import { ImageSelectCard } from "@/features/projects/components/image-select-card";
+import { VolumeCard } from "@/features/projects/components/volume-card";
+import { SpecificationParameters } from "@/features/projects/components/specification-parameters";
+import { SpacesArchitecture } from "@/features/projects/components/spaces-architecture";
 import {
-  StyleDiscovery,
-  DESIGN_STYLES,
-} from "@/features/projects/components/style-discovery";
-import {
-  SpacesSelector,
-  DEFAULT_SPACES,
-} from "@/features/projects/components/spaces-selector";
+  AestheticDirection,
+  AESTHETIC_DIRECTIONS,
+} from "@/features/projects/components/aesthetic-direction";
+import { HeroAtelier } from "@/features/projects/components/hero-atelier";
 import { ProjectReviewCard } from "@/features/projects/components/project-review-card";
 import { useCreateProject } from "@/features/projects/hooks/use-projects";
 import { Spinner } from "@/components/ui/spinner";
@@ -30,68 +26,98 @@ import type { PropertyType, SpaceItem } from "@/features/projects/types";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 
-const PROPERTY_TYPES: Array<{
+const VOLUME_TYPOLOGIES: Array<{
   id: PropertyType;
+  volume: string;
   titleKey: string;
   descKey: string;
   defaultTitle: string;
   defaultDesc: string;
+  tag: string;
+  tagAr: string;
   imageSrc: string;
 }> = [
   {
     id: "villa",
+    volume: "VOLUME 01",
     titleKey: "property.villa",
     descKey: "property.villa_desc",
     defaultTitle: "Villa",
-    defaultDesc: "Standalone luxury residences, twin houses, and townhouses.",
+    defaultDesc: "Freestanding luxury residences, twin houses & estates.",
+    tag: "Primary Typology",
+    tagAr: "النمط الأساسي",
     imageSrc:
       "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "apartment",
+    volume: "VOLUME 02",
     titleKey: "property.apartment",
     descKey: "property.apartment_desc",
     defaultTitle: "Apartment",
-    defaultDesc: "Single-level contemporary residences, penthouses, and flats.",
+    defaultDesc: "Urban residences, penthouses & mid-rise flats.",
+    tag: "High-rise & mid-rise",
+    tagAr: "أبراج سكنية وشقق",
     imageSrc:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
   },
   {
-    id: "commercial",
-    titleKey: "property.commercial",
-    descKey: "property.commercial_desc",
-    defaultTitle: "Office",
-    defaultDesc: "Executive workspaces, creative studios, and administrative suites.",
+    id: "duplex",
+    volume: "VOLUME 03",
+    titleKey: "property.duplex",
+    descKey: "property.duplex_desc",
+    defaultTitle: "Duplex",
+    defaultDesc: "Multi-tier architectural volumes with dual floor levels.",
+    tag: "Dual floor levels",
+    tagAr: "مستويين متصلين",
     imageSrc:
-      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "other",
-    titleKey: "property.retail",
-    descKey: "property.retail_desc",
-    defaultTitle: "Retail Space",
-    defaultDesc: "Luxury commercial boutiques, hospitality, and showrooms.",
-    imageSrc:
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "penthouse",
+    volume: "VOLUME 04",
+    titleKey: "property.penthouse",
+    descKey: "property.penthouse_desc",
+    defaultTitle: "Penthouse",
+    defaultDesc: "Skyline residences with private rooftop terraces.",
+    tag: "Private rooftop access",
+    tagAr: "رووف وتراس بانورامي",
+    imageSrc:
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    id: "commercial",
+    volume: "VOLUME 05",
+    titleKey: "property.commercial",
+    descKey: "property.commercial_desc",
+    defaultTitle: "Commercial",
+    defaultDesc: "Bespoke executive suites, creative studios & showrooms.",
+    tag: "Executive suites",
+    tagAr: "أجنحة تنفيذية راقية",
+    imageSrc:
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+  },
+  {
+    id: "other",
+    volume: "VOLUME 06",
     titleKey: "property.other",
     descKey: "property.other_desc",
     defaultTitle: "Other",
-    defaultDesc: "Chalets, coastal vacation retreats, and bespoke architectural builds.",
+    defaultDesc: "Bespoke architectural pavilions & coastal vacation chalets.",
+    tag: "Custom scope",
+    tagAr: "نطاق تصميم مخصص",
     imageSrc:
-      "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
   },
 ];
 
 const FUNNEL_STEPS = [
-  { id: 1, code: "01", labelKey: "wizard.step_1", eyebrowKey: "step1.eyebrow" },
-  { id: 2, code: "02", labelKey: "wizard.step_2", eyebrowKey: "step2.eyebrow" },
-  { id: 3, code: "03", labelKey: "wizard.step_3", eyebrowKey: "step3.eyebrow" },
-  { id: 4, code: "04", labelKey: "wizard.step_4", eyebrowKey: "step4.eyebrow" },
-  { id: 5, code: "05", labelKey: "wizard.step_5", eyebrowKey: "step5.eyebrow" },
-  { id: 6, code: "06", labelKey: "wizard.step_6", eyebrowKey: "step6.confirmed_badge" },
+  { id: 1, code: "01", labelKey: "wizard.step_1" },
+  { id: 2, code: "02", labelKey: "wizard.step_2" },
+  { id: 3, code: "03", labelKey: "wizard.step_3" },
+  { id: 4, code: "04", labelKey: "wizard.step_4" },
+  { id: 5, code: "05", labelKey: "wizard.step_5" },
+  { id: 6, code: "06", labelKey: "wizard.step_6" },
 ];
 
 function CreateProjectContent() {
@@ -106,22 +132,30 @@ function CreateProjectContent() {
   // Form State
   const [propertyType, setPropertyType] = React.useState<PropertyType>("villa");
   const [projectName, setProjectName] = React.useState(
-    isRTL ? "فيلا بالم هيلز مودرن" : "Palm Hills Modern Villa"
+    isRTL ? "فيلا بالم هيلز جولف إكستنشنز" : "Altea Coastal Residence"
   );
-  const [areaSqm, setAreaSqm] = React.useState(450);
-  const [city, setCity] = React.useState(isRTL ? "السادس من أكتوبر" : "6th of October");
-  const [compound, setCompound] = React.useState(isRTL ? "بالم هيلز جولف فيوز" : "Palm Hills Golf Views");
-  const [selectedStyleId, setSelectedStyleId] = React.useState("modern");
+  const [areaSqm, setAreaSqm] = React.useState(480);
+  const [region, setRegion] = React.useState(
+    isRTL ? "القاهرة والعاصمة الإدارية الجديدة" : "Cairo & New Administrative Capital"
+  );
+  const [district, setDistrict] = React.useState(
+    isRTL ? "بالم هيلز جولف إكستنشنز" : "Palm Hills Golf Extensions"
+  );
+  const [selectedStyleId, setSelectedStyleId] = React.useState("japandi");
+  const [allowBlend, setAllowBlend] = React.useState(false);
   const [createdProjectId, setCreatedProjectId] = React.useState<string | null>(null);
 
-  const [spaces, setSpaces] = React.useState<SpaceItem[]>(
-    DEFAULT_SPACES.map((s) => ({
-      id: s.id,
-      name: s.name,
-      included: s.defaultIncluded,
-      count: s.defaultCount,
-    }))
-  );
+  const [spaces, setSpaces] = React.useState<SpaceItem[]>([
+    { id: "living", name: "Living Room", included: true, count: 1 },
+    { id: "dining", name: "Dining Room", included: true, count: 1 },
+    { id: "kitchen", name: "Kitchen & Pantry", included: true, count: 1 },
+    { id: "master_bedroom", name: "Master Bedroom Suite", included: true, count: 1 },
+    { id: "guest_bedrooms", name: "Guest Bedrooms", included: true, count: 3 },
+    { id: "bathrooms", name: "Bathrooms & Spa", included: true, count: 4 },
+    { id: "terrace", name: "Private Terrace & Loggia", included: true, count: 2 },
+    { id: "office", name: "Home Office / Library", included: false, count: 0 },
+  ]);
+
   const [notes, setNotes] = React.useState(
     isRTL
       ? "أفضل تصميماً دافئاً ومودرن يعتمد على الخامات الطبيعية ووفرة الإضاءة النهارية، مع استخدام الألوان المحايدة وعناصر الخشب والرخام."
@@ -131,7 +165,8 @@ function CreateProjectContent() {
   const createMutation = useCreateProject();
 
   const selectedStyle =
-    DESIGN_STYLES.find((s) => s.id === selectedStyleId) || DESIGN_STYLES[0];
+    AESTHETIC_DIRECTIONS.find((s) => s.id === selectedStyleId) ||
+    AESTHETIC_DIRECTIONS[0];
 
   const goToStep = (stepNumber: number) => {
     setCurrentStep(stepNumber);
@@ -160,577 +195,413 @@ function CreateProjectContent() {
       const created = await createMutation.mutateAsync({
         title: projectName || (isRTL ? "مشروع سكني جديد" : "Untitled Residence"),
         propertyType,
-        areaSqm: Number(areaSqm) || 350,
-        city: city || (isRTL ? "القاهرة" : "Cairo"),
-        compound: compound || undefined,
+        areaSqm: Number(areaSqm) || 480,
+        city: region,
+        compound: district || undefined,
         spaces,
-        notes: `Style: ${t(`style.${selectedStyle.id}`) || selectedStyle.name}. ${notes}`,
+        notes: `Style: ${isRTL ? selectedStyle.nameAr : selectedStyle.name}. ${notes}`,
       });
       setCreatedProjectId(created.id);
       goToStep(6);
     } catch (err) {
       console.error("Failed to create project", err);
-      // Fallback for seamless local testing
+      // Fallback for seamless demo testing
       setCreatedProjectId(`proj-local-${Date.now()}`);
       goToStep(6);
     }
   };
 
-  const currentStepDef =
-    FUNNEL_STEPS.find((s) => s.id === currentStep) || FUNNEL_STEPS[1];
-
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-foreground selection:text-background">
-      {/* Dedicated Intake Top Navigation Bar (Matching Reference Alta Screens 1-4) */}
-      <header className="sticky top-0 z-40 w-full border-b border-border/80 bg-background/90 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6 sm:px-10">
-          {/* Back Action */}
-          <button
-            type="button"
-            onClick={handleBack}
-            className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-all duration-200 hover:text-foreground cursor-pointer"
-          >
-            {isRTL ? (
-              <ArrowRight
-                size={14}
-                className="transition-transform duration-200 group-hover:translate-x-1"
-              />
-            ) : (
-              <ArrowLeft
-                size={14}
-                className="transition-transform duration-200 group-hover:-translate-x-1"
-              />
-            )}
-            <span>{t("wizard.back")}</span>
-          </button>
+    <div className="flex min-h-screen flex-col bg-[#F4EEE5] text-[#1C1917] selection:bg-[#1C1917] selection:text-[#FAF7F2] dark:bg-[#121214] dark:text-[#FAF7F2]">
+      {/* Top Navigation Bar (Matching All Reference Images) */}
+      <header className="sticky top-0 z-40 w-full border-b border-[#E2D7C8] bg-[#F4EEE5]/90 backdrop-blur-md dark:border-[#2C2C32] dark:bg-[#121214]/90">
+        <div className="flex h-16 w-full items-center justify-between px-6 sm:px-10">
+          {/* Brand Lockup */}
+          <div className="flex items-center gap-3">
+            <Link
+              href="/projects"
+              className="flex items-center gap-2.5 group cursor-pointer"
+            >
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FAF7F2] text-[#1C1917] border border-[#DFD6C7] dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-4 w-4 stroke-current"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 20L12 4L20 20" />
+                  <path d="M8 14L16 14" opacity="0.35" />
+                </svg>
+              </div>
+              <span className="font-sans text-xs font-bold tracking-[0.24em] text-[#1C1917] dark:text-[#FAF7F2]">
+                VALENTIA INTERIOR ATELIER
+              </span>
+            </Link>
+          </div>
 
-          {/* Centered Minimal Brand Lockup */}
-          <Link
-            href="/projects"
-            className="flex items-center gap-2 group cursor-pointer transition-opacity hover:opacity-80"
-          >
-            <span className="font-sans text-xs font-bold tracking-[0.28em] text-foreground">
-              {t("brand.name")}
+          {/* Center Pill Badge */}
+          <div className="hidden md:flex items-center rounded-full border border-[#DFD6C7] bg-[#EAE2D5] px-4 py-1.5 shadow-2xs dark:border-[#2C2C32] dark:bg-[#24242A]">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#524B44] dark:text-[#FAF7F2]">
+              {t("nav.fitout_commission") || "FIT-OUT COMMISSION • SPECIFICATION FLOW"}
             </span>
-          </Link>
+          </div>
 
-          {/* Right Action Bar: Language Toggle + Step Counter / Edit + Avatar */}
+          {/* Right Action Bar */}
           <div className="flex items-center gap-4">
-            {/* Live Language Toggle */}
+            {/* Live Language Switcher */}
             <button
               type="button"
               onClick={toggleLanguage}
-              className="inline-flex items-center gap-1 rounded-full border border-border/80 bg-card/80 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur-sm transition-all hover:bg-muted active:scale-95 cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#DFD6C7] bg-[#FAF7F2] px-3 py-1 text-xs font-medium text-[#1C1917] shadow-2xs hover:bg-[#EBE3D7] active:scale-95 transition-all cursor-pointer dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]"
               title={language === "en" ? "تغيير للعربية" : "Switch to English"}
             >
-              <span className={cn(language === "en" ? "font-bold text-foreground" : "text-muted-foreground")}>
+              <span className={cn(language === "en" ? "font-bold text-[#1C1917] dark:text-[#FAF7F2]" : "text-[#78716C] dark:text-[#989692]")}>
                 EN
               </span>
-              <span className="text-border">|</span>
-              <span className={cn(language === "ar" ? "font-bold text-foreground" : "text-muted-foreground")}>
+              <span className="text-[#DFD6C7]">|</span>
+              <span className={cn(language === "ar" ? "font-bold text-[#1C1917] dark:text-[#FAF7F2]" : "text-[#78716C] dark:text-[#989692]")}>
                 عربي
               </span>
             </button>
 
-            {/* Step Action or Indicator */}
-            {currentStep === 5 ? (
-              <button
-                type="button"
-                onClick={() => goToStep(2)}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-card px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-foreground transition-all hover:bg-muted cursor-pointer shadow-2xs active:scale-95"
-              >
-                <PencilSimple size={13} />
-                <span>{t("wizard.edit_selections")}</span>
-              </button>
-            ) : (
-              <span className="hidden sm:inline text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                {t("wizard.step_prefix")} 0{currentStep} {t("wizard.step_of")} 06
-              </span>
-            )}
-
-            {/* User Profile Avatar with Status Dot */}
-            <div className="relative flex h-8 w-8 items-center justify-center rounded-full border border-border/80 bg-card text-xs font-semibold text-foreground shadow-2xs">
+            {/* Profile Avatar */}
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1917] text-[#FAF7F2] shadow-2xs dark:bg-[#FAF7F2] dark:text-[#1C1917]">
               <User size={14} weight="bold" />
-              <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-background" />
             </div>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 pb-24 pt-6 sm:pt-10">
-        <div className="mx-auto max-w-5xl px-6 sm:px-10 flex flex-col gap-10">
-          {/* Slender Numbered Step Tracker (Reference Alta Design: 01 Welcome through 06 Review) */}
-          <div className="border-b border-border/80 pb-6">
-            <div className="grid grid-cols-6 gap-2">
+      {/* Main Studio Atelier Container */}
+      <div className="flex flex-1 flex-col lg:flex-row">
+        {/* Left Sidebar (Desktop) or Mobile Header (Mobile) */}
+        <aside
+          className={cn(
+            "w-full lg:w-64 lg:shrink-0 border-b lg:border-b-0 bg-[#EFE9DF] p-5 sm:p-6 flex flex-col justify-between dark:bg-[#161618]",
+            isRTL ? "lg:border-l lg:border-[#E2D7C8] dark:lg:border-[#2C2C32] lg:order-last" : "lg:border-r lg:border-[#E2D7C8] dark:lg:border-[#2C2C32]"
+          )}
+        >
+          {/* Top section: Steps */}
+          <div>
+            <div className="pb-4">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+                {t("lifecycle.title") || "PROJECT LIFECYCLE"}
+              </span>
+            </div>
+
+            {/* Vertical Step Navigation */}
+            <nav className="flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-none">
               {FUNNEL_STEPS.map((step) => {
-                const isCompleted = step.id < currentStep;
                 const isCurrent = step.id === currentStep;
+                const isCompleted = step.id < currentStep;
 
                 return (
                   <button
                     key={step.id}
                     type="button"
                     onClick={() => goToStep(step.id)}
-                    className="group flex flex-col gap-2 text-start transition-all cursor-pointer hover:opacity-100"
-                    title={`Step ${step.code}: ${t(step.labelKey)}`}
+                    className={cn(
+                      "group flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all duration-200 cursor-pointer select-none text-left",
+                      isCurrent
+                        ? "bg-[#E5DCD0] font-semibold text-[#1C1917] shadow-2xs dark:bg-[#2C2C32] dark:text-[#FAF7F2]"
+                        : "text-[#6E6760] hover:bg-[#EAE2D6]/70 hover:text-[#1C1917] dark:text-[#989692] dark:hover:bg-[#24242A]"
+                    )}
                   >
-                    {/* Horizontal progress hairline */}
-                    <div
+                    <span
                       className={cn(
-                        "h-1 w-full rounded-full transition-all duration-300",
+                        "font-mono text-[11px] transition-colors",
                         isCurrent
-                          ? "bg-foreground"
+                          ? "font-bold text-[#1C1917] dark:text-[#FAF7F2]"
                           : isCompleted
-                          ? "bg-foreground/40"
-                          : "bg-border"
+                          ? "text-[#1C1917]/70 dark:text-[#FAF7F2]/70"
+                          : "text-[#8C847B] dark:text-[#6E6760]"
                       )}
-                    />
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={cn(
-                          "font-mono text-[10px] tracking-wider transition-colors",
-                          isCurrent
-                            ? "text-foreground font-bold"
-                            : isCompleted
-                            ? "text-foreground/70"
-                            : "text-muted-foreground"
-                        )}
-                      >
-                        {step.code}
-                      </span>
-                      <span
-                        className={cn(
-                          "hidden sm:inline text-xs font-medium tracking-tight truncate transition-colors",
-                          isCurrent
-                            ? "text-foreground font-semibold"
-                            : "text-muted-foreground"
-                        )}
-                      >
-                        {t(step.labelKey)}
-                      </span>
-                    </div>
+                    >
+                      {step.code}
+                    </span>
+                    <span className="truncate">{t(step.labelKey)}</span>
                   </button>
                 );
               })}
-            </div>
+            </nav>
           </div>
 
-          {/* STEP 1: Welcome & Architectural Intake Intro */}
-          {currentStep === 1 && (
-            <div className="flex flex-col gap-10 animate-in fade-in duration-300">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="h-px w-6 bg-foreground/40" />
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
-                    {t(currentStepDef.eyebrowKey)}
-                  </span>
-                </div>
-                <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  {t("step1.title")}
-                </h2>
-                <p className="mt-2.5 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  {t("step1.desc")}
-                </p>
-              </div>
+          {/* Bottom link to Projects Dashboard */}
+          <div className="hidden lg:block border-t border-[#DFD6C7] pt-5 dark:border-[#2C2C32]">
+            <Link
+              href="/projects"
+              className="flex items-center gap-2.5 text-xs font-medium text-[#78716C] hover:text-[#1C1917] transition-colors dark:text-[#989692] dark:hover:text-[#FAF7F2]"
+            >
+              <SquaresFour size={16} />
+              <span>{t("lifecycle.dashboard") || "Projects Dashboard"}</span>
+            </Link>
+          </div>
+        </aside>
 
-              {/* 3 Pillar Summary Cards with Micro-Interactions */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="group flex flex-col gap-3 rounded-2xl border border-border/80 bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-foreground/30 hover:shadow-editorial">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/5 text-foreground transition-transform duration-300 group-hover:scale-110">
-                    <HouseLine size={20} weight="bold" />
+        {/* Main Stage Content */}
+        <main className="flex-1 min-w-0 flex flex-col justify-between p-5 sm:p-8 lg:p-12">
+          <div className="mx-auto w-full max-w-5xl flex-1 flex flex-col gap-10">
+            {/* STEP 1: Welcome & Panoramic Hero */}
+            {currentStep === 1 && (
+              <HeroAtelier
+                onStart={() => goToStep(2)}
+                onExploreMood={() => goToStep(4)}
+              />
+            )}
+
+            {/* STEP 2: Project & Property Type */}
+            {currentStep === 2 && (
+              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
+                {/* Header */}
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+                      {t("step2.eyebrow") || "02 — 06 • PROJECT & PROPERTY TYPE"}
+                    </span>
                   </div>
-                  <h3 className="font-serif text-xl font-medium text-foreground">
-                    {t("step1.card1_title")}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {t("step1.card1_desc")}
+                  <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+                    {t("step2.title") || "Tell us about your project"}
+                  </h1>
+                  <p className="mt-2 max-w-3xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
+                    {t("step2.desc") ||
+                      "Choose the architectural typology of the space you wish to commission. Each scheme is meticulously tailored to its structural volume and spatial rhythm."}
                   </p>
                 </div>
 
-                <div className="group flex flex-col gap-3 rounded-2xl border border-border/80 bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-foreground/30 hover:shadow-editorial">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/5 text-foreground transition-transform duration-300 group-hover:scale-110">
-                    <PaintBrushBroad size={20} weight="bold" />
-                  </div>
-                  <h3 className="font-serif text-xl font-medium text-foreground">
-                    {t("step1.card2_title")}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {t("step1.card2_desc")}
-                  </p>
-                </div>
-
-                <div className="group flex flex-col gap-3 rounded-2xl border border-border/80 bg-card p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-foreground/30 hover:shadow-editorial">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground/5 text-foreground transition-transform duration-300 group-hover:scale-110">
-                    <Cube size={20} weight="bold" />
-                  </div>
-                  <h3 className="font-serif text-xl font-medium text-foreground">
-                    {t("step1.card3_title")}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    {t("step1.card3_desc")}
-                  </p>
-                </div>
-              </div>
-
-              {/* Navigation Footer */}
-              <div className="flex items-center justify-between border-t border-border/80 pt-6">
-                <Link
-                  href="/projects"
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
-                >
-                  {t("step1.back")}
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={() => goToStep(2)}
-                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                >
-                  <span>{t("step1.cta")}</span>
-                  {isRTL ? (
-                    <ArrowLeft
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:-translate-x-1"
-                    />
-                  ) : (
-                    <ArrowRight
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: Property Type (Screen 1 from Reference) */}
-          {currentStep === 2 && (
-            <div className="flex flex-col gap-10 animate-in fade-in duration-300">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="h-px w-6 bg-foreground/40" />
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
-                    {t(currentStepDef.eyebrowKey)}
-                  </span>
-                </div>
-                <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  {t("step2.title")}
-                </h2>
-                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  {t("step2.desc")}
-                </p>
-              </div>
-
-              {/* Cards Stage with Split-Card Pattern matching Reference Screen 1 */}
-              <div className="relative flex flex-col gap-6">
-                {/* Top Row: 3 cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {PROPERTY_TYPES.slice(0, 3).map((type) => (
-                    <ImageSelectCard
-                      key={type.id}
-                      title={t(type.titleKey) || type.defaultTitle}
-                      description={t(type.descKey) || type.defaultDesc}
-                      imageSrc={type.imageSrc}
-                      selected={propertyType === type.id}
-                      onClick={() => setPropertyType(type.id)}
+                {/* 6 Volume Cards Grid (Matching Image 2) */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+                  {VOLUME_TYPOLOGIES.map((typology) => (
+                    <VolumeCard
+                      key={typology.id}
+                      volume={typology.volume}
+                      title={t(typology.titleKey) || typology.defaultTitle}
+                      description={t(typology.descKey) || typology.defaultDesc}
+                      tag={isRTL ? typology.tagAr : typology.tag}
+                      imageSrc={typology.imageSrc}
+                      selected={propertyType === typology.id}
+                      onClick={() => setPropertyType(typology.id)}
                     />
                   ))}
                 </div>
 
-                {/* Bottom Row: 2 cards centered/spanned */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl mx-auto w-full">
-                  {PROPERTY_TYPES.slice(3, 5).map((type) => (
-                    <ImageSelectCard
-                      key={type.id}
-                      title={t(type.titleKey) || type.defaultTitle}
-                      description={t(type.descKey) || type.defaultDesc}
-                      imageSrc={type.imageSrc}
-                      selected={propertyType === type.id}
-                      onClick={() => setPropertyType(type.id)}
-                    />
-                  ))}
+                {/* Specification Parameters Panel */}
+                <SpecificationParameters
+                  title={projectName}
+                  onTitleChange={setProjectName}
+                  areaSqm={areaSqm}
+                  onAreaChange={setAreaSqm}
+                  region={region}
+                  onRegionChange={setRegion}
+                  district={district}
+                  onDistrictChange={setDistrict}
+                  propertyType={propertyType}
+                />
+              </div>
+            )}
+
+            {/* STEP 3: Spaces Architecture */}
+            {currentStep === 3 && (
+              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
+                {/* Header */}
+                <div>
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+                    {t("step3.eyebrow") || "03 — 06 • SELECT SPACES"}
+                  </span>
+                  <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+                    {t("step3.title") || "Which spaces would you like us to include?"}
+                  </h1>
+                  <p className="mt-2 max-w-3xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
+                    {t("step3.desc") ||
+                      "Select the spaces for your fit-out project. You can adjust quantities and customize individual architectural finishes later."}
+                  </p>
+                </div>
+
+                <SpacesArchitecture
+                  spaces={spaces}
+                  onChange={setSpaces}
+                  areaSqm={areaSqm}
+                />
+              </div>
+            )}
+
+            {/* STEP 4: What feels like you? / Aesthetic Direction */}
+            {currentStep === 4 && (
+              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
+                {/* Header */}
+                <div>
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+                    {t("step4.eyebrow") || "04 — 06 • AESTHETIC DIRECTION"}
+                  </span>
+                  <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+                    {t("step4.title") || "What feels like you?"}
+                  </h1>
+                  <p className="mt-2 max-w-3xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
+                    {t("step4.desc") ||
+                      "Explore aesthetic directions tailored to your architecture. Save favorite atmospheres or allow our design atelier to synthesize a harmonious blend."}
+                  </p>
+                </div>
+
+                <AestheticDirection
+                  selectedStyleId={selectedStyleId}
+                  onSelectStyle={setSelectedStyleId}
+                  allowBlend={allowBlend}
+                  onToggleBlend={setAllowBlend}
+                />
+              </div>
+            )}
+
+            {/* STEP 5: Design Brief Review */}
+            {currentStep === 5 && (
+              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
+                {/* Header with Edit button */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+                      {t("step5.eyebrow") || "05 — 06 • YOUR DESIGN BRIEF"}
+                    </span>
+                    <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+                      {t("step5.title") || "Here is your design brief"}
+                    </h1>
+                    <p className="mt-2 max-w-2xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
+                      {t("step5.desc") ||
+                        "A summary of your selections. You can edit anything before we continue."}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => goToStep(2)}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#DFD6C7] bg-[#FAF7F2] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#1C1917] shadow-2xs hover:bg-[#EBE3D7] active:scale-95 transition-all cursor-pointer dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]"
+                  >
+                    <PencilSimple size={13} />
+                    <span>{t("wizard.edit_selections") || "Edit Selections"}</span>
+                  </button>
+                </div>
+
+                <ProjectReviewCard
+                  title={projectName}
+                  propertyType={propertyType}
+                  areaSqm={areaSqm}
+                  city={region}
+                  compound={district}
+                  styleName={isRTL ? selectedStyle.nameAr : selectedStyle.name}
+                  styleImage={selectedStyle.heroImage}
+                  spaces={spaces}
+                  notes={notes}
+                  onEditProperty={() => goToStep(2)}
+                  onEditSpaces={() => goToStep(3)}
+                  onEditStyle={() => goToStep(4)}
+                  onNotesChange={setNotes}
+                />
+              </div>
+            )}
+
+            {/* STEP 6: Confirmation & Handoff */}
+            {currentStep === 6 && (
+              <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in duration-300">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EAE2D5] text-[#1C1917] mb-6 shadow-xs ring-4 ring-[#1C1917]/10 dark:bg-[#2C2C32] dark:text-[#FAF7F2]">
+                  <CheckCircle size={36} weight="fill" />
+                </div>
+
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="h-px w-6 bg-[#1C1917]/30" />
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+                    {t("step6.confirmed_badge") || "DESIGN BRIEF CONFIRMED"}
+                  </span>
+                  <span className="h-px w-6 bg-[#1C1917]/30" />
+                </div>
+
+                <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+                  {t("step6.title") || "Your Project Is Initialized"}
+                </h1>
+
+                <p className="mt-3 max-w-md text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
+                  {t("step6.desc") ||
+                    "Our lead architect and site engineers in Cairo have received your brief. Your preliminary spatial model and moodboard are ready for review."}
+                </p>
+
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  {createdProjectId && (
+                    <Link
+                      href={`/projects/${createdProjectId}`}
+                      className="inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all dark:bg-[#FAF7F2] dark:text-[#1C1917]"
+                    >
+                      <span>{t("step6.cta_workspace") || "View Project Workspace"}</span>
+                      {isRTL ? <ArrowLeft size={13} weight="bold" /> : <ArrowRight size={13} weight="bold" />}
+                    </Link>
+                  )}
+
+                  <Link
+                    href="/projects"
+                    className="inline-flex items-center gap-2 rounded-full border border-[#DFD6C7] bg-[#FAF7F2] px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#1C1917] shadow-2xs hover:bg-[#EBE3D7] transition-all dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]"
+                  >
+                    <SquaresFour size={15} />
+                    <span>{t("step6.cta_portfolio") || "Go to Portfolio"}</span>
+                  </Link>
                 </div>
               </div>
+            )}
+          </div>
 
-              {/* Refined Architectural Parameters Form */}
-              <div className="rounded-2xl border border-border/80 bg-card p-5 sm:p-6 shadow-card">
-                <div className="flex items-center justify-between pb-3">
-                  <span className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {t("step2.params_title")}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {t("step2.params_auto")}
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                      {t("step2.field_name")}
-                    </label>
-                    <input
-                      type="text"
-                      value={projectName}
-                      onChange={(e) => setProjectName(e.target.value)}
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition-colors focus:border-foreground"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                      {t("step2.field_area")}
-                    </label>
-                    <input
-                      type="number"
-                      value={areaSqm}
-                      onChange={(e) => setAreaSqm(Number(e.target.value))}
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition-colors focus:border-foreground"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground block mb-1">
-                      {t("step2.field_location")}
-                    </label>
-                    <input
-                      type="text"
-                      value={compound ? `${compound}, ${city}` : city}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        const parts = val.split(",");
-                        if (parts.length > 1) {
-                          setCompound(parts[0].trim());
-                          setCity(parts[1].trim());
-                        } else {
-                          setCity(val);
-                        }
-                      }}
-                      className="w-full rounded-xl border border-border bg-background px-3 py-2 text-xs text-foreground outline-none transition-colors focus:border-foreground"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Navigation Footer (Screen 1 Reference) */}
-              <div className="flex items-center justify-between border-t border-border/80 pt-6">
+          {/* Bottom Action Bar (Matching Images 2, 3, 4, 5) */}
+          {currentStep >= 2 && currentStep <= 5 && (
+            <div className="sticky bottom-0 z-30 -mx-5 sm:-mx-8 lg:-mx-12 -mb-5 sm:-mb-8 lg:-mb-12 mt-12 border-t border-[#E2D7C8] bg-[#F4EEE5]/95 backdrop-blur-md px-6 sm:px-10 py-4 shadow-sm dark:border-[#2C2C32] dark:bg-[#121214]/95">
+              <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+                {/* Back / Skip Action */}
                 <button
                   type="button"
-                  onClick={handleBack}
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
+                  onClick={currentStep === 4 ? () => goToStep(5) : handleBack}
+                  className="text-xs font-medium text-[#78716C] hover:text-[#1C1917] transition-colors cursor-pointer dark:text-[#989692] dark:hover:text-[#FAF7F2]"
                 >
-                  {t("wizard.back")}
+                  {currentStep === 2
+                    ? (isRTL ? "← العودة للبداية" : "← Back to Introduction")
+                    : currentStep === 4
+                    ? (isRTL ? "← تخطي الآن" : "← Skip for now")
+                    : (isRTL ? "← السابق" : "← Back")}
                 </button>
 
+                {/* Center Step Indicator */}
+                <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-[#78716C] dark:text-[#989692]">
+                  <span>
+                    {t("wizard.step_prefix") || "Step"} 0{currentStep} {t("wizard.step_of") || "of"} 06
+                  </span>
+                  {currentStep === 3 && (
+                    <span className="text-[#8C847B]">· Next: Material & Style Moodboard</span>
+                  )}
+                  {currentStep === 4 && (
+                    <span className="text-[#8C847B]">· Next: Design Brief</span>
+                  )}
+                </div>
+
+                {/* Continue Primary CTA (Solid Black Pill Button) */}
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                >
-                  <span>{t("wizard.next")}</span>
-                  {isRTL ? (
-                    <ArrowLeft
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:-translate-x-1"
-                    />
-                  ) : (
-                    <ArrowRight
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Style Discovery (Screen 2 from Reference) */}
-          {currentStep === 3 && (
-            <div className="flex flex-col gap-10 animate-in fade-in duration-300">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="h-px w-6 bg-foreground/40" />
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
-                    {t(currentStepDef.eyebrowKey)}
-                  </span>
-                </div>
-                <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  {t("step3.title")}
-                </h2>
-                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  {t("step3.desc")}
-                </p>
-              </div>
-
-              {/* 3D Depth Card Stage & Thumbnail Strip */}
-              <StyleDiscovery
-                selectedStyleId={selectedStyleId}
-                onSelectStyle={(id) => setSelectedStyleId(id)}
-              />
-
-              {/* Action Navigation Footer (Screen 2 Reference) */}
-              <div className="flex items-center justify-between border-t border-border/80 pt-6">
-                <button
-                  type="button"
-                  onClick={() => goToStep(4)}
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
-                >
-                  {t("wizard.skip")}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                >
-                  <span>{t("wizard.next")}</span>
-                  {isRTL ? (
-                    <ArrowLeft
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:-translate-x-1"
-                    />
-                  ) : (
-                    <ArrowRight
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: Select Spaces (Screen 3 from Reference) */}
-          {currentStep === 4 && (
-            <div className="flex flex-col gap-10 animate-in fade-in duration-300">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="h-px w-6 bg-foreground/40" />
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
-                    {t(currentStepDef.eyebrowKey)}
-                  </span>
-                </div>
-                <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  {t("step4.title")}
-                </h2>
-                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  {t("step4.desc")}
-                </p>
-              </div>
-
-              {/* Two-Column Spaces Architecture */}
-              <SpacesSelector
-                spaces={spaces}
-                onChange={(updatedSpaces) => setSpaces(updatedSpaces)}
-              />
-
-              {/* Action Navigation Footer (Screen 3 Reference) */}
-              <div className="flex items-center justify-between border-t border-border/80 pt-6">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
-                >
-                  {t("wizard.back")}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="group inline-flex items-center gap-2 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
-                >
-                  <span>{t("wizard.next")}</span>
-                  {isRTL ? (
-                    <ArrowLeft
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:-translate-x-1"
-                    />
-                  ) : (
-                    <ArrowRight
-                      size={13}
-                      weight="bold"
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 5: Design Brief Review (Screen 4 from Reference) */}
-          {currentStep === 5 && (
-            <div className="flex flex-col gap-10 animate-in fade-in duration-300">
-              <div>
-                <div className="flex items-center gap-2.5">
-                  <span className="h-px w-6 bg-foreground/40" />
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
-                    {t(currentStepDef.eyebrowKey)}
-                  </span>
-                </div>
-                <h2 className="mt-3 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  {t("step5.title")}
-                </h2>
-                <p className="mt-2.5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  {t("step5.desc")}
-                </p>
-              </div>
-
-              {/* Project Review Card */}
-              <ProjectReviewCard
-                title={projectName}
-                propertyType={propertyType}
-                areaSqm={areaSqm}
-                city={city}
-                compound={compound}
-                styleName={t(`style.${selectedStyle.id}`) || selectedStyle.name}
-                styleImage={selectedStyle.imageSrc}
-                spaces={spaces}
-                notes={notes}
-                onEditProperty={() => goToStep(2)}
-                onEditStyle={() => goToStep(3)}
-                onEditSpaces={() => goToStep(4)}
-                onNotesChange={(newNotes) => setNotes(newNotes)}
-              />
-
-              {/* Action Navigation Footer */}
-              <div className="flex items-center justify-between border-t border-border/80 pt-6">
-                <button
-                  type="button"
-                  onClick={handleBack}
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground cursor-pointer"
-                >
-                  {t("wizard.back")}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleFinalSubmit}
                   disabled={createMutation.isPending}
-                  className="group inline-flex items-center gap-2.5 rounded-full bg-primary px-9 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-editorial transition-all duration-200 hover:shadow-lg hover:shadow-black/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                  className="group inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#FAF7F2] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 dark:bg-[#FAF7F2] dark:text-[#1C1917]"
                 >
                   {createMutation.isPending ? (
                     <>
                       <Spinner className="h-4 w-4" />
-                      <span>{t("step5.cta_creating")}</span>
+                      <span>{t("step5.cta_creating") || "Creating..."}</span>
                     </>
                   ) : (
                     <>
-                      <span>{t("step5.cta_confirm")}</span>
+                      <span>
+                        {currentStep === 2
+                          ? (isRTL ? "المتابعة إلى المساحات" : "Continue to Spaces")
+                          : currentStep === 3
+                          ? (isRTL ? "المتابعة إلى الطراز" : "Continue to Your Style")
+                          : currentStep === 4
+                          ? (isRTL ? "المتابعة لكراسة المواصفات" : "Continue to Design Brief")
+                          : (isRTL ? "تأكيد وإرسال كراسة المواصفات" : "Confirm & Submit Brief")}
+                      </span>
                       {isRTL ? (
-                        <ArrowLeft
-                          size={13}
-                          weight="bold"
-                          className="transition-transform group-hover:-translate-x-1"
-                        />
+                        <ArrowLeft size={13} weight="bold" className="transition-transform group-hover:-translate-x-1" />
                       ) : (
-                        <ArrowRight
-                          size={13}
-                          weight="bold"
-                          className="transition-transform group-hover:translate-x-1"
-                        />
+                        <ArrowRight size={13} weight="bold" className="transition-transform group-hover:translate-x-1" />
                       )}
                     </>
                   )}
@@ -738,53 +609,8 @@ function CreateProjectContent() {
               </div>
             </div>
           )}
-
-          {/* STEP 6: Confirmation / Handoff */}
-          {currentStep === 6 && (
-            <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in duration-300">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground/5 text-foreground mb-6 shadow-xs ring-4 ring-foreground/10 animate-bounce">
-                <CheckCircle size={36} weight="fill" />
-              </div>
-
-              <div className="flex items-center gap-2.5 mb-2">
-                <span className="h-px w-6 bg-foreground/40" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
-                  {t("step6.confirmed_badge")}
-                </span>
-                <span className="h-px w-6 bg-foreground/40" />
-              </div>
-
-              <h2 className="font-serif text-3xl sm:text-4xl font-normal tracking-tight text-foreground">
-                {t("step6.title")}
-              </h2>
-
-              <p className="mt-3 max-w-md text-sm text-muted-foreground leading-relaxed">
-                {t("step6.desc")}
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                {createdProjectId && (
-                  <Link
-                    href={`/projects/${createdProjectId}`}
-                    className="inline-flex items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-editorial transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    <span>{t("step6.cta_workspace")}</span>
-                    {isRTL ? <ArrowLeft size={13} weight="bold" /> : <ArrowRight size={13} weight="bold" />}
-                  </Link>
-                )}
-
-                <Link
-                  href="/projects"
-                  className="inline-flex items-center gap-2 rounded-full border border-border/80 bg-card px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-foreground shadow-2xs transition-all hover:bg-muted"
-                >
-                  <FolderOpen size={14} />
-                  <span>{t("step6.cta_portfolio")}</span>
-                </Link>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
@@ -793,8 +619,8 @@ export default function CreateProjectShellPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="flex h-64 items-center justify-center">
-          <Spinner className="h-8 w-8 text-primary" />
+        <div className="flex h-screen items-center justify-center bg-[#F4EEE5] dark:bg-[#121214]">
+          <Spinner className="h-8 w-8 text-[#1C1917] dark:text-[#FAF7F2]" />
         </div>
       }
     >

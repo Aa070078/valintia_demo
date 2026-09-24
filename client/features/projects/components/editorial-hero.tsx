@@ -179,7 +179,7 @@ export function EditorialHero() {
 
             {/* Right Floating 3D Warm Glass Card (Reference Design) */}
             <div className="lg:col-span-4 flex justify-end">
-              <div className="w-full max-w-md rounded-3xl border border-white/80 bg-white/85 p-6 shadow-3d-floating backdrop-blur-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-white/10 dark:bg-card/85">
+              <div className="w-full max-w-md rounded-3xl border border-white/70 bg-[#FAF7F2]/90 p-6 shadow-3d-floating backdrop-blur-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-white/10 dark:bg-card/85">
                 <div className="flex items-center justify-between pb-2">
                   <h3 className="font-serif text-2xl font-medium tracking-tight text-foreground">
                     {t("hero.floating_title_1")} <br />
@@ -208,7 +208,7 @@ export function EditorialHero() {
 
                   {/* '+' Explore Button */}
                   <Link
-                    href="/projects/new?step=3"
+                    href="/projects/new?step=4"
                     aria-label="Explore Styles"
                     className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-border bg-background/50 text-muted-foreground transition-all duration-200 hover:border-foreground hover:bg-foreground/5 hover:text-foreground active:scale-95 cursor-pointer group/btn"
                   >
