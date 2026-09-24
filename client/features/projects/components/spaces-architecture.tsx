@@ -285,7 +285,7 @@ export function SpacesArchitecture({
               </div>
 
               {/* Bottom Legend on image */}
-              <div className="absolute bottom-3 left-3 z-10 flex items-center gap-4 rounded-xl bg-[#FAF7F2]/90 px-3.5 py-1.5 backdrop-blur-md border border-[#E2D7C8] shadow-2xs text-[10px] font-medium text-[#1C1917] dark:border-[#2C2C32] dark:bg-[#1A1A1E]/90 dark:text-[#FAF7F2]">
+              <div className="absolute bottom-3 start-3 z-10 flex items-center gap-4 rounded-xl bg-[#FAF7F2]/90 px-3.5 py-1.5 backdrop-blur-md border border-[#E2D7C8] shadow-2xs text-[10px] font-medium text-[#1C1917] dark:border-[#2C2C32] dark:bg-[#1A1A1E]/90 dark:text-[#FAF7F2]">
                 <div className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-[#1C1917] dark:bg-white" />
                   <span>{t("step3.legend_included") || "Included in Fit-Out"}</span>
@@ -367,7 +367,7 @@ export function SpacesArchitecture({
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
                     />
                   </div>
-                  <div>
+                  <div className="text-start">
                     <h4
                       className={cn(
                         "text-xs font-semibold tracking-tight transition-colors",
@@ -436,7 +436,7 @@ export function SpacesArchitecture({
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#EDE6DC] text-[#1C1917] dark:bg-[#2C2C32] dark:text-[#FAF7F2]">
                     <span className="font-serif text-xs font-bold">Custom</span>
                   </div>
-                  <div>
+                  <div className="text-start">
                     <h4 className="text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2]">
                       {customSpace.name}
                     </h4>

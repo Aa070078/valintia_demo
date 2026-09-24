@@ -187,7 +187,7 @@ export function AestheticDirection({
       {/* Top Controls: Allow Atelier Blend toggle */}
       <div className="flex items-center justify-end">
         <div className="flex items-center gap-3 rounded-2xl border border-[#E2D7C8] bg-[#FAF7F2] px-4 py-2.5 shadow-2xs dark:border-[#2C2C32] dark:bg-[#1A1A1E]">
-          <div className="flex flex-col text-left">
+          <div className="flex flex-col text-start">
             <span className="text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2]">
               {t("step4.allow_blend") || "Allow Atelier Blend"}
             </span>
@@ -302,7 +302,7 @@ export function AestheticDirection({
                 key={dir.id}
                 onClick={() => onSelectStyle(dir.id)}
                 className={cn(
-                  "group relative flex flex-col overflow-hidden rounded-2xl border text-left transition-all duration-200 cursor-pointer select-none bg-[#FAF7F2] dark:bg-[#1A1A1E]",
+                  "group relative flex flex-col overflow-hidden rounded-2xl border text-start transition-all duration-200 cursor-pointer select-none bg-[#FAF7F2] dark:bg-[#1A1A1E]",
                   isSelected
                     ? "border-[#1C1917] ring-2 ring-[#1C1917]/20 shadow-md -translate-y-0.5"
                     : "border-[#E2D7C8] hover:border-[#1C1917]/40 hover:-translate-y-0.5 dark:border-[#2C2C32]"
@@ -319,7 +319,7 @@ export function AestheticDirection({
 
                   {/* Selected Checkmark Badge */}
                   {isSelected && (
-                    <div className="absolute top-2 right-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#1C1917] shadow-xs">
+                    <div className="absolute top-2 end-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#1C1917] shadow-xs">
                       <Check size={11} weight="bold" />
                     </div>
                   )}
@@ -328,7 +328,7 @@ export function AestheticDirection({
                   <button
                     type="button"
                     onClick={(e) => toggleFavorite(e, dir.id)}
-                    className="absolute bottom-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white/80 text-[#1C1917] backdrop-blur-xs shadow-2xs hover:scale-110 active:scale-90 transition-transform"
+                    className="absolute bottom-2 end-2 z-10 flex h-6 w-6 items-center justify-center rounded-full bg-white/80 text-[#1C1917] backdrop-blur-xs shadow-2xs hover:scale-110 active:scale-90 transition-transform"
                     aria-label="Favorite"
                   >
                     <Heart

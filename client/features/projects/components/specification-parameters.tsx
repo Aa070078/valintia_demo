@@ -3,6 +3,7 @@
 import * as React from "react";
 import { SlidersHorizontal, CaretDown } from "@phosphor-icons/react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface SpecificationParametersProps {
   title: string;
@@ -120,9 +121,17 @@ export function SpecificationParameters({
               type="number"
               value={displayArea || ""}
               onChange={(e) => handleAreaInput(e.target.value)}
-              className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2.5 pr-10 text-xs font-semibold text-[#1C1917] outline-none transition-colors focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
+              className={cn(
+                "w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] py-2.5 text-xs font-semibold text-[#1C1917] outline-none transition-colors focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]",
+                isRTL ? "pl-12 pr-3.5 text-start" : "pr-12 pl-3.5"
+              )}
             />
-            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-mono text-[10px] font-bold text-[#8C847B] uppercase">
+            <span
+              className={cn(
+                "pointer-events-none absolute top-1/2 -translate-y-1/2 font-mono text-[10px] font-bold text-[#8C847B] uppercase",
+                isRTL ? "left-3.5" : "right-3.5"
+              )}
+            >
               {unit === "sqm" ? "M²" : "SQFT"}
             </span>
           </div>
@@ -140,7 +149,10 @@ export function SpecificationParameters({
             <select
               value={region}
               onChange={(e) => onRegionChange(e.target.value)}
-              className="w-full appearance-none rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2.5 text-xs font-medium text-[#1C1917] outline-none transition-colors focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2] cursor-pointer"
+              className={cn(
+                "w-full appearance-none rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] py-2.5 text-xs font-medium text-[#1C1917] outline-none transition-colors focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2] cursor-pointer",
+                isRTL ? "pl-10 pr-3.5 text-start" : "pr-10 pl-3.5"
+              )}
             >
               {regions.map((r) => (
                 <option key={r.id} value={r.label} className="bg-[#FAF7F2] text-[#1C1917]">
@@ -151,7 +163,10 @@ export function SpecificationParameters({
             <CaretDown
               size={13}
               weight="bold"
-              className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#78716C]"
+              className={cn(
+                "pointer-events-none absolute top-1/2 -translate-y-1/2 text-[#78716C]",
+                isRTL ? "left-3.5" : "right-3.5"
+              )}
             />
           </div>
           <span className="text-[10px] text-[#8C847B] dark:text-[#989692]">

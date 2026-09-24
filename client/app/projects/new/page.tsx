@@ -126,14 +126,8 @@ function CreateProjectContent() {
   const { t, language, toggleLanguage, isRTL } = useLanguage();
 
   const stepQuery = Number(searchParams.get("step"));
-  const initialStep = stepQuery >= 1 && stepQuery <= 6 ? stepQuery : 1;
-  const [currentStep, setCurrentStep] = React.useState<number>(initialStep);
-
-  React.useEffect(() => {
-    if (stepQuery >= 1 && stepQuery <= 6 && stepQuery !== currentStep) {
-      setCurrentStep(stepQuery);
-    }
-  }, [stepQuery, currentStep]);
+  const [internalStep, setInternalStep] = React.useState<number>(1);
+  const currentStep = stepQuery >= 1 && stepQuery <= 6 ? stepQuery : internalStep;
 
   // Form State
   const [propertyType, setPropertyType] = React.useState<PropertyType>("villa");
@@ -175,7 +169,7 @@ function CreateProjectContent() {
     AESTHETIC_DIRECTIONS[0];
 
   const goToStep = (stepNumber: number) => {
-    setCurrentStep(stepNumber);
+    setInternalStep(stepNumber);
     router.replace(`/projects/new?step=${stepNumber}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -221,7 +215,7 @@ function CreateProjectContent() {
     <div className="flex min-h-screen flex-col bg-[#F4EEE5] text-[#1C1917] selection:bg-[#1C1917] selection:text-[#FAF7F2] dark:bg-[#121214] dark:text-[#FAF7F2]">
       {/* Top Navigation Bar (Matching All Reference Images) */}
       <header className="sticky top-0 z-40 w-full border-b border-[#E2D7C8] bg-[#F4EEE5]/90 backdrop-blur-md dark:border-[#2C2C32] dark:bg-[#121214]/90">
-        <div className="flex h-16 w-full items-center justify-between px-6 sm:px-10">
+        <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-10">
           {/* Brand Lockup */}
           <div className="flex items-center gap-3">
             <Link
@@ -242,7 +236,7 @@ function CreateProjectContent() {
                 </svg>
               </div>
               <span className="font-sans text-xs font-bold tracking-[0.24em] text-[#1C1917] dark:text-[#FAF7F2]">
-                VALENTIA INTERIOR ATELIER
+                {isRTL ? "فالنتيا • استوديو التصميم المعماري" : "VALENTIA INTERIOR ATELIER"}
               </span>
             </Link>
           </div>
@@ -553,8 +547,8 @@ function CreateProjectContent() {
 
           {/* Bottom Action Bar (Matching Images 2, 3, 4, 5) */}
           {currentStep >= 2 && currentStep <= 5 && (
-            <div className="sticky bottom-0 z-30 -mx-5 sm:-mx-8 lg:-mx-12 -mb-5 sm:-mb-8 lg:-mb-12 mt-12 border-t border-[#E2D7C8] bg-[#F4EEE5]/95 backdrop-blur-md px-6 sm:px-10 py-4 shadow-sm dark:border-[#2C2C32] dark:bg-[#121214]/95">
-              <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
+            <div className="sticky bottom-0 z-30 -mx-5 sm:-mx-8 lg:-mx-12 -mb-5 sm:-mb-8 lg:-mb-12 mt-12 border-t border-[#E2D7C8] bg-[#F4EEE5]/95 backdrop-blur-md px-4 sm:px-8 lg:px-10 py-3.5 sm:py-4 pb-[max(0.875rem,env(safe-area-inset-bottom))] shadow-sm dark:border-[#2C2C32] dark:bg-[#121214]/95">
+              <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 sm:gap-4">
                 {/* Back / Skip Action */}
                 <button
                   type="button"
@@ -586,7 +580,7 @@ function CreateProjectContent() {
                   type="button"
                   onClick={handleNext}
                   disabled={createMutation.isPending}
-                  className="group inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#FAF7F2] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 dark:bg-[#FAF7F2] dark:text-[#1C1917]"
+                  className="group inline-flex items-center gap-2 sm:gap-2.5 rounded-full bg-[#1C1917] px-5 sm:px-8 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#FAF7F2] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 dark:bg-[#FAF7F2] dark:text-[#1C1917]"
                 >
                   {createMutation.isPending ? (
                     <>

@@ -282,8 +282,8 @@ export function ProjectReviewCard({
           rows={3}
           value={notes || ""}
           onChange={(e) => onNotesChange?.(e.target.value)}
-          placeholder={t("step5.notes_placeholder")}
-          className="w-full rounded-xl border border-border/70 bg-background/50 p-4 text-xs sm:text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-1 focus:ring-foreground leading-relaxed resize-none"
+          dir={isRTL ? "rtl" : "ltr"}
+          className="w-full rounded-xl border border-border/70 bg-background/50 p-4 text-xs sm:text-sm text-foreground outline-none transition-colors focus:border-foreground focus:ring-1 focus:ring-foreground leading-relaxed resize-none text-start"
         />
       </div>
     </div>
