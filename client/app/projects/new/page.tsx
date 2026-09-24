@@ -126,8 +126,14 @@ function CreateProjectContent() {
   const { t, language, toggleLanguage, isRTL } = useLanguage();
 
   const stepQuery = Number(searchParams.get("step"));
-  const initialStep = stepQuery >= 1 && stepQuery <= 6 ? stepQuery : 2;
+  const initialStep = stepQuery >= 1 && stepQuery <= 6 ? stepQuery : 1;
   const [currentStep, setCurrentStep] = React.useState<number>(initialStep);
+
+  React.useEffect(() => {
+    if (stepQuery >= 1 && stepQuery <= 6 && stepQuery !== currentStep) {
+      setCurrentStep(stepQuery);
+    }
+  }, [stepQuery, currentStep]);
 
   // Form State
   const [propertyType, setPropertyType] = React.useState<PropertyType>("villa");
@@ -303,7 +309,7 @@ function CreateProjectContent() {
                     type="button"
                     onClick={() => goToStep(step.id)}
                     className={cn(
-                      "group flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all duration-200 cursor-pointer select-none text-left",
+                      "group flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all duration-200 cursor-pointer select-none text-start",
                       isCurrent
                         ? "bg-[#E5DCD0] font-semibold text-[#1C1917] shadow-2xs dark:bg-[#2C2C32] dark:text-[#FAF7F2]"
                         : "text-[#6E6760] hover:bg-[#EAE2D6]/70 hover:text-[#1C1917] dark:text-[#989692] dark:hover:bg-[#24242A]"

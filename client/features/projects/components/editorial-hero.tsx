@@ -77,9 +77,16 @@ export function EditorialHero() {
             alt="Valentia Luxury Residence Interior Overlooking Pyramids"
             className="h-full w-full object-cover object-[65%_center] filter brightness-[1.02] contrast-[1.02] transition-transform duration-1000 ease-out hover:scale-[1.01]"
           />
-          {/* Multi-layer architectural gradients for exquisite readability & depth */}
-          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/65 to-transparent backdrop-contrast-[1.02]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-background/25" />
+          {/* Soft natural architectural scrim - preserves rich sunlit pyramids and interior view */}
+          <div
+            className={cn(
+              "absolute inset-0 pointer-events-none transition-all duration-500",
+              isRTL
+                ? "bg-gradient-to-l from-background/55 via-background/20 to-transparent"
+                : "bg-gradient-to-r from-background/55 via-background/20 to-transparent"
+            )}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-black/10 pointer-events-none" />
         </div>
 
         {/* Content Container */}
@@ -124,7 +131,7 @@ export function EditorialHero() {
             </div>
 
             {/* Center-Left Editorial Headline & CTAs */}
-            <div className="flex flex-col justify-center lg:col-span-6">
+            <div className="flex flex-col justify-center lg:col-span-6 text-start">
               {/* Eyebrow with dash rule */}
               <div className="flex items-center gap-2.5">
                 <span className="h-px w-7 bg-foreground/40" />
@@ -147,7 +154,7 @@ export function EditorialHero() {
               {/* Action Buttons Row with Micro-Interactions */}
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
-                  href="/projects/new?step=2"
+                  href="/projects/new"
                   className="group inline-flex items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-black/20 hover:scale-[1.03] active:scale-[0.96]"
                 >
                   <span>{t("hero.cta_start")}</span>
@@ -169,7 +176,7 @@ export function EditorialHero() {
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground/5 text-foreground transition-all duration-300 group-hover:scale-115 group-hover:bg-foreground group-hover:text-background">
                     <Play size={11} weight="fill" className="ml-0.5" />
                   </div>
-                  <div className="flex flex-col text-left">
+                  <div className="flex flex-col text-start">
                     <span className="tracking-wide">{t("hero.cta_watch")}</span>
                     <span className="text-[10px] text-muted-foreground">{t("hero.cta_watch_duration")}</span>
                   </div>

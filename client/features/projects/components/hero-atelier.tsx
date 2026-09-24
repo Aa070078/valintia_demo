@@ -3,6 +3,7 @@
 import * as React from "react";
 import { ArrowRight, ArrowLeft, Play, Plus, X, SlidersHorizontal, ShieldCheck } from "@phosphor-icons/react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface HeroAtelierProps {
   onStart: () => void;
@@ -39,9 +40,16 @@ export function HeroAtelier({ onStart, onExploreMood }: HeroAtelierProps) {
             alt="Valentia Luxury Residence Interior Overlooking Pyramids"
             className="h-full w-full object-cover object-[65%_center] filter brightness-[1.02] contrast-[1.02]"
           />
-          {/* Architectural gradients for depth & flawless readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#F4EEE5]/95 via-[#F4EEE5]/70 to-transparent dark:from-[#121214]/95 dark:via-[#121214]/70 dark:to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F4EEE5]/90 via-transparent to-[#F4EEE5]/20 dark:from-[#121214]/90 dark:to-[#121214]/20" />
+          {/* Soft natural architectural scrim - preserves rich sunlit pyramids and interior view */}
+          <div
+            className={cn(
+              "absolute inset-0 pointer-events-none transition-all duration-500",
+              isRTL
+                ? "bg-gradient-to-l from-[#F4EEE5]/50 via-[#F4EEE5]/20 to-transparent dark:from-[#121214]/65 dark:via-[#121214]/25 dark:to-transparent"
+                : "bg-gradient-to-r from-[#F4EEE5]/50 via-[#F4EEE5]/20 to-transparent dark:from-[#121214]/65 dark:via-[#121214]/25 dark:to-transparent"
+            )}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F4EEE5]/40 via-transparent to-black/10 dark:from-[#121214]/55 dark:via-transparent dark:to-black/30 pointer-events-none" />
         </div>
 
         {/* Content Container */}
@@ -49,7 +57,7 @@ export function HeroAtelier({ onStart, onExploreMood }: HeroAtelierProps) {
           {/* Main Stage Grid */}
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
             {/* Center-Left Editorial Headline & CTAs */}
-            <div className="flex flex-col justify-center lg:col-span-7">
+            <div className="flex flex-col justify-center lg:col-span-7 text-start">
               {/* Eyebrow */}
               <div className="flex items-center gap-2.5">
                 <span className="h-px w-6 bg-[#1C1917]/40 dark:bg-[#FAF7F2]/40" />
@@ -95,7 +103,7 @@ export function HeroAtelier({ onStart, onExploreMood }: HeroAtelierProps) {
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1C1917]/10 text-[#1C1917] dark:bg-white/10 dark:text-white">
                     <Play size={11} weight="fill" className="ml-0.5" />
                   </div>
-                  <div className="flex flex-col text-left">
+                  <div className="flex flex-col text-start">
                     <span className="text-[11px] font-semibold">{t("hero.cta_watch") || "Watch how it works"}</span>
                     <span className="text-[9px] text-[#78716C] dark:text-[#989692]">
                       {t("hero.cta_watch_duration") || "2 min"}
