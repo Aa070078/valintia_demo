@@ -1,32 +1,41 @@
-import { Geist, Geist_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google"
+import type { Metadata } from "next";
+import { Inter, Cormorant_Garamond } from "next/font/google";
 
-import "./globals.css"
-import { Providers } from "@/components/providers"
+import "./globals.css";
+import { Providers } from "@/components/providers";
 import { cn } from "@/lib/utils";
 
-const spaceGroteskHeading = Space_Grotesk({subsets:['latin'],variable:'--font-heading'});
-
-const ibmPlexSans = IBM_Plex_Sans({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-mono",
-})
+  variable: "--font-heading",
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+
+export const metadata: Metadata = {
+  title: "Valentia — Design & Build",
+  description: "Interior Design & Fit-Out Management Platform",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", ibmPlexSans.variable, spaceGroteskHeading.variable)}
+      className={cn("antialiased", inter.variable, cormorant.variable, "font-sans")}
     >
-      <body>
+      <body className="min-h-screen bg-background text-foreground">
         <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

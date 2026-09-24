@@ -1,0 +1,79 @@
+{
+  "source": "C:\\Users\\Ahmed\\Downloads\\ChatGPT Image Sep 5, 2026, 03_11_31 PM.png",
+  "source_size": [1536, 1024],
+  "svg_note": "Each SVG is a lossless self-contained SVG wrapper around the exact PNG crop, preserving the supplied raster artwork without generative changes.",
+  "variants": [
+    {
+      "name": "01-symbol-primary",
+      "source_box": [80, 35, 490, 410],
+      "size": [410, 375],
+      "png_sha256": "7e34f1e66c5d6441237fccd89afb0ab6605030e87263defe41d609e9c7e6798e"
+    },
+    {
+      "name": "02-logo-stacked",
+      "source_box": [520, 20, 1130, 445],
+      "size": [610, 425],
+      "png_sha256": "92c613fb5683d632e97cb7dedacee62174e278c2d4ad68763e8fc34347bf3725"
+    },
+    {
+      "name": "03-app-icon",
+      "source_box": [1212, 45, 1472, 296],
+      "size": [260, 251],
+      "png_sha256": "d138ed89510c78933c2d88e747f0839955f899ab071a44083f4245e9a06406bf"
+    },
+    {
+      "name": "04-logo-horizontal-left",
+      "source_box": [75, 435, 620, 595],
+      "size": [545, 160],
+      "png_sha256": "afaaa3ee012d8dcfa09fa68dd754b153502de26f21968866fc658dffe10e8aab"
+    },
+    {
+      "name": "05-wordmark-centered",
+      "source_box": [680, 462, 1203, 596],
+      "size": [523, 134],
+      "png_sha256": "ad68ae7e3ad1644c7f007c87ae9a5d401f4275ecf59d689efafb6f05d7e1f9d3"
+    },
+    {
+      "name": "06-logo-compact-right",
+      "source_box": [1210, 345, 1498, 595],
+      "size": [288, 250],
+      "png_sha256": "0819eda714edc5ff75ea5c2102a6e3dd047e036931ea4cb972958f9eed5a7e40"
+    },
+    {
+      "name": "07-symbol-construction-grid",
+      "source_box": [90, 600, 370, 816],
+      "size": [280, 216],
+      "png_sha256": "f1d180deba696e6dec1309bfecacce5e0a6e196e0fef588687af5388bae82470"
+    },
+    {
+      "name": "08-logo-horizontal-compact",
+      "source_box": [525, 620, 910, 770],
+      "size": [385, 150],
+      "png_sha256": "4d5901e8f7f49780a5294ffe45cdcf101aa532621b4f848984deefb44dc15ef8"
+    },
+    {
+      "name": "09-wordmark-only",
+      "source_box": [1080, 645, 1490, 760],
+      "size": [410, 115],
+      "png_sha256": "bc9c1afd5422451f3d318a409fc667c138273f121e14ae6b14265c88b1290692"
+    },
+    {
+      "name": "10-alternative-mark-v",
+      "source_box": [1195, 844, 1310, 982],
+      "size": [115, 138],
+      "png_sha256": "f5c922478be77ed9d03ccb42e0d2912b3ac56fcad285a3020e8625a4392e5ec0"
+    },
+    {
+      "name": "11-alternative-mark-3",
+      "source_box": [1312, 842, 1402, 982],
+      "size": [90, 140],
+      "png_sha256": "1a81eb4867ccfafea1303109d8350fcb8004b5f63fbae9516f2028c1ea46b4e7"
+    },
+    {
+      "name": "12-alternative-mark-d",
+      "source_box": [1406, 842, 1494, 982],
+      "size": [88, 140],
+      "png_sha256": "1b423438e799985a156aba65473ec7a8ef458c071a43d4000f3fe06fb5bd9fa6"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-label="Valentia Design and Build logo">
+  <rect width="1200" height="1200" fill="#D8C9B8"/>
+  <rect x="52" y="52" width="1096" height="1096" rx="235" fill="none" stroke="#C79A6B" stroke-width="28"/>
+      <g transform="translate(100 100)"><g fill="none" stroke="#4B3A2B" stroke-width="38" stroke-linecap="square" stroke-linejoin="miter" opacity="1">
+      <path d="M165 230 L505 30 L505 790"/>
+      <path d="M190 300 L505 905 L700 690"/>
+    </g>
+<g fill="none" stroke="#6E6E6E" stroke-width="42" stroke-linecap="square" stroke-linejoin="round" opacity="1">
+      <path d="M525 225 H600 C710 225 775 286 775 377 C775 468 708 527 602 527 H525"/>
+      <path d="M525 527 H612 C730 527 800 594 800 690 C800 789 728 845 612 845 H540"/>
+    </g>
+<path d="M545 190 H650 A310 310 0 0 1 650 810 H545" fill="none" stroke="#C79A6B" stroke-width="44" stroke-linecap="square" stroke-linejoin="round" opacity="1"/>
+<g fill="#4B3A2B" opacity="1">
+      <path d="M640 732 L782 574 L806 596 L664 754 Z"/>
+      <path d="M640 732 L625 776 L664 754 Z"/>
+      <circle cx="650" cy="743" r="8" fill="#C79A6B"/>
+    </g></g>
+</svg>
