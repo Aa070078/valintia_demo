@@ -1,0 +1,24 @@
+---
+description: Next.js client (customer app) conventions and skill pointers for fitout/client.
+globs:
+  - client/**
+alwaysApply: false
+---
+
+# Client (Next)
+
+- Customer-facing **Valentia** Next.js app. Port defaults to 3000 (`npm run dev`).
+- This is **not** the Next.js from training data — read `client/node_modules/next/dist/docs/` before using Next APIs (else official docs). Heed deprecation notices. Skill: `nextjs-16`.
+- Talk to the shared Nest API (`server/`); do not invent a second domain backend.
+- UI: follow [`design.md`](../../design.md); tokens only (no raw hex). Stack: `.cursor/rules/frontend-stack.mdc`.
+- Prefer existing UI stack (shadcn / Tailwind / Phosphor).
+
+## Skills
+
+- Next/React: `nextjs-16`, `react-dev`, `react-useeffect`
+- Forms / data / state / realtime: `form-validation`, `data-fetching`, `state-management`, `realtime-sockets`
+- UI: `frontend-design`, `ui-ux-pro-max`
+- API needs: `frontend-to-backend-requirements`
+- Build/test: `implement`, `tdd`, `code-review`
+
+Audit file changes under `releases/client.md` (see release-logging rule).

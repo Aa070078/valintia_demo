@@ -1,0 +1,28 @@
+---
+description: NestJS server conventions and skill pointers for fitout/server.
+globs:
+  - server/**
+alwaysApply: false
+---
+
+# Server (Nest)
+
+- Nest 11 + Prisma 7 + Redis. Source under `server/src/`.
+- Typed config via `registerAs` in `server/src/infrastructure/config/` — no secrets in code; use `.env` / `.env.example`.
+- Database only through `PrismaService`; Redis through `RedisService`.
+- Global API prefix `api`. Health: `GET /api/health`.
+- Swagger: `server/src/infrastructure/swagger/setup-swagger.ts`. Document new endpoints with `@ApiTags` / `@ApiOperation`. Prod Basic Auth on docs/YAML when `NODE_ENV=production` (`SWAGGER_USER` / `SWAGGER_PASSWORD`).
+- OpenAPI YAML: `/yaml`, `/ymal`, `/api/yaml`, `/api/ymal`.
+- This API is **not** multi-tenant — do not reintroduce tenant context.
+- Business guardrails: [`valentia-business.md`](../../valentia-business.md) + skill `nestjs-patterns` (payment gates, RBAC, audit ≠ activity timeline, no double booking, AI non-authority, data-trust precedence).
+
+## Skills
+
+- Patterns / BRD API: **`nestjs-patterns`**
+- Schema: `database-schema-designer`
+- Contracts for FE: `backend-to-frontend-handoff-docs`, `openapi-to-typescript`
+- Realtime: `realtime-sockets`
+- Build/test: `tdd`, `implement`, `code-review`
+- Hard bugs: `diagnosing-bugs`
+
+Audit file changes under `releases/server.md` (see release-logging rule).

@@ -1,0 +1,14 @@
+---
+description: Valentia product context — brand, business, and design pointers. Always active.
+globs:
+alwaysApply: true
+---
+
+# Valentia context
+
+- **Product name:** Valentia — Design & Build (repo folder remains `fitout/`).
+- **No multi-tenant model** on this platform.
+- Before **feature / workflow / money / roles / AI** work: read [`valentia-business.md`](valentia-business.md). Full narrative: `Business Requirements Document (BRD).md`.
+- Before **UI / theming / components**: read [`design.md`](design.md). Generated supplement: `design-system/valentia/MASTER.md`.
+- Skill routing: `.cursor/rules/fitout-workflow.mdc`. Unsure → skill `ask-matt`.
+- After file changes: release-logging → `releases/` per app + index.

@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fitout-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: fitout
+      POSTGRES_PASSWORD: fitout
+      POSTGRES_DB: fitout
+    volumes:
+      - fitout_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitout -d fitout"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: fitout-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - fitout_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  fitout_pg_data:
+  fitout_redis_data:

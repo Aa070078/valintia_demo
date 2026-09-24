@@ -1,0 +1,43 @@
+---
+description: Fitout skill routing — map tasks to existing .cursor/skills (ask-matt flow). Always active.
+globs:
+alwaysApply: true
+---
+
+# Fitout workflow (skills)
+
+Route work through skills already under `.cursor/skills/`. Do **not** invent new skills. Prefer progressive disclosure: open the skill’s `SKILL.md` when needed; do not paste full skill bodies into chat.
+
+If unsure which path fits → use skill **`ask-matt`**.
+
+## Main flow (from ask-matt)
+
+| Situation | Skill(s) |
+|-----------|----------|
+| Ambiguous / design / architecture | `grill-with-docs` (preferred in-repo) → then `to-spec` / `to-tickets` if multi-session |
+| Foggy greenfield / huge effort | `wayfinder` → `to-spec` → `to-tickets` → `implement` |
+| Clear small feature | `implement` (drives `tdd` + `code-review`) |
+| Incoming bugs/requests (external) | `triage` → `implement` |
+| Hard / intermittent bug | `diagnosing-bugs` |
+| FE needs BE contract | `frontend-to-backend-requirements` |
+| BE done, FE needs docs | `backend-to-frontend-handoff-docs` |
+| OpenAPI → FE types | `openapi-to-typescript` |
+| Schema design | `database-schema-designer` |
+| UI polish / design system | `frontend-design`, `ui-ux-pro-max` (+ read `design.md`) |
+| Next.js 16 App Router | `nextjs-16` |
+| Forms / validation | `form-validation` |
+| HTTP + cache (axios / Query) | `data-fetching` |
+| Client UI state | `state-management` |
+| Live updates / sockets | `realtime-sockets` |
+| Nest modules / BRD API rules | `nestjs-patterns` |
+| React/Next patterns | `react-dev`, `react-useeffect`, `nextjs-16` |
+| Session pause / context full | `handoff` or `session-handoff` |
+| Unsure which path | `ask-matt` |
+
+## Fitout defaults
+
+- Product brand: **Valentia — Design & Build**. Apps: `client/` (customer Next), `dashboard/` (admin Next), `server/` (Nest API). **No multi-tenant model.**
+- Business: `valentia-business.md`. Design: `design.md`.
+- Prefer Plan mode for multi-app or schema decisions; Agent mode for implementation.
+- After any file-changing task: follow the **release-logging** rule (`releases/` index + per-app logs).
+- Ignore duplicate skill folders (`session-handoff copy`, `gepetto copy`) — do not wire them into flows.

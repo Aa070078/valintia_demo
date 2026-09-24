@@ -1,0 +1,30 @@
+---
+description: Mandated frontend data/UI stack for Valentia client and dashboard.
+globs:
+  - client/**
+  - dashboard/**
+alwaysApply: false
+---
+
+# Frontend stack (Valentia)
+
+Documented standards (install when implementing — not necessarily present yet):
+
+| Concern | Standard | Skill |
+|---------|----------|--------|
+| Framework | Next.js 16 App Router + React 19 | `nextjs-16` |
+| Forms | react-hook-form + Zod | `form-validation` |
+| Server state | axios + TanStack Query | `data-fetching` |
+| Client/UI state | Zustand | `state-management` |
+| Realtime | Socket.IO (Nest ↔ Next) | `realtime-sockets` |
+| UI kit | shadcn / Tailwind v4 / Phosphor | `frontend-design`, `ui-ux-pro-max` |
+| React patterns | — | `react-dev`, `react-useeffect` |
+
+## Rules
+
+- **No raw hex in components** — use tokens from `design.md`.
+- Server state in Query; UI state in Zustand; do not duplicate.
+- Labels on forms; field-level Zod errors; never trust client for payment/workflow truth.
+- Prefer Nest as the domain API; keep Next Route Handlers thin if used at all.
+
+Also follow `client-next.mdc` / `dashboard-next.mdc` for app-specific notes.

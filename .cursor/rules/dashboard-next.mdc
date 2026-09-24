@@ -1,0 +1,23 @@
+---
+description: Next.js dashboard (admin app) conventions and skill pointers for fitout/dashboard.
+globs:
+  - dashboard/**
+alwaysApply: false
+---
+
+# Dashboard (Next)
+
+- Admin / ops **Valentia** Next.js app. Dev port **3001**.
+- This is **not** the Next.js from training data — read `dashboard/node_modules/next/dist/docs/` before using Next APIs (else official docs). Skill: `nextjs-16`.
+- Shares Nest API in `server/`. Dense admin UX — tables, filters, safe destructive actions (`design.md` §8).
+- UI tokens from [`design.md`](../../design.md). Stack: `.cursor/rules/frontend-stack.mdc`.
+
+## Skills
+
+- Next/React: `nextjs-16`, `react-dev`, `react-useeffect`
+- Forms / data / state / realtime: `form-validation`, `data-fetching`, `state-management`, `realtime-sockets`
+- UI: `frontend-design`, **`ui-ux-pro-max`** for dense admin layouts
+- API needs: `frontend-to-backend-requirements`
+- Build/test: `implement`, `tdd`, `code-review`
+
+Audit file changes under `releases/dashboard.md` (see release-logging rule).
