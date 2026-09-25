@@ -1,7 +1,13 @@
 "use client";
 
 import * as React from "react";
-import type { User, UserRole, ProposedLoginDto, ProposedChangePasswordDto } from "../types";
+import type {
+  User,
+  UserRole,
+  ProposedLoginDto,
+  ProposedSignupDto,
+  ProposedChangePasswordDto,
+} from "../types";
 import { authApi } from "../api/auth.api";
 
 interface AuthContextValue {
@@ -11,6 +17,7 @@ interface AuthContextValue {
   requiresPasswordChange: boolean;
   isLoading: boolean;
   login: (dto: ProposedLoginDto) => Promise<{ redirectUrl?: string }>;
+  signup: (dto: ProposedSignupDto) => Promise<{ redirectUrl?: string }>;
   logout: () => Promise<void>;
   changePassword: (dto: ProposedChangePasswordDto) => Promise<boolean>;
   devSwitchRole: (role: UserRole) => Promise<{ redirectUrl?: string }>;
@@ -57,6 +64,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signup = async (dto: ProposedSignupDto): Promise<{ redirectUrl?: string }> => {
+    setIsLoading(true);
+    try {
+      const session = await authApi.signup(dto);
+      setUser(session.user);
+      return handleRoleRedirection(session.user.role);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const logout = async () => {
     await authApi.logout();
     setUser(null);
@@ -93,6 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     requiresPasswordChange: Boolean(user?.requiresPasswordChange),
     isLoading,
     login,
+    signup,
     logout,
     changePassword,
     devSwitchRole,

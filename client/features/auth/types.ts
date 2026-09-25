@@ -11,19 +11,24 @@
  * are provided by the backend team.
  */
 
-export type UserRole = "CUSTOMER" | "ENGINEER" | "PROJECT_MANAGER" | "ADMIN";
+export type UserRole =
+  | "CUSTOMER"
+  | "ENGINEER"
+  | "PROJECT_MANAGER"
+  | "COMPANY_OWNER"
+  | "ADMINISTRATOR"
+  | "ADMIN";
 
 export interface User {
-  id: string;
-  email: string;
+  id: number | string;
+  username: string;
+  email?: string;
   name: string;
   role: UserRole;
   /**
-   * Conceptually represents whether the user was issued a temporary password
-   * on first sign-in and must change it before continuing.
-   * Abstracted so backend field naming (e.g. MUST_CHANGE_PASSWORD, isTemporaryPassword)
-   * can be mapped in the API adapter.
+   * Directly maps to Prisma model User.mustChangePassword
    */
+  mustChangePassword?: boolean;
   requiresPasswordChange?: boolean;
   phone?: string;
   avatarUrl?: string;
@@ -35,8 +40,18 @@ export interface AuthSession {
 }
 
 export interface ProposedLoginDto {
-  email: string;
+  username?: string;
+  email?: string;
   password: string;
+  rememberMe?: boolean;
+}
+
+export interface ProposedSignupDto {
+  username: string;
+  password: string;
+  name?: string;
+  phone?: string;
+  role?: UserRole;
 }
 
 export interface ProposedChangePasswordDto {
@@ -47,11 +62,14 @@ export interface ProposedChangePasswordDto {
 /**
  * Target application destination by role.
  * CUSTOMER remains in the client application.
- * Internal staff are routed to the dashboard entry.
+ * Internal staff and executives are routed to the dashboard entry.
  */
 export const ROLE_DESTINATIONS: Record<UserRole, "client" | "dashboard"> = {
   CUSTOMER: "client",
   ENGINEER: "dashboard",
   PROJECT_MANAGER: "dashboard",
+  COMPANY_OWNER: "dashboard",
+  ADMINISTRATOR: "dashboard",
   ADMIN: "dashboard",
 };
+
