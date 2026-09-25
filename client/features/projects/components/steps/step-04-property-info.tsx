@@ -59,6 +59,15 @@ const PRESET_COMPOUNDS = [
   "Swan Lake Residences",
 ];
 
+const PRESET_CITIES = [
+  { en: "New Cairo", ar: "القاهرة الجديدة" },
+  { en: "Sheikh Zayed", ar: "الشيخ زايد" },
+  { en: "6th of October", ar: "السادس من أكتوبر" },
+  { en: "North Coast", ar: "الساحل الشمالي" },
+  { en: "El Gouna", ar: "الجونة" },
+  { en: "New Capital", ar: "العاصمة الإدارية" },
+];
+
 export function StepPropertyInfo({
   property,
   onChangeProperty,
@@ -154,6 +163,22 @@ export function StepPropertyInfo({
             }
             className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
           />
+          {/* Preset City Tags */}
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {PRESET_CITIES.map((c) => {
+              const label = isRTL ? c.ar : c.en;
+              return (
+                <button
+                  key={c.en}
+                  type="button"
+                  onClick={() => updateField("city", label)}
+                  className="text-[10px] font-normal px-2 py-0.5 rounded-md bg-card border border-border text-[#503C2C] hover:text-[#1C1917] hover:border-[#B88460] transition-colors cursor-pointer"
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
           <span className="text-[#78716C] text-[10px] font-normal">
             {isRTL ? "يحدد فريق الإشراف الهندسي الأقرب" : "Determines logistical dispatch atelier"}
           </span>

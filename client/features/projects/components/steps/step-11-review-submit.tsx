@@ -594,6 +594,11 @@ export function StepReviewSubmit({
               <div className="text-xs font-normal text-[#1C1917]">
                 {customerLocation.city}, {customerLocation.country}
               </div>
+              {customerLocation.phone && (
+                <div className="text-[11px] font-mono text-[#503C2C] mt-0.5" dir="ltr">
+                  {customerLocation.phoneCountryCode || ""} {customerLocation.phone}
+                </div>
+              )}
               <span className={cn("block text-[#78716C] text-[10px] mt-0.5", isRTL ? "font-sans" : "font-mono")}>
                 {customerLocation.timezone}
               </span>
@@ -619,7 +624,11 @@ export function StepReviewSubmit({
             </div>
             <div className="text-start text-xs font-normal text-[#1C1917]">
               {representative.hasRepresentative
-                ? `${representative.name || "Authorized Contact"} (${representative.phone || ""})`
+                ? `${representative.name || "Authorized Contact"}${
+                    representative.phone
+                      ? ` (${representative.phoneCountryCode || "+20"} ${representative.phone})`
+                      : ""
+                  }`
                 : isRTL
                 ? "إشراف وإدارة مباشرة من استوديو فالنتيا"
                 : "Valentia Direct Atelier Management"}

@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { UserCheck, ShieldCheck, Key, Phone, EnvelopeSimple, IdentificationCard } from "@phosphor-icons/react";
+import { UserCheck, ShieldCheck, Key, EnvelopeSimple, IdentificationCard } from "@phosphor-icons/react";
 import type { AuthorizedRepresentative } from "../../types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
+import { PhoneInputWithCountry } from "../phone-input-with-country";
 
 interface StepRepresentativeProps {
   representative: AuthorizedRepresentative;
@@ -148,20 +149,15 @@ export function StepRepresentative({
             </div>
 
             {/* Phone */}
-            <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
-                <Phone className="w-3 h-3 text-[#B88460]" />
-                <span>{isRTL ? "رقم الهاتف في مصر *" : "Phone Number (Egypt) *"}</span>
-              </label>
-              <input
-                type="tel"
-                required
-                value={representative.phone || ""}
-                onChange={(e) => updateField("phone", e.target.value)}
-                placeholder="+20 100 000 0000"
-                className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
-              />
-            </div>
+            <PhoneInputWithCountry
+              label={isRTL ? "رقم الهاتف للممثل بمصر *" : "Phone Number (Egypt) *"}
+              phone={representative.phone || ""}
+              countryCode={representative.phoneCountryCode || "+20"}
+              onChangePhone={(phone) => updateField("phone", phone)}
+              onChangeCountryCode={(code) => updateField("phoneCountryCode", code)}
+              placeholder={isRTL ? "010 1234 5678" : "e.g. 10 1234 5678"}
+              required
+            />
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">

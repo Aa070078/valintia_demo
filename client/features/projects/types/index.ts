@@ -133,14 +133,18 @@ export interface PropertyEntity {
 
 export interface CustomerLocation {
   country: string;
+  countryCode?: string;
   city: string;
   timezone: string;
+  phone?: string;
+  phoneCountryCode?: string;
 }
 
 export interface AuthorizedRepresentative {
   hasRepresentative: boolean;
   name?: string;
   phone?: string;
+  phoneCountryCode?: string;
   email?: string;
   relationship?: string;
   authorizationScope?: string;

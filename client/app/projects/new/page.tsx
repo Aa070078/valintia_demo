@@ -103,13 +103,18 @@ function CreateProjectContent() {
 
   const [customerLocation, setCustomerLocation] = React.useState<CustomerLocation>({
     country: "Egypt",
+    countryCode: "EG",
     city: "Cairo",
     timezone: "Africa/Cairo (GMT+2)",
+    phone: "",
+    phoneCountryCode: "+20",
   });
 
   const [representative, setRepresentative] = React.useState<AuthorizedRepresentative>({
     hasRepresentative: false,
     valentiaManagedDirectly: true,
+    phone: "",
+    phoneCountryCode: "+20",
   });
 
   const [scope, setScope] = React.useState<ProjectScope>({

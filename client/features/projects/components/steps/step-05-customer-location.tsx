@@ -5,6 +5,10 @@ import { GlobeHemisphereWest, Clock } from "@phosphor-icons/react";
 import type { CustomerLocation } from "../../types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
+import { CountrySelect } from "../country-select";
+import { CitySelect } from "../city-select";
+import { PhoneInputWithCountry } from "../phone-input-with-country";
+import { findCountry, type CountryOption } from "../../lib/geo-countries";
 
 interface StepCustomerLocationProps {
   location: CustomerLocation;
@@ -15,6 +19,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "Egypt",
     countryAr: "مصر",
+    code: "EG",
+    dialCode: "+20",
     cityEn: "Cairo",
     cityAr: "القاهرة",
     timezone: "Africa/Cairo (GMT+2)",
@@ -22,6 +28,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "Saudi Arabia",
     countryAr: "المملكة العربية السعودية",
+    code: "SA",
+    dialCode: "+966",
     cityEn: "Riyadh",
     cityAr: "الرياض",
     timezone: "Asia/Riyadh (GMT+3)",
@@ -29,6 +37,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "United Arab Emirates",
     countryAr: "الإمارات العربية المتحدة",
+    code: "AE",
+    dialCode: "+971",
     cityEn: "Dubai",
     cityAr: "دبي",
     timezone: "Asia/Dubai (GMT+4)",
@@ -36,6 +46,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "Qatar",
     countryAr: "قطر",
+    code: "QA",
+    dialCode: "+974",
     cityEn: "Doha",
     cityAr: "الدوحة",
     timezone: "Asia/Qatar (GMT+3)",
@@ -43,6 +55,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "Kuwait",
     countryAr: "الكويت",
+    code: "KW",
+    dialCode: "+965",
     cityEn: "Kuwait City",
     cityAr: "مدينة الكويت",
     timezone: "Asia/Kuwait (GMT+3)",
@@ -50,6 +64,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "United Kingdom",
     countryAr: "المملكة المتحدة",
+    code: "GB",
+    dialCode: "+44",
     cityEn: "London",
     cityAr: "لندن",
     timezone: "Europe/London (GMT+0)",
@@ -57,6 +73,8 @@ const COMMON_REGIONS = [
   {
     countryEn: "United States",
     countryAr: "الولايات المتحدة",
+    code: "US",
+    dialCode: "+1",
     cityEn: "New York",
     cityAr: "نيويورك",
     timezone: "America/New_York (GMT-5)",
@@ -71,17 +89,42 @@ export function StepCustomerLocation({
 
   const handleSelectPreset = (preset: (typeof COMMON_REGIONS)[0]) => {
     onChangeLocation({
+      ...location,
       country: isRTL ? preset.countryAr : preset.countryEn,
+      countryCode: preset.code,
       city: isRTL ? preset.cityAr : preset.cityEn,
       timezone: preset.timezone,
+      phoneCountryCode: preset.dialCode,
     });
   };
+
+  const handleCountryChange = (country: CountryOption) => {
+    const defaultCity = country.cities[0]
+      ? isRTL
+        ? country.cities[0].nameAr
+        : country.cities[0].nameEn
+      : "";
+
+    onChangeLocation({
+      ...location,
+      country: isRTL ? country.nameAr : country.nameEn,
+      countryCode: country.id,
+      city: defaultCity,
+      timezone: country.defaultTimezone,
+      phoneCountryCode: country.dialCode,
+    });
+  };
+
+  const currentCountryObj = React.useMemo(() => {
+    return findCountry(location.country) || findCountry(location.countryCode || "") || undefined;
+  }, [location.country, location.countryCode]);
 
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
+          <span className="h-px w-6 bg-foreground/50" />
           <span
             className={cn(
               "text-[#78716C]",
@@ -90,7 +133,7 @@ export function StepCustomerLocation({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٥ — ٠٦ • موقع إقامتك والمنطقة الزمنية" : "05 — 06 TIMEZONE & RESIDENCE"}
+            {isRTL ? "٠٥ — ٠٦ • موقع إقامتك وبيانات التواصل" : "05 — 06 TIMEZONE & RESIDENCE"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
@@ -98,8 +141,8 @@ export function StepCustomerLocation({
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "يقيم العديد من عملاء فالنتيا في دول الخليج أو أوروبا أو أمريكا. يساعدنا تحديد موقعك في جدولة الاستشارات الافتراضية ومتابعة البث المباشر بما يناسب توقيتك."
-            : "Many of our clients reside overseas in the GCC, Europe, or the Americas. Specifying your timezone ensures consultations and milestone presentations synchronize smoothly with your schedule."}
+            ? "يقيم العديد من عملاء فالنتيا في دول الخليج أو أوروبا أو أمريكا. اختر دولتك ومدينتك لتنسيق الاستشارات وتلقي إشعارات تطورات التصميم والموقع في توقيتك المناسب."
+            : "Many of our clients reside overseas in the GCC, Europe, or the Americas. Selecting your country, city, and contact details ensures presentations and site alerts synchronize smoothly with your schedule."}
         </p>
       </div>
 
@@ -113,7 +156,7 @@ export function StepCustomerLocation({
           {COMMON_REGIONS.map((region, idx) => {
             const isMatch =
               location.country === (isRTL ? region.countryAr : region.countryEn) ||
-              location.timezone === region.timezone;
+              location.countryCode === region.code;
             return (
               <button
                 key={idx}
@@ -134,9 +177,12 @@ export function StepCustomerLocation({
                     {isRTL ? region.cityAr : region.cityEn}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] font-mono text-[#B88460]">
-                  <Clock className="w-3 h-3" />
-                  <span>{region.timezone.split(" ")[1] || region.timezone}</span>
+                <div className="flex items-center justify-between text-[10px] font-mono text-[#B88460]">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{region.timezone.split(" ")[1] || region.timezone}</span>
+                  </div>
+                  <span className="opacity-75">{region.dialCode}</span>
                 </div>
               </button>
             );
@@ -144,57 +190,62 @@ export function StepCustomerLocation({
         </div>
       </div>
 
-      {/* Manual Inputs Container */}
-      <div className="p-5 rounded-2xl bg-card border border-border grid grid-cols-1 md:grid-cols-3 gap-4 shadow-xs">
-        {/* Country */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[#503C2C]">
-            {isRTL ? "الدولة *" : "Country *"}
-          </label>
-          <input
-            type="text"
-            required
+      {/* Selection Fields Form Container */}
+      <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border flex flex-col gap-5 shadow-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Country Dropdown */}
+          <CountrySelect
+            label={isRTL ? "الدولة (اختر من القائمة) *" : "Country (Dropdown menu) *"}
             value={location.country || ""}
-            onChange={(e) =>
-              onChangeLocation({ ...location, country: e.target.value })
-            }
-            placeholder={isRTL ? "مثال: مصر، السعودية، الإمارات..." : "e.g. United Kingdom"}
-            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
-          />
-        </div>
-
-        {/* City */}
-        <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[#503C2C]">
-            {isRTL ? "المدينة *" : "City *"}
-          </label>
-          <input
-            type="text"
+            onChange={handleCountryChange}
             required
+          />
+
+          {/* City Dependent Dropdown */}
+          <CitySelect
+            label={isRTL ? "المدينة (تتحدث بحسب الدولة) *" : "City (Dependent on Country) *"}
+            country={currentCountryObj}
             value={location.city || ""}
-            onChange={(e) =>
-              onChangeLocation({ ...location, city: e.target.value })
-            }
-            placeholder={isRTL ? "مثال: الرياض، دبي، لندن..." : "e.g. London"}
-            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            onChange={(city) => onChangeLocation({ ...location, city })}
+            required
           />
+
+          {/* Timezone */}
+          <div className="flex flex-col gap-1.5">
+            <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
+              <Clock className="w-3.5 h-3.5 text-[#B88460]" />
+              <span>{isRTL ? "المنطقة الزمنية *" : "Timezone *"}</span>
+            </label>
+            <input
+              type="text"
+              required
+              value={location.timezone || ""}
+              onChange={(e) =>
+                onChangeLocation({ ...location, timezone: e.target.value })
+              }
+              placeholder="e.g. Africa/Cairo (GMT+2)"
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            />
+          </div>
         </div>
 
-        {/* Timezone */}
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
-            <Clock className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "المنطقة الزمنية *" : "Timezone *"}</span>
-          </label>
-          <input
-            type="text"
-            required
-            value={location.timezone || ""}
-            onChange={(e) =>
-              onChangeLocation({ ...location, timezone: e.target.value })
+        {/* Direct Contact Phone Number with Country Code Picker */}
+        <div className="pt-2 border-t border-border/70">
+          <PhoneInputWithCountry
+            label={isRTL ? "رقم هاتفك للتواصل ومتابعة المشروع *" : "Your Contact Phone Number *"}
+            description={
+              isRTL
+                ? "يتم استخدام الكود الدولي لتنسيق استشارات التصميم ومشاركة تقارير الإشراف الميداني عبر واتساب أو الاتصال المباشر."
+                : "Includes country dial code for seamless consultation scheduling and digital site updates."
             }
-            placeholder="e.g. GMT+2 / Cairo"
-            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            phone={location.phone || ""}
+            countryCode={location.phoneCountryCode || "+20"}
+            onChangePhone={(phone) => onChangeLocation({ ...location, phone })}
+            onChangeCountryCode={(phoneCountryCode) =>
+              onChangeLocation({ ...location, phoneCountryCode })
+            }
+            placeholder={isRTL ? "010 1234 5678" : "e.g. 10 1234 5678"}
+            required
           />
         </div>
       </div>
