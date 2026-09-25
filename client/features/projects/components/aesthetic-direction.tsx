@@ -16,17 +16,47 @@ export interface StyleDirection {
   descriptionAr: string;
   heroImage: string;
   thumbnail: string;
+  galleryImages: string[];
   matchScore: string;
   materials: { name: string; nameAr: string; color: string }[];
 }
 
 export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
   {
+    id: "modern_architectural",
+    name: "Modern Architectural",
+    nameAr: "مودرن معماري معاصر",
+    subtitle: "Clean lines, open, calm spaces and a refined balance of materials.",
+    subtitleAr: "خطوط معمارية نقية، مساحات رحبة، وتوازن دقيق بين الخامات الطبيعية.",
+    description:
+      "Full-height architectural glazing, monolithic travertine fireplaces, cantilevered joinery, and concealed recessed cove lighting celebrating volume and clarity.",
+    descriptionAr:
+      "واجهات زجاجية ممتدة لكامل الارتفاع، مدافئ رخامية صرحية، تجاليد خشبية معلقة، وإضاءات سقفية مخفية تحتفي برحابة الفراغ وهدوء المساحات.",
+    heroImage:
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85",
+    thumbnail:
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=400&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=1200&q=80",
+    ],
+    matchScore: "95% Aesthetic Match",
+    materials: [
+      { name: "Calacatta Quartz", nameAr: "كوارتز كلكتا", color: "#F2EFEB" },
+      { name: "Smoked Ash", nameAr: "دردار مدخن", color: "#4E4843" },
+      { name: "Brushed Bronze", nameAr: "برونز مصقول", color: "#9E8266" },
+      { name: "Cast Plaster", nameAr: "جبس معمارى ناعم", color: "#ECE4DA" },
+    ],
+  },
+  {
     id: "japandi",
     name: "Japandi & Warm Minimal",
     nameAr: "جاباندي ومينيمال دافئ",
-    subtitle: "Warm wood & stillness",
-    subtitleAr: "أخشاب دافئة وسكينة بصرية",
+    subtitle: "Warm wood, crafted stillness & unbleached linens",
+    subtitleAr: "أخشاب دافئة وسكينة بصرية مع كتان طبيعي",
     description:
       "Natural vertical oak slats, raw travertine stone plinths, organic washed linen upholstery, and contemplative spatial geometry that invites diffused morning radiance.",
     descriptionAr:
@@ -35,6 +65,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=400&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1200&q=80",
+    ],
     matchScore: "94% Aesthetic Match",
     materials: [
       { name: "White Oak", nameAr: "بلوط أبيض", color: "#E0CFB8" },
@@ -47,8 +84,8 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
     id: "mediterranean",
     name: "Mediterranean Coastal",
     nameAr: "طراز متوسطي ساحلي فاخر",
-    subtitle: "Arches & rustic timber",
-    subtitleAr: "أقواس حجرية وأخشاب عتيقة",
+    subtitle: "Arches, rustic timber & sunlit limestone",
+    subtitleAr: "أقواس حجرية وأخشاب عتيقة وحجر جيري مشمس",
     description:
       "Soft curvilinear arches, hand-finished lime plaster walls, natural limestone flooring, and sun-bleached driftwood inspired by the North Coast riviera.",
     descriptionAr:
@@ -57,6 +94,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=400&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600565193348-f74bd3c7ccdf?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1584622781564-1d987f7333c1?auto=format&fit=crop&w=1200&q=80",
+    ],
     matchScore: "91% Aesthetic Match",
     materials: [
       { name: "Lime Plaster", nameAr: "بياض جيري", color: "#F0EAE1" },
@@ -66,33 +110,11 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
     ],
   },
   {
-    id: "modern_architectural",
-    name: "Modern Architectural",
-    nameAr: "مودرن معماري معاصر",
-    subtitle: "Monumental marble & lines",
-    subtitleAr: "كتل رخامية وخطوط معمارية نقية",
-    description:
-      "Full-height glazing, monumental travertine fireplaces, cantilevered joinery, and concealed recessed cove lighting celebrating volume and clarity.",
-    descriptionAr:
-      "واجهات زجاجية ممتدة لكامل الارتفاع، مدافئ رخامية صرحية، تجاليد خشبية معلقة، وإضاءات سقفية مخفية تحتفي برحابة الفراغ.",
-    heroImage:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85",
-    thumbnail:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=400&q=80",
-    matchScore: "89% Aesthetic Match",
-    materials: [
-      { name: "Calacatta Quartz", nameAr: "كوارتز كلكتا", color: "#F2EFEB" },
-      { name: "Smoked Ash", nameAr: "دردار مدخن", color: "#4E4843" },
-      { name: "Brushed Bronze", nameAr: "برونز مصقول", color: "#9E8266" },
-      { name: "Cast Plaster", nameAr: "جبس معمارى ناعم", color: "#ECE4DA" },
-    ],
-  },
-  {
     id: "classic_european",
     name: "Classic European",
     nameAr: "نيو كلاسيك فرنسي باريسي",
-    subtitle: "Herringbone & boiserie",
-    subtitleAr: "باركيه فرنسي وبانوهات جدارية",
+    subtitle: "Herringbone, boiserie & sculpted Statuario",
+    subtitleAr: "باركيه فرنسي وبانوهات جدارية ورخام ستاتوريو",
     description:
       "Delicate wall boiserie, French oak chevron parquetry, Statuario marble fireplace mantelpieces, and timeless sculpted crown moldings.",
     descriptionAr:
@@ -101,6 +123,12 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=400&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1616046229478-9901c5536a45?auto=format&fit=crop&w=1200&q=80",
+    ],
     matchScore: "86% Aesthetic Match",
     materials: [
       { name: "Chevron Oak", nameAr: "بلوط شيفرون", color: "#CDB397" },
@@ -110,33 +138,37 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
     ],
   },
   {
-    id: "biophilic_sanctuary",
-    name: "Biophilic Sanctuary",
-    nameAr: "ملاذ بيوفيليك مستدام",
-    subtitle: "Courtyards & botanicals",
-    subtitleAr: "أفنية داخلية وخامات عضوية",
+    id: "scandinavian_organic",
+    name: "Scandinavian Organic",
+    nameAr: "طراز إسكندنافي عضوي",
+    subtitle: "Light timber, wool textiles & daylight",
+    subtitleAr: "أخشاب صنوبر فاتحة وأقمشة صوفية ونور طبيعي",
     description:
-      "Interior skylit courtyards, living botanical walls, volcanic basalt, raw linen drapes, and organic earth pigments nurturing wellbeing.",
+      "Soft bleached ash joinery, bouclé wool textures, natural morning daylight maximization, and functional minimalism promoting restful living.",
     descriptionAr:
-      "أفنية داخلية مضاءة بأسقف زجاجية، جدران نباتية طبيعية، حجر البازلت البركاني، وستائر كتان هفهافة تعزز الراحة والصحة النفسية.",
+      "أخشاب دردار فاتحة، ملمس قماش البوكليه الدافئ، تعظيم الإضاءة الطبيعية، وتصميم عملي هادئ يعزز الراحة والاسترخاء.",
     heroImage:
-      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=85",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
-      "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=400&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1554995207-c18c203602cb?auto=format&fit=crop&w=1200&q=80",
+    ],
     matchScore: "88% Aesthetic Match",
     materials: [
-      { name: "Porous Basalt", nameAr: "بازلت مسامي", color: "#454441" },
-      { name: "Rattan Weave", nameAr: "قش راتان طبيعي", color: "#C69F6B" },
-      { name: "Sandstone", nameAr: "حجر رملي", color: "#DDC8AB" },
-      { name: "Moss Bedding", nameAr: "عناصر نباتية", color: "#4E5C46" },
+      { name: "Bleached Ash", nameAr: "دردار فاتح", color: "#E8DDD0" },
+      { name: "Bouclé Wool", nameAr: "صوف بوكليه", color: "#F4EFE6" },
+      { name: "Brushed Aluminum", nameAr: "ألومنيوم مصقول", color: "#CFD0D2" },
     ],
   },
   {
     id: "monolithic_stone",
-    name: "Monolithic Stone",
-    nameAr: "أحجار صرحية ودرك لاكشري",
-    subtitle: "Dark travertine & steel",
-    subtitleAr: "ترافرتين داكن وفولاذ أسود",
+    name: "Monolithic Stone & Bronze",
+    nameAr: "أحجار صرحية وبرونز داكن",
+    subtitle: "Dark travertine, blackened steel & depth",
+    subtitleAr: "ترافرتين داكن وفولاذ أسود وعمق بصري",
     description:
       "Deep tactile charcoal travertine, patinated blackened metal joinery, integrated architectural micro-cement, and warm accent wash lights.",
     descriptionAr:
@@ -145,6 +177,11 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=400&q=80",
+    galleryImages: [
+      "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600585152220-90363fe7e115?auto=format&fit=crop&w=1200&q=80",
+      "https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80",
+    ],
     matchScore: "85% Aesthetic Match",
     materials: [
       { name: "Blackened Steel", nameAr: "صلب معالج", color: "#2B2A29" },

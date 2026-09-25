@@ -11,7 +11,7 @@ interface StepPropertyTypeProps {
   onSelectType: (type: PropertyType) => void;
 }
 
-const PROPERTY_TYPOLOGIES: Array<{
+export const PROPERTY_TYPOLOGIES: Array<{
   id: PropertyType;
   volume: string;
   titleKey: string;

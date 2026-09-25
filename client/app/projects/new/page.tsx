@@ -42,8 +42,8 @@ import { useLanguage } from "@/lib/i18n/language-context";
 
 const FUNNEL_STEPS = [
   { id: 1, code: "01", labelKey: "lifecycle.step_property", defaultEn: "Typology", defaultAr: "النمط المعماري" },
-  { id: 2, code: "02", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الطراز والمواد" },
-  { id: 3, code: "03", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الفراغات المعمارية" },
+  { id: 2, code: "02", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الفراغات المعمارية" },
+  { id: 3, code: "03", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الطراز والمواد" },
   { id: 4, code: "04", labelKey: "lifecycle.step_property_info", defaultEn: "Property Specs", defaultAr: "بيانات العقار" },
   { id: 5, code: "05", labelKey: "lifecycle.step_location", defaultEn: "Your Location", defaultAr: "موقع الإقامة" },
   { id: 6, code: "06", labelKey: "lifecycle.step_representative", defaultEn: "Representative", defaultAr: "الممثل بمصر" },
@@ -389,23 +389,24 @@ function CreateProjectContent() {
               />
             )}
 
-            {/* STEP 02: Style Discovery */}
+            {/* STEP 02: Spaces */}
             {currentStep === 2 && (
-              <StepStyleDiscovery
-                pendingStyles={pendingStyles}
-                onChangePendingStyles={setPendingStyles}
-                primaryStyleId={primaryStyleId}
-                onChangePrimaryStyleId={setPrimaryStyleId}
-              />
-            )}
-
-            {/* STEP 03: Spaces */}
-            {currentStep === 3 && (
               <StepSpaces
                 spaces={spaces}
                 onChangeSpaces={setSpaces}
                 pendingStyles={pendingStyles}
                 areaSqm={property.areaSqm}
+              />
+            )}
+
+            {/* STEP 03: Style Discovery */}
+            {currentStep === 3 && (
+              <StepStyleDiscovery
+                pendingStyles={pendingStyles}
+                onChangePendingStyles={setPendingStyles}
+                primaryStyleId={primaryStyleId}
+                onChangePrimaryStyleId={setPrimaryStyleId}
+                spaces={spaces}
               />
             )}
 
