@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ApplicationLoggerService } from './infrastructure/application-logs/application-logger.service';
+// import { ApplicationLoggerService } from './infrastructure/application-logs/application-logger.service';
 import { setupSwagger } from './infrastructure/swagger/setup-swagger';
 
 async function bootstrap() {
@@ -10,8 +10,8 @@ async function bootstrap() {
     bufferLogs: true,
   });
 
-  const logger = app.get(ApplicationLoggerService);
-  app.useLogger(logger);
+  // const logger = app.get(ApplicationLoggerService);
+  // app.useLogger(logger);
 
   const config = app.get(ConfigService);
   const port = config.get<number>('app.port') ?? 5000;
@@ -37,15 +37,15 @@ async function bootstrap() {
   await app.listen(port);
 
   const base = `http://localhost:${port}`;
-  logger.log(`Server listening on ${base}/${apiPrefix}`, 'Bootstrap');
-  logger.log(
-    `Swagger UI at ${base}/docs${nodeEnv === 'production' ? ' (Basic Auth)' : ''}`,
-    'Bootstrap',
-  );
-  logger.log(
-    `OpenAPI YAML at ${base}/yaml and ${base}/${apiPrefix}/yaml`,
-    'Bootstrap',
-  );
+  // logger.log(`Server listening on ${base}/${apiPrefix}`, 'Bootstrap');
+  // logger.log(
+    // `Swagger UI at ${base}/docs${nodeEnv === 'production' ? ' (Basic Auth)' : ''}`,
+    // 'Bootstrap',
+  // );
+  // logger.log(
+    // `OpenAPI YAML at ${base}/yaml and ${base}/${apiPrefix}/yaml`,
+    // 'Bootstrap',
+  // );
 }
 
 void bootstrap();
