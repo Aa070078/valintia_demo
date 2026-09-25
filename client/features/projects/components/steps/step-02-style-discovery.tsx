@@ -283,6 +283,7 @@ export function StepStyleDiscovery({
                     src={img}
                     alt="Reference"
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="80px"
                   />
