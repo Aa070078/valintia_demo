@@ -173,7 +173,7 @@ export default function EditProjectPage() {
             >
               {updateMutation.isPending ? (
                 <>
-                  <Spinner className="mr-1.5 h-4 w-4" />
+                  <Spinner className="ms-1.5 h-4 w-4" />
                   <span>Saving Changes...</span>
                 </>
               ) : (

@@ -101,7 +101,7 @@ export function StatusChip({
         className
       )}
     >
-      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-80" />
+      <span className="ms-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-80" />
       {label}
     </span>
   );

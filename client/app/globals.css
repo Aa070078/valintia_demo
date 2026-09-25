@@ -5,36 +5,36 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-    --background: #F4EEE5;
+    --background: #ECE3D5;
     --foreground: #1C1917;
-    --card: #FAF6F0;
+    --card: #F5EFE6;
     --card-foreground: #1C1917;
-    --popover: #FAF6F0;
+    --popover: #F5EFE6;
     --popover-foreground: #1C1917;
     --primary: #1C1917;
     --primary-foreground: #FAF7F2;
-    --secondary: #EBE3D7;
+    --secondary: #DFD3C1;
     --secondary-foreground: #1C1917;
-    --muted: #EDE6DB;
-    --muted-foreground: #78716C;
-    --accent: #E5DDD1;
+    --muted: #E2D6C4;
+    --muted-foreground: #6B635B;
+    --accent: #DBCDB9;
     --accent-foreground: #1C1917;
     --destructive: #B91C1C;
     --destructive-foreground: #FAF7F2;
-    --border: #E2D7C8;
-    --input: #E8DFD3;
+    --border: #D8C8B4;
+    --input: #DCCEBA;
     --ring: #1C1917;
     --success: #2F6F4E;
     --warning: #B45309;
     --info: #3B5B7A;
     --radius: 0.85rem;
-    --sidebar: #EFE9DF;
+    --sidebar: #E5D9C8;
     --sidebar-foreground: #1C1917;
     --sidebar-primary: #1C1917;
     --sidebar-primary-foreground: #FAF7F2;
-    --sidebar-accent: #E5DCD0;
+    --sidebar-accent: #DDD0BF;
     --sidebar-accent-foreground: #1C1917;
-    --sidebar-border: #E2D7C8;
+    --sidebar-border: #D8C8B4;
     --sidebar-ring: #1C1917;
 }
 
@@ -111,10 +111,10 @@
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary selection:text-primary-foreground;
-    background-color: #F4EEE5;
+    background-color: var(--background);
     background-image: 
-      radial-gradient(ellipse 80% 60% at 85% -10%, rgba(218, 205, 188, 0.45) 0%, transparent 70%),
-      radial-gradient(ellipse 65% 55% at 5% 100%, rgba(225, 213, 198, 0.40) 0%, transparent 65%),
+      radial-gradient(ellipse 80% 60% at 85% -10%, rgba(205, 192, 172, 0.40) 0%, transparent 70%),
+      radial-gradient(ellipse 65% 55% at 5% 100%, rgba(215, 202, 182, 0.35) 0%, transparent 65%),
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'%3E%3Cpath d='M-100,120 C180,240 340,50 620,170 C840,270 940,190 1100,250' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.035'/%3E%3Cpath d='M-80,210 C210,330 370,140 660,260 C870,360 970,280 1120,340' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.03'/%3E%3Cpath d='M-60,300 C240,420 400,230 700,350 C900,450 1000,370 1140,430' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.025'/%3E%3Cpath d='M-100,390 C170,510 430,320 740,440 C930,540 1030,460 1160,520' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.03'/%3E%3Cpath d='M-120,480 C140,600 460,410 780,530 C960,630 1060,550 1180,610' fill='none' stroke='%231C1917' stroke-width='0.75' stroke-opacity='0.025'/%3E%3C/svg%3E");
     background-attachment: fixed;
   }
@@ -128,15 +128,16 @@
   [lang="ar"] {
     font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     letter-spacing: normal;
+    line-height: 1.7;
   }
   [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6,
   [dir="rtl"] .font-serif,
   [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3, [lang="ar"] h4, [lang="ar"] h5, [lang="ar"] h6,
   [lang="ar"] .font-serif {
     font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif !important;
-    font-weight: 600;
-    line-height: 1.28;
-    letter-spacing: -0.015em;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: normal;
   }
   [dir="rtl"] button,
   [dir="rtl"] input,
@@ -150,6 +151,45 @@
   [lang="ar"] nav {
     font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif;
   }
+}
+
+/*
+ * Arabic/RTL hardening — intentionally UNLAYERED so these declarations beat
+ * Tailwind's `utilities` layer regardless of specificity. This guarantees
+ * letter-spacing utility classes (tracking-*) can never break Arabic cursive
+ * letter joining, that faux italics are never synthesized (Arabic has no true
+ * oblique forms), and that the Arabic fonts always win over the `font-sans`
+ * utility (Inter) applied on the <html> element.
+ */
+html[dir="rtl"],
+html[lang="ar"] {
+  font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6),
+html[lang="ar"] :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-arabic-heading), var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: normal;
+}
+html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6, p, span, a, button, label, li, small, strong, em, b, td, th, caption, legend, option, blockquote) {
+  letter-spacing: normal;
+}
+html[dir="rtl"] :is(p, blockquote) {
+  line-height: 1.65;
+}
+html[dir="rtl"] i,
+html[dir="rtl"] em,
+html[dir="rtl"] .italic {
+  font-style: normal;
+}
+html[dir="rtl"] .font-mono {
+  font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", monospace;
+}
+html[dir="rtl"] .tracking-wide,
+html[dir="rtl"] .tracking-wider,
+html[dir="rtl"] .tracking-widest {
+  letter-spacing: normal;
 }
 
 @utility glass-warm {

@@ -45,11 +45,10 @@ export function HeroAtelier({ onStart, onExploreMood }: HeroAtelierProps) {
             className={cn(
               "absolute inset-0 pointer-events-none transition-all duration-500",
               isRTL
-                ? "bg-gradient-to-l from-[#F4EEE5]/50 via-[#F4EEE5]/20 to-transparent dark:from-[#121214]/65 dark:via-[#121214]/25 dark:to-transparent"
-                : "bg-gradient-to-r from-[#F4EEE5]/50 via-[#F4EEE5]/20 to-transparent dark:from-[#121214]/65 dark:via-[#121214]/25 dark:to-transparent"
+                ? "bg-gradient-to-l from-[#ECE3D5]/30 via-[#ECE3D5]/10 to-transparent dark:from-[#121214]/65 dark:via-[#121214]/25 dark:to-transparent"
+                : "bg-gradient-to-r from-[#ECE3D5]/30 via-[#ECE3D5]/10 to-transparent dark:from-[#121214]/65 dark:via-[#121214]/25 dark:to-transparent"
             )}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#F4EEE5]/40 via-transparent to-black/10 dark:from-[#121214]/55 dark:via-transparent dark:to-black/30 pointer-events-none" />
         </div>
 
         {/* Content Container */}
@@ -101,7 +100,7 @@ export function HeroAtelier({ onStart, onExploreMood }: HeroAtelierProps) {
                   className="group inline-flex items-center gap-3 rounded-full border border-[#DFD6C7] bg-[#FAF7F2]/80 px-4 py-2.5 text-xs font-medium text-[#1C1917] backdrop-blur-md shadow-2xs hover:bg-[#FAF7F2] active:scale-95 transition-all cursor-pointer dark:border-[#2C2C32] dark:bg-[#1A1A1E]/80 dark:text-[#FAF7F2]"
                 >
                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#1C1917]/10 text-[#1C1917] dark:bg-white/10 dark:text-white">
-                    <Play size={11} weight="fill" className="ml-0.5" />
+                    <Play size={11} weight="fill" className="ms-0.5" />
                   </div>
                   <div className="flex flex-col text-start">
                     <span className="text-[11px] font-semibold">{t("hero.cta_watch") || "Watch how it works"}</span>

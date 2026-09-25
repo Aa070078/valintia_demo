@@ -80,18 +80,17 @@ export function EditorialHero() {
           <img
             src="/images/hero-pyramids.jpg"
             alt="Valentia Luxury Residence Interior Overlooking Pyramids"
-            className="h-full w-full object-cover object-[65%_center] filter brightness-[1.02] contrast-[1.02] transition-transform duration-1000 ease-out hover:scale-[1.01]"
+            className="h-full w-full object-cover object-[65%_center] filter brightness-[1.0] contrast-[1.04] saturate-[1.06] transition-transform duration-1000 ease-out hover:scale-[1.01]"
           />
-          {/* Soft natural architectural scrim - preserves rich sunlit pyramids and interior view */}
+          {/* Gentle warm directional tint - preserves vivid golden hour, desert pyramids and deep interior tones */}
           <div
             className={cn(
               "absolute inset-0 pointer-events-none transition-all duration-500",
               isRTL
-                ? "bg-gradient-to-l from-background/55 via-background/20 to-transparent"
-                : "bg-gradient-to-r from-background/55 via-background/20 to-transparent"
+                ? "bg-gradient-to-l from-background/30 via-background/10 to-transparent"
+                : "bg-gradient-to-r from-background/30 via-background/10 to-transparent"
             )}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-black/10 pointer-events-none" />
         </div>
 
         {/* Content Container */}
@@ -108,7 +107,7 @@ export function EditorialHero() {
                       "group flex items-center gap-3 text-xs transition-all duration-200 hover:-translate-y-0.5",
                       step.active
                         ? "font-semibold text-foreground"
-                        : "text-muted-foreground/75 hover:text-foreground"
+                        : "text-foreground/75 hover:text-foreground"
                     )}
                   >
                     <div className="relative flex items-center justify-center">
@@ -117,7 +116,7 @@ export function EditorialHero() {
                           "h-2 w-2 rounded-full transition-all duration-300",
                           step.active
                             ? "bg-primary scale-125 ring-4 ring-primary/20 shadow-2xs"
-                            : "bg-muted-foreground/35 group-hover:bg-primary/70 group-hover:scale-110"
+                            : "bg-foreground/35 group-hover:bg-primary/70 group-hover:scale-110"
                         )}
                       />
                       {idx < stepsLocalized.length - 1 && (
@@ -127,7 +126,10 @@ export function EditorialHero() {
                     <span className="font-mono text-[10px] tracking-wider opacity-60">
                       {step.num}
                     </span>
-                    <span className="text-[11px] tracking-wide truncate max-w-[110px]">
+                    <span className={cn(
+                      "text-[11px] tracking-wide truncate max-w-[110px]",
+                      step.active ? "font-bold text-foreground" : "font-medium text-foreground/80 hover:text-foreground"
+                    )}>
                       {step.name}
                     </span>
                   </Link>
@@ -135,24 +137,49 @@ export function EditorialHero() {
               </div>
             </div>
 
-            {/* Center-Left Editorial Headline & CTAs */}
-            <div className="flex flex-col justify-center lg:col-span-6 text-start">
+            {/* Center-Left Editorial Headline & CTAs with Dedicated Warm Frosted Backing */}
+            <div className={cn(
+              "flex flex-col justify-center lg:col-span-6 text-start p-5 sm:p-7 rounded-3xl transition-all",
+              "bg-background/45 backdrop-blur-[3px] border border-border/40 shadow-xs"
+            )}>
               {/* Eyebrow with dash rule */}
               <div className="flex items-center gap-2.5">
-                <span className="h-px w-7 bg-foreground/40" />
-                <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-foreground/75">
+                <span className="h-px w-7 bg-foreground/60" />
+                <span className={cn(
+                  "text-[11px] font-bold text-foreground/90",
+                  isRTL ? "tracking-normal text-xs font-bold text-[#503C2C]" : "uppercase tracking-[0.24em] text-foreground/80"
+                )}>
                   {t("hero.eyebrow")}
                 </span>
               </div>
 
-              {/* High-Contrast Editorial Serif Headline */}
-              <h1 className="mt-4 font-serif text-4xl font-normal tracking-tight text-foreground sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.08]">
-                {t("hero.title_1")} <br />
-                <span className="italic font-light">{t("hero.title_2")}</span>
+              {/* High-Contrast Editorial Serif / Sans Headline */}
+              <h1 className={cn(
+                "mt-4 tracking-tight text-foreground transition-all duration-300",
+                isRTL
+                  ? "font-sans font-bold text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-[1.25] text-[#1C1917]"
+                  : "font-serif text-4xl font-normal sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.08]"
+              )}>
+                {t("hero.title_1")}{" "}
+                {isRTL ? (
+                  <span className="block text-[#503C2C] font-extrabold mt-1">
+                    {t("hero.title_2")}
+                  </span>
+                ) : (
+                  <>
+                    <br />
+                    <span className="italic font-light">{t("hero.title_2")}</span>
+                  </>
+                )}
               </h1>
 
-              {/* Subtitle */}
-              <p className="mt-5 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base font-normal">
+              {/* Subtitle with enhanced Arabic legibility */}
+              <p className={cn(
+                "mt-5 max-w-xl leading-relaxed",
+                isRTL
+                  ? "text-base sm:text-lg font-medium text-[#2C241E] leading-loose"
+                  : "text-sm sm:text-base font-normal text-muted-foreground"
+              )}>
                 {t("hero.description")}
               </p>
 
@@ -160,11 +187,11 @@ export function EditorialHero() {
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
                   href="/projects/new"
-                  className="group inline-flex items-center gap-2.5 rounded-full bg-primary px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-black/20 hover:scale-[1.03] active:scale-[0.96]"
+                  className="group inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3.5 text-xs font-bold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-black/25 hover:scale-[1.03] active:scale-[0.96]"
                 >
                   <span>{t("hero.cta_start")}</span>
                   <ArrowRight
-                    size={13}
+                    size={14}
                     weight="bold"
                     className={cn(
                       "transition-transform duration-300",
@@ -176,13 +203,13 @@ export function EditorialHero() {
                 <button
                   type="button"
                   onClick={() => setIsVideoOpen(true)}
-                  className="group inline-flex items-center gap-3 rounded-full border border-border/80 bg-background/70 px-5 py-3 text-xs font-medium text-foreground backdrop-blur-md transition-all duration-200 hover:bg-background hover:border-foreground/30 hover:scale-[1.02] cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.96]"
+                  className="group inline-flex items-center gap-3 rounded-full border border-border/90 bg-background/85 px-5 py-3 text-xs font-semibold text-foreground backdrop-blur-md transition-all duration-200 hover:bg-background hover:border-foreground/40 hover:scale-[1.02] cursor-pointer shadow-2xs hover:shadow-xs active:scale-[0.96]"
                 >
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground/5 text-foreground transition-all duration-300 group-hover:scale-115 group-hover:bg-foreground group-hover:text-background">
-                    <Play size={11} weight="fill" className="ml-0.5" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground/10 text-foreground transition-all duration-300 group-hover:scale-115 group-hover:bg-foreground group-hover:text-background">
+                    <Play size={11} weight="fill" className={isRTL ? "mr-0.5" : "ml-0.5"} />
                   </div>
                   <div className="flex flex-col text-start">
-                    <span className="tracking-wide">{t("hero.cta_watch")}</span>
+                    <span className="tracking-wide font-medium">{t("hero.cta_watch")}</span>
                     <span className="text-[10px] text-muted-foreground">{t("hero.cta_watch_duration")}</span>
                   </div>
                 </button>
@@ -191,11 +218,23 @@ export function EditorialHero() {
 
             {/* Right Floating 3D Warm Glass Card (Reference Design) */}
             <div className="lg:col-span-4 flex justify-end">
-              <div className="w-full max-w-md rounded-3xl border border-white/70 bg-[#FAF7F2]/90 p-6 shadow-3d-floating backdrop-blur-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-white/10 dark:bg-card/85">
+              <div className="w-full max-w-md rounded-3xl border border-white/60 bg-[#F5EFE6]/95 p-6 shadow-3d-floating backdrop-blur-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl dark:border-white/10 dark:bg-card/85">
                 <div className="flex items-center justify-between pb-2">
-                  <h3 className="font-serif text-2xl font-medium tracking-tight text-foreground">
-                    {t("hero.floating_title_1")} <br />
-                    <span className="italic font-light">{t("hero.floating_title_2")}</span>
+                  <h3 className={cn(
+                    "text-xl sm:text-2xl font-medium tracking-tight text-foreground",
+                    isRTL ? "font-sans font-bold leading-snug" : "font-serif"
+                  )}>
+                    {t("hero.floating_title_1")}{" "}
+                    {isRTL ? (
+                      <span className="block text-[#503C2C] font-extrabold mt-0.5">
+                        {t("hero.floating_title_2")}
+                      </span>
+                    ) : (
+                      <>
+                        <br />
+                        <span className="italic font-light">{t("hero.floating_title_2")}</span>
+                      </>
+                    )}
                   </h3>
                 </div>
 
