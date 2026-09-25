@@ -16,16 +16,67 @@ import {
   ClockCountdown,
   SealCheck,
   User,
+  Sliders,
+  Check,
+  X,
+  Waveform,
+  GlobeHemisphereWest,
+  Sun,
+  SunHorizon,
+  Moon,
+  Eye,
 } from "@phosphor-icons/react";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
+import { AtelierCursor } from "@/components/motion/atelier-cursor";
 import { cn } from "@/lib/utils";
+
+// Lighting mood presets for the 3D Hero Centerpiece Card
+type LightingMood = "daylight" | "golden" | "twilight";
+
+const LIGHTING_PRESETS: Record<
+  LightingMood,
+  {
+    id: LightingMood;
+    nameEn: string;
+    nameAr: string;
+    kelvin: string;
+    image: string;
+    glowColor: string;
+  }
+> = {
+  daylight: {
+    id: "daylight",
+    nameEn: "5500K Studio Natural Light",
+    nameAr: "ضوء النهار الطبيعي 5500K",
+    kelvin: "5500K",
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85",
+    glowColor: "rgba(255, 255, 255, 0.25)",
+  },
+  golden: {
+    id: "golden",
+    nameEn: "3000K Golden Sun Horizon",
+    nameAr: "الغروب الدافئ 3000K",
+    kelvin: "3000K",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
+    glowColor: "rgba(184, 132, 96, 0.4)",
+  },
+  twilight: {
+    id: "twilight",
+    nameEn: "2400K Evening Cove Ambience",
+    nameAr: "الإضاءة الليلية الخافتة 2400K",
+    kelvin: "2400K",
+    image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
+    glowColor: "rgba(80, 60, 44, 0.5)",
+  },
+};
 
 // Material Hotspots for the Interactive 3D Axonometric Section
 interface MaterialHotspot {
   id: string;
+  category: "stone" | "wood" | "glass" | "outdoor";
   x: number; // percentage
   y: number; // percentage
   titleEn: string;
@@ -35,56 +86,85 @@ interface MaterialHotspot {
   specEn: string;
   specAr: string;
   acoustic: string;
+  acousticScore: number; // 0 - 100 for bar viz
+  originEn: string;
+  originAr: string;
+  fireRating: string;
+  image: string;
 }
 
 const HOTSPOTS: MaterialHotspot[] = [
   {
     id: "travertine",
+    category: "stone",
     x: 38,
     y: 62,
     titleEn: "Living Salon Flooring",
     titleAr: "أرضيات الصالون والمعيشة",
     materialEn: "Honed Navona Travertine",
-    materialAr: "ترافرتين نافونا المطفي مع فواصل نحاسية",
-    specEn: "Large format 120×120cm slabs with micro-beveled edges and acoustic sub-mat.",
-    specAr: "ألواح كبيرة قياس 120×120 سم مع حواف دقيقة وطبقة عازلة للصوت.",
-    acoustic: "NRC 0.45 · Class A",
+    materialAr: "ترافرتين نافونا المطفي مع فواصل برونزية غائرة",
+    specEn: "Large format 120×120cm slabs with micro-beveled edges, breathable sealer, and decoupled acoustic sub-mat.",
+    specAr: "ألواح كبيرة قياس 120×120 سم مع حواف دقيقة وطبقة عازلة للصوت وفواصل تمدد مخفية.",
+    acoustic: "NRC 0.45 · Impact Lw 48dB",
+    acousticScore: 68,
+    originEn: "Tivoli Quarries, Italy",
+    originAr: "محاجر تيفولي، إيطاليا",
+    fireRating: "Class A1 Non-Combustible",
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80",
   },
   {
     id: "joinery",
+    category: "wood",
     x: 68,
     y: 42,
-    titleEn: "Architectural Millwork",
+    titleEn: "Architectural Wall Paneling",
     titleAr: "التجاليد الخشبية المعمارية",
-    materialEn: "Rift-Cut White Oak",
-    materialAr: "خشب السنديان الأبيض مع إضاءة دافئة 2700K",
-    specEn: "Custom acoustic wall panels with concealed soft-closing storage and brass shadow reveals.",
-    specAr: "تجاليد جدارية مخصصة عازلة للصوت مع دواليب مخفية وظلال نحاسية غائرة.",
-    acoustic: "NRC 0.65 · Class A",
+    materialEn: "Rift-Cut White Oak & Brass Reveal",
+    materialAr: "خشب السنديان الأبيض المشرح مع إضاءة دافئة 2700K",
+    specEn: "Custom micro-perforated acoustic timber paneling with concealed soft-touch push latches and integrated LED wash.",
+    specAr: "تجاليد خشبية دقيقة التثقيب ممتصة للصدى مع خزائن مخفية وإضاءة خطية مدمجة بالكامل.",
+    acoustic: "NRC 0.75 · Class A Absorption",
+    acousticScore: 92,
+    originEn: "Black Forest, Germany",
+    originAr: "الغابة السوداء، ألمانيا",
+    fireRating: "Class B-s1,d0 Fire Retardant",
+    image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=600&q=80",
   },
   {
     id: "glass",
+    category: "glass",
     x: 48,
     y: 28,
-    titleEn: "Dining Room Partition",
-    titleAr: "قاطع غرفة الطعام",
-    materialEn: "Fluted Low-Iron Glass",
-    materialAr: "زجاج مضلع منخفض الحديد مع إطار برونزي",
-    specEn: "Acoustic laminated fluted glass with anodized deep bronze aluminum profile.",
-    specAr: "زجاج مصفح عازل للصوت بتضليعات ناعمة وإطار ألمنيوم مؤكسد باللون البرونزي.",
-    acoustic: "STC 38dB",
+    titleEn: "Dining Gallery Partition",
+    titleAr: "قاطع غرفة الطعام الزجاجي",
+    materialEn: "Fluted Low-Iron Acoustic Glass",
+    materialAr: "زجاج مضلع عازل للصوت مع إطار ألمنيوم برونزي",
+    specEn: "Laminated acoustic safety glass with 12mm fluted texture, providing visual privacy while channeling natural light.",
+    specAr: "زجاج مصفح آمن متعدد الطبقات بتضليعات ناعمة توفر الخصوصية وتمرر الضوء الطبيعي بانسيابية.",
+    acoustic: "STC 42 dB Acoustic Isolation",
+    acousticScore: 84,
+    originEn: "Murano Atelier, Italy",
+    originAr: "أتيليه مورانو، إيطاليا",
+    fireRating: "EI-30 Fire Barrier",
+    image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80",
   },
   {
     id: "terrace",
+    category: "outdoor",
     x: 22,
     y: 35,
-    titleEn: "Veranda Transition",
-    titleAr: "الامتداد الخارجي للتراس",
-    materialEn: "Textured Basalt & Teak",
-    materialAr: "حجر بازلت ملمس وخشب تيك طبيعي",
-    specEn: "Flush sill threshold transition for seamless indoor-outdoor living flow.",
-    specAr: "عتبات متساوية السطح بالكامل لتحقيق انسيابية تامة بين الداخل والخارج.",
-    acoustic: "Weatherproof · IP68",
+    titleEn: "Veranda Transition Portal",
+    titleAr: "بوابة الامتداد الخارجي للتراس",
+    materialEn: "Textured Basalt & Plantation Teak",
+    materialAr: "حجر بازلت ملمس مع خشب تيك طبيعي مقاوم للعوامل الجوية",
+    specEn: "Flush-sill concealed drainage transition system enabling continuous indoor-to-outdoor spatial harmony.",
+    specAr: "عتبة غائرة مستوية بالكامل بنظام تصريف مخفي لربط الصالون بالتراس الخارجي دون أي عوائق.",
+    acoustic: "Weatherproof · IP68 Drainage",
+    acousticScore: 74,
+    originEn: "Java & Sicily Sustainable Mills",
+    originAr: "مقالع صقلية ومزارع التيك المستدامة",
+    fireRating: "Weather & UV Resilient",
+    image: "https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?auto=format&fit=crop&w=600&q=80",
   },
 ];
 
@@ -93,38 +173,44 @@ const TYPOLOGIES = [
   {
     id: "villa",
     vol: "VOLUME 01",
+    coords: "30.0131° N, 31.4913° E",
     titleEn: "Grand Private Villas",
     titleAr: "الفلل المستقلة والقصور",
     area: "450 – 1,200 m²",
+    height: "3.8m – 7.2m Ceiling",
     locationEn: "New Cairo & Sheikh Zayed",
     locationAr: "القاهرة الجديدة والشيخ زايد",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-    descEn: "Complete turnkey structural and interior fit-out, double-height volumes, and private wellness suites.",
-    descAr: "تشطيب وتنفيذ معماري متكامل يشمل الأسقف المرتفعة ومساحات الاستجمام والحدائق الداخلية.",
+    descEn: "Complete turnkey structural and interior fit-out, double-height light wells, private spa wellness suites, and master courtyards.",
+    descAr: "تنفيذ معماري متكامل يشمل بهو الاستقبال المزدوج، أجنحة الاستجمام والسبا الخاصة، والحدائق الداخلية المتصلة.",
   },
   {
     id: "penthouse",
     vol: "VOLUME 02",
+    coords: "25.1124° N, 55.1390° E",
     titleEn: "Sky Penthouses",
-    titleAr: "بنتهاوس الأفق",
+    titleAr: "بنتهاوس الأفق البانورامي",
     area: "320 – 680 m²",
+    height: "3.4m Floor-to-Ceiling Glazing",
     locationEn: "Palm Jumeirah & Nile View",
-    locationAr: "نخلة جميرا وإطلالات النيل",
+    locationAr: "نخلة جميرا وإطلالات كورنيش النيل",
     image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
-    descEn: "Panoramic glazing, bespoke acoustic ceiling rafts, and infinity terrace indoor-outdoor living.",
-    descAr: "واجهات زجاجية بانورامية، أسقف عازلة للصوت، وتراسات معلقة بإطلالات خلابة.",
+    descEn: "Panoramic acoustic curtain glazing, bespoke floating ceiling rafts, private plunge pools, and seamless indoor-outdoor horizon living.",
+    descAr: "واجهات زجاجية بانورامية ممتدة، أسقف عازلة للصوت بنظام طافي، مسابح أفقية خاصة، وتراسات معلقة بإطلالات خلابة.",
   },
   {
     id: "duplex",
     vol: "VOLUME 03",
+    coords: "30.0444° N, 31.2357° E",
     titleEn: "Urban Duplexes",
-    titleAr: "الدوبلكس العصري",
+    titleAr: "الدوبلكس العصري الفاخر",
     area: "240 – 420 m²",
-    locationEn: "New Capital & Maadi",
-    locationAr: "العاصمة الإدارية والمعادي",
+    height: "Double-Height Atrium",
+    locationEn: "New Capital & Diplomatic Quarter",
+    locationAr: "العاصمة الإدارية والحي الدبلوماسي",
     image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80",
-    descEn: "Sculptural floating staircases, mezzanine libraries, and integrated smart living automation.",
-    descAr: "سلالم معلقة ذات طابع نحتي، ميزانين مفتوح، ونظم منزلية ذكية مدمجة بالكامل.",
+    descEn: "Sculptural floating cantilever staircases, mezzanine libraries, concealed acoustic joinery, and fully integrated building automation.",
+    descAr: "سلالم معلقة ذات طابع نحتي، ميزانين مكتبات، دواليب خشبية مدمجة ممتصة للصدى، ونظم تحكم منزلي فندقية ذكية.",
   },
 ];
 
@@ -134,36 +220,90 @@ const METHODOLOGY = [
     step: "01",
     titleEn: "Laser Survey & Structural Audit",
     titleAr: "المسح الليزري والتدقيق الإنشائي",
-    descEn: "Millimeter-precise 3D point cloud scan of your property with acoustic and structural load verification.",
-    descAr: "مسح ثلاثي الأبعاد بالليزر بدقة المليمتر وفحص الأحمال الإنشائية والعزل.",
+    descEn: "Millimeter-precise 3D LiDAR point cloud scan of your property with acoustic calibration and MEP conduit tracing.",
+    descAr: "مسح ثلاثي الأبعاد بالليزر (LiDAR) بدقة المليمتر لفحص الاستواء الإنشائي ومسارات التغذية والعزل.",
+    badgeEn: "0.02mm Precision",
+    badgeAr: "دقة 0.02 ملم",
   },
   {
     step: "02",
-    titleEn: "Bespoke 3D Spatial Architecture",
-    titleAr: "التصميم المكاني ثلاثي الأبعاد",
-    descEn: "Tailored axonometric layout, curated moodboards, lighting choreography, and material samples at your door.",
-    descAr: "تخطيط أيزومتري مفصل، لوحات إلهام مخصصة، دراسة الإضاءة، وتوصيل عينات المواد لمنزلك.",
+    titleEn: "3D Spatial Architecture & Moodboard",
+    titleAr: "التصميم المكاني ثلاثي الأبعاد واللوحات",
+    descEn: "Bespoke axonometric layout, lighting choreography (2700K circadian), and physical material tactile box delivered to your residence.",
+    descAr: "تخطيط أيزومتري مفصل، دراسة الإضاءة البيولوجية، وصندوق عينات المواد الطبيعية الفاخرة واصل لمنزلك.",
+    badgeEn: "Physical Samples",
+    badgeAr: "عينات مواد فعلية",
   },
   {
     step: "03",
-    titleEn: "100% Itemized BOQ & Procurement",
-    titleAr: "جدول الكميات والتوريدات بشفافية",
-    descEn: "Fixed contract pricing with zero unexpected variation orders. Direct sourcing from European quarries and mills.",
-    descAr: "تسعير تعاقدي ثابت بدون مفاجآت، واستيراد مباشر من المقالع والمصانع الأوروبية المعتمدة.",
+    titleEn: "100% Itemized BOQ & Pricing Lock",
+    titleAr: "جدول الكميات والتسعير الثابت",
+    descEn: "Legally locked contract pricing with zero variation order surprises. Direct quarry allocations from Italy and European mills.",
+    descAr: "تسعير تعاقدي ثابت وملزم بدون أي بنود مستحدثة أو مفاجآت، مع حجز مباشر من مقالع الرخام الأوروبية.",
+    badgeEn: "Zero Cost Creep",
+    badgeAr: "ضمان ثبات التكلفة",
   },
   {
     step: "04",
-    titleEn: "Atelier Joinery & Fit-Out Execution",
-    titleAr: "التنفيذ المعماري وأعمال النجارة الفاخرة",
-    descEn: "Dedicated on-site lead architect managing precision MEP, custom joinery, stone cladding, and acoustic rafts.",
-    descAr: "مهندس موقع مخصص يدير الأعمال الكهروميكانيكية، التكسيات الحجرية، والنجارة الفندقية.",
+    titleEn: "Atelier Joinery & On-Site Execution",
+    titleAr: "التنفيذ المعماري وأعمال النجارة الحرفية",
+    descEn: "Dedicated on-site lead architect managing precision MEP, custom stone cladding, acoustic walls, and weekly video walkthroughs.",
+    descAr: "مهندس موقع أول مخصص يدير الأعمال الكهروميكانيكية، التكسيات الحجرية، والنجارة الفندقية مع تقرير أسبوعي مرئي.",
+    badgeEn: "Dedicated Lead Architect",
+    badgeAr: "إشراف هندسي متفرغ",
   },
   {
     step: "05",
-    titleEn: "White-Glove Handover & Warranty",
-    titleAr: "التسليم الفندقي والضمان الشامل",
-    descEn: "Deep detailing, custom fragrance curation, comprehensive O&M manual, and our 10-year structural warranty.",
-    descAr: "تنظيف وتعقيم فندقي شامل، تسليم كتيب الصيانة والتشغيل، وضمان معتمد لمدة 10 سنوات.",
+    titleEn: "White-Glove Handover & 10-Yr Warranty",
+    titleAr: "التسليم الفندقي والضمان العشري المعتمد",
+    descEn: "Deep detailing, custom signature ambient scent curation, comprehensive O&M digital dossier, and our 10-year structural warranty.",
+    descAr: "تعقيم فندقي دقيق، تعطير المكان برائحة فالنتيا الخاصة، تسليم ملف التشغيل الرقمي، وضمان معتمد لمدة 10 سنوات.",
+    badgeEn: "10-Year Certificate",
+    badgeAr: "شهادة ضمان 10 سنوات",
+  },
+];
+
+// Comparison Matrix: Traditional vs Valentia Atelier
+const COMPARISON_ROWS = [
+  {
+    featureEn: "Project Cost Certainty",
+    featureAr: "ثبات تكلفة المشروع",
+    traditionalEn: "Frequent 20% – 40% cost overruns via variation orders",
+    traditionalAr: "زيادات متكررة بنسبة 20% إلى 40% عبر بنود مستحدثة",
+    valentiaEn: "100% Fixed Itemized BOQ with zero surprise surcharges",
+    valentiaAr: "جدول كميات تعاقدي ثابت 100% بدون أي زيادات مفاجئة",
+  },
+  {
+    featureEn: "Site Measurements",
+    featureAr: "دقة رفع المقاسات الموقعية",
+    traditionalEn: "Manual tape measures prone to human error & misfits",
+    traditionalAr: "أشرطة قياس يدوية عرضة لأخطاء بشرية وتفاوت في المقاسات",
+    valentiaEn: "3D LiDAR Point Cloud Laser Scan accurate to 0.02 mm",
+    valentiaAr: "مسح ليزري رقمي 3D LiDAR بدقة متناهية تصل إلى 0.02 ملم",
+  },
+  {
+    featureEn: "Project Oversight",
+    featureAr: "الإشراف والمسؤولية الموقعية",
+    traditionalEn: "Fragmented sub-contractors blaming each other for defects",
+    traditionalAr: "مقاولون بالباطن متفرقون يتبادلون إلقاء اللوم عند حدوث أخطاء",
+    valentiaEn: "Single Atelier Lead Architect with full on-site accountability",
+    valentiaAr: "مهندس معماري أول مخصص للأتيليه بمسؤولية كاملة وشاملة",
+  },
+  {
+    featureEn: "Material Origin",
+    featureAr: "مصدر وجودة الخامات",
+    traditionalEn: "Local commercial grade stock with unverified durability",
+    traditionalAr: "مواد تجارية محلية غير موثوقة المصدر أو درجات المقاومة",
+    valentiaEn: "Direct European quarry stone & certified acoustic joinery",
+    valentiaAr: "توريد مباشر من المقالع الإيطالية ومصانع الأخشاب الأوروبية المعتمدة",
+  },
+  {
+    featureEn: "Post-Handover Support",
+    featureAr: "خدمات ما بعد التسليم",
+    traditionalEn: "Vanishing support once final payment is collected",
+    traditionalAr: "صعوبة التواصل وانعدام الدعم فور استلام الدفعة الأخيرة",
+    valentiaEn: "10-Year certified structural warranty & concierge maintenance",
+    valentiaAr: "ضمان إنشائي وتشغيلي معتمد لمدة 10 سنوات مع صيانة فندقية",
   },
 ];
 
@@ -172,14 +312,43 @@ export default function LandingPage() {
   const { language, toggleLanguage, isRTL } = useLanguage();
 
   const [activeHotspot, setActiveHotspot] = React.useState<MaterialHotspot>(HOTSPOTS[0]);
+  const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
+  const [lightingMood, setLightingMood] = React.useState<LightingMood>("daylight");
+  const [mouseSpotlight, setMouseSpotlight] = React.useState({ x: 50, y: 35 });
+
+  // Dynamic Destination URL based on Auth State
+  const commissionUrl = isAuthenticated ? "/projects/new" : "/login?redirect=/projects/new";
+  const projectsUrl = isAuthenticated ? "/projects" : "/login?redirect=/projects";
+
+  const filteredHotspots = React.useMemo(() => {
+    if (selectedCategory === "all") return HOTSPOTS;
+    return HOTSPOTS.filter((h) => h.category === selectedCategory);
+  }, [selectedCategory]);
+
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMouseSpotlight({ x, y });
+  };
+
+  const activePreset = LIGHTING_PRESETS[lightingMood];
 
   return (
-    <div className="min-h-screen bg-[#ECE3D5] text-[#1C1917] selection:bg-[#1C1917] selection:text-[#FAF7F2] relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#1C1917] selection:bg-[#1C1917] selection:text-[#FAF7F2] relative overflow-x-hidden">
+      {/* 0. BESPOKE ATELIER CUSTOM CURSOR */}
+      <AtelierCursor />
+
       {/* 1. STICKY ATELIER NAVBAR */}
-      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#FAF7F2]/85 backdrop-blur-xl border-b border-[#D8C8B4]/70 shadow-sm">
+      <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#FAF7F2]/90 backdrop-blur-xl border-b border-[#E6DDD2] shadow-xs">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 h-20 flex items-center justify-between">
           {/* Brand Monogram */}
-          <Link href="/" className="flex items-center gap-3.5 group">
+          <Link
+            href="/"
+            className="flex items-center gap-3.5 group"
+            data-cursor="pointer"
+            data-cursor-text="VALENTIA"
+          >
             <div className="w-10 h-10 rounded-full bg-[#1C1917] text-[#FAF7F2] flex items-center justify-center border border-[#1C1917] shadow-sm group-hover:bg-[#503C2C] transition-colors">
               <Buildings className="w-5 h-5" weight="light" />
             </div>
@@ -187,24 +356,47 @@ export default function LandingPage() {
               <span className="block text-sm tracking-[0.25em] font-light uppercase text-[#1C1917]">
                 VALENTIA
               </span>
-              <span className="block text-[9px] tracking-[0.22em] text-[#6B635B] uppercase font-mono">
-                {isRTL ? "أتيليه التصميم والتنفيذ" : "Design & Build Atelier"}
+              <span className="block text-[9px] tracking-[0.22em] text-[#707070] uppercase font-mono">
+                {isRTL ? "أتيليه التصميم والتنفيذ المعماري" : "Design & Build Atelier"}
               </span>
             </div>
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs uppercase tracking-widest text-[#503C2C] font-medium">
-            <a href="#philosophy" className="hover:text-[#1C1917] transition-colors">
+          <nav className="hidden lg:flex items-center gap-8 text-xs uppercase tracking-widest text-[#503C2C] font-medium">
+            <a
+              href="#philosophy"
+              data-cursor="pointer"
+              className="hover:text-[#1C1917] transition-colors"
+            >
               {isRTL ? "الفلسفة" : "Philosophy"}
             </a>
-            <a href="#blueprints" className="hover:text-[#1C1917] transition-colors">
+            <a
+              href="#blueprints"
+              data-cursor="pointer"
+              className="hover:text-[#1C1917] transition-colors"
+            >
               {isRTL ? "المخططات والمواد" : "Blueprints"}
             </a>
-            <a href="#typologies" className="hover:text-[#1C1917] transition-colors">
+            <a
+              href="#typologies"
+              data-cursor="pointer"
+              className="hover:text-[#1C1917] transition-colors"
+            >
               {isRTL ? "المشاريع والنماذج" : "Typologies"}
             </a>
-            <a href="#methodology" className="hover:text-[#1C1917] transition-colors">
+            <a
+              href="#comparison"
+              data-cursor="pointer"
+              className="hover:text-[#1C1917] transition-colors"
+            >
+              {isRTL ? "معيار الأتيليه" : "Atelier Standard"}
+            </a>
+            <a
+              href="#methodology"
+              data-cursor="pointer"
+              className="hover:text-[#1C1917] transition-colors"
+            >
               {isRTL ? "منهجية التنفيذ" : "Methodology"}
             </a>
           </nav>
@@ -215,7 +407,9 @@ export default function LandingPage() {
             <button
               onClick={toggleLanguage}
               type="button"
-              className="text-xs font-medium tracking-wider text-[#503C2C] hover:text-[#1C1917] transition-colors bg-white/60 hover:bg-white/90 px-3 py-1.5 rounded-full border border-[#D8C8B4] shadow-xs cursor-pointer"
+              data-cursor="pointer"
+              data-cursor-text={language === "en" ? "AR" : "EN"}
+              className="text-xs font-medium tracking-wider text-[#503C2C] hover:text-[#1C1917] transition-colors bg-white/70 hover:bg-white px-3.5 py-1.5 rounded-full border border-[#D8C8B4] shadow-xs cursor-pointer active:scale-95"
             >
               {language === "en" ? "العربية" : "English"}
             </button>
@@ -223,27 +417,36 @@ export default function LandingPage() {
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <Link
-                  href="/projects"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer"
+                  href={projectsUrl}
+                  data-cursor="pointer"
+                  data-cursor-text="PROJECTS"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer active:scale-98"
                 >
                   <span>{isRTL ? "مشاريعي" : "My Projects"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
                 </Link>
-                <div className="w-8 h-8 rounded-full bg-[#DFD3C1] border border-[#D8C8B4] flex items-center justify-center text-xs font-medium text-[#1C1917]">
-                  {user?.name?.[0] || <User className="w-4 h-4" />}
+                <div
+                  title={user?.name || user?.username || "Authenticated"}
+                  className="w-8 h-8 rounded-full bg-[#DFD3C1] border border-[#D8C8B4] flex items-center justify-center text-xs font-medium text-[#1C1917] uppercase"
+                >
+                  {user?.name?.[0] || user?.username?.[0] || <User className="w-4 h-4" />}
                 </div>
               </div>
             ) : (
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   href="/login"
+                  data-cursor="pointer"
+                  data-cursor-text="SIGN IN"
                   className="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#503C2C] hover:text-[#1C1917] hover:bg-white/60 transition-colors"
                 >
                   {isRTL ? "تسجيل الدخول" : "Sign In"}
                 </Link>
                 <Link
-                  href="/projects/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer hover:shadow-md"
+                  href={commissionUrl}
+                  data-cursor="pointer"
+                  data-cursor-text="COMMISSION"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer hover:shadow-md active:scale-98"
                 >
                   <span>{isRTL ? "بدء مشروعك" : "Commission"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
@@ -254,39 +457,103 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* 2. FLAGSHIP HERO: BESPOKE 3D TILT & PARALLAX SHOWCASE */}
+      {/* 2. FLAGSHIP HERO: INLINE-IMAGE TYPOGRAPHY, AMBIENT SPOTLIGHT & 3D TILT CENTERPIECE */}
       <section
         id="philosophy"
+        onMouseMove={handleHeroMouseMove}
         className="pt-32 pb-20 md:pt-40 md:pb-28 max-w-7xl mx-auto px-6 sm:px-8 relative overflow-hidden"
       >
+        {/* Dynamic Architectural Ambient Mouse Spotlight */}
+        <div
+          className="pointer-events-none absolute -inset-10 opacity-70 transition-all duration-300 ease-out -z-10"
+          style={{
+            background: `radial-gradient(circle 650px at ${mouseSpotlight.x}% ${mouseSpotlight.y}%, rgba(184, 132, 96, 0.14) 0%, rgba(250, 247, 242, 0) 70%)`,
+          }}
+        />
+
+        {/* Blueprint Precision Crosshairs at Section Corners */}
+        <div className="hidden sm:block absolute top-28 start-6 font-mono text-[10px] text-[#B88460]/60 select-none pointer-events-none">
+          + [GRID_01 · NORTH]
+        </div>
+        <div className="hidden sm:block absolute top-28 end-6 font-mono text-[10px] text-[#B88460]/60 select-none pointer-events-none">
+          + [RL +14.200m]
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
-          {/* Left Text Column */}
+          {/* Left Text Column with Taste-Design Inline Vignettes */}
           <RevealOnScroll direction="up" delayMs={100} className="lg:col-span-6 space-y-6">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-white/70 border border-[#D8C8B4] text-xs font-mono tracking-widest text-[#503C2C] uppercase shadow-xs">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono tracking-widest text-[#503C2C] uppercase shadow-xs">
               <span className="w-2 h-2 rounded-full bg-[#B88460] animate-pulse" />
               <span>
                 {isRTL
-                  ? "أتيليه فالنتيا للتصميم والتنفيذ المعماري"
-                  : "VALENTIA DESIGN & BUILD ATELIER"}
+                  ? "أتيليه فالنتيا للتصميم والتنفيذ · القاهرة | دبي"
+                  : "VALENTIA DESIGN & BUILD ATELIER · EST. 2026"}
               </span>
             </div>
 
-            <h1 className="font-serif text-4xl sm:text-5xl xl:text-6xl text-[#1C1917] font-normal tracking-tight leading-[1.12]">
+            {/* Editorial Headline with Embedded Architectural Image Capsules */}
+            <h1 className="font-serif text-4xl sm:text-5xl xl:text-6xl text-[#1C1917] font-normal tracking-tight leading-[1.18]">
               {isRTL ? (
                 <>
-                  من مجرد مساحة
-                  <br />
-                  <span className="italic font-light text-[#503C2C]">
-                    إلى أسلوب حياة استثنائي.
+                  من مجرد مساحة{" "}
+                  <span
+                    data-cursor="inspect"
+                    data-cursor-text="VILLA"
+                    className="inline-flex items-center align-middle mx-1.5 px-0.5 rounded-full bg-white border border-[#D8C8B4] shadow-xs overflow-hidden h-9 sm:h-12 w-16 sm:w-24 relative -top-1 group cursor-pointer hover:w-28 transition-all duration-300"
+                  >
+                    <Image
+                      src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80"
+                      alt="Architectural space"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </span>
+                  <br />
+                  إلى أسلوب حياة{" "}
+                  <span
+                    data-cursor="inspect"
+                    data-cursor-text="LIVING"
+                    className="inline-flex items-center align-middle mx-1.5 px-0.5 rounded-full bg-white border border-[#D8C8B4] shadow-xs overflow-hidden h-9 sm:h-12 w-16 sm:w-24 relative -top-1 group cursor-pointer hover:w-28 transition-all duration-300"
+                  >
+                    <Image
+                      src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=300&q=80"
+                      alt="Luxury lifestyle"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </span>
+                  <span className="italic font-light text-[#503C2C]"> استثنائي.</span>
                 </>
               ) : (
                 <>
-                  From a place
-                  <br />
-                  <span className="italic font-light text-[#503C2C]">
-                    to a bespoke lifestyle.
+                  From a place{" "}
+                  <span
+                    data-cursor="inspect"
+                    data-cursor-text="VILLA"
+                    className="inline-flex items-center align-middle mx-2 px-0.5 rounded-full bg-white border border-[#D8C8B4] shadow-xs overflow-hidden h-9 sm:h-12 w-16 sm:w-24 relative -top-1 group cursor-pointer hover:w-28 transition-all duration-300"
+                  >
+                    <Image
+                      src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=300&q=80"
+                      alt="Architectural space"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </span>
+                  <br />
+                  to a bespoke lifestyle{" "}
+                  <span
+                    data-cursor="inspect"
+                    data-cursor-text="ATELIER"
+                    className="inline-flex items-center align-middle mx-2 px-0.5 rounded-full bg-white border border-[#D8C8B4] shadow-xs overflow-hidden h-9 sm:h-12 w-16 sm:w-24 relative -top-1 group cursor-pointer hover:w-28 transition-all duration-300"
+                  >
+                    <Image
+                      src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=300&q=80"
+                      alt="Luxury lifestyle"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </span>
+                  <span className="italic font-light text-[#503C2C]">.</span>
                 </>
               )}
             </h1>
@@ -300,10 +567,12 @@ export default function LandingPage() {
             {/* CTAs */}
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <Link
-                href="/projects/new"
-                className="h-12 px-7 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs uppercase tracking-widest font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2.5 cursor-pointer group"
+                href={commissionUrl}
+                data-cursor="pointer"
+                data-cursor-text="START"
+                className="h-12 px-7 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs uppercase tracking-widest font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2.5 cursor-pointer group active:scale-98"
               >
-                <span>{isRTL ? "ابدأ تصميم مشروعك الآن" : "Commission Your Estate"}</span>
+                <span>{isRTL ? "ابدأ تصميم مسكنك الآن" : "Commission Your Estate"}</span>
                 {isRTL ? (
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 ) : (
@@ -313,14 +582,16 @@ export default function LandingPage() {
 
               <a
                 href="#blueprints"
-                className="h-12 px-6 rounded-full bg-white/80 hover:bg-white border border-[#D8C8B4] text-[#1C1917] text-xs uppercase tracking-widest font-medium transition-colors shadow-xs flex items-center gap-2"
+                data-cursor="pointer"
+                data-cursor-text="INSPECT"
+                className="h-12 px-6 rounded-full bg-white/80 hover:bg-white border border-[#D8C8B4] text-[#1C1917] text-xs uppercase tracking-widest font-medium transition-colors shadow-xs flex items-center gap-2 active:scale-98"
               >
                 <Compass className="w-4 h-4 text-[#B88460]" />
                 <span>{isRTL ? "استعراض المخططات والمواد" : "Explore Blueprints"}</span>
               </a>
             </div>
 
-            {/* Trust Badges */}
+            {/* Trust Metrics */}
             <div className="pt-6 border-t border-[#D8C8B4]/70 grid grid-cols-3 gap-4 text-start">
               <div>
                 <span className="block font-serif text-2xl font-normal text-[#1C1917]">
@@ -349,36 +620,49 @@ export default function LandingPage() {
             </div>
           </RevealOnScroll>
 
-          {/* Right Column: 3D Perspective Tilt Card */}
+          {/* Right Column: 3D Perspective Tilt Card with Interactive Lighting Presets */}
           <div className="lg:col-span-6 relative">
             <RevealOnScroll direction="up" delayMs={250}>
               <TiltCard
-                maxRotation={10}
+                maxRotation={8}
                 perspective={1200}
+                data-cursor="view"
+                data-cursor-text="ROTATE 3D"
                 className="rounded-3xl p-3 sm:p-4 bg-white/80 backdrop-blur-xl border border-[#D8C8B4] shadow-2xl shadow-[#1C1917]/10"
               >
-                {/* Visual Image Container */}
+                {/* Visual Image Container with Dynamic Preset Illumination */}
                 <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-[#241F1B]">
                   <Image
-                    src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85"
-                    alt="Valentia Luxury Residence Interior"
+                    src={activePreset.image}
+                    alt={activePreset.nameEn}
                     fill
                     priority
-                    className="object-cover transition-transform duration-700 hover:scale-105"
+                    className="object-cover transition-all duration-700 hover:scale-105"
                     sizes="(max-width: 1024px) 100vw, 50vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917]/80 via-transparent to-black/20" />
+                  <div
+                    className="absolute inset-0 transition-colors duration-700 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(circle at 50% 30%, ${activePreset.glowColor}, transparent 60%), linear-gradient(to top, rgba(28, 25, 23, 0.85), transparent 60%)`,
+                    }}
+                  />
 
                   {/* Floating Depth Badges */}
-                  <div className="absolute top-4 start-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20 text-[#FAF7F2] text-xs font-mono">
+                  <div className="absolute top-4 start-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[#FAF7F2] text-xs font-mono">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>{isRTL ? "قيد التنفيذ · القاهرة الجديدة" : "Commission · Horizon Villa"}</span>
+                    <span>{isRTL ? "قيد التنفيذ · القاهرة الجديدة" : "Live Commission · Horizon Villa"}</span>
+                  </div>
+
+                  {/* Lighting Kelvin Badge */}
+                  <div className="absolute top-4 end-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[#FAF7F2] text-[10px] font-mono">
+                    <Eye className="w-3 h-3 text-[#B88460]" />
+                    <span>{activePreset.kelvin}</span>
                   </div>
 
                   <div className="absolute bottom-4 start-4 end-4 flex items-end justify-between text-[#FAF7F2]">
                     <div>
                       <span className="block text-xs uppercase tracking-widest text-[#FAF7F2]/70 font-mono">
-                        {isRTL ? "مساحة 520 م² · تصميم معاصر" : "520 m² · Warm Minimalist"}
+                        {isRTL ? "مساحة 520 م² · طابع معاصر دافئ" : "520 m² · Warm Minimalist"}
                       </span>
                       <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#FAF7F2]">
                         {isRTL ? "قصر الباتيو · التجمع الخامس" : "The Patio Villa · New Cairo"}
@@ -391,10 +675,70 @@ export default function LandingPage() {
                   </div>
                 </div>
 
+                {/* Lighting Atmosphere Selector Controls */}
+                <div className="mt-3 px-1 py-1.5 rounded-xl bg-[#FAF7F2] border border-[#E6DDD2] flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#503C2C] px-2">
+                    <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
+                    <span className="hidden sm:inline">
+                      {isRTL ? "الإضاءة المعمارية:" : "Lighting Study:"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setLightingMood("daylight")}
+                      data-cursor="pointer"
+                      data-cursor-text="5500K"
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer",
+                        lightingMood === "daylight"
+                          ? "bg-[#1C1917] text-[#FAF7F2] shadow-xs"
+                          : "text-[#6B635B] hover:text-[#1C1917]"
+                      )}
+                    >
+                      <Sun className="w-3 h-3" />
+                      <span>{isRTL ? "نهار" : "Daylight"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setLightingMood("golden")}
+                      data-cursor="pointer"
+                      data-cursor-text="3000K"
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer",
+                        lightingMood === "golden"
+                          ? "bg-[#1C1917] text-[#FAF7F2] shadow-xs"
+                          : "text-[#6B635B] hover:text-[#1C1917]"
+                      )}
+                    >
+                      <SunHorizon className="w-3 h-3" />
+                      <span>{isRTL ? "غروب" : "Sunset"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setLightingMood("twilight")}
+                      data-cursor="pointer"
+                      data-cursor-text="2400K"
+                      className={cn(
+                        "px-2.5 py-1 rounded-lg text-[10px] font-mono uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer",
+                        lightingMood === "twilight"
+                          ? "bg-[#1C1917] text-[#FAF7F2] shadow-xs"
+                          : "text-[#6B635B] hover:text-[#1C1917]"
+                      )}
+                    >
+                      <Moon className="w-3 h-3" />
+                      <span>{isRTL ? "ليل" : "Twilight"}</span>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Card Lower Bar with Turnkey Progress Tracker */}
-                <div className="mt-4 p-4 rounded-xl bg-[#FAF7F2] border border-[#D8C8B4]/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="mt-3 p-3.5 rounded-xl bg-[#FAF7F2] border border-[#D8C8B4]/80 flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <div className="w-9 h-9 rounded-full bg-[#1C1917] text-[#FAF7F2] flex items-center justify-center shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[#1C1917] text-[#FAF7F2] flex items-center justify-center shrink-0">
                       <Sparkle className="w-4 h-4" />
                     </div>
                     <div>
@@ -408,7 +752,9 @@ export default function LandingPage() {
                   </div>
 
                   <Link
-                    href="/projects/new"
+                    href={commissionUrl}
+                    data-cursor="pointer"
+                    data-cursor-text="INTAKE"
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-[#B88460] hover:text-[#503C2C] underline underline-offset-4 shrink-0 transition-colors"
                   >
                     <span>{isRTL ? "ابدأ مواصفاتك" : "Configure Specifications"}</span>
@@ -422,11 +768,15 @@ export default function LandingPage() {
       </section>
 
       {/* 3. ARCHITECTURAL BENCHMARK STRIP */}
-      <section className="border-y border-[#D8C8B4] bg-[#FAF7F2]/60 py-10">
+      <section className="border-y border-[#E6DDD2] bg-[#FAF7F2]/60 py-10">
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <RevealOnScroll direction="up" delayMs={50}>
-              <div className="p-4 rounded-2xl bg-white/60 border border-[#D8C8B4]/50 shadow-xs">
+              <div
+                data-cursor="inspect"
+                data-cursor-text="0.02MM"
+                className="p-5 rounded-2xl bg-white/70 border border-[#D8C8B4]/50 shadow-xs hover:border-[#B88460]/40 transition-colors cursor-default"
+              >
                 <Ruler className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">0.02 mm</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
@@ -436,7 +786,11 @@ export default function LandingPage() {
             </RevealOnScroll>
 
             <RevealOnScroll direction="up" delayMs={100}>
-              <div className="p-4 rounded-2xl bg-white/60 border border-[#D8C8B4]/50 shadow-xs">
+              <div
+                data-cursor="inspect"
+                data-cursor-text="BOQ"
+                className="p-5 rounded-2xl bg-white/70 border border-[#D8C8B4]/50 shadow-xs hover:border-[#B88460]/40 transition-colors cursor-default"
+              >
                 <SealCheck className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">100%</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
@@ -446,7 +800,11 @@ export default function LandingPage() {
             </RevealOnScroll>
 
             <RevealOnScroll direction="up" delayMs={150}>
-              <div className="p-4 rounded-2xl bg-white/60 border border-[#D8C8B4]/50 shadow-xs">
+              <div
+                data-cursor="inspect"
+                data-cursor-text="10 YRS"
+                className="p-5 rounded-2xl bg-white/70 border border-[#D8C8B4]/50 shadow-xs hover:border-[#B88460]/40 transition-colors cursor-default"
+              >
                 <ShieldCheck className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">10 Years</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
@@ -456,7 +814,11 @@ export default function LandingPage() {
             </RevealOnScroll>
 
             <RevealOnScroll direction="up" delayMs={200}>
-              <div className="p-4 rounded-2xl bg-white/60 border border-[#D8C8B4]/50 shadow-xs">
+              <div
+                data-cursor="inspect"
+                data-cursor-text="SLA"
+                className="p-5 rounded-2xl bg-white/70 border border-[#D8C8B4]/50 shadow-xs hover:border-[#B88460]/40 transition-colors cursor-default"
+              >
                 <ClockCountdown className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">On-Time</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
@@ -468,10 +830,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 4. INTERACTIVE 3D AXONOMETRIC & MATERIAL SPECIFICATION SECTION */}
+      {/* 4. INTERACTIVE 3D AXONOMETRIC & MATERIAL SPECIFICATION DOSSIER */}
       <section id="blueprints" className="py-24 max-w-7xl mx-auto px-6 sm:px-8">
-        <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
+        <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
             <Compass className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "الهندسة المعمارية التفاعلية" : "AXONOMETRIC SPECIFICATION"}</span>
           </div>
@@ -485,23 +847,54 @@ export default function LandingPage() {
               ? "انقر على نقاط التحديد داخل المخطط ثلاثي الأبعاد لاكتشاف مواصفات المواد، معايير العزل الصوتي، وحلول التشطيب المخصصة."
               : "Interact with material pins across the axonometric model to inspect finish grades, acoustic ratings, and architectural joinery."}
           </p>
+
+          {/* Category Filter Pills */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {[
+              { id: "all", labelEn: "All Finishes", labelAr: "كافة المواد" },
+              { id: "stone", labelEn: "Navona Travertine", labelAr: "ترافرتين إيطالي" },
+              { id: "wood", labelEn: "Acoustic Oak", labelAr: "سنديان ألماني" },
+              { id: "glass", labelEn: "Fluted Glazing", labelAr: "زجاج مضلع" },
+              { id: "outdoor", labelEn: "Basalt Veranda", labelAr: "بازلت وتيك خارجي" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setSelectedCategory(tab.id)}
+                data-cursor="pointer"
+                data-cursor-text={tab.id.toUpperCase()}
+                type="button"
+                className={cn(
+                  "px-3.5 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-all cursor-pointer",
+                  selectedCategory === tab.id
+                    ? "bg-[#1C1917] text-[#FAF7F2] shadow-sm"
+                    : "bg-white/80 text-[#503C2C] hover:bg-white border border-[#D8C8B4]"
+                )}
+              >
+                {isRTL ? tab.labelAr : tab.labelEn}
+              </button>
+            ))}
+          </div>
         </RevealOnScroll>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left/Main Blueprint Viewer with Interactive Hotspot Pins */}
           <div className="lg:col-span-8 relative">
             <RevealOnScroll direction="up" delayMs={100}>
-              <div className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[#241F1B] border border-[#D8C8B4] shadow-xl group">
+              <div
+                data-cursor="view"
+                data-cursor-text="INSPECT"
+                className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[#241F1B] border border-[#D8C8B4] shadow-xl group"
+              >
                 <Image
                   src="/images/isometric-floorplan.jpg"
                   alt="3D Axonometric Blueprint Model"
                   fill
                   className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-102"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
 
                 {/* Hotspot Pins */}
-                {HOTSPOTS.map((spot) => {
+                {filteredHotspots.map((spot) => {
                   const isSelected = activeHotspot.id === spot.id;
                   return (
                     <button
@@ -509,6 +902,8 @@ export default function LandingPage() {
                       onClick={() => setActiveHotspot(spot)}
                       style={{ top: `${spot.y}%`, left: `${spot.x}%` }}
                       type="button"
+                      data-cursor="inspect"
+                      data-cursor-text="MATERIAL"
                       aria-label={spot.titleEn}
                       className={cn(
                         "absolute -translate-x-1/2 -translate-y-1/2 z-20 group/pin cursor-pointer transition-all duration-300",
@@ -543,28 +938,30 @@ export default function LandingPage() {
                 })}
 
                 {/* Floating Bottom Instructions */}
-                <div className="absolute bottom-4 start-4 px-3.5 py-1.5 rounded-full bg-white/80 backdrop-blur-md border border-[#D8C8B4] text-xs text-[#503C2C] font-mono flex items-center gap-2">
+                <div className="absolute bottom-4 start-4 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#D8C8B4] text-xs text-[#503C2C] font-mono flex items-center gap-2 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>{isRTL ? "انقر على النقاط لاكتشاف المواد" : "Click pins to inspect specifications"}</span>
+                  <span>{isRTL ? "انقر على النقاط لاكتشاف المواصفات" : "Click pins to inspect specifications"}</span>
                 </div>
               </div>
             </RevealOnScroll>
           </div>
 
-          {/* Right/Inspector Sidebar Card */}
+          {/* Right/Inspector Sidebar Card with Acoustic Spectrum Bar */}
           <div className="lg:col-span-4">
             <RevealOnScroll direction="up" delayMs={200}>
               <TiltCard
                 maxRotation={6}
-                className="p-6 rounded-2xl bg-white/90 backdrop-blur-md border border-[#D8C8B4] shadow-lg"
+                data-cursor="view"
+                data-cursor-text="SPECS"
+                className="p-6 rounded-3xl bg-white/95 backdrop-blur-md border border-[#D8C8B4] shadow-lg"
               >
                 <div className="flex items-center justify-between border-b border-[#D8C8B4]/60 pb-4 mb-4">
                   <div className="flex items-center gap-2 text-xs font-mono uppercase text-[#B88460]">
                     <Sparkle className="w-3.5 h-3.5" />
-                    <span>{isRTL ? "تفاصيل المواصفات" : "SPECIFICATION DOSSIER"}</span>
+                    <span>{isRTL ? "ملف المواصفات المعمارية" : "SPECIFICATION DOSSIER"}</span>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#DFD3C1]/50 text-[#503C2C]">
-                    {activeHotspot.acoustic}
+                    {activeHotspot.fireRating.split(" ")[0]}
                   </span>
                 </div>
 
@@ -580,19 +977,45 @@ export default function LandingPage() {
                   {isRTL ? activeHotspot.specAr : activeHotspot.specEn}
                 </p>
 
-                <div className="space-y-3 pt-4 border-t border-[#D8C8B4]/60 text-xs">
+                {/* Acoustic & Sound Dampening Visualizer */}
+                <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#E6DDD2] mb-5">
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <span className="flex items-center gap-1.5 font-medium text-[#503C2C]">
+                      <Waveform className="w-4 h-4 text-[#B88460]" />
+                      <span>{isRTL ? "معامل امتصاص الصوت:" : "Acoustic Attenuation:"}</span>
+                    </span>
+                    <span className="font-mono text-[11px] font-bold text-[#1C1917]">
+                      {activeHotspot.acousticScore}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-[#E6DDD2] h-2 rounded-full overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-[#B88460] to-[#503C2C] h-full rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${activeHotspot.acousticScore}%` }}
+                    />
+                  </div>
+                  <span className="block text-[10px] font-mono text-[#707070] mt-1.5">
+                    {activeHotspot.acoustic}
+                  </span>
+                </div>
+
+                {/* Technical Specifications List */}
+                <div className="space-y-3 pt-3 border-t border-[#D8C8B4]/60 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-[#6B635B]">{isRTL ? "طريقة التوريد:" : "Procurement:"}</span>
+                    <span className="text-[#6B635B] flex items-center gap-1">
+                      <GlobeHemisphereWest className="w-3.5 h-3.5 text-[#B88460]" />
+                      <span>{isRTL ? "المصدر والمحجر:" : "Origin:"}</span>
+                    </span>
                     <span className="font-medium text-[#1C1917]">
-                      {isRTL ? "استيراد مباشر من إيطاليا" : "Direct European Quarry Import"}
+                      {isRTL ? activeHotspot.originAr : activeHotspot.originEn}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[#6B635B]">{isRTL ? "العزل الصوتي:" : "Acoustic Rating:"}</span>
-                    <span className="font-medium text-[#1C1917]">{activeHotspot.acoustic}</span>
+                    <span className="text-[#6B635B]">{isRTL ? "مقاومة الحريق:" : "Fire Rating:"}</span>
+                    <span className="font-medium text-[#1C1917]">{activeHotspot.fireRating}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[#6B635B]">{isRTL ? "الضمان:" : "Warranty:"}</span>
+                    <span className="text-[#6B635B]">{isRTL ? "الضمان الإنشائي:" : "Warranty:"}</span>
                     <span className="font-medium text-emerald-700">
                       {isRTL ? "10 سنوات شامل" : "10 Years Full Coverage"}
                     </span>
@@ -600,8 +1023,10 @@ export default function LandingPage() {
                 </div>
 
                 <Link
-                  href="/projects/new"
-                  className="w-full mt-6 h-11 rounded-xl bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                  href={commissionUrl}
+                  data-cursor="pointer"
+                  data-cursor-text="ADD"
+                  className="w-full mt-6 h-11 rounded-xl bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-98"
                 >
                   <span>{isRTL ? "تضمين هذه المادة في مشروعي" : "Include in My Commission"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
@@ -612,12 +1037,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 5. BESPOKE TYPOLOGIES GALLERY */}
-      <section id="typologies" className="py-24 bg-[#FAF7F2]/50 border-t border-[#D8C8B4]">
+      {/* 5. BESPOKE TYPOLOGIES GALLERY WITH 3D PERSPECTIVE */}
+      <section id="typologies" className="py-24 bg-[#FAF7F2]/50 border-t border-[#E6DDD2]">
         <div className="max-w-7xl mx-auto px-6 sm:px-8">
           <RevealOnScroll direction="up" className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
                 <HouseLine className="w-3.5 h-3.5" />
                 <span>{isRTL ? "نماذج معمارية مخصصة" : "BESPOKE TYPOLOGIES"}</span>
               </div>
@@ -627,7 +1052,9 @@ export default function LandingPage() {
             </div>
 
             <Link
-              href="/projects/new"
+              href={commissionUrl}
+              data-cursor="pointer"
+              data-cursor-text="COMMISSION"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors shrink-0"
             >
               <span>{isRTL ? "بدء تحديد نموذجك المعماري" : "Commission Your Custom Layout"}</span>
@@ -640,6 +1067,8 @@ export default function LandingPage() {
               <RevealOnScroll key={typ.id} direction="up" delayMs={idx * 100}>
                 <TiltCard
                   maxRotation={6}
+                  data-cursor="view"
+                  data-cursor-text={typ.vol}
                   className="rounded-3xl overflow-hidden bg-white border border-[#D8C8B4] shadow-lg group hover:shadow-xl transition-all"
                 >
                   {/* Image */}
@@ -654,6 +1083,9 @@ export default function LandingPage() {
                     <div className="absolute top-4 start-4 px-3 py-1 rounded-full bg-black/50 backdrop-blur-md text-[#FAF7F2] text-[10px] font-mono tracking-widest border border-white/20">
                       {typ.vol}
                     </div>
+                    <div className="absolute bottom-3 end-3 px-2 py-0.5 rounded bg-black/40 backdrop-blur-md text-[9px] font-mono text-[#FAF7F2]/80">
+                      {typ.coords}
+                    </div>
                   </div>
 
                   {/* Body Content */}
@@ -663,16 +1095,22 @@ export default function LandingPage() {
                       <span>{isRTL ? typ.locationAr : typ.locationEn}</span>
                     </div>
 
-                    <h3 className="font-serif text-2xl font-normal text-[#1C1917] mb-3 group-hover:text-[#503C2C] transition-colors">
+                    <h3 className="font-serif text-2xl font-normal text-[#1C1917] mb-2 group-hover:text-[#503C2C] transition-colors">
                       {isRTL ? typ.titleAr : typ.titleEn}
                     </h3>
+
+                    <div className="text-[11px] font-mono text-[#B88460] mb-3">
+                      {typ.height}
+                    </div>
 
                     <p className="text-xs text-[#6B635B] leading-relaxed mb-6">
                       {isRTL ? typ.descAr : typ.descEn}
                     </p>
 
                     <Link
-                      href="/projects/new"
+                      href={commissionUrl}
+                      data-cursor="pointer"
+                      data-cursor-text="COMMISSION"
                       className="inline-flex items-center justify-between w-full pt-4 border-t border-[#D8C8B4]/60 text-xs font-medium text-[#1C1917] group/link hover:text-[#B88460] transition-colors"
                     >
                       <span>{isRTL ? "مواصفات هذا النموذج" : "Commission This Volume"}</span>
@@ -690,10 +1128,66 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 6. 5-STAGE TURNKEY METHODOLOGY TIMELINE */}
-      <section id="methodology" className="py-24 max-w-7xl mx-auto px-6 sm:px-8">
+      {/* 6. COMPARISON MATRIX: VALENTIA ATELIER VS TRADITIONAL CONTRACTORS */}
+      <section id="comparison" className="py-24 max-w-7xl mx-auto px-6 sm:px-8 border-t border-[#E6DDD2]">
         <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/70 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
+            <Sliders className="w-3.5 h-3.5 text-[#B88460]" />
+            <span>{isRTL ? "معيار فالنتيا المعماري" : "THE ATELIER STANDARD"}</span>
+          </div>
+          <h2 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal">
+            {isRTL ? "لماذا يختار عملاء النخبة أتيليه فالنتيا؟" : "Why Discerning Clients Choose Valentia"}
+          </h2>
+          <p className="mt-3 text-sm text-[#6B635B] leading-relaxed">
+            {isRTL
+              ? "مقارنة دقيقة توضح الفارق الجذري بين المقاولات التقليدية ومنهجية الأتيليه الهندسية الصارمة."
+              : "A transparent side-by-side comparison between conventional contractors and our architectural atelier protocol."}
+          </p>
+        </RevealOnScroll>
+
+        <RevealOnScroll direction="up" delayMs={100}>
+          <div className="rounded-3xl overflow-hidden border border-[#D8C8B4] bg-white shadow-xl">
+            <div className="grid grid-cols-12 bg-[#FAF7F2] p-5 border-b border-[#E6DDD2] text-xs font-mono uppercase tracking-wider text-[#503C2C] font-semibold">
+              <div className="col-span-4 sm:col-span-3">
+                {isRTL ? "المعيار الهندسي" : "Evaluation Metric"}
+              </div>
+              <div className="col-span-4 sm:col-span-4 text-red-900/70">
+                {isRTL ? "المقاولون التقليديون" : "Conventional Contractors"}
+              </div>
+              <div className="col-span-4 sm:col-span-5 text-[#1C1917] font-bold flex items-center gap-1.5">
+                <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
+                <span>{isRTL ? "أتيليه فالنتيا (المعيار المعتمد)" : "Valentia Atelier Standard"}</span>
+              </div>
+            </div>
+
+            <div className="divide-y divide-[#E6DDD2]">
+              {COMPARISON_ROWS.map((row, idx) => (
+                <div
+                  key={idx}
+                  className="grid grid-cols-12 p-5 text-xs items-center hover:bg-[#FAF7F2]/40 transition-colors"
+                >
+                  <div className="col-span-4 sm:col-span-3 font-medium text-[#1C1917]">
+                    {isRTL ? row.featureAr : row.featureEn}
+                  </div>
+                  <div className="col-span-4 sm:col-span-4 text-[#707070] flex items-start gap-2">
+                    <X className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                    <span>{isRTL ? row.traditionalAr : row.traditionalEn}</span>
+                  </div>
+                  <div className="col-span-4 sm:col-span-5 text-[#1C1917] font-medium flex items-start gap-2 bg-[#F5EEE6]/50 p-2.5 rounded-xl border border-[#D8C8B4]/60">
+                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>{isRTL ? row.valentiaAr : row.valentiaEn}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </RevealOnScroll>
+      </section>
+
+      {/* 7. 5-STAGE TURNKEY METHODOLOGY TIMELINE */}
+      <section id="methodology" className="py-24 max-w-7xl mx-auto px-6 sm:px-8 border-t border-[#E6DDD2]">
+        <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
             <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "منهجية العمل المتكاملة" : "TURNKEY METHODOLOGY"}</span>
           </div>
@@ -710,11 +1204,20 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           {METHODOLOGY.map((m, idx) => (
             <RevealOnScroll key={m.step} direction="up" delayMs={idx * 80}>
-              <div className="p-6 rounded-2xl bg-white/80 border border-[#D8C8B4] shadow-sm hover:shadow-md transition-all h-full flex flex-col justify-between">
+              <div
+                data-cursor="inspect"
+                data-cursor-text={`STAGE ${m.step}`}
+                className="p-6 rounded-2xl bg-white border border-[#D8C8B4] shadow-sm hover:shadow-md transition-all h-full flex flex-col justify-between"
+              >
                 <div>
-                  <span className="block font-mono text-3xl font-light text-[#B88460] mb-4">
-                    {m.step}
-                  </span>
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-mono text-3xl font-light text-[#B88460]">
+                      {m.step}
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#FAF7F2] text-[#503C2C] border border-[#D8C8B4]">
+                      {isRTL ? m.badgeAr : m.badgeEn}
+                    </span>
+                  </div>
                   <h4 className="font-serif text-lg font-normal text-[#1C1917] mb-2 leading-snug">
                     {isRTL ? m.titleAr : m.titleEn}
                   </h4>
@@ -725,7 +1228,7 @@ export default function LandingPage() {
 
                 <div className="mt-6 pt-4 border-t border-[#D8C8B4]/40 flex items-center gap-2 text-[10px] font-mono text-[#6B635B]">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{isRTL ? "بند تسليم معتمد" : "Milestone Gate"}</span>
+                  <span>{isRTL ? "بند تسليم تعاقدي معتمد" : "Verified Milestone Gate"}</span>
                 </div>
               </div>
             </RevealOnScroll>
@@ -733,7 +1236,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 7. GRAND CLOSING COMMISSION CTA BANNER */}
+      {/* 8. GRAND CLOSING COMMISSION CTA BANNER */}
       <section className="py-20 max-w-7xl mx-auto px-6 sm:px-8">
         <RevealOnScroll direction="up">
           <div className="relative rounded-3xl overflow-hidden bg-[#1C1917] text-[#FAF7F2] p-8 sm:p-14 lg:p-20 shadow-2xl">
@@ -767,8 +1270,10 @@ export default function LandingPage() {
 
               <div className="pt-4 flex flex-wrap items-center gap-4">
                 <Link
-                  href="/projects/new"
-                  className="h-12 px-8 rounded-full bg-[#FAF7F2] hover:bg-white text-[#1C1917] text-xs uppercase tracking-widest font-medium transition-all shadow-lg flex items-center gap-2 cursor-pointer group"
+                  href={commissionUrl}
+                  data-cursor="pointer"
+                  data-cursor-text="START"
+                  className="h-12 px-8 rounded-full bg-[#FAF7F2] hover:bg-white text-[#1C1917] text-xs uppercase tracking-widest font-medium transition-all shadow-lg flex items-center gap-2 cursor-pointer group active:scale-98"
                 >
                   <span>{isRTL ? "ابدأ مواصفات المشروع" : "Start Project Intake"}</span>
                   {isRTL ? (
@@ -778,21 +1283,25 @@ export default function LandingPage() {
                   )}
                 </Link>
 
-                <Link
-                  href="/signup"
-                  className="h-12 px-6 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-[#FAF7F2] text-xs uppercase tracking-widest font-medium transition-colors flex items-center gap-2 cursor-pointer"
-                >
-                  <User className="w-4 h-4" />
-                  <span>{isRTL ? "تسجيل حساب عميل جديد" : "Create Client Account"}</span>
-                </Link>
+                {!isAuthenticated && (
+                  <Link
+                    href="/signup"
+                    data-cursor="pointer"
+                    data-cursor-text="JOIN"
+                    className="h-12 px-6 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-[#FAF7F2] text-xs uppercase tracking-widest font-medium transition-colors flex items-center gap-2 cursor-pointer active:scale-98"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>{isRTL ? "تسجيل حساب عميل جديد" : "Create Client Account"}</span>
+                  </Link>
+                )}
               </div>
             </div>
           </div>
         </RevealOnScroll>
       </section>
 
-      {/* 8. ATELIER FOOTER */}
-      <footer className="border-t border-[#D8C8B4] bg-[#FAF7F2] py-14 text-xs text-[#6B635B]">
+      {/* 9. ATELIER FOOTER */}
+      <footer className="border-t border-[#E6DDD2] bg-[#FAF7F2] py-14 text-xs text-[#6B635B]">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-3 mb-4">
@@ -827,18 +1336,30 @@ export default function LandingPage() {
             </span>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/projects/new" className="hover:text-[#1C1917] transition-colors">
+                <Link
+                  href={commissionUrl}
+                  data-cursor="pointer"
+                  className="hover:text-[#1C1917] transition-colors"
+                >
                   {isRTL ? "بدء مشروع جديد" : "Commission Project"}
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-[#1C1917] transition-colors">
-                  {isRTL ? "تسجيل الدخول للأتيليه" : "Client Portal Sign In"}
+                <Link
+                  href={projectsUrl}
+                  data-cursor="pointer"
+                  className="hover:text-[#1C1917] transition-colors"
+                >
+                  {isRTL ? "لوحة مشاريعي" : "Projects Workspace"}
                 </Link>
               </li>
               <li>
-                <Link href="/signup" className="hover:text-[#1C1917] transition-colors">
-                  {isRTL ? "إنشاء حساب عميل" : "Register Client Account"}
+                <Link
+                  href="/login"
+                  data-cursor="pointer"
+                  className="hover:text-[#1C1917] transition-colors"
+                >
+                  {isRTL ? "تسجيل الدخول للأتيليه" : "Client Portal Sign In"}
                 </Link>
               </li>
             </ul>
@@ -862,11 +1383,15 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 mt-12 pt-6 border-t border-[#D8C8B4]/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 mt-12 pt-6 border-t border-[#E6DDD2] flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px]">
           <span>© {new Date().getFullYear()} Valentia Design & Build. All rights reserved.</span>
           <div className="flex items-center gap-6">
             <span>ISO 9001 · ISO 27001 Certified</span>
-            <button onClick={toggleLanguage} className="hover:text-[#1C1917] transition-colors">
+            <button
+              onClick={toggleLanguage}
+              data-cursor="pointer"
+              className="hover:text-[#1C1917] transition-colors cursor-pointer"
+            >
               {language === "en" ? "تبديل إلى العربية" : "Switch to English"}
             </button>
           </div>

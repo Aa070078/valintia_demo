@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,7 +11,6 @@ import {
   Lock,
   User,
   ShieldCheck,
-  CheckCircle,
   Buildings,
   CircleNotch,
   Sparkle,
@@ -23,8 +22,10 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
   const { login, isLoading } = useAuth();
   const { language, toggleLanguage, isRTL } = useLanguage();
 
@@ -69,7 +70,11 @@ export default function LoginPage() {
       if (res?.redirectUrl) {
         window.location.href = res.redirectUrl;
       } else {
-        router.push("/projects");
+        const destination =
+          redirectParam && redirectParam.startsWith("/")
+            ? redirectParam
+            : "/projects";
+        router.push(destination);
       }
     } catch (err: unknown) {
       console.error("Login failed:", err);
@@ -250,6 +255,18 @@ export default function LoginPage() {
             </div>
           </div>
 
+          {/* Redirect Notice */}
+          {redirectParam && (
+            <div className="mb-6 p-3.5 rounded-xl bg-[#EFE7DC] border border-[#D8C8B4] text-[#503C2C] text-xs flex items-center gap-2.5 shadow-sm">
+              <Lock className="w-4 h-4 text-[#B88460] shrink-0" />
+              <span>
+                {isRTL
+                  ? "يرجى تسجيل الدخول للمتابعة إلى صفحات الأتيليه المحمية."
+                  : "Please authenticate to access your atelier projects and commission workspace."}
+              </span>
+            </div>
+          )}
+
           {/* Error Banner */}
           {error && (
             <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
@@ -376,7 +393,11 @@ export default function LoginPage() {
             <p className="text-xs text-[#6B635B]">
               {isRTL ? "عميل جديد في فالنتيا؟" : "New client commissioning a project?"}{" "}
               <Link
-                href="/signup"
+                href={
+                  redirectParam
+                    ? `/signup?redirect=${encodeURIComponent(redirectParam)}`
+                    : "/signup"
+                }
                 className="font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors"
               >
                 {isRTL ? "أنشئ حسابك وابدأ مشروعك" : "Create an account & start commission"}
@@ -384,22 +405,36 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Direct link to start without account */}
+          {/* Security & Confidentiality */}
           <div className="mt-4 text-center">
-            <Link
-              href="/projects/new"
-              className="inline-flex items-center gap-1.5 text-xs text-[#6B635B] hover:text-[#1C1917] transition-colors"
-            >
-              <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="inline-flex items-center gap-1.5 text-xs text-[#6B635B]">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>
                 {isRTL
-                  ? "أو ابدأ تحديد مواصفات مشروعك مباشرة دون انتظار"
-                  : "Or configure project specifications directly as guest"}
+                  ? "بيئة معمارية مشفرة بالكامل تضمن خصوصية وسرية مواصفات مشروعك"
+                  : "Encrypted atelier portal protecting architectural and engineering confidentiality"}
               </span>
-            </Link>
+            </div>
           </div>
         </RevealOnScroll>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen w-full bg-[#ECE3D5] flex items-center justify-center text-[#503C2C]">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest">
+            <CircleNotch className="w-4 h-4 animate-spin" />
+            <span>Loading Atelier Login...</span>
+          </div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </React.Suspense>
   );
 }

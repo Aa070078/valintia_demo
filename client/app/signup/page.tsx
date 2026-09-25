@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
@@ -26,8 +26,10 @@ import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
 import { cn } from "@/lib/utils";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get("redirect");
   const { signup, isLoading } = useAuth();
   const { language, toggleLanguage, isRTL } = useLanguage();
 
@@ -134,8 +136,11 @@ export default function SignupPage() {
       if (res?.redirectUrl) {
         window.location.href = res.redirectUrl;
       } else {
-        // Direct transition into project intake
-        router.push("/projects/new");
+        const destination =
+          redirectParam && redirectParam.startsWith("/")
+            ? redirectParam
+            : "/projects/new";
+        router.push(destination);
       }
     } catch (err: unknown) {
       console.error("Signup failed:", err);
@@ -536,7 +541,11 @@ export default function SignupPage() {
             <p className="text-xs text-[#6B635B]">
               {isRTL ? "لديك حساب بالفعل في الأتيليه؟" : "Already an Atelier client?"}{" "}
               <Link
-                href="/login"
+                href={
+                  redirectParam
+                    ? `/login?redirect=${encodeURIComponent(redirectParam)}`
+                    : "/login"
+                }
                 className="font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors"
               >
                 {isRTL ? "تسجيل الدخول" : "Sign in here"}
@@ -546,5 +555,22 @@ export default function SignupPage() {
         </RevealOnScroll>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen w-full bg-[#ECE3D5] flex items-center justify-center text-[#503C2C]">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest">
+            <CircleNotch className="w-4 h-4 animate-spin" />
+            <span>Loading Atelier Registration...</span>
+          </div>
+        </div>
+      }
+    >
+      <SignupForm />
+    </React.Suspense>
   );
 }

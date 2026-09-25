@@ -25,7 +25,12 @@ export class LocalStorageTokenStorageAdapter implements TokenStorageAdapter {
   getToken(): string | null {
     if (typeof window === "undefined") return null;
     try {
-      return localStorage.getItem(this.key);
+      const fromLocal = localStorage.getItem(this.key);
+      if (fromLocal) return fromLocal;
+      
+      // Fallback: parse document.cookie
+      const match = document.cookie.match(new RegExp(`(^|;\\s*)${this.key}=([^;]+)`));
+      return match ? decodeURIComponent(match[2]) : null;
     } catch {
       return null;
     }
@@ -35,6 +40,9 @@ export class LocalStorageTokenStorageAdapter implements TokenStorageAdapter {
     if (typeof window === "undefined") return;
     try {
       localStorage.setItem(this.key, token);
+      // Set 30-day cookie for Next.js edge/middleware verification
+      const secureFlag = window.location.protocol === "https:" ? "; Secure" : "";
+      document.cookie = `${this.key}=${encodeURIComponent(token)}; path=/; max-age=2592000; SameSite=Lax${secureFlag}`;
     } catch {
       // Storage unavailable or quota exceeded
     }
@@ -44,6 +52,7 @@ export class LocalStorageTokenStorageAdapter implements TokenStorageAdapter {
     if (typeof window === "undefined") return;
     try {
       localStorage.removeItem(this.key);
+      document.cookie = `${this.key}=; path=/; max-age=0; SameSite=Lax`;
     } catch {
       // Storage unavailable
     }
