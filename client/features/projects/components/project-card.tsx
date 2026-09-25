@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowLeft, MapPin, Ruler } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import type { Project } from "../types";
+import { getProjectDisplayTitle } from "../types";
 import { StatusChip } from "./status-chip";
 import { useLanguage } from "@/lib/i18n/language-context";
 
@@ -16,7 +17,12 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
   const defaultImage =
     "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80";
 
-  const propertyTypeLabel = t(`property.${project.propertyType}`) || project.propertyType;
+  const propertyType = project.property?.propertyType || project.propertyType || "villa";
+  const propertyTypeLabel = t(`property.${propertyType}`) || propertyType;
+  const areaSqm = project.property?.areaSqm || project.areaSqm || 450;
+  const compound = project.property?.compound || project.compound;
+  const city = project.property?.city || project.city || "Cairo";
+  const displayTitle = getProjectDisplayTitle(project);
 
   return (
     <div
@@ -53,19 +59,19 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
           </div>
 
           <h3 className="mt-2 font-serif text-2xl font-medium tracking-tight text-foreground transition-colors group-hover:text-primary">
-            {project.title}
+            {displayTitle}
           </h3>
 
           <div className="mt-3.5 flex flex-wrap items-center gap-3.5 text-xs text-muted-foreground">
             <span className="flex items-center gap-1.5 font-medium">
               <Ruler size={14} className="text-muted-foreground" />
-              {project.areaSqm} م²
+              {areaSqm} {isRTL ? "م²" : "m²"}
             </span>
             <span className="h-1 w-1 rounded-full bg-border" />
             <span className="flex items-center gap-1.5 font-medium">
               <MapPin size={14} className="text-muted-foreground" />
-              {project.compound ? `${project.compound}, ` : ""}
-              {project.city}
+              {compound ? `${compound}, ` : ""}
+              {city}
             </span>
           </div>
         </div>

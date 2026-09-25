@@ -58,12 +58,17 @@ export function EditorialHero() {
   const { t, isRTL } = useLanguage();
 
   const stepsLocalized = [
-    { num: "01", name: t("wizard.step_1"), stepId: 1, active: true },
-    { num: "02", name: t("wizard.step_2"), stepId: 2 },
-    { num: "03", name: t("wizard.step_3"), stepId: 3 },
-    { num: "04", name: t("wizard.step_4"), stepId: 4 },
-    { num: "05", name: t("wizard.step_5"), stepId: 5 },
-    { num: "06", name: t("wizard.step_6"), stepId: 6 },
+    { num: "01", name: t("lifecycle.step_property") || "Typology", stepId: 1, active: true },
+    { num: "02", name: t("lifecycle.step_style") || "Style & Mood", stepId: 2 },
+    { num: "03", name: t("lifecycle.step_spaces") || "Spatial Program", stepId: 3 },
+    { num: "04", name: t("lifecycle.step_property_info") || "Property Specs", stepId: 4 },
+    { num: "05", name: t("lifecycle.step_location") || "Client Location", stepId: 5 },
+    { num: "06", name: t("lifecycle.step_representative") || "Representative", stepId: 6 },
+    { num: "07", name: t("lifecycle.step_scope") || "Scope of Work", stepId: 7 },
+    { num: "08", name: t("lifecycle.step_budget") || "Target Budget", stepId: 8 },
+    { num: "09", name: t("lifecycle.step_timeline") || "Timeline", stepId: 9 },
+    { num: "10", name: t("lifecycle.step_drawings") || "Drawings & CAD", stepId: 10 },
+    { num: "11", name: t("lifecycle.step_review") || "Review & Submit", stepId: 11 },
   ];
 
   return (
@@ -93,8 +98,8 @@ export function EditorialHero() {
         <div className="relative z-10 flex min-h-[620px] flex-col justify-between p-6 sm:p-10 lg:p-14">
           <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
             {/* Left Vertical Step Tracker (Matching reference screen 1) */}
-            <div className="hidden lg:col-span-2 lg:flex lg:flex-col lg:gap-6">
-              <div className="flex flex-col gap-4">
+            <div className="hidden lg:col-span-2 lg:flex lg:flex-col lg:gap-4">
+              <div className="flex flex-col gap-2.5">
                 {stepsLocalized.map((step, idx) => (
                   <Link
                     key={step.num}
@@ -116,13 +121,13 @@ export function EditorialHero() {
                         )}
                       />
                       {idx < stepsLocalized.length - 1 && (
-                        <div className="absolute top-2.5 h-4.5 w-px bg-border/80" />
+                        <div className="absolute top-2.5 h-3.5 w-px bg-border/80" />
                       )}
                     </div>
                     <span className="font-mono text-[10px] tracking-wider opacity-60">
                       {step.num}
                     </span>
-                    <span className="text-[11px] tracking-wide">
+                    <span className="text-[11px] tracking-wide truncate max-w-[110px]">
                       {step.name}
                     </span>
                   </Link>
@@ -215,7 +220,7 @@ export function EditorialHero() {
 
                   {/* '+' Explore Button */}
                   <Link
-                    href="/projects/new?step=4"
+                    href="/projects/new?step=2"
                     aria-label="Explore Styles"
                     className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-border bg-background/50 text-muted-foreground transition-all duration-200 hover:border-foreground hover:bg-foreground/5 hover:text-foreground active:scale-95 cursor-pointer group/btn"
                   >

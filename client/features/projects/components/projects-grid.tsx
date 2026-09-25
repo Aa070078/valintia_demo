@@ -89,6 +89,8 @@ export function ProjectsGrid({
     }
     if (filter === "review") {
       return (
+        p.status === "submitted" ||
+        p.status === "initial_review" ||
         p.status === "under_engineer_review" ||
         p.status === "meeting_scheduled" ||
         p.status === "site_visit_scheduled"
