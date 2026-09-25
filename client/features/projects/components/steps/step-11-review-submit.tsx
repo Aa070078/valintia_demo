@@ -68,7 +68,7 @@ export function StepReviewSubmit({
   onSubmit,
   isSubmitting,
 }: StepReviewSubmitProps) {
-  const { isRTL } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const selectedSpaces = spaces.filter(
     (s) => s.included && (s.quantity ?? s.count ?? 1) > 0
@@ -155,6 +155,14 @@ export function StepReviewSubmit({
     return isRTL ? "جدول زمني مرن يركز على الجودة" : "Flexible Quality Horizon";
   };
 
+  const getConditionName = (condId?: string) => {
+    if (condId === "core_and_shell") return isRTL ? "هيكل خرساني / على المحارة" : "Core & Shell";
+    if (condId === "semi_finished") return isRTL ? "نصف تشطيب" : "Semi-Finished";
+    if (condId === "fully_finished") return isRTL ? "تشطيب كامل" : "Fully Finished";
+    if (condId === "renovation") return isRTL ? "تجديد وتأهيل" : "Renovation & Remodel";
+    return isRTL ? "هيكل خرساني" : "Core & Shell";
+  };
+
   return (
     <div className="flex flex-col gap-10 animate-in fade-in duration-300">
       {/* ─────────────────────────────────────────────────────────────
@@ -168,33 +176,19 @@ export function StepReviewSubmit({
               className={cn(
                 "text-[#78716C]",
                 isRTL
-                  ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                  ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]"
                   : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
               )}
             >
               {isRTL
-                ? "٠٥ — ٠٦ • ملخص التكليف والتصميم المعماري"
-                : "05 — 06 YOUR DESIGN BRIEF"}
+                ? "٠٦ — ٠٦ • ملخص التكليف والتصميم المعماري"
+                : "06 — 06 YOUR DESIGN BRIEF"}
             </span>
           </div>
-          <h2
-            className={cn(
-              "mt-2 text-[#1C1917]",
-              isRTL
-                ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
-                : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-            )}
-          >
+          <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
             {isRTL ? "ملخص التصميم المعماري والتكليف" : "Here is your design brief"}
           </h2>
-          <p
-            className={cn(
-              "mt-2 leading-relaxed max-w-xl",
-              isRTL
-                ? "text-sm font-medium text-[#4A3E31]"
-                : "text-xs sm:text-sm text-[#78716C]"
-            )}
-          >
+          <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
             {isRTL
               ? "ملخص شامل لكافة اختياراتك ومواصفاتك المعمارية. يمكنك مراجعة وتعديل أي تفصيلة مباشرة قبل إرسال التكليف."
               : "A summary of your selections. You can edit any section before we commission the atelier."}
@@ -205,10 +199,7 @@ export function StepReviewSubmit({
         <button
           type="button"
           onClick={() => onJumpToStep(1)}
-          className={cn(
-            "self-start inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-semibold text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer shrink-0",
-            isRTL && "font-sans font-bold"
-          )}
+          className="self-start inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer shrink-0"
         >
           <PencilSimple size={14} weight="bold" className="text-[#B88460]" />
           <span>{isRTL ? "تعديل الاختيارات" : "Edit Selections"}</span>
@@ -216,133 +207,169 @@ export function StepReviewSubmit({
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. TOP ROW CARDS: Property Type & Style Direction
+          2. TOP ROW CARDS: Property Type, Specs & Style Direction
       ───────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {/* Card 1: Property Type */}
-        <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between pb-3">
-            <span
-              className={cn(
-                "text-[10px] uppercase font-semibold text-[#78716C]",
-                isRTL ? "font-sans text-xs font-bold text-[#503C2C]" : "font-mono tracking-[0.16em]"
-              )}
-            >
-              {isRTL ? "نوع العقار والنمط" : "PROPERTY TYPE"}
-            </span>
-            <button
-              type="button"
-              onClick={() => onJumpToStep(1)}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#B88460] hover:text-[#503C2C] cursor-pointer"
-            >
-              <PencilSimple size={13} weight="bold" />
-              <span>{isRTL ? "تعديل" : "Edit"}</span>
-            </button>
-          </div>
-
-          <div className="flex gap-4 items-center mt-2">
-            <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-border bg-muted">
-              <Image
-                src={propertyTypology.imageSrc}
-                alt={propertyTypology.defaultTitle}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="96px"
-              />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {/* Card 1: Property Typology (Step 1) */}
+        <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-3">
+              <span
+                className={cn(
+                  "text-[10px] uppercase font-medium text-[#78716C]",
+                  isRTL ? "font-sans text-[11px]" : "font-mono tracking-[0.16em]"
+                )}
+              >
+                {isRTL ? "نمط العقار المعماري" : "PROPERTY TYPOLOGY"}
+              </span>
+              <button
+                type="button"
+                onClick={() => onJumpToStep(1)}
+                className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
+              >
+                <PencilSimple size={13} weight="bold" />
+                <span>{isRTL ? "تعديل" : "Edit"}</span>
+              </button>
             </div>
-            <div className="text-start min-w-0">
-              <h3
-                className={cn(
-                  "text-[#1C1917] capitalize truncate",
-                  isRTL ? "font-sans text-xl font-bold" : "font-serif text-2xl font-normal"
-                )}
-              >
-                {isRTL ? propertyTypology.defaultTitle : propertyTypology.defaultTitle}
-              </h3>
-              <p
-                className={cn(
-                  "text-xs text-[#78716C] mt-1 line-clamp-1",
-                  isRTL && "font-sans font-medium"
-                )}
-              >
-                {property.compound ? `${property.compound}, ` : ""}
-                {property.city || "New Cairo"}
-              </p>
-              <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-secondary/80 border border-border px-3 py-1 text-[11px] font-mono font-semibold text-[#503C2C]">
-                <span>{property.areaSqm || 480} {isRTL ? "م²" : "m²"}</span>
-                <span className="text-border">·</span>
-                <span>{property.floors || 2} {isRTL ? "طوابق" : "Levels"}</span>
+
+            <div className="flex gap-3.5 items-center mt-2">
+              <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 border border-border bg-muted">
+                <Image
+                  src={propertyTypology.imageSrc}
+                  alt={propertyTypology.defaultTitle}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="80px"
+                />
+              </div>
+              <div className="text-start min-w-0">
+                <h3 className="text-[#1C1917] capitalize truncate font-serif text-xl sm:text-2xl font-normal">
+                  {propertyTypology.defaultTitle}
+                </h3>
+                <p className="text-xs text-[#78716C] mt-1 line-clamp-2 font-normal">
+                  {t(propertyTypology.descKey) || propertyTypology.defaultDesc}
+                </p>
               </div>
             </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-[#78716C]">
+            <span className="font-normal">{isRTL ? "الخطوة ٠١" : "Step 01"}</span>
+            <span className="font-mono text-[#503C2C] font-medium">{propertyTypology.volume}</span>
           </div>
         </div>
 
-        {/* Card 2: Aesthetic & Material Direction */}
-        <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all">
-          <div className="flex items-center justify-between pb-3">
-            <span
-              className={cn(
-                "text-[10px] uppercase font-semibold text-[#78716C]",
-                isRTL ? "font-sans text-xs font-bold text-[#503C2C]" : "font-mono tracking-[0.16em]"
-              )}
-            >
-              {isRTL ? "التوجه الجمالي والخامات" : "STYLE & MATERIAL DIRECTION"}
-            </span>
-            <button
-              type="button"
-              onClick={() => onJumpToStep(3)}
-              className="flex items-center gap-1 text-[11px] font-semibold text-[#B88460] hover:text-[#503C2C] cursor-pointer"
-            >
-              <PencilSimple size={13} weight="bold" />
-              <span>{isRTL ? "تعديل" : "Edit"}</span>
-            </button>
-          </div>
-
-          <div className="flex gap-4 items-center mt-2">
-            <div className="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-border bg-muted">
-              <Image
-                src={primaryStyle.heroImage}
-                alt={primaryStyle.name}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-                sizes="96px"
-              />
+        {/* Card 2: Property Specs & Location (Step 2) */}
+        <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-3">
+              <span
+                className={cn(
+                  "text-[10px] uppercase font-medium text-[#78716C]",
+                  isRTL ? "font-sans text-[11px]" : "font-mono tracking-[0.16em]"
+                )}
+              >
+                {isRTL ? "مواصفات وموقع العقار" : "PROPERTY SPECS & SITE"}
+              </span>
+              <button
+                type="button"
+                onClick={() => onJumpToStep(2)}
+                className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
+              >
+                <PencilSimple size={13} weight="bold" />
+                <span>{isRTL ? "تعديل" : "Edit"}</span>
+              </button>
             </div>
-            <div className="text-start min-w-0">
-              <h3
-                className={cn(
-                  "text-[#1C1917] truncate",
-                  isRTL ? "font-sans text-xl font-bold" : "font-serif text-2xl font-normal"
-                )}
-              >
-                {isRTL ? primaryStyle.nameAr : primaryStyle.name}
+
+            <div className="text-start mt-2 flex flex-col gap-2">
+              <h3 className="text-[#1C1917] truncate font-serif text-xl sm:text-2xl font-normal">
+                {property.compound || (isRTL ? "مشروع سكني خاص" : "Private Residence")}
               </h3>
-              <p
-                className={cn(
-                  "text-xs text-[#78716C] mt-1 line-clamp-1",
-                  isRTL && "font-sans font-medium"
-                )}
-              >
-                {isRTL ? primaryStyle.subtitleAr : primaryStyle.subtitle}
+              <p className="text-xs text-[#78716C] font-normal">
+                {property.city || (isRTL ? "القاهرة الجديدة" : "New Cairo")}
               </p>
 
-              {/* Per space count or badge */}
-              <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
-                {perSpaceStyles.length > 0 ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#B88460]/15 border border-[#B88460]/30 px-2.5 py-0.5 text-[10px] font-bold text-[#503C2C]">
-                    <Sparkle size={10} weight="fill" className="text-[#B88460]" />
-                    <span>
-                      {perSpaceStyles.length}{" "}
-                      {isRTL ? "فراغات بتنسيق خاص" : "custom styled zones"}
-                    </span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 border border-border px-2.5 py-0.5 text-[10px] font-medium text-[#503C2C]">
-                    <span>{isRTL ? "طراز موحد لكامل المبنى" : "Unified Whole Residence"}</span>
-                  </span>
-                )}
+              <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                <span className="inline-flex items-center rounded-full bg-secondary/80 border border-border px-2.5 py-0.5 text-[11px] font-mono font-medium text-[#503C2C]">
+                  {property.areaSqm || 480} {isRTL ? "م²" : "m²"}
+                </span>
+                <span className="inline-flex items-center rounded-full bg-secondary/80 border border-border px-2.5 py-0.5 text-[11px] font-mono font-medium text-[#503C2C]">
+                  {property.floors || 2} {isRTL ? "طوابق" : "Levels"}
+                </span>
+                <span className="inline-flex items-center rounded-full bg-[#EAE2D7] border border-[#D8C8B4] px-2.5 py-0.5 text-[10px] font-normal text-[#503C2C]">
+                  {getConditionName(property.condition)}
+                </span>
               </div>
             </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-[#78716C]">
+            <span className="font-normal">{isRTL ? "الخطوة ٠٢" : "Step 02"}</span>
+            <span className="font-mono text-[#B88460] font-medium">CAD / BIM READY</span>
+          </div>
+        </div>
+
+        {/* Card 3: Aesthetic & Material Direction (Step 4) */}
+        <div className="group relative overflow-hidden rounded-3xl border border-border bg-card p-5 sm:p-6 shadow-xs hover:shadow-md transition-all flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between pb-3">
+              <span
+                className={cn(
+                  "text-[10px] uppercase font-medium text-[#78716C]",
+                  isRTL ? "font-sans text-[11px]" : "font-mono tracking-[0.16em]"
+                )}
+              >
+                {isRTL ? "التوجه الجمالي والخامات" : "STYLE & MATERIALS"}
+              </span>
+              <button
+                type="button"
+                onClick={() => onJumpToStep(4)}
+                className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
+              >
+                <PencilSimple size={13} weight="bold" />
+                <span>{isRTL ? "تعديل" : "Edit"}</span>
+              </button>
+            </div>
+
+            <div className="flex gap-3.5 items-center mt-2">
+              <div className="relative w-20 h-20 rounded-2xl overflow-hidden shrink-0 border border-border bg-muted">
+                <Image
+                  src={primaryStyle.heroImage}
+                  alt={primaryStyle.name}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="80px"
+                />
+              </div>
+              <div className="text-start min-w-0">
+                <h3 className="text-[#1C1917] truncate font-serif text-xl sm:text-2xl font-normal">
+                  {isRTL ? primaryStyle.nameAr : primaryStyle.name}
+                </h3>
+                <p className="text-xs text-[#78716C] mt-1 line-clamp-1 font-normal">
+                  {isRTL ? primaryStyle.subtitleAr : primaryStyle.subtitle}
+                </p>
+
+                <div className="mt-2 flex items-center gap-1.5 flex-wrap">
+                  {perSpaceStyles.length > 0 ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#B88460]/15 border border-[#B88460]/30 px-2 py-0.5 text-[10px] font-medium text-[#503C2C]">
+                      <Sparkle size={10} weight="fill" className="text-[#B88460]" />
+                      <span>
+                        {perSpaceStyles.length} {isRTL ? "فراغات مخصصة" : "custom zones"}
+                      </span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 border border-border px-2 py-0.5 text-[10px] font-normal text-[#503C2C]">
+                      <span>{isRTL ? "طراز موحد للمسكن" : "Unified Residence"}</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-[#78716C]">
+            <span className="font-normal">{isRTL ? "الخطوة ٠٤" : "Step 04"}</span>
+            <span className="font-mono text-[#503C2C] font-medium">{primaryStyle.matchScore}</span>
           </div>
         </div>
       </div>
@@ -356,21 +383,21 @@ export function StepReviewSubmit({
             <HouseLine size={18} weight="bold" className="text-[#B88460]" />
             <span
               className={cn(
-                "text-xs uppercase font-semibold text-[#1C1917]",
-                isRTL ? "font-sans text-sm font-bold text-[#503C2C]" : "font-mono tracking-[0.16em]"
+                "text-xs uppercase font-medium text-[#1C1917]",
+                isRTL ? "font-sans text-xs text-[#503C2C]" : "font-mono tracking-[0.16em]"
               )}
             >
               {isRTL ? "الفراغات المعمارية المعتمدة" : "INCLUDED SPACES"}
             </span>
-            <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-mono font-bold text-[#503C2C]">
+            <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-mono font-medium text-[#503C2C]">
               {selectedRoomsCount} {isRTL ? "غرفة ومنطقة" : "zones"}
             </span>
           </div>
 
           <button
             type="button"
-            onClick={() => onJumpToStep(2)}
-            className="flex items-center gap-1 text-[11px] font-semibold text-[#B88460] hover:text-[#503C2C] cursor-pointer"
+            onClick={() => onJumpToStep(3)}
+            className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
           >
             <PencilSimple size={13} weight="bold" />
             <span>{isRTL ? "تعديل الفراغات" : "Edit Spaces"}</span>
@@ -400,25 +427,20 @@ export function StepReviewSubmit({
                   />
                   {/* Count badge */}
                   {count > 1 && (
-                    <span className="absolute bottom-0 right-0 bg-[#503C2C] text-[#FAF7F2] text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-full border border-white">
+                    <span className="absolute bottom-0 right-0 bg-[#503C2C] text-[#FAF7F2] text-[9px] font-mono font-medium px-1.5 py-0.5 rounded-full border border-white">
                       x{count}
                     </span>
                   )}
                 </div>
 
                 {/* Space Title */}
-                <span
-                  className={cn(
-                    "mt-2.5 text-xs text-[#1C1917] truncate max-w-full font-medium",
-                    isRTL && "font-bold text-xs"
-                  )}
-                >
+                <span className="mt-2.5 text-xs text-[#1C1917] truncate max-w-full font-medium">
                   {space.customName || space.spaceType}
                 </span>
 
                 {/* Subtitle / Style tag */}
                 {customStyle ? (
-                  <span className="text-[9px] text-[#B88460] font-semibold truncate max-w-full mt-0.5">
+                  <span className="text-[9px] text-[#B88460] font-medium truncate max-w-full mt-0.5">
                     {customStyle}
                   </span>
                 ) : (
@@ -444,8 +466,8 @@ export function StepReviewSubmit({
                 <Images size={17} weight="bold" className="text-[#B88460]" />
                 <span
                   className={cn(
-                    "text-[10px] uppercase font-semibold text-[#1C1917]",
-                    isRTL ? "font-sans text-xs font-bold text-[#503C2C]" : "font-mono tracking-[0.16em]"
+                    "text-[10px] uppercase font-medium text-[#1C1917]",
+                    isRTL ? "font-sans text-[11px] text-[#503C2C]" : "font-mono tracking-[0.16em]"
                   )}
                 >
                   {isRTL ? "معرض الإلهام والمواد" : "INSPIRATION GALLERY"}
@@ -453,20 +475,15 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(3)}
-                className="flex items-center gap-1 text-[11px] font-semibold text-[#B88460] hover:text-[#503C2C] cursor-pointer"
+                onClick={() => onJumpToStep(4)}
+                className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
                 <span>{isRTL ? "استعراض المزيد" : "Explore"}</span>
               </button>
             </div>
 
-            <p
-              className={cn(
-                "text-xs text-[#78716C] mb-3 text-start",
-                isRTL && "font-sans font-medium"
-              )}
-            >
+            <p className="text-xs text-[#78716C] mb-3 text-start font-normal">
               {isRTL
                 ? "لقطات منتقاة لطرازك المعماري تعبر عن المواد، تدرجات الألوان، وتوزيع الإضاءة."
                 : "Curated architectural renders reflecting the palette, textures, and spatial light."}
@@ -501,8 +518,8 @@ export function StepReviewSubmit({
                 <ChatCircleDots size={17} weight="bold" className="text-[#B88460]" />
                 <span
                   className={cn(
-                    "text-[10px] uppercase font-semibold text-[#1C1917]",
-                    isRTL ? "font-sans text-xs font-bold text-[#503C2C]" : "font-mono tracking-[0.16em]"
+                    "text-[10px] uppercase font-medium text-[#1C1917]",
+                    isRTL ? "font-sans text-[11px] text-[#503C2C]" : "font-mono tracking-[0.16em]"
                   )}
                 >
                   {isRTL ? "ملاحظاتك المعمارية" : "YOUR NOTES & VISION"}
@@ -510,8 +527,8 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(3)}
-                className="flex items-center gap-1 text-[11px] font-semibold text-[#B88460] hover:text-[#503C2C] cursor-pointer"
+                onClick={() => onJumpToStep(4)}
+                className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
                 <span>{isRTL ? "تعديل" : "Edit"}</span>
@@ -520,11 +537,11 @@ export function StepReviewSubmit({
 
             <div className="p-4 rounded-2xl bg-secondary/60 border border-border/80 text-start text-xs leading-relaxed text-[#1C1917]">
               {clientNotes ? (
-                <p className={cn("italic", isRTL && "font-sans not-italic font-medium")}>
+                <p className="italic font-normal">
                   &ldquo;{clientNotes}&rdquo;
                 </p>
               ) : (
-                <p className={cn("text-[#78716C] italic", isRTL && "font-sans not-italic font-medium")}>
+                <p className="text-[#78716C] italic font-normal">
                   {isRTL
                     ? "«أرغب في تصميم دافئ وحديث يعتمد على المواد الطبيعية ووفرة الإضاءة النهارية، مع تدرجات لونية هادئة وتفاصيل خشبية مدمجة.»"
                     : "“I want a warm, modern design with natural materials and a lot of light. I prefer neutral colors with integrated wooden elements and refined stone surfaces.”"}
@@ -534,8 +551,8 @@ export function StepReviewSubmit({
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-[#78716C]">
-            <span>{isRTL ? "مرفقة مع ملف التكليف" : "Attached to atelier brief"}</span>
-            <span className="font-mono text-[#B88460] font-bold">VALENTIA ATELIER</span>
+            <span className="font-normal">{isRTL ? "مرفقة مع ملف التكليف" : "Attached to atelier brief"}</span>
+            <span className="font-mono text-[#B88460] font-medium">VALENTIA ATELIER</span>
           </div>
         </div>
       </div>
@@ -547,8 +564,8 @@ export function StepReviewSubmit({
         <div className="pb-3 text-start">
           <span
             className={cn(
-              "text-[10px] uppercase font-semibold text-[#78716C]",
-              isRTL ? "font-sans text-xs font-bold text-[#503C2C]" : "font-mono tracking-[0.16em]"
+              "text-[10px] uppercase font-medium text-[#78716C]",
+              isRTL ? "font-sans text-[11px] text-[#503C2C]" : "font-mono tracking-[0.16em]"
             )}
           >
             {isRTL ? "المعايير التشغيلية والهندسية" : "TECHNICAL & OPERATIONAL PARAMETERS"}
@@ -559,9 +576,9 @@ export function StepReviewSubmit({
           {/* Location & Timezone */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col justify-between gap-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C]">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <Globe size={16} className="text-[#B88460]" />
-                <span className={cn(isRTL && "font-sans font-bold text-xs")}>
+                <span>
                   {isRTL ? "بلد الإقامة" : "Client Base & Timezone"}
                 </span>
               </div>
@@ -574,7 +591,7 @@ export function StepReviewSubmit({
               </button>
             </div>
             <div className="text-start">
-              <div className={cn("text-xs text-[#1C1917]", isRTL && "font-bold text-sm")}>
+              <div className="text-xs font-normal text-[#1C1917]">
                 {customerLocation.city}, {customerLocation.country}
               </div>
               <span className={cn("block text-[#78716C] text-[10px] mt-0.5", isRTL ? "font-sans" : "font-mono")}>
@@ -586,9 +603,9 @@ export function StepReviewSubmit({
           {/* Representative in Egypt */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col justify-between gap-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C]">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <UserCheck size={16} className="text-[#B88460]" />
-                <span className={cn(isRTL && "font-sans font-bold text-xs")}>
+                <span>
                   {isRTL ? "الممثل في مصر" : "Representation in Egypt"}
                 </span>
               </div>
@@ -600,7 +617,7 @@ export function StepReviewSubmit({
                 <PencilSimple size={13} weight="bold" />
               </button>
             </div>
-            <div className={cn("text-start text-xs text-[#1C1917]", isRTL && "font-bold text-sm")}>
+            <div className="text-start text-xs font-normal text-[#1C1917]">
               {representative.hasRepresentative
                 ? `${representative.name || "Authorized Contact"} (${representative.phone || ""})`
                 : isRTL
@@ -612,9 +629,9 @@ export function StepReviewSubmit({
           {/* Scope of Work */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col justify-between gap-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C]">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <Hammer size={16} className="text-[#B88460]" />
-                <span className={cn(isRTL && "font-sans font-bold text-xs")}>
+                <span>
                   {isRTL ? "نطاق العمل" : "Scope"}
                 </span>
               </div>
@@ -626,7 +643,7 @@ export function StepReviewSubmit({
                 <PencilSimple size={13} weight="bold" />
               </button>
             </div>
-            <div className={cn("text-start text-xs text-[#1C1917] capitalize", isRTL && "font-bold text-sm")}>
+            <div className="text-start text-xs font-normal text-[#1C1917] capitalize">
               {(scope.scopeType || "full_fitout").replace("_", " ")}
             </div>
           </div>
@@ -634,9 +651,9 @@ export function StepReviewSubmit({
           {/* Target Budget */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col justify-between gap-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C]">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <Coins size={16} className="text-[#B88460]" />
-                <span className={cn(isRTL && "font-sans font-bold text-xs")}>
+                <span>
                   {isRTL ? "الميزانية المقدرة" : "Target Budget"}
                 </span>
               </div>
@@ -648,7 +665,7 @@ export function StepReviewSubmit({
                 <PencilSimple size={13} weight="bold" />
               </button>
             </div>
-            <div className={cn("text-start text-xs font-semibold text-[#1C1917]", isRTL && "font-bold text-sm")}>
+            <div className="text-start text-xs font-semibold text-[#1C1917]">
               {getBudgetText()}
             </div>
           </div>
@@ -656,9 +673,9 @@ export function StepReviewSubmit({
           {/* Timeline */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col justify-between gap-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C]">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <CalendarCheck size={16} className="text-[#B88460]" />
-                <span className={cn(isRTL && "font-sans font-bold text-xs")}>
+                <span>
                   {isRTL ? "الجدول الزمني" : "Target Timeline"}
                 </span>
               </div>
@@ -670,7 +687,7 @@ export function StepReviewSubmit({
                 <PencilSimple size={13} weight="bold" />
               </button>
             </div>
-            <div className={cn("text-start text-xs text-[#1C1917]", isRTL && "font-bold text-sm")}>
+            <div className="text-start text-xs font-normal text-[#1C1917]">
               {getTimelineText()}
             </div>
           </div>
@@ -678,9 +695,9 @@ export function StepReviewSubmit({
           {/* Drawings & Site Survey */}
           <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col justify-between gap-3 shadow-xs">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C]">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <FilePdf size={16} className="text-[#B88460]" />
-                <span className={cn(isRTL && "font-sans font-bold text-xs")}>
+                <span>
                   {isRTL ? "المخططات الهندسية" : "Drawings & CAD"}
                 </span>
               </div>
@@ -692,7 +709,7 @@ export function StepReviewSubmit({
                 <PencilSimple size={13} weight="bold" />
               </button>
             </div>
-            <div className={cn("text-start text-xs text-[#1C1917]", isRTL && "font-bold text-sm")}>
+            <div className="text-start text-xs font-normal text-[#1C1917]">
               {documents.length > 0
                 ? `${documents.length} ${isRTL ? "ملفات مرفوعة" : "files attached"}`
                 : isRTL
@@ -710,27 +727,14 @@ export function StepReviewSubmit({
         <div className="text-start">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-[#B88460] animate-ping" />
-            <span className={cn(
-              "text-[10px] uppercase font-mono tracking-widest text-[#E5D7C7]",
-              isRTL && "font-sans font-bold text-xs"
-            )}>
+            <span className="text-[10px] uppercase font-mono tracking-widest text-[#E5D7C7] font-medium">
               {isRTL ? "المرحلة النهائية • اعتماد التكليف" : "FINAL STAGE · COMMISSIONING"}
             </span>
           </div>
-          <h3
-            className={cn(
-              "leading-tight text-white",
-              isRTL ? "font-sans text-xl sm:text-2xl font-bold" : "font-serif text-2xl sm:text-3xl font-normal"
-            )}
-          >
+          <h3 className="font-serif text-2xl sm:text-3xl font-normal leading-tight text-white">
             {isRTL ? "جاهز لاعتماد وإرسال طلب مشروعك؟" : "Ready to commission your atelier?"}
           </h3>
-          <p
-            className={cn(
-              "mt-2 max-w-xl leading-relaxed",
-              isRTL ? "text-xs font-medium text-[#E5D7C7]" : "text-xs text-[#D4C3B3]"
-            )}
-          >
+          <p className="mt-2 max-w-xl leading-relaxed text-xs text-[#E5D7C7] font-normal">
             {isRTL
               ? "بمجرد الإرسال، سيتولى فريق فالنتيا مراجعة المواصفات وإتاحة حجز الاستشارة المباشرة وتنسيق زيارة المعاينة الميدانية والمسح الليزري."
               : "Submitting creates your digital project hub. Our lead architects review specifications and open direct video consultation scheduling."}
@@ -742,7 +746,7 @@ export function StepReviewSubmit({
           onClick={onSubmit}
           disabled={isSubmitting}
           className={cn(
-            "shrink-0 px-8 py-4 rounded-full bg-[#B88460] text-white hover:bg-[#A37250] active:scale-95 transition-all shadow-md disabled:opacity-50 flex items-center gap-2.5 cursor-pointer font-bold",
+            "shrink-0 px-8 py-4 rounded-full bg-[#B88460] text-white hover:bg-[#A37250] active:scale-95 transition-all shadow-md disabled:opacity-50 flex items-center gap-2.5 cursor-pointer font-medium",
             isRTL ? "text-xs font-sans tracking-normal" : "text-xs tracking-wider uppercase"
           )}
         >

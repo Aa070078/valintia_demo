@@ -99,31 +99,17 @@ export function StepSpaces({
             className={cn(
               "text-[#78716C]",
               isRTL
-                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]"
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٢ — ٠٦ • الفراغات المعمارية" : "02 — 06 SELECT SPACES"}
+            {isRTL ? "٠٣ — ٠٦ • الفراغات المعمارية" : "03 — 06 SELECT SPACES"}
           </span>
         </div>
-        <h2
-          className={cn(
-            "mt-2 text-[#1C1917]",
-            isRTL
-              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
-              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-          )}
-        >
+        <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
           {isRTL ? "ما الفراغات التي تود إدراجها؟" : "Which spaces would you like to include?"}
         </h2>
-        <p
-          className={cn(
-            "mt-2 leading-relaxed max-w-xl",
-            isRTL
-              ? "text-sm font-medium text-[#4A3E31]"
-              : "text-xs sm:text-sm text-[#78716C]"
-          )}
-        >
+        <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
             ? "حدد الفراغات والغرف الخاصة بمشروعك، مع إمكانية تعديل أعداد الغرف أو إضافتها لاحقاً."
             : "Select the spaces for your project. You can always adjust counts, add or remove spaces later."}
@@ -149,7 +135,7 @@ export function StepSpaces({
 
               {/* Floating Top Badge */}
               <div className={cn("absolute top-3.5 z-10", isRTL ? "right-3.5" : "left-3.5")}>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/90 px-3 py-1 text-[10px] font-bold text-[#1C1917] backdrop-blur-md shadow-xs">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/90 px-3 py-1 text-[10px] font-medium text-[#1C1917] backdrop-blur-md shadow-xs">
                   <Cube size={12} weight="bold" className="text-[#B88460]" />
                   <span>{isRTL ? "مخطط أيزومتري ثلاثي الأبعاد" : "3D Isometric Blueprint"}</span>
                 </span>
@@ -161,7 +147,7 @@ export function StepSpaces({
                   <span className="text-[9px] font-mono uppercase tracking-wider text-[#78716C]">
                     {isRTL ? "الفراغات النشطة" : "Active Zones"}
                   </span>
-                  <div className="text-sm font-bold text-[#1C1917]">
+                  <div className="text-sm font-semibold text-[#1C1917]">
                     {totalSelectedRooms} {isRTL ? "غرف / مناطق" : "Selected"}
                   </div>
                 </div>
@@ -170,12 +156,12 @@ export function StepSpaces({
                   <span className="text-[9px] font-mono uppercase tracking-wider text-[#78716C]">
                     {isRTL ? "المساحة الإجمالية" : "Est. Area"}
                   </span>
-                  <div className="text-sm font-bold text-[#1C1917]">
+                  <div className="text-sm font-semibold text-[#1C1917]">
                     {areaSqm || 480} {isRTL ? "م²" : "m²"}
                   </div>
                 </div>
                 <div className="h-6 w-px bg-border/80" />
-                <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#B88460]">
+                <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#B88460]">
                   <span className="h-2 w-2 rounded-full bg-[#B88460] animate-pulse" />
                   <span>{isRTL ? "توزيع مثالي" : "Optimized"}</span>
                 </div>
@@ -216,10 +202,7 @@ export function StepSpaces({
                   <div className="min-w-0 text-start">
                     <div className="flex items-center gap-2 flex-wrap">
                       <h4
-                        className={cn(
-                          "text-[#1C1917] truncate",
-                          isRTL ? "text-sm font-bold tracking-normal" : "text-sm font-medium"
-                        )}
+                        className="text-[#1C1917] truncate text-sm font-medium"
                       >
                         {(t(curated.nameKey) !== curated.nameKey && t(curated.nameKey)) || curated.defaultName}
                       </h4>
@@ -227,21 +210,14 @@ export function StepSpaces({
                         <span
                           className={cn(
                             "px-2 py-0.5 rounded-full bg-[#EAE2D7] text-[#503C2C] shrink-0 border border-[#D8C8B4]",
-                            isRTL ? "text-[10px] font-bold tracking-normal" : "font-mono text-[9px]"
+                            isRTL ? "text-[10px] font-normal tracking-normal" : "font-mono text-[9px]"
                           )}
                         >
                           {assignedStyle}
                         </span>
                       )}
                     </div>
-                    <p
-                      className={cn(
-                        "truncate mt-0.5",
-                        isRTL
-                          ? "text-xs font-medium text-[#78716C]"
-                          : "text-[11px] text-[#78716C]"
-                      )}
-                    >
+                    <p className="text-[11px] text-[#78716C] font-normal truncate mt-0.5">
                       {isRTL ? curated.descAr : curated.desc}
                     </p>
                   </div>
@@ -260,7 +236,7 @@ export function StepSpaces({
                       >
                         <Minus size={11} weight="bold" />
                       </button>
-                      <span className="font-mono text-xs font-bold w-4 text-center text-[#1C1917]">
+                      <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917]">
                         {quantity}
                       </span>
                       <button
@@ -297,22 +273,10 @@ export function StepSpaces({
                     <HouseLine size={22} weight="bold" />
                   </div>
                   <div className="text-start">
-                    <h4
-                      className={cn(
-                        "text-[#1C1917]",
-                        isRTL ? "text-sm font-bold" : "text-sm font-medium"
-                      )}
-                    >
+                    <h4 className="text-[#1C1917] text-sm font-medium">
                       {custom.customName}
                     </h4>
-                    <span
-                      className={cn(
-                        "text-[#78716C]",
-                        isRTL
-                          ? "text-xs font-semibold text-[#503C2C]"
-                          : "font-mono text-[10px]"
-                      )}
-                    >
+                    <span className="text-[#78716C] text-[11px] font-normal">
                       {isRTL ? "فراغ معماري مخصص" : "Bespoke Space"}
                     </span>
                   </div>
@@ -327,7 +291,7 @@ export function StepSpaces({
                     >
                       <Minus size={11} weight="bold" />
                     </button>
-                    <span className="font-mono text-xs font-bold w-4 text-center text-[#1C1917]">
+                    <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917]">
                       {custom.quantity}
                     </span>
                     <button
@@ -358,18 +322,12 @@ export function StepSpaces({
                   ? "إضافة فراغ مخصص (مثل: غرفة سينما، سبا، مجلس عربي، ركن قراءة)..."
                   : "Add custom space (e.g. Cinema Room, Private Spa, Library Lounge)..."
               }
-              className={cn(
-                "flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:border-primary text-xs",
-                isRTL && "font-sans font-medium"
-              )}
+              className="flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:border-primary text-xs font-normal"
             />
             <button
               type="button"
               onClick={handleAddCustomSpace}
-              className={cn(
-                "flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors cursor-pointer shrink-0 shadow-2xs",
-                isRTL ? "text-xs font-bold font-sans" : "text-xs font-semibold"
-              )}
+              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors cursor-pointer shrink-0 shadow-2xs text-xs font-medium"
             >
               <Plus size={14} weight="bold" />
               <span>{isRTL ? "إضافة فراغ" : "Add Space"}</span>

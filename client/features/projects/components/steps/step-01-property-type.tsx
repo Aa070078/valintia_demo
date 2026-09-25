@@ -109,26 +109,16 @@ export function StepPropertyType({
         <div className="flex items-center gap-2">
           <span className="h-px w-6 bg-foreground/50" />
           <span className={cn(
-            "text-[11px] font-bold text-foreground/80",
-            isRTL ? "tracking-normal text-xs text-[#503C2C]" : "font-mono uppercase tracking-[0.2em]"
+            "text-[#78716C]",
+            isRTL ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]" : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
           )}>
-            {t("lifecycle.step_property") || "STEP 01 · TYPOLOGY"}
+            {isRTL ? "٠١ — ٠٦ • النمط المعماري" : "01 — 06 PROPERTY TYPOLOGY"}
           </span>
         </div>
-        <h2 className={cn(
-          "mt-2 text-[#1C1917] dark:text-[#FAF7F2] transition-colors",
-          isRTL
-            ? "font-sans font-bold text-2xl sm:text-3xl lg:text-4xl leading-[1.3]"
-            : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-        )}>
+        <h2 className="mt-2 text-[#1C1917] dark:text-[#FAF7F2] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
           {t("step1.headline") || (isRTL ? "ما هو النمط المعماري لمسكنك؟" : "What are we creating?")}
         </h2>
-        <p className={cn(
-          "mt-2 leading-relaxed max-w-xl",
-          isRTL
-            ? "text-sm sm:text-base font-medium text-[#4A3E31]"
-            : "text-xs sm:text-sm text-muted-foreground"
-        )}>
+        <p className="mt-2 text-xs sm:text-sm text-muted-foreground font-normal leading-relaxed max-w-xl">
           {t("step1.subheadline") ||
             (isRTL
               ? "حدد الكتلة المعمارية الأساسية لمسكنك أو وحدتك التجارية لبدء دراسة الفراغات والمواصفات."

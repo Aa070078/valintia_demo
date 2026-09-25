@@ -42,9 +42,9 @@ import { useLanguage } from "@/lib/i18n/language-context";
 
 const FUNNEL_STEPS = [
   { id: 1, code: "01", labelKey: "lifecycle.step_property", defaultEn: "Typology", defaultAr: "النمط المعماري" },
-  { id: 2, code: "02", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الفراغات المعمارية" },
-  { id: 3, code: "03", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الطراز والمواد" },
-  { id: 4, code: "04", labelKey: "lifecycle.step_property_info", defaultEn: "Property Specs", defaultAr: "بيانات العقار" },
+  { id: 2, code: "02", labelKey: "lifecycle.step_property_info", defaultEn: "Property Specs", defaultAr: "بيانات وموقع العقار" },
+  { id: 3, code: "03", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الفراغات المعمارية" },
+  { id: 4, code: "04", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الطراز والمواد" },
   { id: 5, code: "05", labelKey: "lifecycle.step_location", defaultEn: "Your Location", defaultAr: "موقع الإقامة" },
   { id: 6, code: "06", labelKey: "lifecycle.step_representative", defaultEn: "Representative", defaultAr: "الممثل بمصر" },
   { id: 7, code: "07", labelKey: "lifecycle.step_scope", defaultEn: "Scope of Work", defaultAr: "نطاق العمل" },
@@ -239,8 +239,8 @@ function CreateProjectContent() {
                 </svg>
               </div>
               <span className={cn(
-                "text-xs font-bold text-foreground transition-colors",
-                isRTL ? "tracking-normal font-sans" : "font-sans tracking-[0.24em]"
+                "text-xs text-foreground transition-colors",
+                isRTL ? "font-serif text-sm font-normal" : "font-sans tracking-[0.24em] font-bold"
               )}>
                 {isRTL ? "فالنتيا • استوديو التصميم المعماري" : "VALENTIA INTERIOR ATELIER"}
               </span>
@@ -250,8 +250,8 @@ function CreateProjectContent() {
           {/* Center Pill Badge */}
           <div className="hidden md:flex items-center rounded-full border border-border bg-secondary/70 px-4 py-1.5 shadow-2xs">
             <span className={cn(
-              "text-[10px] font-semibold text-[#503C2C] dark:text-[#FAF7F2]",
-              isRTL ? "tracking-normal font-sans font-bold" : "font-mono uppercase tracking-[0.18em]"
+              "text-[10px] text-[#503C2C] dark:text-[#FAF7F2]",
+              isRTL ? "font-sans font-medium text-xs tracking-normal" : "font-mono uppercase tracking-[0.18em] font-semibold"
             )}>
               {t("nav.fitout_commission") || "FIT-OUT COMMISSION • SPECIFICATION FLOW"}
             </span>
@@ -308,12 +308,12 @@ function CreateProjectContent() {
           <div>
             <div className="pb-3 flex items-center justify-between">
               <span className={cn(
-                "text-[10px] font-bold text-foreground/80",
-                isRTL ? "tracking-normal text-xs text-[#503C2C]" : "font-mono uppercase tracking-[0.2em]"
+                "text-[10px]",
+                isRTL ? "font-sans text-xs font-medium text-[#78716C]" : "font-mono uppercase tracking-[0.2em] font-bold text-foreground/80"
               )}>
                 {t("lifecycle.title") || "PROJECT LIFECYCLE"}
               </span>
-              <span className="text-[10px] font-mono font-bold text-[#B88460]">
+              <span className="text-[10px] font-mono font-medium text-[#B88460]">
                 {currentStep} / 11
               </span>
             </div>
@@ -332,23 +332,23 @@ function CreateProjectContent() {
                     className={cn(
                       "group flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-150 cursor-pointer select-none text-start",
                       isCurrent
-                        ? "bg-sidebar-accent font-bold text-foreground shadow-2xs"
-                        : "text-[#5A4F45] hover:bg-secondary/60 hover:text-foreground font-medium"
+                        ? "bg-sidebar-accent font-semibold text-foreground shadow-2xs"
+                        : "text-[#5A4F45] hover:bg-secondary/60 hover:text-foreground font-normal"
                     )}
                   >
                     <span
                       className={cn(
                         "font-mono text-[10px] transition-colors",
                         isCurrent
-                          ? "font-bold text-foreground"
+                          ? "font-semibold text-foreground"
                           : isCompleted
-                          ? "text-[#B88460] font-bold"
+                          ? "text-[#B88460] font-medium"
                           : "text-muted-foreground"
                       )}
                     >
                       {step.code}
                     </span>
-                    <span className={cn("truncate", isRTL ? "font-sans font-semibold text-xs" : "font-medium")}>
+                    <span className={cn("truncate", isRTL ? "font-sans font-normal text-xs" : "font-normal")}>
                       {t(step.labelKey) || (isRTL ? step.defaultAr : step.defaultEn)}
                     </span>
                     {isCompleted && (
@@ -389,8 +389,16 @@ function CreateProjectContent() {
               />
             )}
 
-            {/* STEP 02: Spaces */}
+            {/* STEP 02: Property Specs & Location */}
             {currentStep === 2 && (
+              <StepPropertyInfo
+                property={property}
+                onChangeProperty={setProperty}
+              />
+            )}
+
+            {/* STEP 03: Spaces */}
+            {currentStep === 3 && (
               <StepSpaces
                 spaces={spaces}
                 onChangeSpaces={setSpaces}
@@ -399,22 +407,14 @@ function CreateProjectContent() {
               />
             )}
 
-            {/* STEP 03: Style Discovery */}
-            {currentStep === 3 && (
+            {/* STEP 04: Style Discovery */}
+            {currentStep === 4 && (
               <StepStyleDiscovery
                 pendingStyles={pendingStyles}
                 onChangePendingStyles={setPendingStyles}
                 primaryStyleId={primaryStyleId}
                 onChangePrimaryStyleId={setPrimaryStyleId}
                 spaces={spaces}
-              />
-            )}
-
-            {/* STEP 04: Property Specs */}
-            {currentStep === 4 && (
-              <StepPropertyInfo
-                property={property}
-                onChangeProperty={setProperty}
               />
             )}
 

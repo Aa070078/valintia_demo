@@ -78,39 +78,26 @@ export function StepPropertyInfo({
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
       {/* Header */}
-      <div>
+      <div className="text-start">
         <div className="flex items-center gap-2">
+          <span className="h-px w-6 bg-foreground/50" />
           <span
             className={cn(
               "text-[#78716C]",
               isRTL
-                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]"
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "الخطوة ٠٤ · بيانات العقار والموقع" : "STEP 04 · PROPERTY SPECIFICATIONS"}
+            {isRTL ? "٠٢ — ٠٦ • بيانات وموقع العقار" : "02 — 06 PROPERTY SPECS"}
           </span>
         </div>
-        <h2
-          className={cn(
-            "mt-2 text-[#1C1917]",
-            isRTL
-              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
-              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-          )}
-        >
-          {isRTL ? "تفاصيل العقار وموقعه الجغرافي" : "Where is your property located?"}
+        <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
+          {isRTL ? "أين يقع عقارك؟ مواصفات المشروع" : "Where is your property located?"}
         </h2>
-        <p
-          className={cn(
-            "mt-2 leading-relaxed max-w-xl",
-            isRTL
-              ? "text-sm font-medium text-[#4A3E31]"
-              : "text-xs sm:text-sm text-[#78716C]"
-          )}
-        >
+        <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "حدد موقع المشروع، والمجمع السكني، والمساحة الإجمالية، وحالة العقار الحالية لتخطيط الفرق الهندسية بدقة."
+            ? "حدد موقع المشروع، والمجمع السكني، والمساحة الإجمالية، وحالة العقار الحالية لحساب الفراغات المعمارية وتخطيط الفرق الهندسية بدقة."
             : "Specify the geographic region, compound, gross footprint, and current condition to calibrate logistical execution."}
         </p>
       </div>
@@ -119,12 +106,7 @@ export function StepPropertyInfo({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* Compound / Development */}
         <div className="flex flex-col gap-2">
-          <label
-            className={cn(
-              "flex items-center gap-1.5",
-              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-            )}
-          >
+          <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <Buildings className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "اسم الكمبوند أو المشروع السكني" : "Masterplan / Compound"}</span>
           </label>
@@ -137,10 +119,7 @@ export function StepPropertyInfo({
                 ? "مثال: بالم هيلز، قطامية ديونز، مراسي..."
                 : "e.g. Palm Hills Golf, Katameya Dunes, Marassi..."
             }
-            className={cn(
-              "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-              isRTL ? "text-xs font-medium" : "text-xs"
-            )}
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
           />
           {/* Preset tags */}
           <div className="flex flex-wrap gap-1.5 pt-1">
@@ -149,7 +128,7 @@ export function StepPropertyInfo({
                 key={c}
                 type="button"
                 onClick={() => updateField("compound", c)}
-                className="text-[10px] font-medium px-2 py-0.5 rounded-md bg-card border border-border text-[#503C2C] hover:text-[#1C1917] hover:border-[#B88460] transition-colors cursor-pointer"
+                className="text-[10px] font-normal px-2 py-0.5 rounded-md bg-card border border-border text-[#503C2C] hover:text-[#1C1917] hover:border-[#B88460] transition-colors cursor-pointer"
               >
                 {c}
               </button>
@@ -159,12 +138,7 @@ export function StepPropertyInfo({
 
         {/* City / District */}
         <div className="flex flex-col gap-2">
-          <label
-            className={cn(
-              "flex items-center gap-1.5",
-              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-            )}
-          >
+          <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <MapPin className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "المدينة / الحي *" : "City / District *"}</span>
           </label>
@@ -178,29 +152,16 @@ export function StepPropertyInfo({
                 ? "مثال: القاهرة الجديدة، الشيخ زايد، الساحل الشمالي، الجونة..."
                 : "e.g. New Cairo, Sheikh Zayed, North Coast, El Gouna..."
             }
-            className={cn(
-              "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-              isRTL ? "text-xs font-medium" : "text-xs"
-            )}
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
           />
-          <span
-            className={cn(
-              "text-[#78716C]",
-              isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[10px]"
-            )}
-          >
+          <span className="text-[#78716C] text-[10px] font-normal">
             {isRTL ? "يحدد فريق الإشراف الهندسي الأقرب" : "Determines logistical dispatch atelier"}
           </span>
         </div>
 
         {/* Gross Surface Area (sqm) */}
         <div className="flex flex-col gap-2">
-          <label
-            className={cn(
-              "flex items-center gap-1.5",
-              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-            )}
-          >
+          <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <Gauge className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "المساحة الإجمالية (متر مربع) *" : "Gross Area (m²) *"}</span>
           </label>
@@ -212,21 +173,13 @@ export function StepPropertyInfo({
               value={property.areaSqm || ""}
               onChange={(e) => updateField("areaSqm", Number(e.target.value))}
               placeholder="e.g. 450"
-              className={cn(
-                "w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                isRTL ? "text-xs font-bold" : "text-xs"
-              )}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
             />
-            <span className="absolute end-3 top-2.5 text-xs font-bold text-[#78716C]">
+            <span className="absolute end-3 top-2.5 text-xs font-normal text-[#78716C]">
               {isRTL ? "م²" : "m²"}
             </span>
           </div>
-          <span
-            className={cn(
-              "text-[#78716C]",
-              isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[10px]"
-            )}
-          >
+          <span className="text-[#78716C] text-[10px] font-normal">
             {isRTL
               ? "مساحة تقريبية، سيتم إجراء مسح ليزري دقيق ثلاثي الأبعاد لاحقاً"
               : "Approximate footprint; 3D laser survey will verify exact dimensions"}
@@ -235,12 +188,7 @@ export function StepPropertyInfo({
 
         {/* Floors / Levels */}
         <div className="flex flex-col gap-2">
-          <label
-            className={cn(
-              "flex items-center gap-1.5",
-              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-            )}
-          >
+          <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <Stack className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "عدد الأدوار / الطوابق" : "Levels / Floors"}</span>
           </label>
@@ -251,10 +199,9 @@ export function StepPropertyInfo({
                 type="button"
                 onClick={() => updateField("floors", fl)}
                 className={cn(
-                  "py-2.5 rounded-xl border transition-all text-center cursor-pointer",
-                  isRTL ? "text-xs font-bold tracking-normal" : "text-xs font-mono font-medium",
+                  "py-2.5 rounded-xl border transition-all text-center cursor-pointer text-xs font-normal",
                   (property.floors || 1) === fl
-                    ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-xs"
+                    ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-xs font-medium"
                     : "bg-background border-border text-[#1C1917] hover:border-[#B88460]"
                 )}
               >
@@ -267,12 +214,7 @@ export function StepPropertyInfo({
 
       {/* Property Condition Cards */}
       <div className="flex flex-col gap-3">
-        <label
-          className={cn(
-            "flex items-center gap-1.5",
-            isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-          )}
-        >
+        <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
           <Wrench className="w-3.5 h-3.5 text-[#B88460]" />
           <span>{isRTL ? "الحالة الإنشائية الحالية للموقع" : "Current Property Condition"}</span>
         </label>
@@ -284,31 +226,21 @@ export function StepPropertyInfo({
                 key={cond.id}
                 onClick={() => updateField("condition", cond.id)}
                 className={cn(
-                  "cursor-pointer p-4 rounded-2xl border transition-all duration-200 bg-card",
+                  "cursor-pointer p-4 rounded-2xl border transition-all duration-200 bg-card text-start",
                   isSelected
                     ? "border-[#503C2C] shadow-sm ring-1 ring-[#503C2C]/20"
                     : "border-border hover:border-[#B88460]/60"
                 )}
               >
                 <div className="flex items-center justify-between">
-                  <h4
-                    className={cn(
-                      "text-[#1C1917]",
-                      isRTL ? "text-sm font-bold tracking-normal" : "text-xs font-semibold"
-                    )}
-                  >
+                  <h4 className="text-[#1C1917] text-xs font-medium">
                     {isRTL ? cond.titleAr : cond.titleEn}
                   </h4>
                   {isSelected && (
                     <span className="w-2 h-2 rounded-full bg-[#B88460]" />
                   )}
                 </div>
-                <p
-                  className={cn(
-                    "mt-1 leading-relaxed",
-                    isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]"
-                  )}
-                >
+                <p className="mt-1 leading-relaxed text-[11px] text-[#78716C] font-normal">
                   {isRTL ? cond.descAr : cond.descEn}
                 </p>
               </div>
@@ -319,12 +251,7 @@ export function StepPropertyInfo({
 
       {/* Site Accessibility & Gate Notes */}
       <div className="flex flex-col gap-2">
-        <label
-          className={cn(
-            "flex items-center gap-1.5",
-            isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-          )}
-        >
+        <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
           <ShieldCheck className="w-3.5 h-3.5 text-[#B88460]" />
           <span>{isRTL ? "تصاريح الدخول وملاحظات الوصول للموقع" : "Site Accessibility & Gate Passes"}</span>
         </label>
@@ -337,10 +264,7 @@ export function StepPropertyInfo({
               ? "ملاحظات الدخول: مثل وجود مصعد خدمي، مواعيد العمل المسموح بها في الكمبوند، أو متطلبات بوابة الأمن..."
               : "e.g., Service elevator access available, compound permits construction between 8 AM - 5 PM..."
           }
-          className={cn(
-            "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none",
-            isRTL ? "text-xs font-medium" : "text-xs"
-          )}
+          className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none"
         />
       </div>
     </div>

@@ -130,13 +130,20 @@
     letter-spacing: normal;
     line-height: 1.7;
   }
-  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3, [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6,
+  [dir="rtl"] h1, [dir="rtl"] h2, [dir="rtl"] h3,
   [dir="rtl"] .font-serif,
-  [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3, [lang="ar"] h4, [lang="ar"] h5, [lang="ar"] h6,
+  [lang="ar"] h1, [lang="ar"] h2, [lang="ar"] h3,
   [lang="ar"] .font-serif {
-    font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif !important;
-    font-weight: 700;
+    font-family: var(--font-arabic-heading), "Amiri", Georgia, serif !important;
+    font-weight: 400;
     line-height: 1.35;
+    letter-spacing: normal;
+  }
+  [dir="rtl"] h4, [dir="rtl"] h5, [dir="rtl"] h6,
+  [lang="ar"] h4, [lang="ar"] h5, [lang="ar"] h6 {
+    font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+    font-weight: 500;
+    line-height: 1.4;
     letter-spacing: normal;
   }
   [dir="rtl"] button,
@@ -165,10 +172,17 @@ html[dir="rtl"],
 html[lang="ar"] {
   font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
-html[dir="rtl"] :is(h1, h2, h3, h4, h5, h6),
-html[lang="ar"] :is(h1, h2, h3, h4, h5, h6) {
-  font-family: var(--font-arabic-heading), var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif;
-  font-weight: 700;
+html[dir="rtl"] :is(h1, h2, h3),
+html[lang="ar"] :is(h1, h2, h3) {
+  font-family: var(--font-arabic-heading), "Amiri", Georgia, serif;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: normal;
+}
+html[dir="rtl"] :is(h4, h5, h6),
+html[lang="ar"] :is(h4, h5, h6) {
+  font-family: var(--font-arabic), "Readex Pro", "IBM Plex Sans Arabic", "Tajawal", sans-serif;
+  font-weight: 500;
   line-height: 1.4;
   letter-spacing: normal;
 }

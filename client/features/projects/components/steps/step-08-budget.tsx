@@ -42,31 +42,17 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
             className={cn(
               "text-[#78716C]",
               isRTL
-                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]"
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "الخطوة ٠٨ · الميزانية الاستثمارية" : "STEP 08 · ESTIMATED BUDGET"}
+            {isRTL ? "٠٨ — ٠٦ • الميزانية الاستثمارية" : "STEP 08 · ESTIMATED BUDGET"}
           </span>
         </div>
-        <h2
-          className={cn(
-            "mt-2 text-[#1C1917]",
-            isRTL
-              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
-              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-          )}
-        >
+        <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
           {isRTL ? "ما هو نطاق الميزانية التقديري؟" : "What is your target budget?"}
         </h2>
-        <p
-          className={cn(
-            "mt-2 leading-relaxed max-w-xl",
-            isRTL
-              ? "text-sm font-medium text-[#4A3E31]"
-              : "text-xs sm:text-sm text-[#78716C]"
-          )}
-        >
+        <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
             ? "نساعدك في هندسة التكاليف باحترافية. حدد رقماً مستهدفاً، أو نطاقاً تقريبياً، أو اترك الأمر مفتوحاً لتقدير فريقنا في جدول الكميات (BOQ)."
             : "Guide our design team to balance material palettes and bespoke joinery within your targeted financial framework."}
@@ -77,12 +63,7 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-card border border-border shadow-xs">
         <div className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-[#B88460]" />
-          <span
-            className={cn(
-              "text-[#1C1917]",
-              isRTL ? "text-xs font-bold" : "text-xs font-semibold"
-            )}
-          >
+          <span className="text-[#1C1917] text-xs font-medium">
             {isRTL ? "عملة التقدير المفضلة:" : "Preferred Currency:"}
           </span>
         </div>
@@ -93,7 +74,7 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
               type="button"
               onClick={() => updateField("currency", curr)}
               className={cn(
-                "px-3 py-1.5 rounded-xl font-mono text-xs font-bold transition-all border cursor-pointer",
+                "px-3 py-1.5 rounded-xl font-mono text-xs font-medium transition-all border cursor-pointer",
                 (budget.currency || "EGP") === curr
                   ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-sm"
                   : "bg-background border-border text-[#78716C] hover:text-[#1C1917]"
@@ -118,12 +99,7 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
           )}
         >
           <div className="flex items-start justify-between">
-            <span
-              className={cn(
-                "text-[#B88460]",
-                isRTL ? "text-xs font-bold tracking-normal" : "font-mono text-xs font-semibold"
-              )}
-            >
+            <span className="text-[#B88460] font-mono text-xs font-medium">
               {isRTL ? "٠١ · محددة" : "01 · EXACT"}
             </span>
             {budget.budgetType === "exact" && (
@@ -131,20 +107,10 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
             )}
           </div>
           <div>
-            <h3
-              className={cn(
-                "text-[#1C1917]",
-                isRTL ? "font-sans text-base font-bold tracking-normal" : "font-serif text-base font-medium"
-              )}
-            >
+            <h3 className="text-[#1C1917] font-serif text-lg font-normal">
               {isRTL ? "ميزانية محددة" : "Target Cap"}
             </h3>
-            <p
-              className={cn(
-                "mt-1 text-xs leading-relaxed",
-                isRTL ? "font-medium text-[#4A3E31]" : "text-[#78716C]"
-              )}
-            >
+            <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
                 ? "لديك رقم دقيق مستهدف لكامل المشروع."
                 : "A defined financial target for the entire commission."}
@@ -176,20 +142,10 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
             )}
           </div>
           <div>
-            <h3
-              className={cn(
-                "text-[#1C1917]",
-                isRTL ? "font-sans text-base font-bold tracking-normal" : "font-serif text-base font-medium"
-              )}
-            >
+            <h3 className="text-[#1C1917] font-serif text-lg font-normal">
               {isRTL ? "نطاق تقريبي (من - إلى)" : "Estimated Range"}
             </h3>
-            <p
-              className={cn(
-                "mt-1 text-xs leading-relaxed",
-                isRTL ? "font-medium text-[#4A3E31]" : "text-[#78716C]"
-              )}
-            >
+            <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
                 ? "تحديد حد أدنى وأقصى مرن للتشطيب والتأثيث."
                 : "Flexible minimum and maximum bracket."}
@@ -208,12 +164,7 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
           )}
         >
           <div className="flex items-start justify-between">
-            <span
-              className={cn(
-                "text-[#B88460]",
-                isRTL ? "text-xs font-bold tracking-normal" : "font-mono text-xs font-semibold"
-              )}
-            >
+            <span className="text-[#B88460] font-mono text-xs font-medium">
               {isRTL ? "٠٣ · مفتوحة" : "03 · OPEN"}
             </span>
             {budget.budgetType === "undecided" && (
@@ -221,20 +172,10 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
             )}
           </div>
           <div>
-            <h3
-              className={cn(
-                "text-[#1C1917]",
-                isRTL ? "font-sans text-base font-bold tracking-normal" : "font-serif text-base font-medium"
-              )}
-            >
+            <h3 className="text-[#1C1917] font-serif text-lg font-normal">
               {isRTL ? "غير محدد حالياً" : "Undecided / Open"}
             </h3>
-            <p
-              className={cn(
-                "mt-1 text-xs leading-relaxed",
-                isRTL ? "font-medium text-[#4A3E31]" : "text-[#78716C]"
-              )}
-            >
+            <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
                 ? "نقدم لك مقترح التكلفة بعد المعاينة ودراسة التصميم."
                 : "Awaiting preliminary estimate from Valentia based on BOQ."}
@@ -246,11 +187,7 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
       {/* Input Fields based on Mode */}
       {budget.budgetType === "exact" && (
         <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-2 max-w-md animate-in fade-in duration-300 shadow-xs">
-          <label
-            className={cn(
-              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-            )}
-          >
+          <label className="text-xs font-medium text-[#503C2C]">
             {isRTL ? "المبلغ المستهدف بالكامل" : "Exact Target Amount"}
           </label>
           <div className="relative">
@@ -261,12 +198,9 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
               value={budget.exactAmount || ""}
               onChange={(e) => updateField("exactAmount", Number(e.target.value))}
               placeholder="e.g. 3,500,000"
-              className={cn(
-                "w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                isRTL ? "text-xs font-bold" : "text-xs"
-              )}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
             />
-            <span className="absolute end-3.5 top-2.5 text-xs font-bold text-[#B88460]">
+            <span className="absolute end-3.5 top-2.5 text-xs font-medium text-[#B88460]">
               {budget.currency || "EGP"}
             </span>
           </div>
@@ -276,11 +210,7 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
       {budget.budgetType === "range" && (
         <div className="p-5 rounded-2xl bg-card border border-border grid grid-cols-1 sm:grid-cols-2 gap-4 animate-in fade-in duration-300 shadow-xs">
           <div className="flex flex-col gap-2">
-            <label
-              className={cn(
-                isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-              )}
-            >
+            <label className="text-xs font-medium text-[#503C2C]">
               {isRTL ? "الحد الأدنى المتوقع" : "Minimum Amount"}
             </label>
             <div className="relative">
@@ -291,23 +221,16 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
                 value={budget.minAmount || ""}
                 onChange={(e) => updateField("minAmount", Number(e.target.value))}
                 placeholder="e.g. 2,000,000"
-                className={cn(
-                  "w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                  isRTL ? "text-xs font-bold" : "text-xs"
-                )}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
-              <span className="absolute end-3.5 top-2.5 text-xs font-bold text-[#B88460]">
+              <span className="absolute end-3.5 top-2.5 text-xs font-medium text-[#B88460]">
                 {budget.currency || "EGP"}
               </span>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
-            <label
-              className={cn(
-                isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
-              )}
-            >
+            <label className="text-xs font-medium text-[#503C2C]">
               {isRTL ? "الحد الأقصى المتوقع" : "Maximum Amount"}
             </label>
             <div className="relative">
@@ -318,12 +241,9 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
                 value={budget.maxAmount || ""}
                 onChange={(e) => updateField("maxAmount", Number(e.target.value))}
                 placeholder="e.g. 4,500,000"
-                className={cn(
-                  "w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                  isRTL ? "text-xs font-bold" : "text-xs"
-                )}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
-              <span className="absolute end-3.5 top-2.5 text-xs font-bold text-[#B88460]">
+              <span className="absolute end-3.5 top-2.5 text-xs font-medium text-[#B88460]">
                 {budget.currency || "EGP"}
               </span>
             </div>

@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Check, ArrowUpRight } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/lib/i18n/language-context";
 
 export interface VolumeCardProps {
   volume: string;
@@ -26,7 +25,6 @@ export function VolumeCard({
   onClick,
   className,
 }: VolumeCardProps) {
-  const { isRTL } = useLanguage();
 
   return (
     <button
@@ -69,26 +67,17 @@ export function VolumeCard({
       {/* Card Details (Warm latte / travertine surface) */}
       <div className="flex flex-1 flex-col justify-between p-3.5 sm:p-4 bg-card">
         <div>
-          <h3 className={cn(
-            "text-[#1C1917] dark:text-[#FAF7F2] transition-colors",
-            isRTL ? "font-sans font-bold text-base sm:text-lg leading-snug" : "font-serif text-lg font-medium tracking-tight"
-          )}>
+          <h3 className="text-[#1C1917] dark:text-[#FAF7F2] transition-colors font-serif text-lg sm:text-xl font-normal tracking-tight">
             {title}
           </h3>
-          <p className={cn(
-            "mt-1 line-clamp-1 leading-relaxed",
-            isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-muted-foreground"
-          )}>
+          <p className="mt-1 line-clamp-1 leading-relaxed text-[11px] text-muted-foreground font-normal">
             {description}
           </p>
         </div>
 
         {/* Footer row with typology tag & corner arrow */}
         <div className="mt-3 flex items-center justify-between border-t border-border pt-2 text-[10px]">
-          <span className={cn(
-            "truncate max-w-[100px] sm:max-w-[120px]",
-            isRTL ? "font-bold text-[#503C2C] text-[11px]" : "font-medium text-muted-foreground tracking-wide"
-          )}>
+          <span className="truncate max-w-[100px] sm:max-w-[120px] font-normal text-muted-foreground tracking-wide text-[10px] sm:text-[11px]">
             {tag}
           </span>
           <ArrowUpRight

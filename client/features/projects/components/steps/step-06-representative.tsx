@@ -44,31 +44,17 @@ export function StepRepresentative({
             className={cn(
               "text-[#78716C]",
               isRTL
-                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]"
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "الخطوة ٠٦ · الممثل القانوني في مصر" : "STEP 06 · LOCAL REPRESENTATION"}
+            {isRTL ? "٠٦ — ٠٦ • الممثل المحلي في مصر" : "STEP 06 · LOCAL REPRESENTATION"}
           </span>
         </div>
-        <h2
-          className={cn(
-            "mt-2 text-[#1C1917]",
-            isRTL
-              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
-              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-          )}
-        >
+        <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
           {isRTL ? "هل لديك ممثل أو وكيل داخل مصر؟" : "Do you have a representative in Egypt?"}
         </h2>
-        <p
-          className={cn(
-            "mt-2 leading-relaxed max-w-xl",
-            isRTL
-              ? "text-sm font-medium text-[#4A3E31]"
-              : "text-xs sm:text-sm text-[#78716C]"
-          )}
-        >
+        <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
             ? "يمكنك تفويض شخص موثوق لاستلام المفاتيح وحضور زيارة المعاينة، أو توكيل فريق فالنتيا بالإشراف والإدارة الكاملة والمباشرة نيابة عنك."
             : "Delegate an authorized contact in Egypt for site keys and physical inspections, or authorize Valentia to manage site custody and approvals directly."}
@@ -96,22 +82,10 @@ export function StepRepresentative({
             )}
           </div>
           <div>
-            <h3
-              className={cn(
-                "text-[#1C1917]",
-                isRTL
-                  ? "font-sans text-base sm:text-lg font-bold tracking-normal"
-                  : "font-serif text-base sm:text-lg font-medium"
-              )}
-            >
+            <h3 className="text-[#1C1917] font-serif text-lg sm:text-xl font-normal">
               {isRTL ? "إدارة مباشرة وشاملة من فالنتيا" : "Valentia Manages Directly"}
             </h3>
-            <p
-              className={cn(
-                "mt-1 text-xs leading-relaxed",
-                isRTL ? "font-medium text-[#4A3E31]" : "text-[#78716C]"
-              )}
-            >
+            <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
                 ? "لا يوجد ممثل محلي. يتولى مهندس مشروعك استلام المفاتيح، والمسح الليزري، والتنسيق المباشر معك عبر المنصة الرقمية."
                 : "No local representative required. Our lead project engineer receives site keys, oversees scans, and coordinates directly with you digitally."}
@@ -138,22 +112,10 @@ export function StepRepresentative({
             )}
           </div>
           <div>
-            <h3
-              className={cn(
-                "text-[#1C1917]",
-                isRTL
-                  ? "font-sans text-base sm:text-lg font-bold tracking-normal"
-                  : "font-serif text-base sm:text-lg font-medium"
-              )}
-            >
+            <h3 className="text-[#1C1917] font-serif text-lg sm:text-xl font-normal">
               {isRTL ? "لدي ممثل / وكيل داخل مصر" : "I Have an Authorized Representative"}
             </h3>
-            <p
-              className={cn(
-                "mt-1 text-xs leading-relaxed",
-                isRTL ? "font-medium text-[#4A3E31]" : "text-[#78716C]"
-              )}
-            >
+            <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
                 ? "يوجد شخص موثوق (فرد من العائلة، محامي، مدير أعمال) لحضور تسليم الموقع والتنسيق الميداني."
                 : "A trusted family member, legal representative, or estate manager in Egypt will attend site appointments on your behalf."}
@@ -165,23 +127,14 @@ export function StepRepresentative({
       {/* Representative Details Form (Conditional) */}
       {representative.hasRepresentative && (
         <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border flex flex-col gap-4 animate-in fade-in duration-300 shadow-xs">
-          <h4
-            className={cn(
-              "text-[#1C1917]",
-              isRTL ? "font-sans text-sm font-bold tracking-normal" : "font-serif text-sm font-semibold"
-            )}
-          >
+          <h4 className="text-[#1C1917] font-serif text-base font-normal">
             {isRTL ? "بيانات الممثل القانوني أو جهة الاتصال" : "Authorized Contact Details"}
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Name */}
             <div className="flex flex-col gap-1.5">
-              <label
-                className={cn(
-                  isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
-                )}
-              >
+              <label className="text-xs font-medium text-[#503C2C]">
                 {isRTL ? "الاسم بالكامل *" : "Full Name *"}
               </label>
               <input
@@ -190,21 +143,13 @@ export function StepRepresentative({
                 value={representative.name || ""}
                 onChange={(e) => updateField("name", e.target.value)}
                 placeholder={isRTL ? "مثال: م. أحمد عبد العزيز" : "e.g. Eng. Tarek Mansour"}
-                className={cn(
-                  "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                  isRTL ? "text-xs font-medium" : "text-xs"
-                )}
+                className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
             </div>
 
             {/* Phone */}
             <div className="flex flex-col gap-1.5">
-              <label
-                className={cn(
-                  "flex items-center gap-1",
-                  isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
-                )}
-              >
+              <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
                 <Phone className="w-3 h-3 text-[#B88460]" />
                 <span>{isRTL ? "رقم الهاتف في مصر *" : "Phone Number (Egypt) *"}</span>
               </label>
@@ -214,21 +159,13 @@ export function StepRepresentative({
                 value={representative.phone || ""}
                 onChange={(e) => updateField("phone", e.target.value)}
                 placeholder="+20 100 000 0000"
-                className={cn(
-                  "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                  isRTL ? "text-xs font-medium" : "text-xs"
-                )}
+                className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label
-                className={cn(
-                  "flex items-center gap-1",
-                  isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
-                )}
-              >
+              <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
                 <EnvelopeSimple className="w-3 h-3 text-[#B88460]" />
                 <span>{isRTL ? "البريد الإلكتروني" : "Email Address"}</span>
               </label>
@@ -237,21 +174,13 @@ export function StepRepresentative({
                 value={representative.email || ""}
                 onChange={(e) => updateField("email", e.target.value)}
                 placeholder="contact@representative.com"
-                className={cn(
-                  "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                  isRTL ? "text-xs font-medium" : "text-xs"
-                )}
+                className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
             </div>
 
             {/* Relationship */}
             <div className="flex flex-col gap-1.5">
-              <label
-                className={cn(
-                  "flex items-center gap-1",
-                  isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
-                )}
-              >
+              <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
                 <IdentificationCard className="w-3 h-3 text-[#B88460]" />
                 <span>{isRTL ? "صلة القرابة أو الصفة" : "Relationship / Capacity"}</span>
               </label>
@@ -260,22 +189,14 @@ export function StepRepresentative({
                 value={representative.relationship || ""}
                 onChange={(e) => updateField("relationship", e.target.value)}
                 placeholder={isRTL ? "مثال: شقيق، محامي، مدير أعمال" : "e.g. Brother, Legal Counsel, Property Manager"}
-                className={cn(
-                  "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                  isRTL ? "text-xs font-medium" : "text-xs"
-                )}
+                className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
             </div>
           </div>
 
           {/* Authorization Scope */}
           <div className="flex flex-col gap-1.5 pt-2">
-            <label
-              className={cn(
-                "flex items-center gap-1",
-                isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
-              )}
-            >
+            <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
               <Key className="w-3 h-3 text-[#B88460]" />
               <span>{isRTL ? "نطاق الصلاحيات المفوضة" : "Authorization Scope"}</span>
             </label>
@@ -288,10 +209,7 @@ export function StepRepresentative({
                   ? "مثال: تسليم واستلام مفاتيح الموقع ومرافقة مهندس المعاينة فقط"
                   : "e.g. Key handover & physical site access accompaniment only"
               }
-              className={cn(
-                "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
-                isRTL ? "text-xs font-medium" : "text-xs"
-              )}
+              className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
             />
           </div>
         </div>

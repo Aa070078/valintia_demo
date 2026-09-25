@@ -161,31 +161,17 @@ export function StepStyleDiscovery({
             className={cn(
               "text-[#78716C]",
               isRTL
-                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                ? "font-sans text-[11px] font-normal tracking-normal text-[#78716C]"
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٣ — ٠٦ • الطراز والمواد" : "03 — 06 YOUR STYLE"}
+            {isRTL ? "٠٤ — ٠٦ • الطراز والمواد" : "04 — 06 YOUR STYLE"}
           </span>
         </div>
-        <h2
-          className={cn(
-            "mt-2 text-[#1C1917]",
-            isRTL
-              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
-              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
-          )}
-        >
+        <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
           {isRTL ? "استكشف طرازك المعماري المفضل" : "Discover your style"}
         </h2>
-        <p
-          className={cn(
-            "mt-2 leading-relaxed max-w-xl",
-            isRTL
-              ? "text-sm font-medium text-[#4A3E31]"
-              : "text-xs sm:text-sm text-[#78716C]"
-          )}
-        >
+        <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
             ? "اختر الطراز المعماري الأقرب لذوقك. يمكنك استعراض معرض كل طراز وتطبيقه على المشروع بالكامل أو تخصيصه لكل فراغ."
             : "Explore architectural styles that match your taste. Browse galleries and apply across your residence or per space."}
@@ -220,7 +206,7 @@ export function StepStyleDiscovery({
           )}
         >
           <div className="flex items-center justify-between">
-            <span className={cn("text-xs font-bold", isRTL && "font-sans")}>
+            <span className="text-xs font-semibold">
               {t("style_strategy.unified_title") || (isRTL ? "ستايل واحد للكل" : "Single Style for All")}
             </span>
             <div
@@ -236,8 +222,8 @@ export function StepStyleDiscovery({
           </div>
           <p
             className={cn(
-              "text-[11px] leading-relaxed",
-              strategy === "unified" ? "text-primary-foreground/80 font-medium" : "text-[#78716C]"
+              "text-[11px] leading-relaxed font-normal",
+              strategy === "unified" ? "text-primary-foreground/90 font-normal" : "text-[#78716C]"
             )}
           >
             {t("style_strategy.unified_desc") ||
@@ -259,7 +245,7 @@ export function StepStyleDiscovery({
           )}
         >
           <div className="flex items-center justify-between">
-            <span className={cn("text-xs font-bold", isRTL && "font-sans")}>
+            <span className="text-xs font-semibold">
               {t("style_strategy.per_space_title") || (isRTL ? "ستايل لكل فراغ" : "Curate Per Space")}
             </span>
             <div
@@ -275,8 +261,8 @@ export function StepStyleDiscovery({
           </div>
           <p
             className={cn(
-              "text-[11px] leading-relaxed",
-              strategy === "per_space" ? "text-primary-foreground/80 font-medium" : "text-[#78716C]"
+              "text-[11px] leading-relaxed font-normal",
+              strategy === "per_space" ? "text-primary-foreground/90 font-normal" : "text-[#78716C]"
             )}
           >
             {t("style_strategy.per_space_desc") ||
@@ -301,7 +287,7 @@ export function StepStyleDiscovery({
           )}
         >
           <div className="flex items-center justify-between">
-            <span className={cn("text-xs font-bold", isRTL && "font-sans")}>
+            <span className="text-xs font-semibold">
               {t("style_strategy.designer_title") || (isRTL ? "دع المصمم يحدد" : "Let Designer Curate")}
             </span>
             <div
@@ -317,8 +303,8 @@ export function StepStyleDiscovery({
           </div>
           <p
             className={cn(
-              "text-[11px] leading-relaxed",
-              strategy === "designer" ? "text-primary-foreground/80 font-medium" : "text-[#78716C]"
+              "text-[11px] leading-relaxed font-normal",
+              strategy === "designer" ? "text-primary-foreground/90 font-normal" : "text-[#78716C]"
             )}
           >
             {t("style_strategy.designer_desc") ||
@@ -378,7 +364,7 @@ export function StepStyleDiscovery({
 
                   {/* Bottom Image Subtitle */}
                   <div className="absolute bottom-3 inset-x-3.5 z-10">
-                    <span className="text-[11px] font-medium text-white/90 drop-shadow-sm">
+                    <span className="text-[11px] font-normal text-white/90 drop-shadow-sm">
                       {isRTL ? direction.subtitleAr : direction.subtitle}
                     </span>
                   </div>
@@ -387,25 +373,20 @@ export function StepStyleDiscovery({
                 {/* Card Body */}
                 <div className="flex flex-col justify-between flex-1 p-5 gap-4">
                   <div>
-                    <h3
-                      className={cn(
-                        "text-[#1C1917] text-lg sm:text-xl font-bold transition-colors group-hover:text-primary",
-                        isRTL && "font-sans"
-                      )}
-                    >
+                    <h3 className="text-[#1C1917] font-serif text-xl sm:text-2xl font-normal transition-colors group-hover:text-primary">
                       {isRTL ? direction.nameAr : direction.name}
                     </h3>
 
                     {/* Assigned Spaces Badges (Per-space mode) */}
                     {strategy === "per_space" && hasAssignedSpaces && (
                       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                        <span className="text-[10px] font-bold text-[#503C2C]">
+                        <span className="text-[10px] font-medium text-[#503C2C]">
                           {isRTL ? "مطبق على:" : "Applied to:"}
                         </span>
                         {assignedSpaces.map((sp, idx) => (
                           <span
                             key={idx}
-                            className="inline-flex items-center gap-1 rounded-full bg-[#EAE2D7] px-2.5 py-0.5 text-[10px] font-bold text-[#503C2C] border border-[#D8C8B4]"
+                            className="inline-flex items-center gap-1 rounded-full bg-[#EAE2D7] px-2.5 py-0.5 text-[10px] font-medium text-[#503C2C] border border-[#D8C8B4]"
                           >
                             <Check size={10} weight="bold" />
                             <span>{sp}</span>
@@ -419,7 +400,7 @@ export function StepStyleDiscovery({
                       {direction.materials.map((mat, i) => (
                         <div
                           key={i}
-                          className="flex items-center gap-1 rounded-full border border-border/80 bg-background/80 px-2 py-0.5 text-[9px] font-medium text-[#78716C]"
+                          className="flex items-center gap-1 rounded-full border border-border/80 bg-background/80 px-2 py-0.5 text-[9px] font-normal text-[#78716C]"
                         >
                           <span
                             className="h-2 w-2 rounded-full border border-black/10 shrink-0"
@@ -433,10 +414,7 @@ export function StepStyleDiscovery({
 
                   {/* Open Gallery Trigger Button */}
                   <div className="pt-2 border-t border-border/60 flex items-center justify-between">
-                    <span className={cn(
-                      "inline-flex items-center gap-1.5 text-xs font-bold text-[#503C2C] group-hover:underline",
-                      isRTL && "font-sans"
-                    )}>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#503C2C] group-hover:underline">
                       <Eye size={14} weight="bold" />
                       <span>{t("style_gallery.view_btn") || (isRTL ? "استعراض معرض الطراز" : "Explore Style & Rooms")}</span>
                     </span>
@@ -459,10 +437,10 @@ export function StepStyleDiscovery({
               <Compass size={28} weight="bold" />
             </div>
             <div>
-              <h3 className={cn("text-xl sm:text-2xl font-bold text-[#1C1917]", isRTL && "font-sans")}>
+              <h3 className="text-xl sm:text-2xl font-serif font-normal text-[#1C1917]">
                 {isRTL ? "رؤية معمارية مخصصة بإشراف كبار مصممي الأتيليه" : "Bespoke Atelier Lead Curation"}
               </h3>
-              <p className="text-xs text-[#78716C] mt-0.5">
+              <p className="text-xs text-[#78716C] mt-0.5 font-normal">
                 {isRTL
                   ? "سيقوم فريق فالنتيا باقتراح الأسلوب والمواد المثالية بعد دراسة الموقع والكتل المعمارية."
                   : "Valentia's architectural team will propose the optimum design direction after site & spatial study."}
@@ -471,7 +449,7 @@ export function StepStyleDiscovery({
           </div>
 
           <div className="flex flex-col gap-2">
-            <label className={cn("text-xs font-bold text-[#1C1917]", isRTL && "font-sans")}>
+            <label className="text-xs font-medium text-[#1C1917]">
               {isRTL ? "هل لديك تفضيلات أو ملاحظات ذوقية خاصة تود إطلاع المصمم عليها؟" : "Any aesthetic preferences or notes for our designers?"}
             </label>
             <textarea
@@ -483,10 +461,7 @@ export function StepStyleDiscovery({
                   ? "مثال: أفضل الأجواء الهادئة، أخشاب البلوط الطبيعي مع خامات الكتان والأحجار الفاتحة، وإضاءة طبيعية وافرة..."
                   : "e.g., I love warm organic textures, light oak slats, unbleached linen, and serene morning illumination..."
               }
-              className={cn(
-                "w-full rounded-2xl border border-border bg-background p-4 text-xs text-[#1C1917] focus:outline-none focus:border-primary transition-colors",
-                isRTL && "font-sans font-medium"
-              )}
+              className="w-full rounded-2xl border border-border bg-background p-4 text-xs font-normal text-[#1C1917] focus:outline-none focus:border-primary transition-colors"
             />
           </div>
         </div>
@@ -520,10 +495,10 @@ export function StepStyleDiscovery({
                   {isRTL ? "معرض الطراز المعماري" : "CURATED STYLE GALLERY"}
                 </span>
               </div>
-              <h2 className={cn("text-2xl sm:text-3xl font-bold text-[#1C1917] mt-1", isRTL && "font-sans")}>
+              <h2 className="text-2xl sm:text-3xl font-serif font-normal text-[#1C1917] mt-1">
                 {isRTL ? activeGalleryDirection.nameAr : activeGalleryDirection.name}
               </h2>
-              <p className="text-xs text-[#78716C] mt-1 max-w-2xl leading-relaxed">
+              <p className="text-xs text-[#78716C] mt-1 max-w-2xl leading-relaxed font-normal">
                 {isRTL ? activeGalleryDirection.descriptionAr : activeGalleryDirection.description}
               </p>
             </div>
@@ -566,7 +541,7 @@ export function StepStyleDiscovery({
               {/* If Unified Mode: Simple Confirm button */}
               {strategy === "unified" && (
                 <div className="w-full flex items-center justify-between gap-4">
-                  <span className="text-xs font-medium text-[#78716C]">
+                  <span className="text-xs font-normal text-[#78716C]">
                     {isRTL
                       ? "سيتم تطبيق هذا الطراز على كافة فراغات المسكن تلقائياً."
                       : "This style will be applied across all rooms in your commission."}
@@ -574,10 +549,7 @@ export function StepStyleDiscovery({
                   <button
                     type="button"
                     onClick={() => handleConfirmUnified(activeGalleryDirection)}
-                    className={cn(
-                      "px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer whitespace-nowrap",
-                      isRTL && "font-sans"
-                    )}
+                    className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
                   >
                     {t("style_gallery.confirm_unified") ||
                       (isRTL ? "تأكيد واعتماد هذا الطراز لكامل المشروع" : "Confirm & Apply to Entire Residence")}
@@ -591,7 +563,7 @@ export function StepStyleDiscovery({
                   {/* Spaces Dropdown Trigger & Popover */}
                   <div className="relative">
                     <div className="flex items-center justify-between mb-2">
-                      <span className={cn("text-xs font-bold text-[#1C1917]", isRTL && "font-sans")}>
+                      <span className="text-xs font-medium text-[#1C1917]">
                         {t("style_gallery.select_spaces_label") ||
                           (isRTL ? "اختر الفراغات التي ترغب بتطبيق هذا الطراز عليها:" : "Assign this style to spaces:")}
                       </span>
@@ -599,7 +571,7 @@ export function StepStyleDiscovery({
                         <button
                           type="button"
                           onClick={() => setTempAssignedSpaceIds(activeSpaces.map((s) => s.id))}
-                          className="text-[11px] font-bold text-[#B88460] hover:underline cursor-pointer"
+                          className="text-[11px] font-medium text-[#B88460] hover:underline cursor-pointer"
                         >
                           {t("style_gallery.select_all") || (isRTL ? "تحديد الكل" : "Select All")}
                         </button>
@@ -607,7 +579,7 @@ export function StepStyleDiscovery({
                         <button
                           type="button"
                           onClick={() => setTempAssignedSpaceIds([])}
-                          className="text-[11px] font-bold text-[#78716C] hover:underline cursor-pointer"
+                          className="text-[11px] font-medium text-[#78716C] hover:underline cursor-pointer"
                         >
                           {t("style_gallery.clear_all") || (isRTL ? "إلغاء التحديد" : "Clear")}
                         </button>
@@ -617,7 +589,7 @@ export function StepStyleDiscovery({
                     {/* Interactive Spaces Checkbox Grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-2xl border border-border bg-background max-h-48 overflow-y-auto">
                       {activeSpaces.length === 0 ? (
-                        <span className="col-span-full text-xs text-[#78716C] py-2 text-center">
+                        <span className="col-span-full text-xs text-[#78716C] py-2 text-center font-normal">
                           {isRTL ? "لم يتم تحديد فراغات بعد في الخطوة السابقة." : "No active spaces found."}
                         </span>
                       ) : (
@@ -635,8 +607,8 @@ export function StepStyleDiscovery({
                               className={cn(
                                 "flex items-center justify-between p-2.5 rounded-xl border text-xs text-start transition-all cursor-pointer",
                                 isAssigned
-                                  ? "border-primary bg-primary/10 text-primary font-bold shadow-2xs"
-                                  : "border-border/80 bg-card text-[#78716C] hover:border-foreground/30 font-medium"
+                                  ? "border-primary bg-primary/10 text-primary font-medium shadow-2xs"
+                                  : "border-border/80 bg-card text-[#78716C] hover:border-foreground/30 font-normal"
                               )}
                             >
                               <span className="truncate">{spaceName}</span>
@@ -665,10 +637,7 @@ export function StepStyleDiscovery({
                     <button
                       type="button"
                       onClick={() => handleConfirmPerSpace(activeGalleryDirection)}
-                      className={cn(
-                        "px-7 py-3 rounded-full bg-primary text-primary-foreground font-bold text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer",
-                        isRTL && "font-sans"
-                      )}
+                      className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                     >
                       {t("style_gallery.confirm_per_space") ||
                         (isRTL ? "تطبيق الطراز على الفراغات المحددة" : "Apply to Selected Spaces")}
