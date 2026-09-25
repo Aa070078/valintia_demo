@@ -48,28 +48,40 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
         </div>
       </div>
 
-      {/* Card Body */}
+      {/* Card Body & Footer Container */}
       <div className="flex flex-1 flex-col justify-between p-6">
-        <div>
+        <div className="text-start">
           <div className="flex items-center gap-2">
-            <span className="h-px w-4 bg-foreground/40" />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/70">
+            <span className="h-px w-4 bg-foreground/50" />
+            <span
+              className={cn(
+                "text-[10px] text-foreground/80",
+                isRTL ? "font-bold text-xs text-[#503C2C] tracking-normal" : "font-semibold uppercase tracking-[0.2em]"
+              )}
+            >
               {propertyTypeLabel}
             </span>
           </div>
 
-          <h3 className="mt-2 font-serif text-2xl font-medium tracking-tight text-foreground transition-colors group-hover:text-primary">
+          <h3
+            className={cn(
+              "mt-2 text-foreground transition-colors group-hover:text-primary",
+              isRTL
+                ? "font-sans font-bold text-xl sm:text-2xl leading-snug text-[#1C1917]"
+                : "font-serif text-2xl font-medium tracking-tight"
+            )}
+          >
             {displayTitle}
           </h3>
 
-          <div className="mt-3.5 flex flex-wrap items-center gap-3.5 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5 font-medium">
-              <Ruler size={14} className="text-muted-foreground" />
+          <div className="mt-3.5 flex flex-wrap items-center gap-3.5 text-xs text-foreground/75">
+            <span className="flex items-center gap-1.5 font-semibold text-[#1C1917]">
+              <Ruler size={14} className="text-[#503C2C]" />
               {areaSqm} {isRTL ? "م²" : "m²"}
             </span>
             <span className="h-1 w-1 rounded-full bg-border" />
-            <span className="flex items-center gap-1.5 font-medium">
-              <MapPin size={14} className="text-muted-foreground" />
+            <span className="flex items-center gap-1.5 font-medium text-[#4A3E31]">
+              <MapPin size={14} className="text-[#503C2C]" />
               {compound ? `${compound}, ` : ""}
               {city}
             </span>
@@ -78,12 +90,18 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
 
         {/* Card Footer */}
         <div className="mt-6 flex items-center justify-between border-t border-border/70 pt-4">
-          <span className="text-xs text-muted-foreground font-medium">
+          <span className={cn(
+            "text-xs font-medium",
+            isRTL ? "text-[#503C2C] font-semibold" : "text-muted-foreground"
+          )}>
             {project.spaces?.length || 0} {t("portfolio.spaces_configured")}
           </span>
           <Link
             href={`/projects/${project.id}`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-foreground transition-colors group-hover:text-primary cursor-pointer"
+            className={cn(
+              "inline-flex items-center gap-1.5 text-xs font-bold text-foreground transition-colors group-hover:text-primary cursor-pointer",
+              isRTL ? "tracking-normal" : "uppercase tracking-[0.1em]"
+            )}
           >
             <span>{t("portfolio.view_project")}</span>
             {isRTL ? (

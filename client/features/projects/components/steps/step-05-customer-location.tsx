@@ -82,14 +82,35 @@ export function StepCustomerLocation({
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            )}
+          >
             {isRTL ? "الخطوة ٠٥ · موقع إقامتك والمنطقة الزمنية" : "STEP 05 · TIMEZONE & RESIDENCE"}
           </span>
         </div>
-        <h2 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+        <h2
+          className={cn(
+            "mt-2 text-[#1C1917]",
+            isRTL
+              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
+              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
+          )}
+        >
           {isRTL ? "أين تتواجد حالياً؟" : "Where are you currently based?"}
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#78716C] dark:text-[#989692] leading-relaxed max-w-xl">
+        <p
+          className={cn(
+            "mt-2 leading-relaxed max-w-xl",
+            isRTL
+              ? "text-sm font-medium text-[#4A3E31]"
+              : "text-xs sm:text-sm text-[#78716C]"
+          )}
+        >
           {isRTL
             ? "يقيم العديد من عملاء فالنتيا في دول الخليج أو أوروبا أو أمريكا. يساعدنا تحديد موقعك في جدولة الاستشارات الافتراضية ومتابعة البث المباشر بما يناسب توقيتك."
             : "Many of our clients reside overseas in the GCC, Europe, or the Americas. Specifying your timezone ensures consultations and milestone presentations synchronize smoothly with your schedule."}
@@ -98,7 +119,12 @@ export function StepCustomerLocation({
 
       {/* Preset Regional Shortcuts */}
       <div className="flex flex-col gap-3">
-        <label className="text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3] flex items-center gap-1.5">
+        <label
+          className={cn(
+            "flex items-center gap-1.5",
+            isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+          )}
+        >
           <GlobeHemisphereWest className="w-3.5 h-3.5 text-[#B88460]" />
           <span>{isRTL ? "المناطق الأكثر شيوعاً بين عملائنا" : "Frequent Client Locations"}</span>
         </label>
@@ -113,17 +139,27 @@ export function StepCustomerLocation({
                 type="button"
                 onClick={() => handleSelectPreset(region)}
                 className={cn(
-                  "p-3 rounded-xl border text-start transition-all flex flex-col justify-between gap-2 bg-[#FAF7F2] dark:bg-[#1E1B18]",
+                  "p-3 rounded-xl border text-start transition-all flex flex-col justify-between gap-2 bg-card cursor-pointer",
                   isMatch
-                    ? "border-[#503C2C] dark:border-[#B88460] ring-1 ring-[#503C2C]/20 shadow-sm"
-                    : "border-[#E6DDD2] dark:border-[#2E2A27] hover:border-[#B88460]/60"
+                    ? "border-[#503C2C] ring-1 ring-[#503C2C]/20 shadow-sm"
+                    : "border-border hover:border-[#B88460]/60"
                 )}
               >
                 <div>
-                  <div className="text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2]">
+                  <div
+                    className={cn(
+                      "text-[#1C1917]",
+                      isRTL ? "text-sm font-bold tracking-normal" : "text-xs font-semibold"
+                    )}
+                  >
                     {isRTL ? region.countryAr : region.countryEn}
                   </div>
-                  <div className="text-[11px] text-[#78716C] dark:text-[#989692]">
+                  <div
+                    className={cn(
+                      "mt-0.5",
+                      isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[11px] text-[#78716C]"
+                    )}
+                  >
                     {isRTL ? region.cityAr : region.cityEn}
                   </div>
                 </div>
@@ -138,10 +174,14 @@ export function StepCustomerLocation({
       </div>
 
       {/* Manual Inputs Container */}
-      <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="p-5 rounded-2xl bg-card border border-border grid grid-cols-1 md:grid-cols-3 gap-4 shadow-xs">
         {/* Country */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[#503C2C] dark:text-[#D4C3B3]">
+          <label
+            className={cn(
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
+            )}
+          >
             {isRTL ? "الدولة *" : "Country *"}
           </label>
           <input
@@ -152,13 +192,20 @@ export function StepCustomerLocation({
               onChangeLocation({ ...location, country: e.target.value })
             }
             placeholder={isRTL ? "مثال: مصر، السعودية، الإمارات..." : "e.g. United Kingdom"}
-            className="text-xs px-3.5 py-2.5 rounded-xl border border-[#E6DDD2] dark:border-[#38332E] bg-white dark:bg-[#141210] text-[#1C1917] dark:text-[#FAF7F2] focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            className={cn(
+              "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
+              isRTL ? "text-xs font-medium" : "text-xs"
+            )}
           />
         </div>
 
         {/* City */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[#503C2C] dark:text-[#D4C3B3]">
+          <label
+            className={cn(
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
+            )}
+          >
             {isRTL ? "المدينة *" : "City *"}
           </label>
           <input
@@ -169,13 +216,21 @@ export function StepCustomerLocation({
               onChangeLocation({ ...location, city: e.target.value })
             }
             placeholder={isRTL ? "مثال: الرياض، دبي، لندن..." : "e.g. London"}
-            className="text-xs px-3.5 py-2.5 rounded-xl border border-[#E6DDD2] dark:border-[#38332E] bg-white dark:bg-[#141210] text-[#1C1917] dark:text-[#FAF7F2] focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            className={cn(
+              "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
+              isRTL ? "text-xs font-medium" : "text-xs"
+            )}
           />
         </div>
 
         {/* Timezone */}
         <div className="flex flex-col gap-2">
-          <label className="text-xs font-medium text-[#503C2C] dark:text-[#D4C3B3] flex items-center gap-1">
+          <label
+            className={cn(
+              "flex items-center gap-1",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-medium text-[#503C2C]"
+            )}
+          >
             <Clock className="w-3.5 h-3.5 text-[#B88460]" />
             <span>{isRTL ? "المنطقة الزمنية *" : "Timezone *"}</span>
           </label>
@@ -187,7 +242,10 @@ export function StepCustomerLocation({
               onChangeLocation({ ...location, timezone: e.target.value })
             }
             placeholder="e.g. GMT+2 / Cairo"
-            className="text-xs px-3.5 py-2.5 rounded-xl border border-[#E6DDD2] dark:border-[#38332E] bg-white dark:bg-[#141210] text-[#1C1917] dark:text-[#FAF7F2] focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            className={cn(
+              "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
+              isRTL ? "text-xs font-medium" : "text-xs"
+            )}
           />
         </div>
       </div>

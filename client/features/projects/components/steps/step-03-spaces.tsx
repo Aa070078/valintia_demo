@@ -90,14 +90,35 @@ export function StepSpaces({
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            )}
+          >
             {isRTL ? "الخطوة ٠٣ · الفراغات المعمارية" : "STEP 03 · SPATIAL PROGRAM"}
           </span>
         </div>
-        <h2 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+        <h2
+          className={cn(
+            "mt-2 text-[#1C1917]",
+            isRTL
+              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
+              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
+          )}
+        >
           {isRTL ? "ما الفراغات التي تود إدراجها؟" : "Which spaces shall we shape?"}
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#78716C] dark:text-[#989692] leading-relaxed max-w-xl">
+        <p
+          className={cn(
+            "mt-2 leading-relaxed max-w-xl",
+            isRTL
+              ? "text-sm font-medium text-[#4A3E31]"
+              : "text-xs sm:text-sm text-[#78716C]"
+          )}
+        >
           {isRTL
             ? "حدد الغرف والأجنحة التي يشملها المشروع. يتم ربط الطراز المختار مسبقاً بكل فراغ بشكل تلقائي."
             : "Select the architectural zones to be designed. Styles selected previously are automatically aligned to their respective zones."}
@@ -105,28 +126,68 @@ export function StepSpaces({
       </div>
 
       {/* Spatial Summary Metrics Card */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27]">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-2xl bg-card border border-border shadow-xs">
         <div>
-          <span className="font-mono text-[9px] uppercase tracking-wider text-[#78716C] dark:text-[#8C827A]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[9px] uppercase tracking-wider"
+            )}
+          >
             {isRTL ? "إجمالي الفراغات المعتمدة" : "Active Spatial Zones"}
           </span>
-          <div className="text-xl sm:text-2xl font-serif text-[#1C1917] dark:text-[#FAF7F2] mt-0.5">
+          <div
+            className={cn(
+              "text-[#1C1917] mt-0.5",
+              isRTL
+                ? "font-sans text-xl sm:text-2xl font-bold"
+                : "font-serif text-xl sm:text-2xl"
+            )}
+          >
             {totalSelectedRooms} {isRTL ? "غرف / أجنحة" : "Zones"}
           </div>
         </div>
         <div>
-          <span className="font-mono text-[9px] uppercase tracking-wider text-[#78716C] dark:text-[#8C827A]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[9px] uppercase tracking-wider"
+            )}
+          >
             {isRTL ? "المساحة التقريبية" : "Est. Surface Area"}
           </span>
-          <div className="text-xl sm:text-2xl font-serif text-[#1C1917] dark:text-[#FAF7F2] mt-0.5">
-            {areaSqm || 450} m²
+          <div
+            className={cn(
+              "text-[#1C1917] mt-0.5",
+              isRTL
+                ? "font-sans text-xl sm:text-2xl font-bold"
+                : "font-serif text-xl sm:text-2xl"
+            )}
+          >
+            {areaSqm || 450} {isRTL ? "م²" : "m²"}
           </div>
         </div>
         <div className="col-span-2 sm:col-span-1">
-          <span className="font-mono text-[9px] uppercase tracking-wider text-[#78716C] dark:text-[#8C827A]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[9px] uppercase tracking-wider"
+            )}
+          >
             {isRTL ? "حالة التوزيع" : "Spatial Density"}
           </span>
-          <div className="text-xs sm:text-sm font-medium text-[#B88460] mt-1 flex items-center gap-1.5">
+          <div
+            className={cn(
+              "text-xs sm:text-sm text-[#B88460] mt-1 flex items-center gap-1.5",
+              isRTL ? "font-bold" : "font-medium"
+            )}
+          >
             <span className="w-2 h-2 rounded-full bg-[#B88460]" />
             <span>{isRTL ? "توزيع هندسي متوازن" : "Optimum Volumetric Flow"}</span>
           </div>
@@ -145,14 +206,14 @@ export function StepSpaces({
             <div
               key={curated.id}
               className={cn(
-                "p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 bg-[#FAF7F2] dark:bg-[#1E1B18]",
+                "p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 bg-card",
                 isIncluded
-                  ? "border-[#503C2C]/50 dark:border-[#B88460]/60 shadow-sm"
-                  : "border-[#E6DDD2]/60 dark:border-[#2E2A27] opacity-70 hover:opacity-100"
+                  ? "border-[#503C2C]/50 shadow-sm"
+                  : "border-border/70 opacity-75 hover:opacity-100"
               )}
             >
               <div className="flex items-center gap-3.5 min-w-0">
-                <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-[#E6DDD2]/80 dark:border-[#38332E]">
+                <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-border">
                   <Image
                     src={curated.imageSrc}
                     alt={curated.defaultName}
@@ -163,16 +224,33 @@ export function StepSpaces({
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-medium text-[#1C1917] dark:text-[#FAF7F2] truncate">
+                    <h4
+                      className={cn(
+                        "text-[#1C1917] truncate",
+                        isRTL ? "text-sm font-bold tracking-normal" : "text-sm font-medium"
+                      )}
+                    >
                       {t(curated.nameKey) || curated.defaultName}
                     </h4>
                     {assignedStyle && isIncluded && (
-                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-[#EAE2D7] dark:bg-[#2C2723] text-[#503C2C] dark:text-[#D4C3B3] shrink-0">
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded bg-[#EAE2D7] text-[#503C2C] shrink-0",
+                          isRTL ? "text-[10px] font-bold tracking-normal" : "font-mono text-[9px]"
+                        )}
+                      >
                         {assignedStyle}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#78716C] dark:text-[#989692] truncate mt-0.5">
+                  <p
+                    className={cn(
+                      "truncate mt-0.5",
+                      isRTL
+                        ? "text-xs font-medium text-[#503C2C]"
+                        : "text-[11px] text-[#78716C]"
+                    )}
+                  >
                     {isRTL ? curated.descAr : curated.desc}
                   </p>
                 </div>
@@ -181,7 +259,7 @@ export function StepSpaces({
               {/* Actions: Counter or Switch */}
               <div className="flex items-center gap-2.5 shrink-0">
                 {curated.hasCounter ? (
-                  <div className="flex items-center gap-2 bg-white dark:bg-[#141210] border border-[#E6DDD2] dark:border-[#38332E] rounded-xl px-2 py-1">
+                  <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-2 py-1">
                     <button
                       type="button"
                       onClick={() => updateQuantity(curated.id, -1)}
@@ -190,7 +268,7 @@ export function StepSpaces({
                     >
                       <Minus className="w-3 h-3" />
                     </button>
-                    <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917] dark:text-[#FAF7F2]">
+                    <span className="font-mono text-xs font-bold w-4 text-center text-[#1C1917]">
                       {quantity}
                     </span>
                     <button
@@ -218,23 +296,35 @@ export function StepSpaces({
           .map((custom) => (
             <div
               key={custom.id}
-              className="p-4 rounded-2xl border border-[#503C2C]/50 dark:border-[#B88460]/60 bg-[#FAF7F2] dark:bg-[#1E1B18] flex items-center justify-between gap-3 shadow-sm"
+              className="p-4 rounded-2xl border border-[#503C2C]/50 bg-card flex items-center justify-between gap-3 shadow-sm"
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-[#F4EEE5] dark:bg-[#25221F] border border-[#E6DDD2] dark:border-[#38332E] flex items-center justify-center shrink-0">
-                  <HouseLine className="w-5 h-5 text-[#503C2C] dark:text-[#B88460]" />
+                <div className="w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center shrink-0">
+                  <HouseLine className="w-5 h-5 text-[#503C2C]" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-medium text-[#1C1917] dark:text-[#FAF7F2]">
+                  <h4
+                    className={cn(
+                      "text-[#1C1917]",
+                      isRTL ? "text-sm font-bold" : "text-sm font-medium"
+                    )}
+                  >
                     {custom.customName}
                   </h4>
-                  <span className="font-mono text-[10px] text-[#78716C]">
+                  <span
+                    className={cn(
+                      "text-[#78716C]",
+                      isRTL
+                        ? "text-xs font-semibold text-[#503C2C]"
+                        : "font-mono text-[10px]"
+                    )}
+                  >
                     {isRTL ? "فراغ معماري مخصص" : "Bespoke Space"}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 bg-white dark:bg-[#141210] border border-[#E6DDD2] dark:border-[#38332E] rounded-xl px-2 py-1">
+                <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-2 py-1">
                   <button
                     type="button"
                     onClick={() => updateQuantity(custom.id, -1)}
@@ -242,7 +332,7 @@ export function StepSpaces({
                   >
                     <Minus className="w-3 h-3" />
                   </button>
-                  <span className="font-mono text-xs font-semibold w-4 text-center">
+                  <span className="font-mono text-xs font-bold w-4 text-center">
                     {custom.quantity}
                   </span>
                   <button
@@ -259,7 +349,7 @@ export function StepSpaces({
       </div>
 
       {/* Add Custom Space input */}
-      <div className="flex gap-2 p-3 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-dashed border-[#E6DDD2] dark:border-[#38332E]">
+      <div className="flex gap-2 p-3 rounded-2xl bg-card border border-dashed border-border">
         <input
           type="text"
           value={customSpaceName}
@@ -269,12 +359,18 @@ export function StepSpaces({
               ? "إضافة فراغ مخصص (مثل: غرفة سينما، سبا، غرفة ملابس إضافية)..."
               : "Add bespoke room (e.g. Cinema Room, Private Spa, Cigar Lounge)..."
           }
-          className="flex-1 text-xs px-3.5 py-2 rounded-xl border border-[#E6DDD2] dark:border-[#38332E] bg-white dark:bg-[#141210] text-[#1C1917] dark:text-[#FAF7F2] focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+          className={cn(
+            "flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460]",
+            isRTL ? "text-xs font-medium" : "text-xs"
+          )}
         />
         <button
           type="button"
           onClick={handleAddCustomSpace}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#503C2C] text-[#FAF7F2] text-xs font-medium hover:bg-[#3D2E22] transition-colors"
+          className={cn(
+            "flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors cursor-pointer",
+            isRTL ? "text-xs font-bold tracking-normal" : "text-xs font-medium"
+          )}
         >
           <Plus className="w-3.5 h-3.5" />
           <span>{isRTL ? "إضافة فراغ" : "Add Space"}</span>

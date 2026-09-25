@@ -121,16 +121,30 @@ export function StepStyleDiscovery({
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
       {/* Header */}
-      <div>
+      <div className="text-start">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <span className="h-px w-6 bg-foreground/50" />
+          <span className={cn(
+            "text-[11px] font-bold text-foreground/80",
+            isRTL ? "tracking-normal text-xs text-[#503C2C]" : "font-mono uppercase tracking-[0.2em]"
+          )}>
             {isRTL ? "الخطوة ٠٢ · استكشاف الطراز والمواد" : "STEP 02 · STYLE DISCOVERY"}
           </span>
         </div>
-        <h2 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+        <h2 className={cn(
+          "mt-2 text-[#1C1917] dark:text-[#FAF7F2] transition-colors",
+          isRTL
+            ? "font-sans font-bold text-2xl sm:text-3xl lg:text-4xl leading-[1.3]"
+            : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
+        )}>
           {isRTL ? "ما هو الطراز الذي يشبهك؟" : "What feels like you?"}
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#78716C] dark:text-[#989692] leading-relaxed max-w-xl">
+        <p className={cn(
+          "mt-2 leading-relaxed max-w-xl",
+          isRTL
+            ? "text-sm sm:text-base font-medium text-[#4A3E31]"
+            : "text-xs sm:text-sm text-muted-foreground"
+        )}>
           {isRTL
             ? "اختر التوجه الجمالي العام لمشروعك، أو حدد طابعاً خاصاً لكل فراغ معماري رئيسي مع رفع صور الإلهام المفضلة لديك."
             : "Define the overarching aesthetic spirit or tailor individual moods per space, paired with curated materials and reference photography."}
@@ -138,7 +152,7 @@ export function StepStyleDiscovery({
       </div>
 
       {/* Space Category Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-[#E6DDD2]/60 dark:border-[#38332E]">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-border">
         {SPACE_CATEGORIES.map((cat) => {
           const isSelected = activeCategory === cat.key;
           const hasCustom = pendingStyles.some((s) => s.targetSpaceKey === cat.key);
@@ -148,10 +162,11 @@ export function StepStyleDiscovery({
               type="button"
               onClick={() => setActiveCategory(cat.key)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all",
+                "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap transition-all cursor-pointer",
                 isSelected
-                  ? "bg-[#503C2C] text-[#FAF7F2] shadow-sm"
-                  : "bg-[#F4EEE5] dark:bg-[#25221F] text-[#78716C] dark:text-[#A8A29E] hover:text-[#1C1917] hover:bg-[#EAE2D7]"
+                  ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                  : "bg-card border border-border text-[#4A3E31] font-medium hover:bg-secondary hover:text-foreground",
+                isRTL ? "font-sans tracking-normal" : "font-medium"
               )}
             >
               <span>{isRTL ? cat.labelAr : cat.labelEn}</span>
@@ -172,10 +187,10 @@ export function StepStyleDiscovery({
               key={direction.id}
               onClick={() => handleSelectStyle(direction)}
               className={cn(
-                "group relative cursor-pointer overflow-hidden rounded-2xl border transition-all duration-300 bg-[#FAF7F2] dark:bg-[#1E1B18]",
+                "group relative cursor-pointer overflow-hidden rounded-2xl border transition-all duration-300 bg-card",
                 isSelected
-                  ? "border-[#503C2C] dark:border-[#B88460] shadow-md ring-1 ring-[#503C2C]/20"
-                  : "border-[#E6DDD2]/80 dark:border-[#2E2A27] hover:border-[#B88460]/60 hover:shadow-sm"
+                  ? "border-primary shadow-md ring-1 ring-primary/30 -translate-y-0.5"
+                  : "border-border hover:border-foreground/40 hover:shadow-sm"
               )}
             >
               <div className="relative h-48 w-full overflow-hidden">
@@ -186,34 +201,46 @@ export function StepStyleDiscovery({
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
                 
                 {/* Active check pill */}
                 {isSelected && (
-                  <div className="absolute top-3 end-3 flex items-center gap-1 bg-[#503C2C] text-[#FAF7F2] text-[11px] font-medium px-2.5 py-1 rounded-full shadow-md">
+                  <div className="absolute top-3 end-3 flex items-center gap-1 bg-[#1C1917] text-[#FAF7F2] text-[11px] font-bold px-2.5 py-1 rounded-full shadow-md">
                     <Check weight="bold" className="w-3.5 h-3.5 text-[#B88460]" />
                     <span>{isRTL ? "محدد" : "Selected"}</span>
                   </div>
                 )}
 
                 <div className="absolute bottom-3 start-4 end-4 text-white">
-                  <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#E0CFB8]">
+                  <div className={cn(
+                    "text-[10px] text-[#E0CFB8]",
+                    isRTL ? "font-bold tracking-normal font-sans" : "font-mono uppercase tracking-[0.2em]"
+                  )}>
                     {isRTL ? direction.subtitleAr : direction.subtitle}
                   </div>
-                  <h3 className="font-serif text-xl sm:text-2xl font-normal leading-tight mt-0.5">
+                  <h3 className={cn(
+                    "leading-snug mt-0.5 text-white",
+                    isRTL ? "font-sans font-bold text-xl sm:text-2xl" : "font-serif text-xl sm:text-2xl font-normal"
+                  )}>
                     {isRTL ? direction.nameAr : direction.name}
                   </h3>
                 </div>
               </div>
 
               <div className="p-4 sm:p-5 flex flex-col gap-3">
-                <p className="text-xs text-[#78716C] dark:text-[#A8A29E] leading-relaxed">
+                <p className={cn(
+                  "leading-relaxed",
+                  isRTL ? "text-xs font-medium text-[#382D22]" : "text-xs text-muted-foreground"
+                )}>
                   {isRTL ? direction.descriptionAr : direction.description}
                 </p>
 
                 {/* Material Palette Swatches */}
-                <div className="pt-2 border-t border-[#E6DDD2]/50 dark:border-[#2E2A27] flex items-center justify-between">
-                  <span className="font-mono text-[9px] uppercase tracking-wider text-[#78716C] dark:text-[#8C827A]">
+                <div className="pt-2 border-t border-border flex items-center justify-between">
+                  <span className={cn(
+                    "text-[10px]",
+                    isRTL ? "font-bold text-[#503C2C] tracking-normal font-sans" : "font-mono uppercase tracking-wider text-muted-foreground"
+                  )}>
                     {isRTL ? "الخامات الرئيسية" : "Signature Materials"}
                   </span>
                   <div className="flex items-center gap-1.5">

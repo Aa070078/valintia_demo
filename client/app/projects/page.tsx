@@ -9,9 +9,10 @@ import { EditorialHeader } from "@/features/projects/components/editorial-header
 import { ProjectsGrid } from "@/features/projects/components/projects-grid";
 import { useProjects } from "@/features/projects/hooks/use-projects";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 export default function ProjectsPage() {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const { data: projects, isLoading, isError, error, refetch } = useProjects();
 
   return (
@@ -29,7 +30,10 @@ export default function ProjectsPage() {
             action={
               <Link
                 href="/projects/new"
-                className="group inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-primary-foreground shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
+                className={cn(
+                  "group inline-flex items-center gap-2.5 rounded-full bg-primary px-6 py-3 text-xs text-primary-foreground shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer",
+                  isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-[0.14em]"
+                )}
               >
                 <Plus size={14} weight="bold" />
                 <span>{t("nav.start_project")}</span>

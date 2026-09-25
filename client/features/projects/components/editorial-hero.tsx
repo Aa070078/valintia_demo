@@ -187,7 +187,10 @@ export function EditorialHero() {
               <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
                   href="/projects/new"
-                  className="group inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3.5 text-xs font-bold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-black/25 hover:scale-[1.03] active:scale-[0.96]"
+                  className={cn(
+                    "group inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3.5 text-xs text-[#FAF7F2] shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-black/25 hover:scale-[1.03] active:scale-[0.96]",
+                    isRTL ? "tracking-normal font-sans font-bold" : "font-bold uppercase tracking-[0.14em]"
+                  )}
                 >
                   <span>{t("hero.cta_start")}</span>
                   <ArrowRight
@@ -273,7 +276,10 @@ export function EditorialHero() {
 
                 {/* Progress Track Line Inside Floating Card */}
                 <div className="mt-8 border-t border-border/60 pt-4">
-                  <div className="flex items-center justify-between text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+                  <div className={cn(
+                    "flex items-center justify-between text-[10px] text-muted-foreground",
+                    isRTL ? "tracking-normal font-sans font-semibold" : "font-medium tracking-wider uppercase"
+                  )}>
                     <span className="text-foreground font-bold">{t("hero.phase_concept")}</span>
                     <span>{t("hero.phase_design")}</span>
                     <span>{t("hero.phase_execution")}</span>

@@ -4,6 +4,7 @@ import * as React from "react";
 import { UploadSimple, FilePdf, Trash, ShieldCheck } from "@phosphor-icons/react";
 import type { ProjectDocument } from "../../types";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface StepDrawingsProps {
   documents: ProjectDocument[];
@@ -45,14 +46,35 @@ export function StepDrawings({
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            )}
+          >
             {isRTL ? "الخطوة ١٠ · المخططات والرسومات المعمارية" : "STEP 10 · DRAWINGS & CAD PLANS"}
           </span>
         </div>
-        <h2 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+        <h2
+          className={cn(
+            "mt-2 text-[#1C1917]",
+            isRTL
+              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
+              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
+          )}
+        >
           {isRTL ? "هل لديك مخططات أو كاد للعقار؟" : "Do you have existing CAD or PDF drawings?"}
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#78716C] dark:text-[#989692] leading-relaxed max-w-xl">
+        <p
+          className={cn(
+            "mt-2 leading-relaxed max-w-xl",
+            isRTL
+              ? "text-sm font-medium text-[#4A3E31]"
+              : "text-xs sm:text-sm text-[#78716C]"
+          )}
+        >
           {isRTL
             ? "إذا كانت المخططات التنفيذية متوفرة لديك من المطور العقاري فقم برفعها هنا. وإذا لم تكن متوفرة، سيتولى فريق فالنتيا مسح الموقع بالكامل ليزرياً."
             : "Upload developer blueprints, CAD files, or sketches if available. If you don't have drawings, our engineering team will perform a full 3D lidar scan during site inspection."}
@@ -60,16 +82,26 @@ export function StepDrawings({
       </div>
 
       {/* Unblocking Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#F4EEE5]/70 dark:bg-[#25221F] border border-[#E6DDD2] dark:border-[#38332E] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-4 sm:p-5 rounded-2xl bg-card border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white dark:bg-[#1E1B18] border border-[#E6DDD2] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shrink-0">
             <ShieldCheck className="w-5 h-5 text-[#B88460]" />
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2]">
+            <h4
+              className={cn(
+                "text-[#1C1917]",
+                isRTL ? "font-sans text-sm font-bold tracking-normal" : "text-xs font-semibold"
+              )}
+            >
               {isRTL ? "لا تملك مخططات هندسية حالياً؟" : "Don't have architectural plans?"}
             </h4>
-            <p className="text-[11px] text-[#78716C] dark:text-[#989692] mt-0.5">
+            <p
+              className={cn(
+                "mt-0.5 leading-relaxed",
+                isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]"
+              )}
+            >
               {isRTL
                 ? "هذا طبيعي تماماً. يتضمن بروتوكول فالنتيا مسحاً ليزرياً شاملاً (3D Lidar Survey) في أول زيارة ميدانية."
                 : "No problem at all. Valentia conducts an exhaustive 3D point-cloud lidar scan during the physical survey visit."}
@@ -79,7 +111,10 @@ export function StepDrawings({
         <button
           type="button"
           onClick={onProceedWithoutDrawings}
-          className="shrink-0 px-4 py-2 rounded-xl border border-[#503C2C] text-[#503C2C] dark:text-[#FAF7F2] dark:border-[#B88460] text-xs font-medium hover:bg-[#503C2C] hover:text-[#FAF7F2] transition-colors"
+          className={cn(
+            "shrink-0 px-4 py-2 rounded-xl border border-[#503C2C] text-[#503C2C] hover:bg-[#503C2C] hover:text-[#FAF7F2] transition-colors cursor-pointer",
+            isRTL ? "text-xs font-bold tracking-normal" : "text-xs font-medium"
+          )}
         >
           {isRTL ? "المتابعة دون مخططات ←" : "Proceed Without Drawings →"}
         </button>
@@ -88,18 +123,28 @@ export function StepDrawings({
       {/* Upload Dropzone */}
       <div
         onClick={() => fileInputRef.current?.click()}
-        className="cursor-pointer border-2 border-dashed border-[#E6DDD2] dark:border-[#38332E] rounded-3xl p-8 sm:p-12 bg-[#FAF7F2]/60 dark:bg-[#1E1B18]/60 hover:bg-[#FAF7F2] hover:border-[#B88460] transition-all flex flex-col items-center justify-center text-center gap-3"
+        className="cursor-pointer border-2 border-dashed border-border hover:border-[#B88460] rounded-3xl p-8 sm:p-12 bg-card hover:bg-card/80 transition-all flex flex-col items-center justify-center text-center gap-3 shadow-xs"
       >
-        <div className="w-14 h-14 rounded-2xl bg-[#F4EEE5] dark:bg-[#25221F] border border-[#E6DDD2] flex items-center justify-center">
-          <UploadSimple className="w-6 h-6 text-[#503C2C] dark:text-[#B88460]" />
+        <div className="w-14 h-14 rounded-2xl bg-background border border-border flex items-center justify-center">
+          <UploadSimple className="w-6 h-6 text-[#503C2C]" />
         </div>
         <div>
-          <p className="text-sm font-medium text-[#1C1917] dark:text-[#FAF7F2]">
+          <p
+            className={cn(
+              "text-[#1C1917]",
+              isRTL ? "font-sans text-sm font-bold tracking-normal" : "text-sm font-medium"
+            )}
+          >
             {isRTL
               ? "اضغط لاختيار الملفات أو اسحبها إلى هنا"
               : "Click to browse or drop drawings here"}
           </p>
-          <p className="text-xs text-[#78716C] dark:text-[#989692] mt-1">
+          <p
+            className={cn(
+              "mt-1",
+              isRTL ? "text-xs font-semibold text-[#503C2C]" : "text-xs text-[#78716C]"
+            )}
+          >
             DWG, DXF, PDF, JPG, PNG {isRTL ? "(بحد أقصى ٥٠ ميجابايت)" : "(Up to 50MB per file)"}
           </p>
         </div>
@@ -116,21 +161,31 @@ export function StepDrawings({
       {/* Uploaded Documents List */}
       {documents.length > 0 && (
         <div className="flex flex-col gap-2.5">
-          <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-[#78716C]">
+          <h4
+            className={cn(
+              "text-[#78716C]",
+              isRTL ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]" : "text-xs font-mono font-semibold uppercase tracking-wider"
+            )}
+          >
             {isRTL ? `الملفات المرفوعة (${documents.length})` : `Uploaded Files (${documents.length})`}
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {documents.map((doc) => (
               <div
                 key={doc.id}
-                className="p-3.5 rounded-xl border border-[#E6DDD2] dark:border-[#2E2A27] bg-[#FAF7F2] dark:bg-[#1E1B18] flex items-center justify-between gap-3"
+                className="p-3.5 rounded-xl border border-border bg-card flex items-center justify-between gap-3 shadow-2xs"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-lg bg-[#F4EEE5] dark:bg-[#25221F] flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-background flex items-center justify-center shrink-0 border border-border">
                     <FilePdf className="w-5 h-5 text-[#B88460]" />
                   </div>
                   <div className="min-w-0">
-                    <div className="text-xs font-medium text-[#1C1917] dark:text-[#FAF7F2] truncate">
+                    <div
+                      className={cn(
+                        "text-[#1C1917] truncate",
+                        isRTL ? "text-xs font-bold" : "text-xs font-medium"
+                      )}
+                    >
                       {doc.name}
                     </div>
                     <div className="text-[10px] font-mono text-[#78716C] uppercase">
@@ -141,7 +196,7 @@ export function StepDrawings({
                 <button
                   type="button"
                   onClick={() => handleRemoveDoc(doc.id)}
-                  className="p-1.5 text-[#78716C] hover:text-rose-500 transition-colors"
+                  className="p-1.5 text-[#78716C] hover:text-rose-500 transition-colors cursor-pointer"
                 >
                   <Trash className="w-4 h-4" />
                 </button>

@@ -11,7 +11,7 @@ import { SignInModal } from "@/features/auth/components/sign-in-modal";
 
 export function CustomerHeader() {
   const pathname = usePathname();
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, isRTL } = useLanguage();
   const { user, isAuthenticated, role } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = React.useState(false);
 
@@ -45,10 +45,16 @@ export function CustomerHeader() {
             </svg>
           </div>
           <div className="flex flex-col">
-            <span className="font-sans text-[13px] font-semibold tracking-[0.28em] text-foreground transition-colors group-hover:opacity-80">
+            <span className={cn(
+              "font-sans font-semibold text-foreground transition-colors group-hover:opacity-80",
+              isRTL ? "text-[15px] font-bold tracking-normal" : "text-[13px] tracking-[0.28em]"
+            )}>
               {t("brand.name")}
             </span>
-            <span className="text-[9px] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+            <span className={cn(
+              "font-medium text-muted-foreground",
+              isRTL ? "text-[11px] font-semibold tracking-normal text-[#503C2C]" : "text-[9px] uppercase tracking-[0.22em]"
+            )}>
               {t("brand.tagline")}
             </span>
           </div>
@@ -59,7 +65,8 @@ export function CustomerHeader() {
           <Link
             href="/projects"
             className={cn(
-              "relative py-1 text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 hover:-translate-y-0.5",
+              "relative py-1 transition-all duration-200 hover:-translate-y-0.5",
+              isRTL ? "text-sm font-bold tracking-normal" : "text-xs font-semibold uppercase tracking-[0.16em]",
               pathname === "/projects" ||
                 (pathname.startsWith("/projects/") &&
                   pathname !== "/projects/new")
@@ -72,7 +79,8 @@ export function CustomerHeader() {
           <Link
             href="/projects/new"
             className={cn(
-              "relative py-1 text-xs font-semibold uppercase tracking-[0.16em] transition-all duration-200 hover:-translate-y-0.5",
+              "relative py-1 transition-all duration-200 hover:-translate-y-0.5",
+              isRTL ? "text-sm font-bold tracking-normal" : "text-xs font-semibold uppercase tracking-[0.16em]",
               pathname === "/projects/new"
                 ? "text-foreground font-bold after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-foreground after:rounded-full"
                 : "text-muted-foreground hover:text-foreground"
@@ -86,7 +94,10 @@ export function CustomerHeader() {
         <div className="flex items-center gap-5">
           <Link
             href="/projects/new"
-            className="hidden sm:inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-primary-foreground shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.97]"
+            className={cn(
+              "hidden sm:inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-primary-foreground shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.97]",
+              isRTL ? "text-xs font-bold tracking-normal" : "text-xs font-semibold uppercase tracking-[0.12em]"
+            )}
           >
             <Plus size={13} weight="bold" />
             <span>{t("nav.new_project")}</span>

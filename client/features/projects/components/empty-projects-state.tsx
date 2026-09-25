@@ -1,36 +1,58 @@
 import * as React from "react";
 import Link from "next/link";
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight, ArrowLeft } from "@phosphor-icons/react";
+import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 export function EmptyProjectsState() {
+  const { t, isRTL } = useLanguage();
+
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-xs">
       <div className="grid grid-cols-1 items-center lg:grid-cols-12">
-        <div className="flex flex-col justify-center p-8 sm:p-12 lg:col-span-6 lg:p-16">
+        <div className="flex flex-col justify-center p-8 sm:p-12 lg:col-span-6 lg:p-14 text-start">
           <div className="flex items-center gap-2">
-            <span className="h-px w-8 bg-brand-slate/40" />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Your Journey Starts Here
+            <span className="h-px w-8 bg-foreground/40" />
+            <span className={cn(
+              "text-[11px] font-semibold text-muted-foreground",
+              isRTL ? "tracking-normal font-sans font-bold text-xs text-[#503C2C]" : "uppercase tracking-[0.18em]"
+            )}>
+              {t("hero.eyebrow")}
             </span>
           </div>
 
-          <h2 className="mt-4 font-serif text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-            From a place to a lifestyle.
+          <h2 className={cn(
+            "mt-4 text-foreground transition-colors",
+            isRTL
+              ? "font-sans font-bold text-2xl sm:text-3xl lg:text-4xl text-[#1C1917] leading-snug"
+              : "font-serif text-3xl font-medium tracking-tight sm:text-4xl lg:text-5xl"
+          )}>
+            {t("portfolio.empty_title")}
           </h2>
 
-          <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
-            We design and build exceptional interior spaces in Egypt, while you
-            stay informed at every milestone through transparent engineering
-            workflows.
+          <p className={cn(
+            "mt-4 max-w-lg leading-relaxed",
+            isRTL
+              ? "font-medium text-sm sm:text-base text-[#4A3E31] leading-relaxed"
+              : "text-sm text-muted-foreground sm:text-base"
+          )}>
+            {t("portfolio.empty_desc")}
           </p>
 
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Link
               href="/projects/new"
-              className="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-sm font-medium text-primary-foreground shadow-sm transition-all hover:opacity-90 active:scale-[0.98]"
+              className={cn(
+                "inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3 text-xs text-primary-foreground shadow-xs transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer",
+                isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-wider"
+              )}
             >
-              <span>Start Your Project</span>
-              <ArrowRight size={14} weight="bold" />
+              <span>{t("hero.cta_start")}</span>
+              {isRTL ? (
+                <ArrowLeft size={14} weight="bold" />
+              ) : (
+                <ArrowRight size={14} weight="bold" />
+              )}
             </Link>
           </div>
         </div>

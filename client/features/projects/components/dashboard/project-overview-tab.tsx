@@ -12,6 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import type { Project } from "../../types";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface ProjectOverviewTabProps {
   project: Project;
@@ -54,19 +55,33 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
       {/* 2-Column Grid of Architectural Parameters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Property & Location */}
-        <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+            )}
+          >
             <Building className="w-4 h-4 text-[#B88460]" />
             <span>{isRTL ? "بيانات العقار والنمط المعماري" : "Property & Typology"}</span>
           </div>
-          <div className="space-y-1.5 text-xs text-[#1C1917] dark:text-[#FAF7F2]">
-            <div className="font-serif text-lg capitalize">{property.propertyType}</div>
-            <div className="flex items-center gap-1.5 text-[#78716C] dark:text-[#989692]">
-              <MapPin className="w-3.5 h-3.5 text-[#B88460]" />
-              <span>{property.compound ? `${property.compound}, ` : ""}{property.city}</span>
+          <div className="space-y-1.5 text-xs text-[#1C1917]">
+            <div
+              className={cn(
+                "capitalize",
+                isRTL ? "font-sans text-lg font-bold" : "font-serif text-lg"
+              )}
+            >
+              {property.propertyType}
             </div>
-            <div className="flex items-center gap-3 font-mono text-[11px] text-[#78716C] pt-1">
-              <span>{property.areaSqm} m²</span>
+            <div className="flex items-center gap-1.5 text-[#503C2C]">
+              <MapPin className="w-3.5 h-3.5 text-[#B88460]" />
+              <span className={cn(isRTL ? "font-bold" : "font-medium")}>
+                {property.compound ? `${property.compound}, ` : ""}{property.city}
+              </span>
+            </div>
+            <div className={cn("flex items-center gap-3 text-[#78716C] pt-1", isRTL ? "font-sans text-xs font-semibold" : "font-mono text-[11px]")}>
+              <span>{property.areaSqm} {isRTL ? "م²" : "m²"}</span>
               <span>•</span>
               <span>{property.floors || 1} {isRTL ? "أدوار" : "Levels"}</span>
               <span>•</span>
@@ -76,19 +91,28 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
         </div>
 
         {/* Client Residence & Timezone */}
-        <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+            )}
+          >
             <Globe className="w-4 h-4 text-[#B88460]" />
             <span>{isRTL ? "موقع إقامة العميل والمنطقة الزمنية" : "Client Base & Timezone"}</span>
           </div>
-          <div className="space-y-1.5 text-xs text-[#1C1917] dark:text-[#FAF7F2]">
-            <div className="font-serif text-lg">
+          <div className="space-y-1.5 text-xs text-[#1C1917]">
+            <div
+              className={cn(
+                isRTL ? "font-sans text-lg font-bold" : "font-serif text-lg"
+              )}
+            >
               {project.customerLocation?.city || "Cairo"}, {project.customerLocation?.country || "Egypt"}
             </div>
-            <div className="font-mono text-[#78716C] dark:text-[#989692] text-[11px]">
+            <div className={cn("text-[#78716C] text-[11px]", isRTL ? "font-sans font-medium" : "font-mono")}>
               {project.customerLocation?.timezone || "Africa/Cairo (GMT+2)"}
             </div>
-            <p className="text-[11px] text-[#78716C] pt-1">
+            <p className={cn("pt-1", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
               {isRTL
                 ? "يتم جدولة الجلسات الافتراضية ومكالمات المراجعة وفق توقيت هذا الموقع."
                 : "Virtual sessions and live updates are scheduled around this local time."}
@@ -97,20 +121,25 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
         </div>
 
         {/* Local Representative */}
-        <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+            )}
+          >
             <UserCheck className="w-4 h-4 text-[#B88460]" />
             <span>{isRTL ? "الممثل والوكيل في مصر" : "Representation in Egypt"}</span>
           </div>
-          <div className="text-xs text-[#1C1917] dark:text-[#FAF7F2]">
+          <div className="text-xs text-[#1C1917]">
             {project.representative?.hasRepresentative ? (
               <div className="space-y-1">
-                <div className="font-medium">{project.representative.name}</div>
-                <div className="font-mono text-[#78716C]">{project.representative.phone}</div>
-                <div className="text-[11px] text-[#78716C]">{project.representative.authorizationScope || "Key handover & site visits"}</div>
+                <div className={cn(isRTL ? "font-bold text-sm" : "font-medium")}>{project.representative.name}</div>
+                <div className={cn("text-[#78716C]", isRTL ? "font-sans font-semibold" : "font-mono")}>{project.representative.phone}</div>
+                <div className={cn(isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>{project.representative.authorizationScope || "Key handover & site visits"}</div>
               </div>
             ) : (
-              <div className="text-[#78716C] dark:text-[#989692] leading-relaxed">
+              <div className={cn("leading-relaxed", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[#78716C]")}>
                 {isRTL
                   ? "إدارة مباشرة من فالنتيا: يتولى مهندس المشروع استلام المفاتيح والمسح الميداني دون الحاجة لوسيط محلي."
                   : "Valentia Direct Custody: Our team manages keys, scans, and site logistics directly with you."}
@@ -120,17 +149,27 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
         </div>
 
         {/* Scope of Work */}
-        <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+            )}
+          >
             <Hammer className="w-4 h-4 text-[#B88460]" />
             <span>{isRTL ? "نطاق العمل المطلوب" : "Commission Scope"}</span>
           </div>
-          <div className="space-y-1.5 text-xs text-[#1C1917] dark:text-[#FAF7F2]">
-            <div className="font-serif text-lg capitalize">
+          <div className="space-y-1.5 text-xs text-[#1C1917]">
+            <div
+              className={cn(
+                "capitalize",
+                isRTL ? "font-sans text-lg font-bold" : "font-serif text-lg"
+              )}
+            >
               {(project.scope?.scopeType || "full_fitout").replace("_", " ")}
             </div>
             {project.scope?.customDetails && (
-              <p className="text-[11px] text-[#78716C] leading-relaxed">
+              <p className={cn("leading-relaxed", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
                 {project.scope.customDetails}
               </p>
             )}
@@ -138,16 +177,26 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
         </div>
 
         {/* Financial & Budget Bracket */}
-        <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+            )}
+          >
             <Coins className="w-4 h-4 text-[#B88460]" />
             <span>{isRTL ? "الميزانية المستهدفة" : "Target Investment"}</span>
           </div>
-          <div className="text-xs text-[#1C1917] dark:text-[#FAF7F2]">
-            <div className="font-serif text-xl text-[#B88460] font-normal">
+          <div className="text-xs text-[#1C1917]">
+            <div
+              className={cn(
+                "text-[#B88460]",
+                isRTL ? "font-sans text-xl font-bold" : "font-serif text-xl font-normal"
+              )}
+            >
               {getBudgetText()}
             </div>
-            <p className="text-[11px] text-[#78716C] mt-1">
+            <p className={cn("mt-1", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
               {isRTL
                 ? "يتم تدقيق البنود والكميات بالتفصيل في مرحلة جدول الكميات (BOQ)."
                 : "Refined and itemized during the BOQ engineering phase."}
@@ -156,16 +205,25 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
         </div>
 
         {/* Target Handover Horizon */}
-        <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+        <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+          <div
+            className={cn(
+              "flex items-center gap-2",
+              isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+            )}
+          >
             <CalendarCheck className="w-4 h-4 text-[#B88460]" />
             <span>{isRTL ? "الجدول الزمني المستهدف" : "Target Handover Horizon"}</span>
           </div>
-          <div className="text-xs text-[#1C1917] dark:text-[#FAF7F2]">
-            <div className="font-serif text-xl font-normal">
+          <div className="text-xs text-[#1C1917]">
+            <div
+              className={cn(
+                isRTL ? "font-sans text-xl font-bold" : "font-serif text-xl font-normal"
+              )}
+            >
               {getTimelineText()}
             </div>
-            <p className="text-[11px] text-[#78716C] mt-1">
+            <p className={cn("mt-1", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
               {isRTL
                 ? "يتم تتبع مراحل التنفيذ الميداني أسبوعياً مع تحديثات مصورة."
                 : "Tracked weekly with high-resolution photographic milestones."}

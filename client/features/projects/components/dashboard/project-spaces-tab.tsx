@@ -6,6 +6,7 @@ import { HouseLine, Sparkle } from "@phosphor-icons/react";
 import type { SpaceEntity } from "../../types";
 import { CURATED_SPACES } from "../spaces-architecture";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface ProjectSpacesTabProps {
   spaces: SpaceEntity[];
@@ -18,9 +19,9 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
 
   if (activeSpaces.length === 0) {
     return (
-      <div className="p-8 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] text-center">
+      <div className="p-8 rounded-2xl bg-card border border-border text-center shadow-xs">
         <HouseLine className="w-8 h-8 text-[#B88460] mx-auto mb-2" />
-        <p className="text-xs text-[#78716C] dark:text-[#989692]">
+        <p className={cn("text-xs text-[#78716C]", isRTL && "font-medium")}>
           {isRTL ? "لم يتم تحديد فراغات معمارية بعد." : "No spatial zones configured for this project."}
         </p>
       </div>
@@ -40,7 +41,7 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
         return (
           <div
             key={space.id}
-            className="rounded-2xl border border-[#E6DDD2] dark:border-[#2E2A27] bg-[#FAF7F2] dark:bg-[#1E1B18] overflow-hidden flex flex-col justify-between"
+            className="rounded-2xl border border-border bg-card overflow-hidden flex flex-col justify-between shadow-xs"
           >
             <div className="relative h-36 w-full">
               <Image
@@ -50,29 +51,51 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 33vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent" />
               <div className="absolute bottom-3 start-3 end-3 text-white">
-                <span className="font-mono text-[9px] uppercase tracking-wider text-[#E0CFB8]">
+                <span
+                  className={cn(
+                    "text-[#E0CFB8]",
+                    isRTL ? "text-[10px] font-bold tracking-normal" : "font-mono text-[9px] uppercase tracking-wider"
+                  )}
+                >
                   {space.quantity || 1} {isRTL ? "وحدة" : (space.quantity || 1) === 1 ? "Unit" : "Units"}
                 </span>
-                <h4 className="font-serif text-base font-normal mt-0.5">{title}</h4>
+                <h4
+                  className={cn(
+                    "text-white mt-0.5",
+                    isRTL ? "font-sans text-base font-bold tracking-normal" : "font-serif text-base font-normal"
+                  )}
+                >
+                  {title}
+                </h4>
               </div>
             </div>
 
             <div className="p-4 flex flex-col gap-2.5">
               {space.stylePreference ? (
-                <div className="flex items-center gap-1.5 text-xs text-[#503C2C] dark:text-[#D4C3B3]">
+                <div
+                  className={cn(
+                    "flex items-center gap-1.5 text-xs text-[#503C2C]",
+                    isRTL ? "font-bold" : "font-medium"
+                  )}
+                >
                   <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
                   <span>{space.stylePreference.styleName}</span>
                 </div>
               ) : (
-                <div className="text-[11px] text-[#78716C] dark:text-[#989692]">
+                <div className={cn("text-[11px] text-[#78716C]", isRTL && "font-medium text-[#503C2C]")}>
                   {isRTL ? "مدرج ضمن النطاق المعماري العام" : "Aligned to overall residence atmosphere"}
                 </div>
               )}
 
               {space.notes && (
-                <p className="text-[11px] text-[#78716C] dark:text-[#989692] italic border-t border-[#E6DDD2]/60 pt-2">
+                <p
+                  className={cn(
+                    "text-[11px] text-[#78716C] border-t border-border pt-2",
+                    isRTL ? "font-medium not-italic text-[#4A3E31]" : "italic"
+                  )}
+                >
                   &ldquo;{space.notes}&rdquo;
                 </p>
               )}

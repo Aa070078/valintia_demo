@@ -55,17 +55,23 @@ export default function ProjectDetailsPage() {
     return (
       <CustomerShell>
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-          <h2 className="font-serif text-2xl font-medium text-[#1C1917] dark:text-[#FAF7F2]">
+          <h2 className={cn(
+            "text-2xl text-[#1C1917]",
+            isRTL ? "font-sans font-bold" : "font-serif font-medium"
+          )}>
             {isRTL ? "المشروع غير موجود" : "Commission Not Found"}
           </h2>
-          <p className="text-xs text-[#78716C] dark:text-[#989692]">
+          <p className="text-xs font-medium text-[#503C2C]">
             {isRTL
               ? "لم يتم العثور على هذا المشروع في سجلات الأتيليه الخاصة بك."
               : "The requested commission does not exist or has been moved."}
           </p>
           <Link
             href="/projects"
-            className="mt-4 rounded-full bg-[#503C2C] px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-[#FAF7F2]"
+            className={cn(
+              "mt-4 rounded-full bg-[#503C2C] px-6 py-2.5 text-xs text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors",
+              isRTL ? "font-sans font-bold tracking-normal" : "font-semibold uppercase tracking-wider"
+            )}
           >
             {isRTL ? "العودة لقائمة المشاريع" : "Back to Projects"}
           </Link>
@@ -121,11 +127,14 @@ export default function ProjectDetailsPage() {
     <CustomerShell>
       <div className="mx-auto max-w-5xl flex flex-col gap-8 pb-16">
         {/* Top Header & Breadcrumb */}
-        <div className="flex flex-col gap-5 border-b border-[#E6DDD2] dark:border-[#2E2A27] pb-6">
+        <div className="flex flex-col gap-5 border-b border-border pb-6">
           <div className="flex items-center justify-between">
             <Link
               href="/projects"
-              className="group inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#78716C] hover:text-[#1C1917] transition-colors"
+              className={cn(
+                "group inline-flex items-center gap-2 text-xs font-semibold text-[#503C2C] hover:text-[#1C1917] transition-colors",
+                isRTL ? "tracking-normal font-sans font-bold" : "uppercase tracking-[0.14em]"
+              )}
             >
               {isRTL ? (
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -153,7 +162,10 @@ export default function ProjectDetailsPage() {
                   type="button"
                   onClick={handleSubmit}
                   disabled={submitMutation.isPending}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#503C2C] px-6 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-sm hover:bg-[#3D2E22] transition-all disabled:opacity-50"
+                  className={cn(
+                    "inline-flex items-center gap-2 rounded-full bg-[#503C2C] px-6 py-2.5 text-xs text-[#FAF7F2] shadow-sm hover:bg-[#3D2E22] transition-all disabled:opacity-50 cursor-pointer",
+                    isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-[0.14em]"
+                  )}
                 >
                   {submitMutation.isPending ? (
                     <>
@@ -176,7 +188,7 @@ export default function ProjectDetailsPage() {
         <ProjectJourney projectStatus={project.status} />
 
         {/* Tab Navigation */}
-        <div className="flex items-center gap-2 border-b border-[#E6DDD2] dark:border-[#2E2A27] pb-3 overflow-x-auto scrollbar-none">
+        <div className="flex items-center gap-2 border-b border-border pb-3 overflow-x-auto scrollbar-none">
           {TABS.map((tab) => {
             const Icon = tab.icon;
             const isSelected = activeTab === tab.id;
@@ -186,10 +198,11 @@ export default function ProjectDetailsPage() {
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all",
+                  "flex items-center gap-2 px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all cursor-pointer border",
                   isSelected
-                    ? "bg-[#503C2C] text-[#FAF7F2] shadow-xs"
-                    : "bg-[#FAF7F2] dark:bg-[#1E1B18] text-[#78716C] hover:text-[#1C1917] hover:bg-[#EAE2D7]"
+                    ? "bg-[#503C2C] border-[#503C2C] text-[#FAF7F2] shadow-xs font-bold"
+                    : "bg-card border-border text-[#4A3E31] hover:text-[#1C1917] hover:bg-secondary font-medium",
+                  isRTL && "font-sans font-semibold"
                 )}
               >
                 <Icon className={cn("w-4 h-4", isSelected ? "text-[#B88460]" : "text-[#78716C]")} />

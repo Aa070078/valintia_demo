@@ -85,20 +85,37 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
   const activeStages = stages || defaultStages;
 
   return (
-    <div className="rounded-3xl border border-[#E6DDD2] dark:border-[#2E2A27] bg-[#FAF7F2] dark:bg-[#1E1B18] p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
+    <div className="rounded-3xl border border-border bg-card p-6 sm:p-8 flex flex-col gap-6 shadow-sm">
       {/* Journey Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E6DDD2]/60 dark:border-[#2E2A27]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border/70">
         <div>
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <div
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            )}
+          >
             {isRTL ? "خارطة طريق المشروع" : "COMMISSION ROADMAP"}
           </div>
-          <h3 className="font-serif text-2xl sm:text-3xl text-[#1C1917] dark:text-[#FAF7F2] font-normal mt-0.5">
+          <h3
+            className={cn(
+              "text-[#1C1917] mt-0.5",
+              isRTL ? "font-sans text-2xl sm:text-3xl font-bold leading-tight" : "font-serif text-2xl sm:text-3xl font-normal"
+            )}
+          >
             {isRTL ? "مراحل تطور مشروعك المعماري" : "Your Project Journey"}
           </h3>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#B88460] animate-pulse" />
-          <span className="text-xs font-mono font-medium text-[#503C2C] dark:text-[#D4C3B3]">
+          <span
+            className={cn(
+              "text-[#503C2C]",
+              isRTL ? "text-xs font-bold" : "text-xs font-mono font-medium"
+            )}
+          >
             {isRTL ? "مرحلة الدراسة الأولية" : "Initial Review Stage"}
           </span>
         </div>
@@ -117,17 +134,18 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
               className={cn(
                 "p-4 rounded-2xl border transition-all flex flex-col justify-between gap-3 relative",
                 isCurrent
-                  ? "bg-white dark:bg-[#141210] border-[#503C2C] dark:border-[#B88460] shadow-sm ring-1 ring-[#503C2C]/20"
+                  ? "bg-background border-[#503C2C] shadow-sm ring-1 ring-[#503C2C]/20"
                   : isDone
-                  ? "bg-[#F4EEE5]/50 dark:bg-[#25221F]/50 border-[#E6DDD2] dark:border-[#38332E]"
-                  : "bg-white/40 dark:bg-[#141210]/30 border-[#E6DDD2]/60 dark:border-[#2E2A27] opacity-60"
+                  ? "bg-background/70 border-border"
+                  : "bg-background/40 border-border/60 opacity-60"
               )}
             >
               {/* Step indicator top row */}
               <div className="flex items-center justify-between">
                 <span
                   className={cn(
-                    "font-mono text-[10px] font-semibold px-2 py-0.5 rounded-full",
+                    "text-[10px] px-2 py-0.5 rounded-full font-bold",
+                    isRTL ? "font-sans" : "font-mono",
                     isCurrent
                       ? "bg-[#503C2C] text-[#FAF7F2]"
                       : isDone
@@ -142,7 +160,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
                   className={cn(
                     "w-4 h-4",
                     isDone
-                      ? "text-[#503C2C] dark:text-[#B88460]"
+                      ? "text-[#503C2C]"
                       : isCurrent
                       ? "text-[#B88460]"
                       : "text-[#78716C]"
@@ -152,30 +170,55 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
 
               {/* Title & Desc */}
               <div>
-                <h4 className="text-xs sm:text-sm font-semibold text-[#1C1917] dark:text-[#FAF7F2] leading-snug">
+                <h4
+                  className={cn(
+                    "text-[#1C1917] leading-snug",
+                    isRTL ? "font-sans text-xs sm:text-sm font-bold tracking-normal" : "text-xs sm:text-sm font-semibold"
+                  )}
+                >
                   {isRTL ? stage.titleAr : stage.titleEn}
                 </h4>
-                <p className="text-[11px] text-[#78716C] dark:text-[#989692] mt-1 leading-relaxed">
+                <p
+                  className={cn(
+                    "mt-1 leading-relaxed",
+                    isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]"
+                  )}
+                >
                   {isRTL ? stage.descAr : stage.descEn}
                 </p>
               </div>
 
               {/* Status pill or schedule badge */}
-              <div className="pt-2 border-t border-[#E6DDD2]/50 dark:border-[#2E2A27]">
+              <div className="pt-2 border-t border-border/70">
                 {isDone && (
-                  <span className="text-[10px] font-mono text-[#503C2C] dark:text-[#D4C3B3] flex items-center gap-1 font-semibold">
-                    <CheckCircle weight="fill" className="w-3 h-3 text-[#B88460]" />
+                  <span
+                    className={cn(
+                      "text-[#503C2C] flex items-center gap-1 font-semibold",
+                      isRTL ? "text-xs font-bold" : "text-[10px] font-mono"
+                    )}
+                  >
+                    <CheckCircle weight="fill" className="w-3.5 h-3.5 text-[#B88460]" />
                     <span>{isRTL ? "مكتمل" : "Completed"}</span>
                   </span>
                 )}
                 {isCurrent && (
-                  <span className="text-[10px] font-mono text-[#B88460] flex items-center gap-1 font-semibold">
-                    <Clock className="w-3 h-3" />
+                  <span
+                    className={cn(
+                      "text-[#B88460] flex items-center gap-1 font-semibold",
+                      isRTL ? "text-xs font-bold" : "text-[10px] font-mono"
+                    )}
+                  >
+                    <Clock className="w-3.5 h-3.5" />
                     <span>{stage.scheduledDate || (isRTL ? "جاري التنسيق" : "Active Stage")}</span>
                   </span>
                 )}
                 {!isDone && !isCurrent && (
-                  <span className="text-[10px] font-mono text-[#78716C]">
+                  <span
+                    className={cn(
+                      "text-[#78716C]",
+                      isRTL ? "text-xs font-medium" : "text-[10px] font-mono"
+                    )}
+                  >
                     {isRTL ? "المرحلة القادمة" : "Upcoming"}
                   </span>
                 )}

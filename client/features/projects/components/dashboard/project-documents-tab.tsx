@@ -4,6 +4,7 @@ import * as React from "react";
 import { FilePdf, DownloadSimple, HardDrives } from "@phosphor-icons/react";
 import type { ProjectDocument } from "../../types";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface ProjectDocumentsTabProps {
   documents: ProjectDocument[];
@@ -15,15 +16,30 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-300">
       {/* Overview Banner */}
-      <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="p-5 rounded-2xl bg-card border border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
         <div>
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C]">
+          <div
+            className={cn(
+              "text-[#78716C]",
+              isRTL ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]" : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            )}
+          >
             {isRTL ? "مستودع المخططات والوثائق" : "ARCHITECTURAL ARCHIVE"}
           </div>
-          <h4 className="font-serif text-lg text-[#1C1917] dark:text-[#FAF7F2] mt-0.5">
+          <h4
+            className={cn(
+              "text-[#1C1917] mt-0.5",
+              isRTL ? "font-sans text-lg font-bold" : "font-serif text-lg"
+            )}
+          >
             {isRTL ? "ملفات ومخططات المشروع" : "Project Blueprints & Records"}
           </h4>
-          <p className="text-xs text-[#78716C] dark:text-[#989692] mt-0.5">
+          <p
+            className={cn(
+              "mt-0.5",
+              isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-xs text-[#78716C]"
+            )}
+          >
             {isRTL
               ? "مخططات الكاد التنفيذية، رسومات الأوتوكاد، ونتائج المسح الليزري ثلاثي الأبعاد."
               : "Executive CAD drawings, architectural schematics, and lidar survey scans."}
@@ -37,14 +53,19 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
           {documents.map((doc) => (
             <div
               key={doc.id}
-              className="p-4 rounded-2xl border border-[#E6DDD2] dark:border-[#2E2A27] bg-[#FAF7F2] dark:bg-[#1E1B18] flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition-all"
+              className="p-4 rounded-2xl border border-border bg-card flex items-center justify-between gap-3 shadow-2xs hover:shadow-sm transition-all"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-[#F4EEE5] dark:bg-[#25221F] border border-[#E6DDD2] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shrink-0">
                   <FilePdf className="w-5 h-5 text-[#B88460]" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2] truncate">
+                  <div
+                    className={cn(
+                      "text-[#1C1917] truncate",
+                      isRTL ? "text-xs font-bold" : "text-xs font-semibold"
+                    )}
+                  >
                     {doc.name}
                   </div>
                   <div className="text-[10px] font-mono text-[#78716C] uppercase mt-0.5">
@@ -58,7 +79,7 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
                 target="_blank"
                 rel="noreferrer"
                 download
-                className="p-2 rounded-lg bg-white dark:bg-[#141210] border border-[#E6DDD2] text-[#78716C] hover:text-[#503C2C] transition-colors"
+                className="p-2 rounded-lg bg-background border border-border text-[#78716C] hover:text-[#503C2C] transition-colors"
               >
                 <DownloadSimple className="w-4 h-4" />
               </a>
@@ -66,12 +87,22 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
           ))}
         </div>
       ) : (
-        <div className="p-8 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-dashed border-[#E6DDD2] dark:border-[#2E2A27] text-center flex flex-col items-center justify-center gap-2">
+        <div className="p-8 rounded-2xl bg-card border border-dashed border-border text-center flex flex-col items-center justify-center gap-2 shadow-xs">
           <HardDrives className="w-8 h-8 text-[#B88460]" />
-          <h5 className="text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2]">
+          <h5
+            className={cn(
+              "text-[#1C1917]",
+              isRTL ? "text-sm font-bold" : "text-xs font-semibold"
+            )}
+          >
             {isRTL ? "لا توجد ملفات مرفوعة حالياً" : "No Drawings Uploaded"}
           </h5>
-          <p className="text-[11px] text-[#78716C] dark:text-[#989692] max-w-sm">
+          <p
+            className={cn(
+              "max-w-sm",
+              isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]"
+            )}
+          >
             {isRTL
               ? "سيتم رفع مخططات المسح الليزري ثلاثي الأبعاد والرسومات التنفيذية هنا بعد اكتمال المعاينة الميدانية."
               : "3D lidar point-clouds and CAD schematics will be uploaded here by the engineering atelier following the site visit."}

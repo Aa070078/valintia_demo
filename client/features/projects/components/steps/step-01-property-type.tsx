@@ -4,6 +4,7 @@ import * as React from "react";
 import type { PropertyType } from "../../types";
 import { VolumeCard } from "../volume-card";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface StepPropertyTypeProps {
   selectedType: PropertyType;
@@ -104,18 +105,34 @@ export function StepPropertyType({
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
       {/* Header */}
-      <div>
+      <div className="text-start">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <span className="h-px w-6 bg-foreground/50" />
+          <span className={cn(
+            "text-[11px] font-bold text-foreground/80",
+            isRTL ? "tracking-normal text-xs text-[#503C2C]" : "font-mono uppercase tracking-[0.2em]"
+          )}>
             {t("lifecycle.step_property") || "STEP 01 · TYPOLOGY"}
           </span>
         </div>
-        <h2 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
-          {t("step1.headline") || "What are we creating?"}
+        <h2 className={cn(
+          "mt-2 text-[#1C1917] dark:text-[#FAF7F2] transition-colors",
+          isRTL
+            ? "font-sans font-bold text-2xl sm:text-3xl lg:text-4xl leading-[1.3]"
+            : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
+        )}>
+          {t("step1.headline") || (isRTL ? "ما هو النمط المعماري لمسكنك؟" : "What are we creating?")}
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#78716C] dark:text-[#989692] leading-relaxed max-w-xl">
+        <p className={cn(
+          "mt-2 leading-relaxed max-w-xl",
+          isRTL
+            ? "text-sm sm:text-base font-medium text-[#4A3E31]"
+            : "text-xs sm:text-sm text-muted-foreground"
+        )}>
           {t("step1.subheadline") ||
-            "Select the foundational architectural volume for your residence or commercial commission."}
+            (isRTL
+              ? "حدد الكتلة المعمارية الأساسية لمسكنك أو وحدتك التجارية لبدء دراسة الفراغات والمواصفات."
+              : "Select the foundational architectural volume for your residence or commercial commission.")}
         </p>
       </div>
 

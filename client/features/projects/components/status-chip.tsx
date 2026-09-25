@@ -13,7 +13,7 @@ const STATUS_MAP: Record<string, StatusConfig> = {
   draft: {
     labelKey: "status.draft",
     defaultLabel: "Draft",
-    className: "bg-white/90 text-muted-foreground border-border/80 backdrop-blur-md",
+    className: "bg-card text-muted-foreground border-border/80 backdrop-blur-md",
   },
   submitted: {
     labelKey: "status.submitted",
@@ -89,19 +89,20 @@ export function StatusChip({
   status: ProjectStatus;
   className?: string;
 }) {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const config = STATUS_MAP[status] || STATUS_MAP.draft;
   const label = t(config.labelKey) || config.defaultLabel;
 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] transition-all duration-200 shadow-2xs",
+        "inline-flex items-center rounded-full border px-3 py-1 text-[10px] transition-all duration-200 shadow-2xs",
+        isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-[0.12em]",
         config.className,
         className
       )}
     >
-      <span className="ms-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-80" />
+      <span className="me-1.5 h-1.5 w-1.5 rounded-full bg-current opacity-80" />
       {label}
     </span>
   );

@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Lock,
   ArrowRight,
+  ArrowLeft,
   ArrowSquareOut,
   Sparkle,
 } from "@phosphor-icons/react";
@@ -122,12 +123,15 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-md transition-opacity"
     >
-      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-[#E2D7C8] bg-[#FAF6F0] p-6 sm:p-8 shadow-2xl dark:border-[#2C2C32] dark:bg-[#1A1A1E]">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-border bg-card p-6 sm:p-8 shadow-2xl text-start">
         {/* Close Button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-[#EBE3D7] text-[#1C1917] hover:bg-[#DFD6C7] cursor-pointer dark:bg-[#2C2C32] dark:text-white"
+          className={cn(
+            "absolute top-4 flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-foreground hover:bg-secondary/80 cursor-pointer transition-colors",
+            isRTL ? "left-4" : "right-4"
+          )}
         >
           <X size={15} weight="bold" />
         </button>
@@ -136,45 +140,62 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
         {requiresPasswordChange ? (
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Lock size={18} className="text-[#1C1917] dark:text-[#FAF7F2]" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
-                {t("auth.password_change_required") || "Security Notice"}
+              <Lock size={18} className="text-[#503C2C]" />
+              <span className={cn(
+                "text-[10px] font-semibold text-[#503C2C]",
+                isRTL ? "tracking-normal font-sans font-bold" : "font-mono uppercase tracking-[0.2em]"
+              )}>
+                {t("auth.password_change_required") || (isRTL ? "تنبيه أمني" : "Security Notice")}
               </span>
             </div>
-            <h3 className="font-serif text-2xl font-medium text-[#1C1917] dark:text-[#FAF7F2]">
-              {t("auth.create_new_password") || "Set Your Permanent Password"}
+            <h3 className={cn(
+              "text-2xl text-foreground",
+              isRTL ? "font-sans font-bold" : "font-serif font-medium"
+            )}>
+              {t("auth.create_new_password") || (isRTL ? "تعيين كلمة المرور الدائمة" : "Set Your Permanent Password")}
             </h3>
-            <p className="mt-1 text-xs text-[#78716C] leading-relaxed dark:text-[#989692]">
+            <p className={cn(
+              "mt-1 text-xs leading-relaxed",
+              isRTL ? "font-medium text-[#4A3E31]" : "text-muted-foreground"
+            )}>
               {t("auth.temp_password_desc") ||
-                "You logged in with a temporary password. Please set a secure password for your Valentia account to proceed."}
+                (isRTL
+                  ? "لقد قمت بتسجيل الدخول باستخدام كلمة مرور مؤقتة. يرجى تعيين كلمة مرور جديدة وآمنة لحسابك للمتابعة."
+                  : "You logged in with a temporary password. Please set a secure password for your Valentia account to proceed.")}
             </p>
 
             <form onSubmit={handlePasswordChangeSubmit} className="mt-6 flex flex-col gap-4">
               <div>
-                <label className="block text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2] mb-1">
-                  New Password *
+                <label className={cn(
+                  "block text-xs font-semibold text-foreground mb-1",
+                  isRTL && "font-sans"
+                )}>
+                  {isRTL ? "كلمة المرور الجديدة *" : "New Password *"}
                 </label>
                 <input
                   type="password"
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Minimum 8 characters"
-                  className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
+                  placeholder={isRTL ? "٨ أحرف على الأقل" : "Minimum 8 characters"}
+                  className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs text-foreground outline-none focus:border-primary transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#1C1917] dark:text-[#FAF7F2] mb-1">
-                  Confirm Password *
+                <label className={cn(
+                  "block text-xs font-semibold text-foreground mb-1",
+                  isRTL && "font-sans"
+                )}>
+                  {isRTL ? "تأكيد كلمة المرور *" : "Confirm Password *"}
                 </label>
                 <input
                   type="password"
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-type new password"
-                  className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
+                  placeholder={isRTL ? "أعد إدخال كلمة المرور" : "Re-type new password"}
+                  className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs text-foreground outline-none focus:border-primary transition-colors"
                 />
               </div>
 
@@ -185,9 +206,12 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#1C1917] py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer dark:bg-[#FAF7F2] dark:text-[#1C1917]"
+                className={cn(
+                  "mt-2 flex items-center justify-center gap-2 rounded-full bg-primary py-3 text-xs text-primary-foreground shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer",
+                  isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-[0.14em]"
+                )}
               >
-                {isLoading ? <Spinner className="h-4 w-4" /> : <span>Update & Continue</span>}
+                {isLoading ? <Spinner className="h-4 w-4" /> : <span>{isRTL ? "تحديث والمتابعة" : "Update & Continue"}</span>}
               </button>
             </form>
           </div>
@@ -195,13 +219,19 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
           /* Normal Sign In & Role Picker */
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <ShieldCheck size={18} className="text-[#1C1917] dark:text-[#FAF7F2]" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+              <ShieldCheck size={18} className="text-[#503C2C]" />
+              <span className={cn(
+                "text-[10px] font-semibold text-[#503C2C]",
+                isRTL ? "tracking-normal font-sans font-bold" : "font-mono uppercase tracking-[0.2em]"
+              )}>
                 VALENTIA ATELIER AUTH
               </span>
             </div>
 
-            <h3 className="font-serif text-2xl font-medium text-[#1C1917] dark:text-[#FAF7F2]">
+            <h3 className={cn(
+              "text-2xl text-foreground",
+              isRTL ? "font-sans font-bold" : "font-serif font-medium"
+            )}>
               {isAuthenticated
                 ? isRTL
                   ? "حساب المستخدم النشط"
@@ -246,7 +276,10 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
               </div>
             ) : (
               <>
-                <p className="mt-1 text-xs text-[#78716C] leading-relaxed dark:text-[#989692]">
+                <p className={cn(
+                  "mt-1 text-xs leading-relaxed",
+                  isRTL ? "font-medium text-[#4A3E31]" : "text-muted-foreground"
+                )}>
                   {isRTL
                     ? "سجل الدخول بحساب العميل لمتابعة مشاريعك، أو اختر دوراً للاختبار السريع."
                     : "Sign in with your customer account, or pick a role to test post-login routing."}
@@ -254,28 +287,28 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
 
                 <form onSubmit={handleLoginSubmit} className="mt-5 flex flex-col gap-3.5">
                   <div>
-                    <label className="block text-xs font-medium text-[#1C1917] dark:text-[#FAF7F2] mb-1">
-                      Email Address
+                    <label className={cn("block text-xs font-semibold text-foreground mb-1", isRTL && "font-sans")}>
+                      {isRTL ? "البريد الإلكتروني" : "Email Address"}
                     </label>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2 text-xs text-[#1C1917] outline-none focus:border-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
+                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2 text-xs text-foreground outline-none focus:border-primary transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-[#1C1917] dark:text-[#FAF7F2] mb-1">
-                      Password
+                    <label className={cn("block text-xs font-semibold text-foreground mb-1", isRTL && "font-sans")}>
+                      {isRTL ? "كلمة المرور" : "Password"}
                     </label>
                     <input
                       type="password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2 text-xs text-[#1C1917] outline-none focus:border-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
+                      className="w-full rounded-xl border border-border bg-background px-3.5 py-2 text-xs text-foreground outline-none focus:border-primary transition-colors"
                     />
                   </div>
 
@@ -293,14 +326,21 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="mt-2 flex items-center justify-center gap-2 rounded-full bg-[#1C1917] py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer dark:bg-[#FAF7F2] dark:text-[#1C1917]"
+                    className={cn(
+                      "mt-2 flex items-center justify-center gap-2 rounded-full bg-primary py-3 text-xs text-primary-foreground shadow-xs hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer",
+                      isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-[0.14em]"
+                    )}
                   >
                     {isLoading ? (
                       <Spinner className="h-4 w-4" />
                     ) : (
                       <>
                         <span>{isRTL ? "تسجيل الدخول" : "Sign In to Client"}</span>
-                        <ArrowRight size={13} weight="bold" />
+                        {isRTL ? (
+                          <ArrowLeft size={13} weight="bold" />
+                        ) : (
+                          <ArrowRight size={13} weight="bold" />
+                        )}
                       </>
                     )}
                   </button>
@@ -309,11 +349,14 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
             )}
 
             {/* Development-Only Role Switcher */}
-            <div className="mt-6 border-t border-[#E8DFD3] pt-4 dark:border-[#2C2C32]">
+            <div className="mt-6 border-t border-border pt-4">
               <div className="flex items-center justify-between mb-3">
-                <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.18em] text-[#78716C] dark:text-[#989692] flex items-center gap-1">
+                <span className={cn(
+                  "text-[9px] font-semibold flex items-center gap-1 text-[#503C2C]",
+                  isRTL ? "tracking-normal font-sans font-bold" : "font-mono uppercase tracking-[0.18em]"
+                )}>
                   <Sparkle size={11} weight="fill" />
-                  <span>DEVELOPMENT ROLE SWITCHER (PROTOTYPE)</span>
+                  <span>{isRTL ? "تبديل الصلاحيات (تجريبي للتطوير)" : "DEVELOPMENT ROLE SWITCHER (PROTOTYPE)"}</span>
                 </span>
               </div>
 
@@ -329,8 +372,8 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                       className={cn(
                         "flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all cursor-pointer",
                         isCurrent
-                          ? "border-[#1C1917] bg-[#1C1917] text-[#FAF7F2] dark:bg-[#FAF7F2] dark:text-[#1C1917]"
-                          : "border-[#DFD6C7] bg-[#F4EEE5] text-[#1C1917] hover:border-[#1C1917]/50 dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
+                          ? "border-primary bg-primary text-primary-foreground font-bold shadow-xs"
+                          : "border-border bg-background text-foreground hover:border-foreground/50 hover:bg-secondary font-medium"
                       )}
                     >
                       <span className="text-[10px] font-bold tracking-tight">{r}</span>

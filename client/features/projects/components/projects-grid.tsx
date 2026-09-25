@@ -5,6 +5,7 @@ import { ProjectCard } from "./project-card";
 import { EmptyProjectsState } from "./empty-projects-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 interface ProjectsGridProps {
   projects?: Project[];
@@ -21,7 +22,7 @@ export function ProjectsGrid({
   error,
   onRetry,
 }: ProjectsGridProps) {
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
   const [filter, setFilter] = React.useState<"all" | "active" | "review" | "draft">("all");
 
   // 1. Loading State
@@ -52,21 +53,26 @@ export function ProjectsGrid({
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive mb-4">
           <WarningCircle size={24} weight="bold" />
         </div>
-        <h3 className="font-serif text-2xl font-medium text-foreground">
-          Unable to Load Portfolio Projects
+        <h3 className={cn(
+          "text-2xl text-foreground",
+          isRTL ? "font-sans font-bold" : "font-serif font-medium"
+        )}>
+          {isRTL ? "تعذر تحميل مشاريع المعرض" : "Unable to Load Portfolio Projects"}
         </h3>
-        <p className="mt-2 max-w-md text-sm text-muted-foreground leading-relaxed">
+        <p className="mt-2 max-w-md text-sm text-[#4A3E31] leading-relaxed">
           {error?.message ||
-            "A network or server connectivity issue occurred while retrieving your project records."}
+            (isRTL
+              ? "حدث خطأ أثناء استرداد سجلات مشاريعك المعمارية."
+              : "A network or server connectivity issue occurred while retrieving your project records.")}
         </p>
         {onRetry && (
           <button
             type="button"
             onClick={onRetry}
-            className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-background px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-foreground shadow-2xs transition-all hover:bg-muted cursor-pointer active:scale-[0.98]"
+            className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-background px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-2xs transition-all hover:bg-muted cursor-pointer active:scale-[0.98]"
           >
             <ArrowClockwise size={14} weight="bold" />
-            <span>Retry Connection</span>
+            <span>{isRTL ? "إعادة المحاولة" : "Retry Connection"}</span>
           </button>
         )}
       </div>
@@ -107,7 +113,7 @@ export function ProjectsGrid({
     <div className="flex flex-col gap-6">
       {/* Filter Tabs Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/70 pb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {(
             [
               { key: "all", label: t("portfolio.tab_all"), count: projects.length },
@@ -123,6 +129,8 @@ export function ProjectsGrid({
                 label: t("portfolio.tab_review"),
                 count: projects.filter((p) =>
                   [
+                    "submitted",
+                    "initial_review",
                     "under_engineer_review",
                     "meeting_scheduled",
                     "site_visit_scheduled",
@@ -140,19 +148,22 @@ export function ProjectsGrid({
               key={tab.key}
               type="button"
               onClick={() => setFilter(tab.key)}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-medium tracking-wide transition-all cursor-pointer ${
+              className={cn(
+                "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs transition-all cursor-pointer",
                 filter === tab.key
-                  ? "bg-primary text-primary-foreground shadow-2xs font-semibold"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
+                  ? "bg-primary text-primary-foreground shadow-2xs font-bold"
+                  : "bg-card text-[#4A3E31] border border-border/70 hover:bg-muted font-medium hover:text-foreground",
+                isRTL ? "tracking-normal font-sans" : "tracking-wide"
+              )}
             >
               <span>{tab.label}</span>
               <span
-                className={`rounded-full px-1.5 py-0.2 text-[10px] font-mono ${
+                className={cn(
+                  "rounded-full px-1.5 py-0.2 text-[10px] font-mono",
                   filter === tab.key
-                    ? "bg-primary-foreground/20 text-primary-foreground"
-                    : "bg-border text-muted-foreground"
-                }`}
+                    ? "bg-primary-foreground/20 text-primary-foreground font-bold"
+                    : "bg-border/80 text-[#503C2C] font-semibold"
+                )}
               >
                 {tab.count}
               </span>
@@ -160,14 +171,17 @@ export function ProjectsGrid({
           ))}
         </div>
 
-        <span className="text-xs text-muted-foreground">
+        <span className={cn(
+          "text-xs font-medium",
+          isRTL ? "text-[#503C2C] font-semibold" : "text-muted-foreground"
+        )}>
           {t("portfolio.showing")} {filtered.length} {t("portfolio.of_properties")} ({projects.length})
         </span>
       </div>
 
       {filtered.length === 0 ? (
-        <div className="py-12 text-center text-sm text-muted-foreground rounded-2xl border border-dashed border-border/70 bg-card/40">
-          No projects found in this category.
+        <div className="py-12 text-center text-sm font-medium text-[#4A3E31] rounded-2xl border border-dashed border-border/70 bg-card/60">
+          {isRTL ? "لا توجد مشاريع في هذا القسم حتى الآن." : "No projects found in this category."}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">

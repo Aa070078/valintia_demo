@@ -77,14 +77,35 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
       {/* Header */}
       <div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
+          <span
+            className={cn(
+              "text-[#78716C]",
+              isRTL
+                ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]"
+                : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
+            )}
+          >
             {isRTL ? "الخطوة ٠٧ · نطاق العمل المطلوب" : "STEP 07 · SCOPE OF WORK"}
           </span>
         </div>
-        <h2 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
+        <h2
+          className={cn(
+            "mt-2 text-[#1C1917]",
+            isRTL
+              ? "font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-[1.3] tracking-normal"
+              : "font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight"
+          )}
+        >
           {isRTL ? "ما هو نطاق العمل المطلوب من فالنتيا؟" : "What is the desired scope of work?"}
         </h2>
-        <p className="mt-2 text-xs sm:text-sm text-[#78716C] dark:text-[#989692] leading-relaxed max-w-xl">
+        <p
+          className={cn(
+            "mt-2 leading-relaxed max-w-xl",
+            isRTL
+              ? "text-sm font-medium text-[#4A3E31]"
+              : "text-xs sm:text-sm text-[#78716C]"
+          )}
+        >
           {isRTL
             ? "اختر مستوى التدخل الهندسي المناسب، بدءاً من التصميم الداخلي وتوريد الأثاث حتى التنفيذ الشامل وتسليم المفتاح."
             : "Select the depth of involvement required from our atelier, from design-only packages through end-to-end turnkey construction."}
@@ -101,22 +122,23 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
               key={opt.id}
               onClick={() => handleSelectType(opt.id as ProjectScope["scopeType"])}
               className={cn(
-                "cursor-pointer p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-4 bg-[#FAF7F2] dark:bg-[#1E1B18]",
+                "cursor-pointer p-5 rounded-2xl border transition-all duration-300 flex flex-col justify-between gap-4 bg-card",
                 isSelected
-                  ? "border-[#503C2C] dark:border-[#B88460] shadow-md ring-1 ring-[#503C2C]/20"
-                  : "border-[#E6DDD2] dark:border-[#2E2A27] hover:border-[#B88460]/60 opacity-85 hover:opacity-100"
+                  ? "border-[#503C2C] shadow-md ring-1 ring-[#503C2C]/20"
+                  : "border-border hover:border-[#B88460]/60 opacity-85 hover:opacity-100"
               )}
             >
               <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[#F4EEE5] dark:bg-[#25221F] border border-[#E6DDD2] flex items-center justify-center">
-                  <IconComponent className="w-5 h-5 text-[#503C2C] dark:text-[#B88460]" />
+                <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center">
+                  <IconComponent className="w-5 h-5 text-[#503C2C]" />
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-mono px-2 py-0.5 rounded-full border",
+                    "px-2 py-0.5 rounded-full border",
+                    isRTL ? "text-xs font-bold tracking-normal" : "text-[10px] font-mono",
                     isSelected
                       ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C]"
-                      : "bg-white dark:bg-[#141210] text-[#78716C] border-[#E6DDD2]"
+                      : "bg-background text-[#78716C] border-border"
                   )}
                 >
                   {isRTL ? opt.badgeAr : opt.badgeEn}
@@ -124,10 +146,20 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
               </div>
 
               <div>
-                <h3 className="font-serif text-base font-medium text-[#1C1917] dark:text-[#FAF7F2]">
+                <h3
+                  className={cn(
+                    "text-[#1C1917]",
+                    isRTL ? "font-sans text-base font-bold tracking-normal" : "font-serif text-base font-medium"
+                  )}
+                >
                   {isRTL ? opt.titleAr : opt.titleEn}
                 </h3>
-                <p className="mt-1.5 text-xs text-[#78716C] dark:text-[#989692] leading-relaxed">
+                <p
+                  className={cn(
+                    "mt-1.5 leading-relaxed",
+                    isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-xs text-[#78716C]"
+                  )}
+                >
                   {isRTL ? opt.descAr : opt.descEn}
                 </p>
               </div>
@@ -137,8 +169,12 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
       </div>
 
       {/* Custom details / Notes */}
-      <div className="p-5 rounded-2xl bg-[#FAF7F2] dark:bg-[#1E1B18] border border-[#E6DDD2] dark:border-[#2E2A27] flex flex-col gap-3">
-        <label className="text-xs font-semibold text-[#503C2C] dark:text-[#D4C3B3]">
+      <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
+        <label
+          className={cn(
+            isRTL ? "text-xs font-bold text-[#1C1917]" : "text-xs font-semibold text-[#503C2C]"
+          )}
+        >
           {isRTL ? "تفاصيل إضافية أو متطلبات خاصة في التنفيذ" : "Specific Custom Scope Requirements"}
         </label>
         <textarea
@@ -152,7 +188,10 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
               ? "مثال: نرغب في إضافة نظام سمارت هوم كامل (KNX)، وعزل صوتي لغرف النوم، وتعديل مكان المطبخ ليكون مفتوحاً على المعيشة..."
               : "e.g., Integrate full KNX smart home system, acoustic double walls for private quarters, open-concept kitchen island..."
           }
-          className="text-xs px-3.5 py-2.5 rounded-xl border border-[#E6DDD2] dark:border-[#38332E] bg-white dark:bg-[#141210] text-[#1C1917] dark:text-[#FAF7F2] focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none"
+          className={cn(
+            "px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none",
+            isRTL ? "text-xs font-medium" : "text-xs"
+          )}
         />
       </div>
     </div>
