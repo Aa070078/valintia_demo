@@ -181,6 +181,16 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
     "step3.inventory_zones": "8 Curated Zones",
     "step3.add_custom_btn": "+ Add Custom Architectural Space",
 
+    // Spaces
+    "space.living": "Living Room",
+    "space.dining": "Dining Room",
+    "space.kitchen": "Kitchen & Pantry",
+    "space.master_bedroom": "Master Suite",
+    "space.bedroom": "Guest Bedrooms",
+    "space.bathrooms": "Bathrooms & Spa",
+    "space.terrace": "Terrace & Loggia",
+    "space.office": "Home Office",
+
     // Step 4: Your Style
     "step4.eyebrow": "04 — 06 • AESTHETIC DIRECTION",
     "step4.title": "What feels like you?",
@@ -433,6 +443,16 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
     "step3.inventory_title": "قائمة المساحات المعمارية",
     "step3.inventory_zones": "٨ مناطق منتقاة",
     "step3.add_custom_btn": "+ إضافة مساحة معمارية خاصة",
+
+    // Spaces
+    "space.living": "غرفة المعيشة والاستقبال",
+    "space.dining": "غرفة الطعام الرسمية",
+    "space.kitchen": "المطبخ ومخزن المؤن",
+    "space.master_bedroom": "جناح النوم الرئيسي",
+    "space.bedroom": "غرف نوم إضافية",
+    "space.bathrooms": "الحمامات والسبا",
+    "space.terrace": "التراس والحديقة المعلقة",
+    "space.office": "المكتبة وركن العمل",
 
     // Step 4: Your Style
     "step4.eyebrow": "٠٤ — ٠٦ • أسلوبك المعماري",

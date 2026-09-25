@@ -221,7 +221,7 @@ export function StepSpaces({
                           isRTL ? "text-sm font-bold tracking-normal" : "text-sm font-medium"
                         )}
                       >
-                        {t(curated.nameKey) || curated.defaultName}
+                        {(t(curated.nameKey) !== curated.nameKey && t(curated.nameKey)) || curated.defaultName}
                       </h4>
                       {assignedStyle && isIncluded && (
                         <span
