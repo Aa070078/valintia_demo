@@ -25,12 +25,15 @@ export function StepSpaces({
   const { t, isRTL } = useLanguage();
   const [customSpaceName, setCustomSpaceName] = React.useState("");
 
-  // Map pending styles to spaces if assigned
+  // Map pending styles to spaces if assigned (only explicit per-space styles, not global default)
   const getStyleForSpace = (spaceId: string) => {
-    const specific = pendingStyles.find((p) => p.targetSpaceKey === spaceId);
-    if (specific) return specific.styleName;
-    const general = pendingStyles.find((p) => p.targetSpaceKey === "general");
-    return general ? general.styleName : undefined;
+    const specific = pendingStyles.find(
+      (p) =>
+        p.targetSpaceKey === spaceId &&
+        p.targetSpaceKey !== "general" &&
+        p.targetSpaceKey !== "designer_curated"
+    );
+    return specific ? specific.styleName : undefined;
   };
 
   const toggleSpace = (id: string, currentIncluded: boolean) => {
@@ -224,14 +227,20 @@ export function StepSpaces({
                 </div>
 
                 {/* Right controls: Counter (-/+) AND Switch */}
-                <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center gap-3 shrink-0" dir="ltr">
                   {/* Quantity Counter */}
-                  {isIncluded && (
-                    <div className="flex items-center gap-1.5 bg-background border border-border rounded-xl px-2 py-1 shadow-2xs">
+                  {isIncluded ? (
+                    <div
+                      className="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E2D8CC] rounded-full px-2 py-0.5 shadow-2xs select-none"
+                      dir="ltr"
+                    >
                       <button
                         type="button"
-                        onClick={() => updateQuantity(curated.id, -1)}
-                        className="flex h-5 w-5 items-center justify-center rounded-md text-[#78716C] hover:bg-secondary hover:text-[#1C1917] transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(curated.id, -1);
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
                         title={isRTL ? "تقليل العدد" : "Decrease count"}
                       >
                         <Minus size={11} weight="bold" />
@@ -241,13 +250,20 @@ export function StepSpaces({
                       </span>
                       <button
                         type="button"
-                        onClick={() => updateQuantity(curated.id, 1)}
-                        className="flex h-5 w-5 items-center justify-center rounded-md text-[#78716C] hover:bg-secondary hover:text-[#1C1917] transition-colors cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(curated.id, 1);
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
                         title={isRTL ? "زيادة العدد" : "Increase count"}
                       >
                         <Plus size={11} weight="bold" />
                       </button>
                     </div>
+                  ) : (
+                    <span className="text-[11px] font-mono text-[#A8A29E] px-1 select-none">
+                      {isRTL ? "غير مدرج" : "Qty: 0"}
+                    </span>
                   )}
 
                   {/* Toggle Switch */}
@@ -282,26 +298,43 @@ export function StepSpaces({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-background border border-border rounded-xl px-2 py-1 shadow-2xs">
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(custom.id, -1)}
-                      className="flex h-5 w-5 items-center justify-center rounded-md text-[#78716C] hover:bg-secondary hover:text-[#1C1917] cursor-pointer"
+                <div className="flex items-center gap-3 shrink-0" dir="ltr">
+                  {custom.included ? (
+                    <div
+                      className="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E2D8CC] rounded-full px-2 py-0.5 shadow-2xs select-none"
+                      dir="ltr"
                     >
-                      <Minus size={11} weight="bold" />
-                    </button>
-                    <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917]">
-                      {custom.quantity}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(custom.id, -1);
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
+                        title={isRTL ? "تقليل العدد" : "Decrease count"}
+                      >
+                        <Minus size={11} weight="bold" />
+                      </button>
+                      <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917]">
+                        {custom.quantity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(custom.id, 1);
+                        }}
+                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
+                        title={isRTL ? "زيادة العدد" : "Increase count"}
+                      >
+                        <Plus size={11} weight="bold" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-[11px] font-mono text-[#A8A29E] px-1 select-none">
+                      {isRTL ? "غير مدرج" : "Qty: 0"}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(custom.id, 1)}
-                      className="flex h-5 w-5 items-center justify-center rounded-md text-[#78716C] hover:bg-secondary hover:text-[#1C1917] cursor-pointer"
-                    >
-                      <Plus size={11} weight="bold" />
-                    </button>
-                  </div>
+                  )}
 
                   <Switch
                     checked={custom.included}
