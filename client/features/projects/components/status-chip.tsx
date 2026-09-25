@@ -9,11 +9,21 @@ interface StatusConfig {
   className: string;
 }
 
-const STATUS_MAP: Record<ProjectStatus, StatusConfig> = {
+const STATUS_MAP: Record<string, StatusConfig> = {
   draft: {
     labelKey: "status.draft",
     defaultLabel: "Draft",
     className: "bg-white/90 text-muted-foreground border-border/80 backdrop-blur-md",
+  },
+  submitted: {
+    labelKey: "status.submitted",
+    defaultLabel: "Submitted",
+    className: "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-xs",
+  },
+  initial_review: {
+    labelKey: "status.initial_review",
+    defaultLabel: "Initial Review",
+    className: "bg-[#B88460] text-white border-[#B88460] shadow-xs",
   },
   concept_selected: {
     labelKey: "status.concept_selected",

@@ -90,14 +90,14 @@ export function SpacesSelector({ spaces, onChange }: SpacesSelectorProps) {
   const [showAddCustom, setShowAddCustom] = React.useState(false);
   const [customName, setCustomName] = React.useState("");
 
-  const handleToggle = (id: string, name: string) => {
+  const handleToggle = (id: string, name?: string) => {
     const existing = spaces.find((s) => s.id === id);
     if (existing) {
       onChange(
         spaces.map((s) => (s.id === id ? { ...s, included: !s.included } : s))
       );
     } else {
-      onChange([...spaces, { id, name, included: true, count: 1 }]);
+      onChange([...spaces, { id, name: name || id, spaceType: id, quantity: 1, count: 1, included: true }]);
     }
   };
 
@@ -110,8 +110,11 @@ export function SpacesSelector({ spaces, onChange }: SpacesSelectorProps) {
       {
         id: newId,
         name: customName.trim(),
+        customName: customName.trim(),
+        spaceType: "custom",
         included: true,
         count: 1,
+        quantity: 1,
       },
     ]);
     setCustomName("");

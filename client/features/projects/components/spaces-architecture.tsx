@@ -111,26 +111,27 @@ export function SpacesArchitecture({
     return spaces.find((s) => s.id === id);
   };
 
-  const handleToggle = (id: string, name: string, defaultCount = 1) => {
+  const handleToggle = (id: string, name?: string, defaultCount = 1) => {
     const existing = spaces.find((s) => s.id === id);
     if (existing) {
       onChange(
         spaces.map((s) => (s.id === id ? { ...s, included: !s.included } : s))
       );
     } else {
-      onChange([...spaces, { id, name, included: true, count: defaultCount }]);
+      onChange([...spaces, { id, name: name || id, spaceType: id, quantity: defaultCount, count: defaultCount, included: true }]);
     }
   };
 
-  const handleCountChange = (id: string, name: string, delta: number) => {
+  const handleCountChange = (id: string, name?: string, delta = 1) => {
     const existing = spaces.find((s) => s.id === id);
     if (existing) {
-      const nextCount = Math.max(1, (existing.count || 1) + delta);
+      const nextCount = Math.max(1, (existing.count || existing.quantity || 1) + delta);
       onChange(
-        spaces.map((s) => (s.id === id ? { ...s, count: nextCount, included: true } : s))
+        spaces.map((s) => (s.id === id ? { ...s, count: nextCount, quantity: nextCount, included: true } : s))
       );
     } else {
-      onChange([...spaces, { id, name, included: true, count: Math.max(1, 1 + delta) }]);
+      const nextCount = Math.max(1, 1 + delta);
+      onChange([...spaces, { id, name: name || id, spaceType: id, quantity: nextCount, count: nextCount, included: true }]);
     }
   };
 
@@ -143,8 +144,11 @@ export function SpacesArchitecture({
       {
         id: newId,
         name: customName.trim(),
+        customName: customName.trim(),
+        spaceType: "custom",
         included: true,
         count: 1,
+        quantity: 1,
       },
     ]);
     setCustomName("");

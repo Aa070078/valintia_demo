@@ -1,4 +1,5 @@
 import axios, { type AxiosError } from "axios";
+import { tokenStorage } from "@/lib/auth/token-storage";
 import type { ApiError } from "./types";
 
 const API_BASE_URL =
@@ -15,12 +16,10 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (config) => {
-    // If token exists in client-side storage, attach it
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("valentia_auth_token");
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    // If token exists in token storage adapter, attach as Bearer token
+    const token = tokenStorage.getToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },

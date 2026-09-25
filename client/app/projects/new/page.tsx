@@ -6,178 +6,145 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
-  PencilSimple,
-  CheckCircle,
   SquaresFour,
   User,
+  CheckCircle,
 } from "@phosphor-icons/react";
-import { VolumeCard } from "@/features/projects/components/volume-card";
-import { SpecificationParameters } from "@/features/projects/components/specification-parameters";
-import { SpacesArchitecture } from "@/features/projects/components/spaces-architecture";
-import {
-  AestheticDirection,
-  AESTHETIC_DIRECTIONS,
-} from "@/features/projects/components/aesthetic-direction";
-import { HeroAtelier } from "@/features/projects/components/hero-atelier";
-import { ProjectReviewCard } from "@/features/projects/components/project-review-card";
+import { StepPropertyType } from "@/features/projects/components/steps/step-01-property-type";
+import { StepStyleDiscovery } from "@/features/projects/components/steps/step-02-style-discovery";
+import { StepSpaces } from "@/features/projects/components/steps/step-03-spaces";
+import { StepPropertyInfo } from "@/features/projects/components/steps/step-04-property-info";
+import { StepCustomerLocation } from "@/features/projects/components/steps/step-05-customer-location";
+import { StepRepresentative } from "@/features/projects/components/steps/step-06-representative";
+import { StepScope } from "@/features/projects/components/steps/step-07-scope";
+import { StepBudget } from "@/features/projects/components/steps/step-08-budget";
+import { StepTimeline } from "@/features/projects/components/steps/step-09-timeline";
+import { StepDrawings } from "@/features/projects/components/steps/step-10-drawings";
+import { StepReviewSubmit } from "@/features/projects/components/steps/step-11-review-submit";
 import { useCreateProject } from "@/features/projects/hooks/use-projects";
-import { Spinner } from "@/components/ui/spinner";
-import type { PropertyType, SpaceItem } from "@/features/projects/types";
+import { projectsApi } from "@/features/projects/api/projects.api";
+import { useAuth } from "@/features/auth/context/auth-context";
+import { SignInModal } from "@/features/auth/components/sign-in-modal";
+import type {
+  PropertyType,
+  PropertyEntity,
+  SpaceEntity,
+  PendingStyleSelection,
+  CustomerLocation,
+  AuthorizedRepresentative,
+  ProjectScope,
+  ProjectBudget,
+  TargetCompletion,
+  ProjectDocument,
+} from "@/features/projects/types";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 
-const VOLUME_TYPOLOGIES: Array<{
-  id: PropertyType;
-  volume: string;
-  titleKey: string;
-  descKey: string;
-  defaultTitle: string;
-  defaultDesc: string;
-  tag: string;
-  tagAr: string;
-  imageSrc: string;
-}> = [
-  {
-    id: "villa",
-    volume: "VOLUME 01",
-    titleKey: "property.villa",
-    descKey: "property.villa_desc",
-    defaultTitle: "Villa",
-    defaultDesc: "Freestanding luxury residences, twin houses & estates.",
-    tag: "Primary Typology",
-    tagAr: "النمط الأساسي",
-    imageSrc:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "apartment",
-    volume: "VOLUME 02",
-    titleKey: "property.apartment",
-    descKey: "property.apartment_desc",
-    defaultTitle: "Apartment",
-    defaultDesc: "Urban residences, penthouses & mid-rise flats.",
-    tag: "High-rise & mid-rise",
-    tagAr: "أبراج سكنية وشقق",
-    imageSrc:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "duplex",
-    volume: "VOLUME 03",
-    titleKey: "property.duplex",
-    descKey: "property.duplex_desc",
-    defaultTitle: "Duplex",
-    defaultDesc: "Multi-tier architectural volumes with dual floor levels.",
-    tag: "Dual floor levels",
-    tagAr: "مستويين متصلين",
-    imageSrc:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "penthouse",
-    volume: "VOLUME 04",
-    titleKey: "property.penthouse",
-    descKey: "property.penthouse_desc",
-    defaultTitle: "Penthouse",
-    defaultDesc: "Skyline residences with private rooftop terraces.",
-    tag: "Private rooftop access",
-    tagAr: "رووف وتراس بانورامي",
-    imageSrc:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "commercial",
-    volume: "VOLUME 05",
-    titleKey: "property.commercial",
-    descKey: "property.commercial_desc",
-    defaultTitle: "Commercial",
-    defaultDesc: "Bespoke executive suites, creative studios & showrooms.",
-    tag: "Executive suites",
-    tagAr: "أجنحة تنفيذية راقية",
-    imageSrc:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: "other",
-    volume: "VOLUME 06",
-    titleKey: "property.other",
-    descKey: "property.other_desc",
-    defaultTitle: "Other",
-    defaultDesc: "Bespoke architectural pavilions & coastal vacation chalets.",
-    tag: "Custom scope",
-    tagAr: "نطاق تصميم مخصص",
-    imageSrc:
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
-  },
-];
-
 const FUNNEL_STEPS = [
-  { id: 1, code: "01", labelKey: "wizard.step_1" },
-  { id: 2, code: "02", labelKey: "wizard.step_2" },
-  { id: 3, code: "03", labelKey: "wizard.step_3" },
-  { id: 4, code: "04", labelKey: "wizard.step_4" },
-  { id: 5, code: "05", labelKey: "wizard.step_5" },
-  { id: 6, code: "06", labelKey: "wizard.step_6" },
+  { id: 1, code: "01", labelKey: "lifecycle.step_property", defaultEn: "Typology", defaultAr: "النمط المعماري" },
+  { id: 2, code: "02", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الطراز والمواد" },
+  { id: 3, code: "03", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الفراغات المعمارية" },
+  { id: 4, code: "04", labelKey: "lifecycle.step_property_info", defaultEn: "Property Specs", defaultAr: "بيانات العقار" },
+  { id: 5, code: "05", labelKey: "lifecycle.step_location", defaultEn: "Your Location", defaultAr: "موقع الإقامة" },
+  { id: 6, code: "06", labelKey: "lifecycle.step_representative", defaultEn: "Representative", defaultAr: "الممثل بمصر" },
+  { id: 7, code: "07", labelKey: "lifecycle.step_scope", defaultEn: "Scope of Work", defaultAr: "نطاق العمل" },
+  { id: 8, code: "08", labelKey: "lifecycle.step_budget", defaultEn: "Budget", defaultAr: "الميزانية" },
+  { id: 9, code: "09", labelKey: "lifecycle.step_timeline", defaultEn: "Timeline", defaultAr: "الموعد المستهدف" },
+  { id: 10, code: "10", labelKey: "lifecycle.step_drawings", defaultEn: "Drawings", defaultAr: "المخططات" },
+  { id: 11, code: "11", labelKey: "lifecycle.step_review", defaultEn: "Review & Submit", defaultAr: "المراجعة والاعتماد" },
 ];
 
 function CreateProjectContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t, language, toggleLanguage, isRTL } = useLanguage();
+  const { user } = useAuth();
+  const [isSignInOpen, setIsSignInOpen] = React.useState(false);
 
   const stepQuery = Number(searchParams.get("step"));
   const [internalStep, setInternalStep] = React.useState<number>(1);
-  const currentStep = stepQuery >= 1 && stepQuery <= 6 ? stepQuery : internalStep;
+  const currentStep = stepQuery >= 1 && stepQuery <= 11 ? stepQuery : internalStep;
 
-  // Form State
+  // 11 Step Form State
   const [propertyType, setPropertyType] = React.useState<PropertyType>("villa");
-  const [projectName, setProjectName] = React.useState(
-    isRTL ? "فيلا بالم هيلز جولف إكستنشنز" : "Altea Coastal Residence"
-  );
-  const [areaSqm, setAreaSqm] = React.useState(480);
-  const [region, setRegion] = React.useState(
-    isRTL ? "القاهرة والعاصمة الإدارية الجديدة" : "Cairo & New Administrative Capital"
-  );
-  const [district, setDistrict] = React.useState(
-    isRTL ? "بالم هيلز جولف إكستنشنز" : "Palm Hills Golf Extensions"
-  );
-  const [selectedStyleId, setSelectedStyleId] = React.useState("japandi");
-  const [allowBlend, setAllowBlend] = React.useState(false);
-  const [createdProjectId, setCreatedProjectId] = React.useState<string | null>(null);
-
-  const [spaces, setSpaces] = React.useState<SpaceItem[]>([
-    { id: "living", name: "Living Room", included: true, count: 1 },
-    { id: "dining", name: "Dining Room", included: true, count: 1 },
-    { id: "kitchen", name: "Kitchen & Pantry", included: true, count: 1 },
-    { id: "master_bedroom", name: "Master Bedroom Suite", included: true, count: 1 },
-    { id: "guest_bedrooms", name: "Guest Bedrooms", included: true, count: 3 },
-    { id: "bathrooms", name: "Bathrooms & Spa", included: true, count: 4 },
-    { id: "terrace", name: "Private Terrace & Loggia", included: true, count: 2 },
-    { id: "office", name: "Home Office / Library", included: false, count: 0 },
+  const [primaryStyleId, setPrimaryStyleId] = React.useState("japandi");
+  const [pendingStyles, setPendingStyles] = React.useState<PendingStyleSelection[]>([
+    {
+      targetSpaceKey: "general",
+      styleId: "japandi",
+      styleName: "Japandi & Warm Minimal",
+      referenceImages: [
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
+      ],
+      notes: "",
+    },
   ]);
 
-  const [notes, setNotes] = React.useState(
-    isRTL
-      ? "أفضل تصميماً دافئاً ومودرن يعتمد على الخامات الطبيعية ووفرة الإضاءة النهارية، مع استخدام الألوان المحايدة وعناصر الخشب والرخام."
-      : "I want a warm, modern design with natural materials and a lot of light. I prefer neutral colors with some wooden elements."
-  );
+  const [spaces, setSpaces] = React.useState<SpaceEntity[]>([
+    { id: "living", spaceType: "living", customName: "Living Room & Salon", included: true, quantity: 1 },
+    { id: "dining", spaceType: "dining", customName: "Formal Dining Area", included: true, quantity: 1 },
+    { id: "kitchen", spaceType: "kitchen", customName: "Chef Kitchen & Pantry", included: true, quantity: 1 },
+    { id: "master_bedroom", spaceType: "master_bedroom", customName: "Master Suite", included: true, quantity: 1 },
+    { id: "guest_bedrooms", spaceType: "guest_bedrooms", customName: "Guest Bedrooms", included: true, quantity: 3 },
+    { id: "bathrooms", spaceType: "bathrooms", customName: "Bathrooms & Spa", included: true, quantity: 4 },
+    { id: "terrace", spaceType: "terrace", customName: "Private Terrace & Loggia", included: true, quantity: 2 },
+    { id: "office", spaceType: "office", customName: "Home Office & Library", included: false, quantity: 0 },
+  ]);
+
+  const [property, setProperty] = React.useState<PropertyEntity>({
+    propertyType: "villa",
+    compound: "Palm Hills Golf Extensions",
+    city: "New Cairo",
+    areaSqm: 480,
+    floors: 2,
+    condition: "semi_finished",
+    accessibilityNotes: "",
+  });
+
+  const [customerLocation, setCustomerLocation] = React.useState<CustomerLocation>({
+    country: "Egypt",
+    city: "Cairo",
+    timezone: "Africa/Cairo (GMT+2)",
+  });
+
+  const [representative, setRepresentative] = React.useState<AuthorizedRepresentative>({
+    hasRepresentative: false,
+    valentiaManagedDirectly: true,
+  });
+
+  const [scope, setScope] = React.useState<ProjectScope>({
+    scopeType: "full_fitout",
+    customDetails: "",
+  });
+
+  const [budget, setBudget] = React.useState<ProjectBudget>({
+    budgetType: "range",
+    minAmount: 2500000,
+    maxAmount: 4500000,
+    currency: "EGP",
+  });
+
+  const [timeline, setTimeline] = React.useState<TargetCompletion>({
+    deadlineType: "duration",
+    durationDescription: "6 Months (Standard)",
+  });
+
+  const [documents, setDocuments] = React.useState<ProjectDocument[]>([]);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const createMutation = useCreateProject();
 
-  const selectedStyle =
-    AESTHETIC_DIRECTIONS.find((s) => s.id === selectedStyleId) ||
-    AESTHETIC_DIRECTIONS[0];
-
   const goToStep = (stepNumber: number) => {
-    setInternalStep(stepNumber);
-    router.replace(`/projects/new?step=${stepNumber}`);
+    const clamped = Math.max(1, Math.min(11, stepNumber));
+    setInternalStep(clamped);
+    router.replace(`/projects/new?step=${clamped}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleNext = () => {
-    if (currentStep < 5) {
+    if (currentStep < 11) {
       goToStep(currentStep + 1);
-    } else if (currentStep === 5) {
+    } else {
       handleFinalSubmit();
     }
   };
@@ -190,30 +157,66 @@ function CreateProjectContent() {
     }
   };
 
+  const reconcileSpacesWithStyles = (): SpaceEntity[] => {
+    return spaces.map((space) => {
+      const specific = pendingStyles.find((p) => p.targetSpaceKey === space.id);
+      const fallback = pendingStyles.find((p) => p.targetSpaceKey === "general");
+      const matched = specific || fallback;
+
+      if (matched) {
+        return {
+          ...space,
+          stylePreference: {
+            styleId: matched.styleId,
+            styleName: matched.styleName,
+            referenceImages: matched.referenceImages,
+            notes: matched.notes,
+          },
+        };
+      }
+      return space;
+    });
+  };
+
   const handleFinalSubmit = async () => {
+    setIsSubmitting(true);
     try {
+      const reconciledSpaces = reconcileSpacesWithStyles();
+      const projectTitle = property.compound
+        ? `${property.compound} Residence`
+        : `${property.city} Architectural Fit-Out`;
+
       const created = await createMutation.mutateAsync({
-        title: projectName || (isRTL ? "مشروع سكني جديد" : "Untitled Residence"),
-        propertyType,
-        areaSqm: Number(areaSqm) || 480,
-        city: region,
-        compound: district || undefined,
-        spaces,
-        notes: `Style: ${isRTL ? selectedStyle.nameAr : selectedStyle.name}. ${notes}`,
+        title: projectTitle,
+        property: {
+          ...property,
+          propertyType,
+        },
+        spaces: reconciledSpaces,
+        pendingStyles,
+        customerLocation,
+        representative,
+        scope,
+        budget,
+        timeline,
+        documents,
       });
-      setCreatedProjectId(created.id);
-      goToStep(6);
+
+      // Confirm transition to 'submitted' lifecycle status
+      await projectsApi.submitProject(created.id);
+      router.push(`/projects/${created.id}`);
     } catch (err) {
-      console.error("Failed to create project", err);
-      // Fallback for seamless demo testing
-      setCreatedProjectId(`proj-local-${Date.now()}`);
-      goToStep(6);
+      console.error("Failed to commission project", err);
+      // Fallback local ID redirect to preserve smooth flow
+      router.push(`/projects`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F4EEE5] text-[#1C1917] selection:bg-[#1C1917] selection:text-[#FAF7F2] dark:bg-[#121214] dark:text-[#FAF7F2]">
-      {/* Top Navigation Bar (Matching All Reference Images) */}
+      {/* Top Header */}
       <header className="sticky top-0 z-40 w-full border-b border-[#E2D7C8] bg-[#F4EEE5]/90 backdrop-blur-md dark:border-[#2C2C32] dark:bg-[#121214]/90">
         <div className="flex h-16 w-full items-center justify-between px-4 sm:px-8 lg:px-10">
           {/* Brand Lockup */}
@@ -249,7 +252,7 @@ function CreateProjectContent() {
           </div>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             {/* Live Language Switcher */}
             <button
               type="button"
@@ -266,33 +269,48 @@ function CreateProjectContent() {
               </span>
             </button>
 
-            {/* Profile Avatar */}
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1917] text-[#FAF7F2] shadow-2xs dark:bg-[#FAF7F2] dark:text-[#1C1917]">
-              <User size={14} weight="bold" />
-            </div>
+            {/* User Profile Button */}
+            <button
+              type="button"
+              onClick={() => setIsSignInOpen(true)}
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1C1917] text-[#FAF7F2] shadow-2xs hover:opacity-90 transition-opacity dark:bg-[#FAF7F2] dark:text-[#1C1917]"
+              title={user ? user.name : "Sign In"}
+            >
+              {user ? (
+                <span className="text-xs font-bold font-mono">
+                  {user.name.charAt(0).toUpperCase()}
+                </span>
+              ) : (
+                <User size={14} weight="bold" />
+              )}
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main Studio Atelier Container */}
       <div className="flex flex-1 flex-col lg:flex-row">
-        {/* Left Sidebar (Desktop) or Mobile Header (Mobile) */}
+        {/* Left Sidebar (Desktop) / Top Horizontal Steps (Mobile) */}
         <aside
           className={cn(
-            "w-full lg:w-64 lg:shrink-0 border-b lg:border-b-0 bg-[#EFE9DF] p-5 sm:p-6 flex flex-col justify-between dark:bg-[#161618]",
-            isRTL ? "lg:border-l lg:border-[#E2D7C8] dark:lg:border-[#2C2C32] lg:order-last" : "lg:border-r lg:border-[#E2D7C8] dark:lg:border-[#2C2C32]"
+            "w-full lg:w-72 lg:shrink-0 border-b lg:border-b-0 bg-[#EFE9DF] p-4 sm:p-6 flex flex-col justify-between dark:bg-[#161618]",
+            isRTL
+              ? "lg:border-l lg:border-[#E2D7C8] dark:lg:border-[#2C2C32] lg:order-last"
+              : "lg:border-r lg:border-[#E2D7C8] dark:lg:border-[#2C2C32]"
           )}
         >
-          {/* Top section: Steps */}
           <div>
-            <div className="pb-4">
+            <div className="pb-3 flex items-center justify-between">
               <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
                 {t("lifecycle.title") || "PROJECT LIFECYCLE"}
               </span>
+              <span className="text-[10px] font-mono font-medium text-[#B88460]">
+                {currentStep} / 11
+              </span>
             </div>
 
-            {/* Vertical Step Navigation */}
-            <nav className="flex lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-none">
+            {/* Steps List */}
+            <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-none">
               {FUNNEL_STEPS.map((step) => {
                 const isCurrent = step.id === currentStep;
                 const isCompleted = step.id < currentStep;
@@ -303,7 +321,7 @@ function CreateProjectContent() {
                     type="button"
                     onClick={() => goToStep(step.id)}
                     className={cn(
-                      "group flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-2.5 text-xs transition-all duration-200 cursor-pointer select-none text-start",
+                      "group flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-150 cursor-pointer select-none text-start",
                       isCurrent
                         ? "bg-[#E5DCD0] font-semibold text-[#1C1917] shadow-2xs dark:bg-[#2C2C32] dark:text-[#FAF7F2]"
                         : "text-[#6E6760] hover:bg-[#EAE2D6]/70 hover:text-[#1C1917] dark:text-[#989692] dark:hover:bg-[#24242A]"
@@ -311,17 +329,25 @@ function CreateProjectContent() {
                   >
                     <span
                       className={cn(
-                        "font-mono text-[11px] transition-colors",
+                        "font-mono text-[10px] transition-colors",
                         isCurrent
                           ? "font-bold text-[#1C1917] dark:text-[#FAF7F2]"
                           : isCompleted
-                          ? "text-[#1C1917]/70 dark:text-[#FAF7F2]/70"
+                          ? "text-[#B88460]"
                           : "text-[#8C847B] dark:text-[#6E6760]"
                       )}
                     >
                       {step.code}
                     </span>
-                    <span className="truncate">{t(step.labelKey)}</span>
+                    <span className="truncate">
+                      {t(step.labelKey) || (isRTL ? step.defaultAr : step.defaultEn)}
+                    </span>
+                    {isCompleted && (
+                      <CheckCircle
+                        weight="fill"
+                        className="w-3 h-3 text-[#B88460] ms-auto shrink-0 hidden lg:block"
+                      />
+                    )}
                   </button>
                 );
               })}
@@ -329,12 +355,12 @@ function CreateProjectContent() {
           </div>
 
           {/* Bottom link to Projects Dashboard */}
-          <div className="hidden lg:block border-t border-[#DFD6C7] pt-5 dark:border-[#2C2C32]">
+          <div className="hidden lg:block border-t border-[#DFD6C7] pt-4 dark:border-[#2C2C32]">
             <Link
               href="/projects"
-              className="flex items-center gap-2.5 text-xs font-medium text-[#78716C] hover:text-[#1C1917] transition-colors dark:text-[#989692] dark:hover:text-[#FAF7F2]"
+              className="flex items-center gap-2 text-xs font-medium text-[#78716C] hover:text-[#1C1917] transition-colors dark:text-[#989692] dark:hover:text-[#FAF7F2]"
             >
-              <SquaresFour size={16} />
+              <SquaresFour size={15} />
               <span>{t("lifecycle.dashboard") || "Projects Dashboard"}</span>
             </Link>
           </div>
@@ -342,285 +368,153 @@ function CreateProjectContent() {
 
         {/* Main Stage Content */}
         <main className="flex-1 min-w-0 flex flex-col justify-between p-5 sm:p-8 lg:p-12">
-          <div className="mx-auto w-full max-w-5xl flex-1 flex flex-col gap-10">
-            {/* STEP 1: Welcome & Panoramic Hero */}
+          <div className="mx-auto w-full max-w-4xl flex-1 flex flex-col">
+            {/* STEP 01: Typology */}
             {currentStep === 1 && (
-              <HeroAtelier
-                onStart={() => goToStep(2)}
-                onExploreMood={() => goToStep(4)}
+              <StepPropertyType
+                selectedType={propertyType}
+                onSelectType={setPropertyType}
               />
             )}
 
-            {/* STEP 2: Project & Property Type */}
+            {/* STEP 02: Style Discovery */}
             {currentStep === 2 && (
-              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
-                {/* Header */}
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
-                      {t("step2.eyebrow") || "02 — 06 • PROJECT & PROPERTY TYPE"}
-                    </span>
-                  </div>
-                  <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
-                    {t("step2.title") || "Tell us about your project"}
-                  </h1>
-                  <p className="mt-2 max-w-3xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
-                    {t("step2.desc") ||
-                      "Choose the architectural typology of the space you wish to commission. Each scheme is meticulously tailored to its structural volume and spatial rhythm."}
-                  </p>
-                </div>
-
-                {/* 6 Volume Cards Grid (Matching Image 2) */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-                  {VOLUME_TYPOLOGIES.map((typology) => (
-                    <VolumeCard
-                      key={typology.id}
-                      volume={typology.volume}
-                      title={t(typology.titleKey) || typology.defaultTitle}
-                      description={t(typology.descKey) || typology.defaultDesc}
-                      tag={isRTL ? typology.tagAr : typology.tag}
-                      imageSrc={typology.imageSrc}
-                      selected={propertyType === typology.id}
-                      onClick={() => setPropertyType(typology.id)}
-                    />
-                  ))}
-                </div>
-
-                {/* Specification Parameters Panel */}
-                <SpecificationParameters
-                  title={projectName}
-                  onTitleChange={setProjectName}
-                  areaSqm={areaSqm}
-                  onAreaChange={setAreaSqm}
-                  region={region}
-                  onRegionChange={setRegion}
-                  district={district}
-                  onDistrictChange={setDistrict}
-                  propertyType={propertyType}
-                />
-              </div>
+              <StepStyleDiscovery
+                pendingStyles={pendingStyles}
+                onChangePendingStyles={setPendingStyles}
+                primaryStyleId={primaryStyleId}
+                onChangePrimaryStyleId={setPrimaryStyleId}
+              />
             )}
 
-            {/* STEP 3: Spaces Architecture */}
+            {/* STEP 03: Spaces */}
             {currentStep === 3 && (
-              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
-                {/* Header */}
-                <div>
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
-                    {t("step3.eyebrow") || "03 — 06 • SELECT SPACES"}
-                  </span>
-                  <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
-                    {t("step3.title") || "Which spaces would you like us to include?"}
-                  </h1>
-                  <p className="mt-2 max-w-3xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
-                    {t("step3.desc") ||
-                      "Select the spaces for your fit-out project. You can adjust quantities and customize individual architectural finishes later."}
-                  </p>
-                </div>
-
-                <SpacesArchitecture
-                  spaces={spaces}
-                  onChange={setSpaces}
-                  areaSqm={areaSqm}
-                />
-              </div>
+              <StepSpaces
+                spaces={spaces}
+                onChangeSpaces={setSpaces}
+                pendingStyles={pendingStyles}
+                areaSqm={property.areaSqm}
+              />
             )}
 
-            {/* STEP 4: What feels like you? / Aesthetic Direction */}
+            {/* STEP 04: Property Specs */}
             {currentStep === 4 && (
-              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
-                {/* Header */}
-                <div>
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
-                    {t("step4.eyebrow") || "04 — 06 • AESTHETIC DIRECTION"}
-                  </span>
-                  <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
-                    {t("step4.title") || "What feels like you?"}
-                  </h1>
-                  <p className="mt-2 max-w-3xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
-                    {t("step4.desc") ||
-                      "Explore aesthetic directions tailored to your architecture. Save favorite atmospheres or allow our design atelier to synthesize a harmonious blend."}
-                  </p>
-                </div>
-
-                <AestheticDirection
-                  selectedStyleId={selectedStyleId}
-                  onSelectStyle={setSelectedStyleId}
-                  allowBlend={allowBlend}
-                  onToggleBlend={setAllowBlend}
-                />
-              </div>
+              <StepPropertyInfo
+                property={property}
+                onChangeProperty={setProperty}
+              />
             )}
 
-            {/* STEP 5: Design Brief Review */}
+            {/* STEP 05: Client Location */}
             {currentStep === 5 && (
-              <div className="flex flex-col gap-8 animate-in fade-in duration-200">
-                {/* Header with Edit button */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
-                      {t("step5.eyebrow") || "05 — 06 • YOUR DESIGN BRIEF"}
-                    </span>
-                    <h1 className="mt-2 font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
-                      {t("step5.title") || "Here is your design brief"}
-                    </h1>
-                    <p className="mt-2 max-w-2xl text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
-                      {t("step5.desc") ||
-                        "A summary of your selections. You can edit anything before we continue."}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => goToStep(2)}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#DFD6C7] bg-[#FAF7F2] px-4 py-2 text-xs font-semibold uppercase tracking-wider text-[#1C1917] shadow-2xs hover:bg-[#EBE3D7] active:scale-95 transition-all cursor-pointer dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]"
-                  >
-                    <PencilSimple size={13} />
-                    <span>{t("wizard.edit_selections") || "Edit Selections"}</span>
-                  </button>
-                </div>
-
-                <ProjectReviewCard
-                  title={projectName}
-                  propertyType={propertyType}
-                  areaSqm={areaSqm}
-                  city={region}
-                  compound={district}
-                  styleName={isRTL ? selectedStyle.nameAr : selectedStyle.name}
-                  styleImage={selectedStyle.heroImage}
-                  spaces={spaces}
-                  notes={notes}
-                  onEditProperty={() => goToStep(2)}
-                  onEditSpaces={() => goToStep(3)}
-                  onEditStyle={() => goToStep(4)}
-                  onNotesChange={setNotes}
-                />
-              </div>
+              <StepCustomerLocation
+                location={customerLocation}
+                onChangeLocation={setCustomerLocation}
+              />
             )}
 
-            {/* STEP 6: Confirmation & Handoff */}
+            {/* STEP 06: Local Representative */}
             {currentStep === 6 && (
-              <div className="flex flex-col items-center justify-center text-center py-12 px-4 animate-in fade-in duration-300">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#EAE2D5] text-[#1C1917] mb-6 shadow-xs ring-4 ring-[#1C1917]/10 dark:bg-[#2C2C32] dark:text-[#FAF7F2]">
-                  <CheckCircle size={36} weight="fill" />
-                </div>
+              <StepRepresentative
+                representative={representative}
+                onChangeRepresentative={setRepresentative}
+              />
+            )}
 
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="h-px w-6 bg-[#1C1917]/30" />
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-[#78716C] dark:text-[#989692]">
-                    {t("step6.confirmed_badge") || "DESIGN BRIEF CONFIRMED"}
-                  </span>
-                  <span className="h-px w-6 bg-[#1C1917]/30" />
-                </div>
+            {/* STEP 07: Scope of Work */}
+            {currentStep === 7 && (
+              <StepScope
+                scope={scope}
+                onChangeScope={setScope}
+              />
+            )}
 
-                <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight text-[#1C1917] dark:text-[#FAF7F2]">
-                  {t("step6.title") || "Your Project Is Initialized"}
-                </h1>
+            {/* STEP 08: Budget */}
+            {currentStep === 8 && (
+              <StepBudget
+                budget={budget}
+                onChangeBudget={setBudget}
+              />
+            )}
 
-                <p className="mt-3 max-w-md text-xs sm:text-sm text-[#78716C] leading-relaxed dark:text-[#989692]">
-                  {t("step6.desc") ||
-                    "Our lead architect and site engineers in Cairo have received your brief. Your preliminary spatial model and moodboard are ready for review."}
-                </p>
+            {/* STEP 09: Timeline */}
+            {currentStep === 9 && (
+              <StepTimeline
+                timeline={timeline}
+                onChangeTimeline={setTimeline}
+              />
+            )}
 
-                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                  {createdProjectId && (
-                    <Link
-                      href={`/projects/${createdProjectId}`}
-                      className="inline-flex items-center gap-2.5 rounded-full bg-[#1C1917] px-8 py-3.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#FAF7F2] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all dark:bg-[#FAF7F2] dark:text-[#1C1917]"
-                    >
-                      <span>{t("step6.cta_workspace") || "View Project Workspace"}</span>
-                      {isRTL ? <ArrowLeft size={13} weight="bold" /> : <ArrowRight size={13} weight="bold" />}
-                    </Link>
-                  )}
+            {/* STEP 10: Drawings & CAD */}
+            {currentStep === 10 && (
+              <StepDrawings
+                documents={documents}
+                onChangeDocuments={setDocuments}
+                onProceedWithoutDrawings={() => goToStep(11)}
+              />
+            )}
 
-                  <Link
-                    href="/projects"
-                    className="inline-flex items-center gap-2 rounded-full border border-[#DFD6C7] bg-[#FAF7F2] px-6 py-3.5 text-xs font-semibold uppercase tracking-[0.12em] text-[#1C1917] shadow-2xs hover:bg-[#EBE3D7] transition-all dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]"
-                  >
-                    <SquaresFour size={15} />
-                    <span>{t("step6.cta_portfolio") || "Go to Portfolio"}</span>
-                  </Link>
-                </div>
-              </div>
+            {/* STEP 11: Review & Submit */}
+            {currentStep === 11 && (
+              <StepReviewSubmit
+                propertyType={propertyType}
+                primaryStyleId={primaryStyleId}
+                pendingStyles={pendingStyles}
+                spaces={spaces}
+                property={property}
+                customerLocation={customerLocation}
+                representative={representative}
+                scope={scope}
+                budget={budget}
+                timeline={timeline}
+                documents={documents}
+                onJumpToStep={goToStep}
+                onSubmit={handleFinalSubmit}
+                isSubmitting={isSubmitting}
+              />
             )}
           </div>
 
-          {/* Bottom Action Bar (Matching Images 2, 3, 4, 5) */}
-          {currentStep >= 2 && currentStep <= 5 && (
-            <div className="sticky bottom-0 z-30 -mx-5 sm:-mx-8 lg:-mx-12 -mb-5 sm:-mb-8 lg:-mb-12 mt-12 border-t border-[#E2D7C8] bg-[#F4EEE5]/95 backdrop-blur-md px-4 sm:px-8 lg:px-10 py-3.5 sm:py-4 pb-[max(0.875rem,env(safe-area-inset-bottom))] shadow-sm dark:border-[#2C2C32] dark:bg-[#121214]/95">
-              <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 sm:gap-4">
-                {/* Back / Skip Action */}
-                <button
-                  type="button"
-                  onClick={currentStep === 4 ? () => goToStep(5) : handleBack}
-                  className="text-xs font-medium text-[#78716C] hover:text-[#1C1917] transition-colors cursor-pointer dark:text-[#989692] dark:hover:text-[#FAF7F2]"
-                >
-                  {currentStep === 2
-                    ? (isRTL ? "← العودة للبداية" : "← Back to Introduction")
-                    : currentStep === 4
-                    ? (isRTL ? "← تخطي الآن" : "← Skip for now")
-                    : (isRTL ? "← السابق" : "← Back")}
-                </button>
+          {/* Sticky / Fixed Navigation Footer for Steps 1 - 10 */}
+          {currentStep < 11 && (
+            <div className="mt-12 pt-6 border-t border-[#E6DDD2] dark:border-[#2E2A27] flex items-center justify-between">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#DFD6C7] bg-[#FAF7F2] text-xs font-semibold uppercase tracking-wider text-[#1C1917] hover:bg-[#EBE3D7] transition-all cursor-pointer dark:border-[#2C2C32] dark:bg-[#1A1A1E] dark:text-[#FAF7F2]"
+              >
+                {isRTL ? <ArrowRight size={13} /> : <ArrowLeft size={13} />}
+                <span>{t("wizard.back") || "Back"}</span>
+              </button>
 
-                {/* Center Step Indicator */}
-                <div className="hidden sm:flex items-center gap-2 font-mono text-[11px] text-[#78716C] dark:text-[#989692]">
-                  <span>
-                    {t("wizard.step_prefix") || "Step"} 0{currentStep} {t("wizard.step_of") || "of"} 06
-                  </span>
-                  {currentStep === 3 && (
-                    <span className="text-[#8C847B]">· Next: Material & Style Moodboard</span>
-                  )}
-                  {currentStep === 4 && (
-                    <span className="text-[#8C847B]">· Next: Design Brief</span>
-                  )}
-                </div>
-
-                {/* Continue Primary CTA (Solid Black Pill Button) */}
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={createMutation.isPending}
-                  className="group inline-flex items-center gap-2 sm:gap-2.5 rounded-full bg-[#1C1917] px-5 sm:px-8 py-2.5 sm:py-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#FAF7F2] shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer disabled:opacity-50 dark:bg-[#FAF7F2] dark:text-[#1C1917]"
-                >
-                  {createMutation.isPending ? (
-                    <>
-                      <Spinner className="h-4 w-4" />
-                      <span>{t("step5.cta_creating") || "Creating..."}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>
-                        {currentStep === 2
-                          ? (isRTL ? "المتابعة إلى المساحات" : "Continue to Spaces")
-                          : currentStep === 3
-                          ? (isRTL ? "المتابعة إلى الطراز" : "Continue to Your Style")
-                          : currentStep === 4
-                          ? (isRTL ? "المتابعة لكراسة المواصفات" : "Continue to Design Brief")
-                          : (isRTL ? "تأكيد وإرسال كراسة المواصفات" : "Confirm & Submit Brief")}
-                      </span>
-                      {isRTL ? (
-                        <ArrowLeft size={13} weight="bold" className="transition-transform group-hover:-translate-x-1" />
-                      ) : (
-                        <ArrowRight size={13} weight="bold" className="transition-transform group-hover:translate-x-1" />
-                      )}
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleNext}
+                className="flex items-center gap-2 px-7 py-2.5 rounded-full bg-[#503C2C] text-xs font-semibold uppercase tracking-wider text-[#FAF7F2] shadow-sm hover:bg-[#3D2E22] transition-all cursor-pointer dark:bg-[#FAF7F2] dark:text-[#1C1917] dark:hover:bg-[#E5DCD0]"
+              >
+                <span>{t("wizard.next") || "Next Step"}</span>
+                {isRTL ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
+              </button>
             </div>
           )}
         </main>
       </div>
+
+      {/* Sign-In & Role Boundary Modal */}
+      <SignInModal
+        open={isSignInOpen}
+        onClose={() => setIsSignInOpen(false)}
+      />
     </div>
   );
 }
 
-export default function CreateProjectShellPage() {
+export default function CreateProjectPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="flex h-screen items-center justify-center bg-[#F4EEE5] dark:bg-[#121214]">
-          <Spinner className="h-8 w-8 text-[#1C1917] dark:text-[#FAF7F2]" />
+        <div className="flex h-screen items-center justify-center bg-[#F4EEE5]">
+          <div className="font-serif text-lg text-[#503C2C]">VALENTIA ATELIER...</div>
         </div>
       }
     >

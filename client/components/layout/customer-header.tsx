@@ -6,13 +6,27 @@ import { usePathname } from "next/navigation";
 import { User, Plus } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { useAuth } from "@/features/auth/context/auth-context";
+import { SignInModal } from "@/features/auth/components/sign-in-modal";
 
 export function CustomerHeader() {
   const pathname = usePathname();
   const { language, setLanguage, t } = useLanguage();
+  const { user, isAuthenticated, role } = useAuth();
+  const [isAuthOpen, setIsAuthOpen] = React.useState(false);
+
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : null;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/80 backdrop-blur-xl transition-all">
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-border/70 bg-background/80 backdrop-blur-xl transition-all">
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 sm:px-10">
         {/* Brand Lockup */}
         <Link href="/projects" className="flex items-center gap-3.5 group cursor-pointer">
@@ -107,16 +121,30 @@ export function CustomerHeader() {
             </button>
           </div>
 
-          {/* Profile Circle */}
+          {/* Profile Circle / Auth Trigger */}
           <button
             type="button"
-            aria-label="User Profile"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer"
+            onClick={() => setIsAuthOpen(true)}
+            aria-label="User Profile & Sign In"
+            title={isAuthenticated && user ? `${user.name} (${role})` : "Sign In"}
+            className="flex items-center gap-2 rounded-full border border-border bg-card p-1 text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer pr-2.5"
           >
-            <User size={16} weight="bold" />
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground/5 text-foreground text-[10px] font-bold">
+              {isAuthenticated && initials ? (
+                <span>{initials}</span>
+              ) : (
+                <User size={14} weight="bold" />
+              )}
+            </div>
+            <span className="text-[10px] font-semibold tracking-wider uppercase text-foreground">
+              {isAuthenticated && user ? user.name.split(" ")[0] : t("nav.sign_in") || "Sign In"}
+            </span>
           </button>
         </div>
       </div>
     </header>
+
+    <SignInModal open={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+    </>
   );
 }

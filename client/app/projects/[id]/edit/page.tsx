@@ -29,7 +29,8 @@ export default function EditProjectPage() {
   const updateMutation = useUpdateProject(id);
 
   const form = useForm<ProjectFormValues>({
-    resolver: zodResolver(projectFormSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(projectFormSchema) as any,
     defaultValues: {
       title: "",
       propertyType: "villa",
