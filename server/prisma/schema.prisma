@@ -7,3 +7,95 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum Role {
+  CUSTOMER
+  ENGINEER
+  PROJECT_MANAGER
+  COMPANY_OWNER
+  ADMINISTRATOR
+}
+
+enum ProjectStatus {
+  DRAFT
+  SUBMITTED
+}
+
+enum SpaceType {
+  LIVING_ROOM
+  KITCHEN
+  MASTER_BEDROOM
+  BEDROOM
+  BATHROOM
+  BALCONY
+}
+
+model User {
+  id                  Int                 @id @default(autoincrement())
+  username            String              @unique
+  passwordHash        String
+  role                Role
+  mustChangePassword  Boolean             @default(true)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  projectsAsClient    Project[]           @relation("ClientProjects")
+  engineerAssignments ProjectAssignment[] @relation("EngineerAssignments")
+
+  @@map("users")
+}
+
+model Project {
+  id         Int                @id @default(autoincrement())
+  title      String
+  status     ProjectStatus      @default(DRAFT)
+  notes      String?
+  clientId   Int
+  client     User               @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Restrict)
+  property   Property?
+  spaces     Space[]
+  assignment ProjectAssignment?
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@index([clientId])
+  @@map("projects")
+}
+
+model Property {
+  id           Int      @id @default(autoincrement())
+  projectId    Int      @unique
+  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  propertyType String
+  areaSqm      Decimal  @db.Decimal(10, 2)
+  city         String
+  compound     String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("properties")
+}
+
+model Space {
+  id        Int       @id @default(autoincrement())
+  projectId Int
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type      SpaceType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([projectId])
+  @@map("spaces")
+}
+
+model ProjectAssignment {
+  id         Int      @id @default(autoincrement())
+  projectId  Int      @unique
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  engineerId Int
+  engineer   User     @relation("EngineerAssignments", fields: [engineerId], references: [id], onDelete: Restrict)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([engineerId])
+  @@map("project_assignments")
+}
