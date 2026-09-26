@@ -53,7 +53,7 @@ export function SpecificationParameters({
   const regions = [
     { id: "cairo_nac", label: isRTL ? "القاهرة والعاصمة الإدارية الجديدة" : "Cairo & New Administrative Capital" },
     { id: "zayed_october", label: isRTL ? "الشيخ زايد والسادس من أكتوبر" : "Sheikh Zayed & 6th of October" },
-    { id: "new_cairo", label: isRTL ? "القاهرة الجديدة والمربع الذهبي" : "New Cairo & Golden Square" },
+    { id: "new_cairo", label: isRTL ? "القاهرة الجديدة والتجمع والمربع الذهبي" : "New Cairo & Golden Square" },
     { id: "north_coast", label: isRTL ? "الساحل الشمالي وسيدي عبد الرحمن" : "North Coast & Mediterranean" },
     { id: "el_gouna", label: isRTL ? "البحر الأحمر والجونة وسوما باي" : "Red Sea & El Gouna" },
   ];
@@ -92,7 +92,7 @@ export function SpecificationParameters({
             type="text"
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
-            placeholder={isRTL ? "مثال: ريزيدنس الساحل" : "e.g. Altea Coastal Residence"}
+            placeholder={isRTL ? "مثال: فيلا الساحل أو شقة التجمع" : "e.g. Altea Coastal Residence"}
             className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2.5 text-xs font-medium text-[#1C1917] outline-none transition-colors focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
           />
           <span className="text-[10px] text-[#8C847B] dark:text-[#989692]">
@@ -183,7 +183,7 @@ export function SpecificationParameters({
             type="text"
             value={district}
             onChange={(e) => onDistrictChange(e.target.value)}
-            placeholder={isRTL ? "مثال: بالم هيلز جولف إكستنشنز" : "e.g. Palm Hills Golf Extensions"}
+            placeholder={isRTL ? "مثال: بالم هيلز أو مدينتي أو مراسي أو هايد بارك" : "e.g. Palm Hills Golf Extensions"}
             className="w-full rounded-xl border border-[#DFD6C7] bg-[#F4EEE5] px-3.5 py-2.5 text-xs font-medium text-[#1C1917] outline-none transition-colors focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] dark:border-[#2C2C32] dark:bg-[#24242A] dark:text-[#FAF7F2]"
           />
           <span className="text-[10px] text-[#8C847B] dark:text-[#989692]">
@@ -208,7 +208,7 @@ export function SpecificationParameters({
             </span>
             <p className="text-xs font-medium text-[#1C1917] dark:text-[#FAF7F2]">
               {isRTL
-                ? `المحدد: ${propertyType} — ${areaSqm} م² عبر ٣ طوابق (داخلي + تراس خارجي)`
+                ? `المختار: ${propertyType} — ${areaSqm} م² (تشطيب داخلي + مساحات خارجية)`
                 : `Selected: ${propertyType.charAt(0).toUpperCase() + propertyType.slice(1)} — ${areaSqm} m² across 3 levels (Indoor + Exterior Loggia)`}
             </p>
           </div>

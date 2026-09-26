@@ -22,7 +22,7 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
       <div className="p-8 rounded-2xl bg-card border border-border text-center shadow-xs">
         <HouseLine className="w-8 h-8 text-[#B88460] mx-auto mb-2" />
         <p className={cn("text-xs text-[#78716C]", isRTL && "font-medium")}>
-          {isRTL ? "لم يتم تحديد فراغات معمارية بعد." : "No spatial zones configured for this project."}
+          {isRTL ? "لسه ما حددتش أي غرف أو مساحات للمشروع." : "No spatial zones configured for this project."}
         </p>
       </div>
     );
@@ -59,7 +59,7 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
                     isRTL ? "text-[10px] font-bold tracking-normal" : "font-mono text-[9px] uppercase tracking-wider"
                   )}
                 >
-                  {space.quantity || 1} {isRTL ? "وحدة" : (space.quantity || 1) === 1 ? "Unit" : "Units"}
+                  {space.quantity || 1} {isRTL ? "غرفة" : (space.quantity || 1) === 1 ? "Unit" : "Units"}
                 </span>
                 <h4
                   className={cn(
@@ -85,7 +85,7 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
                 </div>
               ) : (
                 <div className={cn("text-[11px] text-[#78716C]", isRTL && "font-medium text-[#503C2C]")}>
-                  {isRTL ? "مدرج ضمن النطاق المعماري العام" : "Aligned to overall residence atmosphere"}
+                  {isRTL ? "ماشي مع الستايل والجو العام للبيت" : "Aligned to overall residence atmosphere"}
                 </div>
               )}
 

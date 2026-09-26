@@ -25,13 +25,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
   {
     id: "modern_architectural",
     name: "Modern Architectural",
-    nameAr: "مودرن معماري معاصر",
+    nameAr: "مودرن معاصر",
     subtitle: "Clean lines, open, calm spaces and a refined balance of materials.",
-    subtitleAr: "خطوط معمارية نقية، مساحات رحبة، وتوازن دقيق بين الخامات الطبيعية.",
+    subtitleAr: "خطوط نقية، مساحات مفتوحة، وتناغم بين الرخام والأخشاب الدافئة.",
     description:
       "Full-height architectural glazing, monolithic travertine fireplaces, cantilevered joinery, and concealed recessed cove lighting celebrating volume and clarity.",
     descriptionAr:
-      "واجهات زجاجية ممتدة لكامل الارتفاع، مدافئ رخامية صرحية، تجاليد خشبية معلقة، وإضاءات سقفية مخفية تحتفي برحابة الفراغ وهدوء المساحات.",
+      "واجهات زجاجية واسعة، دفاية رخام فخمة، تجاليد خشبية راقية، وإضاءات ليد مخفية بتوسع الفراغ وتدي إحساس بالهدوء.",
     heroImage:
       "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
@@ -56,11 +56,11 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
     name: "Japandi & Warm Minimal",
     nameAr: "جاباندي ومينيمال دافئ",
     subtitle: "Warm wood, crafted stillness & unbleached linens",
-    subtitleAr: "أخشاب دافئة وسكينة بصرية مع كتان طبيعي",
+    subtitleAr: "أخشاب دافئة وهدوء بصري مع كتان طبيعي",
     description:
       "Natural vertical oak slats, raw travertine stone plinths, organic washed linen upholstery, and contemplative spatial geometry that invites diffused morning radiance.",
     descriptionAr:
-      "شرائح خشب البلوط الرأسي، كتل حجر الترافرتين الخام، أقمشة الكتان المغسول الطبيعي، وهندسة مكانية هادئة تستقبل ضوء الصباح المنعكس بنعومة.",
+      "بانوهات خشب أرو طبيعي، حجر ترافرتين، أقمشة كتان ناعمة، وتصميم مريح بيخلي ضوء الشمس يتوزع بنعومة في كل زاوية.",
     heroImage:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
@@ -83,13 +83,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
   {
     id: "mediterranean",
     name: "Mediterranean Coastal",
-    nameAr: "طراز متوسطي ساحلي فاخر",
+    nameAr: "طراز متوسطي وساحلي",
     subtitle: "Arches, rustic timber & sunlit limestone",
-    subtitleAr: "أقواس حجرية وأخشاب عتيقة وحجر جيري مشمس",
+    subtitleAr: "أقواس ناعمة وأخشاب طبيعية مع لمسات الساحل",
     description:
       "Soft curvilinear arches, hand-finished lime plaster walls, natural limestone flooring, and sun-bleached driftwood inspired by the North Coast riviera.",
     descriptionAr:
-      "أقواس معمارية انسيابية، طلاء جيري طبيعي ناعم، أرضيات من الحجر الجيري، وأخشاب طبيعية مستوحاة من ريفيرا الساحل الشمالي.",
+      "أقواس معمارية انسيابية، بياض جيري ناعم، حجر جيري وأخشاب طبيعية مستوحاة من أجواء وفلل الساحل الشمالي والجونة.",
     heroImage:
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
@@ -112,13 +112,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
   {
     id: "classic_european",
     name: "Classic European",
-    nameAr: "نيو كلاسيك فرنسي باريسي",
+    nameAr: "نيو كلاسيك فرنسي",
     subtitle: "Herringbone, boiserie & sculpted Statuario",
-    subtitleAr: "باركيه فرنسي وبانوهات جدارية ورخام ستاتوريو",
+    subtitleAr: "باركيه فرنسي وبانوهات جدارية ورخام إيطالي",
     description:
       "Delicate wall boiserie, French oak chevron parquetry, Statuario marble fireplace mantelpieces, and timeless sculpted crown moldings.",
     descriptionAr:
-      "بانوهات جدارية باريسية دقيقة، أرضيات خشبية بنمط الشيفرون، مدافئ رخام ستاتوريو الإيطالي، وكرانيش سقفية كلاسيكية متوازنة.",
+      "بانوهات حوائط رفيعة ومظبوطة، أرضيات باركيه خشب أرو، مدافئ رخام ستاتوريو إيطالي، وكرانيش سقفية كلاسيكية هادية.",
     heroImage:
       "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
@@ -140,13 +140,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
   {
     id: "scandinavian_organic",
     name: "Scandinavian Organic",
-    nameAr: "طراز إسكندنافي عضوي",
+    nameAr: "إسكندنافي هادئ",
     subtitle: "Light timber, wool textiles & daylight",
-    subtitleAr: "أخشاب صنوبر فاتحة وأقمشة صوفية ونور طبيعي",
+    subtitleAr: "أخشاب فاتحة وأقمشة بوكليه ونور طبيعي مريح",
     description:
       "Soft bleached ash joinery, bouclé wool textures, natural morning daylight maximization, and functional minimalism promoting restful living.",
     descriptionAr:
-      "أخشاب دردار فاتحة، ملمس قماش البوكليه الدافئ، تعظيم الإضاءة الطبيعية، وتصميم عملي هادئ يعزز الراحة والاسترخاء.",
+      "أخشاب دردار فاتحة، قماش بوكليه دافئ، استغلال ذكي للضوء الطبيعي، وديكور عملي بيساعد على الاسترخاء والراحة النفسية.",
     heroImage:
       "https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=1600&q=85",
     thumbnail:
@@ -166,13 +166,13 @@ export const AESTHETIC_DIRECTIONS: StyleDirection[] = [
   {
     id: "monolithic_stone",
     name: "Monolithic Stone & Bronze",
-    nameAr: "أحجار صرحية وبرونز داكن",
+    nameAr: "أحجار طبيعية وبرونز داكن",
     subtitle: "Dark travertine, blackened steel & depth",
-    subtitleAr: "ترافرتين داكن وفولاذ أسود وعمق بصري",
+    subtitleAr: "ترافرتين داكن وفولاذ أسود وعمق وفخامة",
     description:
       "Deep tactile charcoal travertine, patinated blackened metal joinery, integrated architectural micro-cement, and warm accent wash lights.",
     descriptionAr:
-      "كتل حجرية فحمية داكنة، معادن سوداء معتقة، ميكروسيمنت معماري مدمج، وإضاءات موجهة تبرز قوة الكتل وفخامتها.",
+      "كتل حجرية فحمية فخمة، تفاصيل معدنية سوداء معتقة، ميكروسيمنت، وإضاءات مسلطة بتبرز قوة وفخامة الخامات.",
     heroImage:
       "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=1600&q=85",
     thumbnail:

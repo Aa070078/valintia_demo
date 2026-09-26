@@ -129,7 +129,7 @@ export function StepStyleDiscovery({
       {
         targetSpaceKey: "designer_curated",
         styleId: "designer_curated",
-        styleName: isRTL ? "منسق من قبل الأتيليه" : "Atelier Curated",
+        styleName: isRTL ? "باختيار مهندسي فالنتيا" : "Atelier Curated",
         referenceImages: [],
         notes,
       },
@@ -165,15 +165,15 @@ export function StepStyleDiscovery({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٤ — ٠٦ • الطراز والمواد" : "04 — 06 YOUR STYLE"}
+            {isRTL ? "الخطوة الثانية • الستايل والخامات" : "04 — 06 YOUR STYLE"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "استكشف طرازك المعماري المفضل" : "Discover your style"}
+          {isRTL ? "اختار الستايل اللي يليق ببيتك" : "Discover your style"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "اختر الطراز المعماري الأقرب لذوقك. يمكنك استعراض معرض كل طراز وتطبيقه على المشروع بالكامل أو تخصيصه لكل فراغ."
+            ? "اختار الستايل الأقرب لذوقك، وتقدر تتفرج على صور ومساحات كل ستايل وتطبقه على البيت كله أو تختار ستايل مختلف لكل غرفة."
             : "Explore architectural styles that match your taste. Browse galleries and apply across your residence or per space."}
         </p>
       </div>
@@ -207,7 +207,7 @@ export function StepStyleDiscovery({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold">
-              {t("style_strategy.unified_title") || (isRTL ? "ستايل واحد للكل" : "Single Style for All")}
+              {t("style_strategy.unified_title") || (isRTL ? "ستايل موحد للبيت كله" : "Single Style for All")}
             </span>
             <div
               className={cn(
@@ -228,7 +228,7 @@ export function StepStyleDiscovery({
           >
             {t("style_strategy.unified_desc") ||
               (isRTL
-                ? "طراز وتناغم بصري موحد يسري بسلاسة عبر جميع غرف ومساحات المسكن."
+                ? "ستايل واحد متناسق يمشي بسلاسة في كل غرف ومساحات بيتك."
                 : "One coherent aesthetic language applied seamlessly across all spaces.")}
           </p>
         </button>
@@ -246,7 +246,7 @@ export function StepStyleDiscovery({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold">
-              {t("style_strategy.per_space_title") || (isRTL ? "ستايل لكل فراغ" : "Curate Per Space")}
+              {t("style_strategy.per_space_title") || (isRTL ? "ستايل مختلف لكل غرفة" : "Curate Per Space")}
             </span>
             <div
               className={cn(
@@ -267,7 +267,7 @@ export function StepStyleDiscovery({
           >
             {t("style_strategy.per_space_desc") ||
               (isRTL
-                ? "تخصيص طراز ومواد مستقلة لكل غرفة أو جناح حسب طبيعة استخدامه."
+                ? "تختار ستايل وخامات مستقلة لكل غرفة أو جناح حسب طبيعة استخدامها."
                 : "Assign bespoke styles and materials to individual rooms and zones.")}
           </p>
         </button>
@@ -288,7 +288,7 @@ export function StepStyleDiscovery({
         >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold">
-              {t("style_strategy.designer_title") || (isRTL ? "دع المصمم يحدد" : "Let Designer Curate")}
+              {t("style_strategy.designer_title") || (isRTL ? "سيب الاختيار لمهندسينا" : "Let Designer Curate")}
             </span>
             <div
               className={cn(
@@ -309,7 +309,7 @@ export function StepStyleDiscovery({
           >
             {t("style_strategy.designer_desc") ||
               (isRTL
-                ? "يتولى كبار مصممي الأتيليه اختيار الطراز الأنسب لضوء وتوجيه المبنى."
+                ? "مهندسي فالنتيا هيقترحوا الستايل الأنسب لمساحة بيتك وتوزيع الإضاءة الطبيعية."
                 : "Valentia Atelier leads curate based on lighting, volumes and orientation.")}
           </p>
         </button>
@@ -381,7 +381,7 @@ export function StepStyleDiscovery({
                     {strategy === "per_space" && hasAssignedSpaces && (
                       <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                         <span className="text-[10px] font-medium text-[#503C2C]">
-                          {isRTL ? "مطبق على:" : "Applied to:"}
+                          {isRTL ? "مختار لـ:" : "Applied to:"}
                         </span>
                         {assignedSpaces.map((sp, idx) => (
                           <span
@@ -416,7 +416,7 @@ export function StepStyleDiscovery({
                   <div className="pt-2 border-t border-border/60 flex items-center justify-between">
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#503C2C] group-hover:underline">
                       <Eye size={14} weight="bold" />
-                      <span>{t("style_gallery.view_btn") || (isRTL ? "استعراض معرض الطراز" : "Explore Style & Rooms")}</span>
+                      <span>{t("style_gallery.view_btn") || (isRTL ? "تصفح صور وستايل الغرف" : "Explore Style & Rooms")}</span>
                     </span>
                     <span className="text-[11px] font-mono text-[#78716C]">
                       {direction.galleryImages?.length || 4} {isRTL ? "صور" : "Photos"}
@@ -438,11 +438,11 @@ export function StepStyleDiscovery({
             </div>
             <div>
               <h3 className="text-xl sm:text-2xl font-serif font-normal text-[#1C1917]">
-                {isRTL ? "رؤية معمارية مخصصة بإشراف كبار مصممي الأتيليه" : "Bespoke Atelier Lead Curation"}
+                {isRTL ? "رؤية وتصميم خاص بإشراف مهندسي الأتيليه" : "Bespoke Atelier Lead Curation"}
               </h3>
               <p className="text-xs text-[#78716C] mt-0.5 font-normal">
                 {isRTL
-                  ? "سيقوم فريق فالنتيا باقتراح الأسلوب والمواد المثالية بعد دراسة الموقع والكتل المعمارية."
+                  ? "فريق مهندسي فالنتيا هيقترح الستايل والخامات المناسبة بعد دراسة مساحات بيتك وتوزيع الإضاءة على الطبيعة."
                   : "Valentia's architectural team will propose the optimum design direction after site & spatial study."}
               </p>
             </div>
@@ -450,7 +450,7 @@ export function StepStyleDiscovery({
 
           <div className="flex flex-col gap-2">
             <label className="text-xs font-medium text-[#1C1917]">
-              {isRTL ? "هل لديك تفضيلات أو ملاحظات ذوقية خاصة تود إطلاع المصمم عليها؟" : "Any aesthetic preferences or notes for our designers?"}
+              {isRTL ? "عندك أي ملاحظات أو تفضيلات معينة تحب تقولها للمهندس؟" : "Any aesthetic preferences or notes for our designers?"}
             </label>
             <textarea
               rows={4}
@@ -458,7 +458,7 @@ export function StepStyleDiscovery({
               onChange={(e) => handleSaveDesignerMode(e.target.value)}
               placeholder={
                 isRTL
-                  ? "مثال: أفضل الأجواء الهادئة، أخشاب البلوط الطبيعي مع خامات الكتان والأحجار الفاتحة، وإضاءة طبيعية وافرة..."
+                  ? "مثال: بحب الأجواء الهادية والمودرن، خشب أرو طبيعي مع رخام فاتح وكتان، وإضاءة طبيعية دافية في النهار..."
                   : "e.g., I love warm organic textures, light oak slats, unbleached linen, and serene morning illumination..."
               }
               className="w-full rounded-2xl border border-border bg-background p-4 text-xs font-normal text-[#1C1917] focus:outline-none focus:border-primary transition-colors"
@@ -492,7 +492,7 @@ export function StepStyleDiscovery({
               <div className="flex items-center gap-2">
                 <span className="h-px w-6 bg-foreground/50" />
                 <span className="font-mono text-[10px] uppercase tracking-wider text-[#78716C]">
-                  {isRTL ? "معرض الطراز المعماري" : "CURATED STYLE GALLERY"}
+                  {isRTL ? "معرض صور الستايل" : "CURATED STYLE GALLERY"}
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-serif font-normal text-[#1C1917] mt-1">
@@ -543,7 +543,7 @@ export function StepStyleDiscovery({
                 <div className="w-full flex items-center justify-between gap-4">
                   <span className="text-xs font-normal text-[#78716C]">
                     {isRTL
-                      ? "سيتم تطبيق هذا الطراز على كافة فراغات المسكن تلقائياً."
+                      ? "الستايل ده هيتطبق على كل غرف ومساحات بيتك تلقائياً."
                       : "This style will be applied across all rooms in your commission."}
                   </span>
                   <button
@@ -552,7 +552,7 @@ export function StepStyleDiscovery({
                     className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
                   >
                     {t("style_gallery.confirm_unified") ||
-                      (isRTL ? "تأكيد واعتماد هذا الطراز لكامل المشروع" : "Confirm & Apply to Entire Residence")}
+                      (isRTL ? "تأكيد واعتماد الستايل ده للبيت كله" : "Confirm & Apply to Entire Residence")}
                   </button>
                 </div>
               )}
@@ -565,7 +565,7 @@ export function StepStyleDiscovery({
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-medium text-[#1C1917]">
                         {t("style_gallery.select_spaces_label") ||
-                          (isRTL ? "اختر الفراغات التي ترغب بتطبيق هذا الطراز عليها:" : "Assign this style to spaces:")}
+                          (isRTL ? "اختار الغرف اللي تحب تطبق عليها الستايل ده:" : "Assign this style to spaces:")}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
@@ -573,7 +573,7 @@ export function StepStyleDiscovery({
                           onClick={() => setTempAssignedSpaceIds(activeSpaces.map((s) => s.id))}
                           className="text-[11px] font-medium text-[#B88460] hover:underline cursor-pointer"
                         >
-                          {t("style_gallery.select_all") || (isRTL ? "تحديد الكل" : "Select All")}
+                          {t("style_gallery.select_all") || (isRTL ? "تحديد كل الغرف" : "Select All")}
                         </button>
                         <span className="text-border">|</span>
                         <button
@@ -590,7 +590,7 @@ export function StepStyleDiscovery({
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-2xl border border-border bg-background max-h-48 overflow-y-auto">
                       {activeSpaces.length === 0 ? (
                         <span className="col-span-full text-xs text-[#78716C] py-2 text-center font-normal">
-                          {isRTL ? "لم يتم تحديد فراغات بعد في الخطوة السابقة." : "No active spaces found."}
+                          {isRTL ? "لسه مفيش غرف محددة في الخطوة اللي فاتت." : "No active spaces found."}
                         </span>
                       ) : (
                         activeSpaces.map((space) => {
@@ -632,7 +632,7 @@ export function StepStyleDiscovery({
                   {/* Confirm Button */}
                   <div className="flex items-center justify-between pt-2">
                     <span className="text-xs text-[#78716C] font-mono">
-                      {tempAssignedSpaceIds.length} {isRTL ? "فراغات محددة" : "spaces selected"}
+                      {tempAssignedSpaceIds.length} {isRTL ? "غرف مختارة" : "spaces selected"}
                     </span>
                     <button
                       type="button"
@@ -640,7 +640,7 @@ export function StepStyleDiscovery({
                       className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
                     >
                       {t("style_gallery.confirm_per_space") ||
-                        (isRTL ? "تطبيق الطراز على الفراغات المحددة" : "Apply to Selected Spaces")}
+                        (isRTL ? "تطبيق الستايل على الغرف المختارة" : "Apply to Selected Spaces")}
                     </button>
                   </div>
                 </div>

@@ -54,15 +54,15 @@ export function StepDrawings({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "١٠ — ٠٦ • المخططات والرسومات المعمارية" : "STEP 10 · DRAWINGS & CAD PLANS"}
+            {isRTL ? "الخطوة العاشرة • الرسومات والمخططات" : "STEP 10 · DRAWINGS & CAD PLANS"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "هل لديك مخططات أو كاد للعقار؟" : "Do you have existing CAD or PDF drawings?"}
+          {isRTL ? "معاك رسومات أو مخططات (CAD / PDF) للعقار؟" : "Do you have existing CAD or PDF drawings?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "إذا كانت المخططات التنفيذية متوفرة لديك من المطور العقاري فقم برفعها هنا. وإذا لم تكن متوفرة، سيتولى فريق فالنتيا مسح الموقع بالكامل ليزرياً."
+            ? "لو معاك مخططات الشقة أو الفيلا من شركة التطوير العقاري ارفعها هنا. ولو مش معاك متقلقش، مهندسي فالنتيا هيعملوا رفع مساحي ليزر كامل للمكان في أول معاينة."
             : "Upload developer blueprints, CAD files, or sketches if available. If you don't have drawings, our engineering team will perform a full 3D lidar scan during site inspection."}
         </p>
       </div>
@@ -75,11 +75,11 @@ export function StepDrawings({
           </div>
           <div>
             <h4 className="text-[#1C1917] text-xs font-medium">
-              {isRTL ? "لا تملك مخططات هندسية حالياً؟" : "Don't have architectural plans?"}
+              {isRTL ? "مش معاك رسومات حالياً؟ مفيش أي مشكلة!" : "Don't have architectural plans?"}
             </h4>
             <p className="mt-0.5 leading-relaxed text-[11px] text-[#78716C] font-normal">
               {isRTL
-                ? "هذا طبيعي تماماً. يتضمن بروتوكول فالنتيا مسحاً ليزرياً شاملاً (3D Lidar Survey) في أول زيارة ميدانية."
+                ? "عادي جداً ومفيش قلق. مهندس فالنتيا هيزور الموقع ويعمل رفع مساحي ليزر 3D دقيق جداً لكل زاوية في الشقة أو الفيلا."
                 : "No problem at all. Valentia conducts an exhaustive 3D point-cloud lidar scan during the physical survey visit."}
             </p>
           </div>
@@ -89,7 +89,7 @@ export function StepDrawings({
           onClick={onProceedWithoutDrawings}
           className="shrink-0 px-4 py-2 rounded-xl border border-[#503C2C] text-[#503C2C] hover:bg-[#503C2C] hover:text-[#FAF7F2] transition-colors cursor-pointer text-xs font-medium"
         >
-          {isRTL ? "المتابعة دون مخططات ←" : "Proceed Without Drawings →"}
+          {isRTL ? "كمّل من غير رسومات ←" : "Proceed Without Drawings →"}
         </button>
       </div>
 
@@ -104,11 +104,11 @@ export function StepDrawings({
         <div>
           <p className="text-[#1C1917] text-sm font-medium">
             {isRTL
-              ? "اضغط لاختيار الملفات أو اسحبها إلى هنا"
+              ? "دوس هنا عشان ترفع الملفات أو اسحبها هنا"
               : "Click to browse or drop drawings here"}
           </p>
           <p className="mt-1 text-xs text-[#78716C] font-normal">
-            DWG, DXF, PDF, JPG, PNG {isRTL ? "(بحد أقصى ٥٠ ميجابايت)" : "(Up to 50MB per file)"}
+            DWG, DXF, PDF, JPG, PNG {isRTL ? "(لحد أقصى ٥٠ ميجابايت للملف)" : "(Up to 50MB per file)"}
           </p>
         </div>
         <input
@@ -130,7 +130,7 @@ export function StepDrawings({
               isRTL ? "font-sans text-xs font-medium text-[#503C2C]" : "text-xs font-mono font-medium uppercase tracking-wider"
             )}
           >
-            {isRTL ? `الملفات المرفوعة (${documents.length})` : `Uploaded Files (${documents.length})`}
+            {isRTL ? `الملفات اللي رفعتها (${documents.length})` : `Uploaded Files (${documents.length})`}
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {documents.map((doc) => (

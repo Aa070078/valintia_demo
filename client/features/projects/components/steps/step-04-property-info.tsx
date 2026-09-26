@@ -21,30 +21,30 @@ const PROPERTY_CONDITIONS: Array<{
   {
     id: "red_brick",
     titleEn: "Core & Shell (Red Brick)",
-    titleAr: "طوب أحمر (Core & Shell)",
+    titleAr: "على الطوب الأحمر (Core & Shell)",
     descEn: "Raw structure with no plumbing, electrical, or plaster layers.",
-    descAr: "هيكل خرساني خام بدون تمديدات أو بياض محارة.",
+    descAr: "هيكل خرساني ومباني بدون تأسيس سباكة أو كهرباء أو محارة.",
   },
   {
     id: "semi_finished",
     titleEn: "Semi-Finished",
-    titleAr: "نصف تشطيب (محارة وحلوق)",
+    titleAr: "نص تشطيب (محارة وحلوق)",
     descEn: "Plastered walls, basic rough-ins ready for final architectural fit-out.",
-    descAr: "محارة وبنية تحتية أساسية جاهزة للبدء في التشطيبات النهائية.",
+    descAr: "متأسس محارة وحلوق ووصلات أساسية، جاهز للتشطيب والديكور.",
   },
   {
     id: "under_construction",
     titleEn: "Under Construction",
-    titleAr: "قيد الإنشاء والتسليم",
+    titleAr: "تحت الإنشاء (استلام قريب)",
     descEn: "Delivery within the coming months from master developer.",
-    descAr: "من المقرر الاستلام من المطور العقاري خلال الأشهر القادمة.",
+    descAr: "هتستلم من المطور العقاري خلال الشهور اللي جاية.",
   },
   {
     id: "occupied",
     titleEn: "Existing / Renovation",
-    titleAr: "مبنى قائم / إعادة تأهيل",
+    titleAr: "عقار قائم ومحتاج تجديد شامل",
     descEn: "Fully finished or occupied space requiring comprehensive remodel.",
-    descAr: "عقار قائم أو مسكون يحتاج لتعديلات معمارية وتجديد كامل.",
+    descAr: "متشطب أو مسكون ومحتاج تجديد ديكورات وتعديل معماري.",
   },
 ];
 
@@ -98,15 +98,15 @@ export function StepPropertyInfo({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٢ — ٠٦ • بيانات وموقع العقار" : "02 — 06 PROPERTY SPECS"}
+            {isRTL ? "الخطوة الثانية • بيانات وموقع العقار" : "02 — 06 PROPERTY SPECS"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "أين يقع عقارك؟ مواصفات المشروع" : "Where is your property located?"}
+          {isRTL ? "عقارك موجود فين؟ وبيانات المشروع" : "Where is your property located?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "حدد موقع المشروع، والمجمع السكني، والمساحة الإجمالية، وحالة العقار الحالية لحساب الفراغات المعمارية وتخطيط الفرق الهندسية بدقة."
+            ? "حدد مكان العقار، اسم الكمبوند، المساحة التقريبية، وحالة الاستلام عشان نظبط جدول الشغل وفرق المهندسين بالموقع."
             : "Specify the geographic region, compound, gross footprint, and current condition to calibrate logistical execution."}
         </p>
       </div>
@@ -117,7 +117,7 @@ export function StepPropertyInfo({
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <Buildings className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "اسم الكمبوند أو المشروع السكني" : "Masterplan / Compound"}</span>
+            <span>{isRTL ? "اسم الكمبوند أو المنطقة السكنية" : "Masterplan / Compound"}</span>
           </label>
           <input
             type="text"
@@ -125,7 +125,7 @@ export function StepPropertyInfo({
             onChange={(e) => updateField("compound", e.target.value)}
             placeholder={
               isRTL
-                ? "مثال: بالم هيلز، قطامية ديونز، مراسي..."
+                ? "مثال: بالم هيلز، قطامية ديونز، مراسي، ميفيدا..."
                 : "e.g. Palm Hills Golf, Katameya Dunes, Marassi..."
             }
             className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
@@ -149,7 +149,7 @@ export function StepPropertyInfo({
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <MapPin className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "المدينة / المنطقة في مصر (اختر من القائمة) *" : "City / District in Egypt (Select from list) *"}</span>
+            <span>{isRTL ? "المدينة / المنطقة في مصر (اختار من القائمة) *" : "City / District in Egypt (Select from list) *"}</span>
           </label>
           <div className="flex gap-2">
             <select
@@ -166,7 +166,7 @@ export function StepPropertyInfo({
               className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] cursor-pointer"
             >
               <option value="" disabled>
-                {isRTL ? "-- اختر المدينة أو المنطقة --" : "-- Select Egyptian City or Region --"}
+                {isRTL ? "-- اختار المدينة أو المنطقة --" : "-- Select Egyptian City or Region --"}
               </option>
               {PRESET_CITIES.map((c) => (
                 <option key={c.en} value={isRTL ? c.ar : c.en}>
@@ -174,7 +174,7 @@ export function StepPropertyInfo({
                 </option>
               ))}
               <option value="custom">
-                {isRTL ? "منطقة أخرى (كتابة مخصصة)..." : "Other District (Type custom)..."}
+                {isRTL ? "منطقة تانية (اكتبها بنفسك)..." : "Other District (Type custom)..."}
               </option>
             </select>
           </div>
@@ -188,7 +188,7 @@ export function StepPropertyInfo({
             />
           )}
           <span className="text-[#78716C] text-[10px] font-normal">
-            {isRTL ? "يحدد فريق الإشراف الهندسي الميداني الأقرب" : "Calibrates field engineering logistical dispatch in Egypt"}
+            {isRTL ? "عشان نوجه أقرب مهندس إشراف للموقع بتاعك" : "Calibrates field engineering logistical dispatch in Egypt"}
           </span>
         </div>
 
@@ -196,7 +196,7 @@ export function StepPropertyInfo({
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <Gauge className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "المساحة الإجمالية (متر مربع) *" : "Gross Area (m²) *"}</span>
+            <span>{isRTL ? "المساحة الإجمالية (بالمتر المربع) *" : "Gross Area (m²) *"}</span>
           </label>
           <div className="relative">
             <input
@@ -214,7 +214,7 @@ export function StepPropertyInfo({
           </div>
           <span className="text-[#78716C] text-[10px] font-normal">
             {isRTL
-              ? "مساحة تقريبية، سيتم إجراء مسح ليزري دقيق ثلاثي الأبعاد لاحقاً"
+              ? "مساحة تقريبية، والمهندس هيعمل رفع مساحي ليزر دقيق لما يعاين"
               : "Approximate footprint; 3D laser survey will verify exact dimensions"}
           </span>
         </div>
@@ -223,7 +223,7 @@ export function StepPropertyInfo({
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <Stack className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "عدد الأدوار / الطوابق" : "Levels / Floors"}</span>
+            <span>{isRTL ? "عدد الأدوار" : "Levels / Floors"}</span>
           </label>
           <div className="grid grid-cols-4 gap-2">
             {[1, 2, 3, 4].map((fl) => (
@@ -249,7 +249,7 @@ export function StepPropertyInfo({
       <div className="flex flex-col gap-3">
         <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
           <Wrench className="w-3.5 h-3.5 text-[#B88460]" />
-          <span>{isRTL ? "الحالة الإنشائية الحالية للموقع" : "Current Property Condition"}</span>
+          <span>{isRTL ? "حالة العقار حالياً إيه؟" : "Current Property Condition"}</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           {PROPERTY_CONDITIONS.map((cond) => {
@@ -286,7 +286,7 @@ export function StepPropertyInfo({
       <div className="flex flex-col gap-2">
         <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
           <ShieldCheck className="w-3.5 h-3.5 text-[#B88460]" />
-          <span>{isRTL ? "تصاريح الدخول وملاحظات الوصول للموقع" : "Site Accessibility & Gate Passes"}</span>
+          <span>{isRTL ? "ملاحظات دخول الموقع وتصاريح الكمبوند" : "Site Accessibility & Gate Passes"}</span>
         </label>
         <textarea
           rows={2}
@@ -294,7 +294,7 @@ export function StepPropertyInfo({
           onChange={(e) => updateField("accessibilityNotes", e.target.value)}
           placeholder={
             isRTL
-              ? "ملاحظات الدخول: مثل وجود مصعد خدمي، مواعيد العمل المسموح بها في الكمبوند، أو متطلبات بوابة الأمن..."
+              ? "مثلاً: مواعيد العمل في الكمبوند، تصاريح أمن البوابة، أو وجود أسانسير خدمات..."
               : "e.g., Service elevator access available, compound permits construction between 8 AM - 5 PM..."
           }
           className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none"

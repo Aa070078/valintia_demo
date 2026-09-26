@@ -124,7 +124,7 @@ export function CitySelect({
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={
-              placeholder || (isRTL ? "أدخل اسم المدينة..." : "Enter city name...")
+              placeholder || (isRTL ? "اكتب اسم مدينتك..." : "Enter city name...")
             }
             className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#B88460] bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
           />
@@ -134,7 +134,7 @@ export function CitySelect({
               setIsCustomMode(false);
               setIsOpen(true);
             }}
-            title={isRTL ? "العودة للقائمة" : "Choose from list"}
+            title={isRTL ? "ارجع للقائمة" : "Choose from list"}
             className="px-2.5 py-2.5 rounded-xl border border-border bg-card text-[#78716C] hover:text-[#1C1917] hover:border-[#B88460] text-xs transition-colors cursor-pointer"
           >
             <CaretDown size={14} />
@@ -159,7 +159,7 @@ export function CitySelect({
                 : matchedCity.nameEn
               : value ||
                 placeholder ||
-                (isRTL ? "اختر المدينة..." : "Select city...")}
+                (isRTL ? "اختار المدينة..." : "Select city...")}
           </span>
           <CaretDown
             size={14}
@@ -194,7 +194,7 @@ export function CitySelect({
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={isRTL ? "بحث عن مدينة..." : "Search city..."}
+                placeholder={isRTL ? "دور على مدينتك..." : "Search city..."}
                 className={cn(
                   "w-full py-1.5 text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460]",
                   isRTL ? "pr-8 pl-7 text-right" : "pl-8 pr-7 text-left"
@@ -258,7 +258,7 @@ export function CitySelect({
 
             {filteredCities.length === 0 && (
               <div className="py-4 text-center text-xs text-[#78716C]">
-                {isRTL ? "لم يتم العثور على مدينة مطابقة" : "No matching cities"}
+                {isRTL ? "ملقناش مدينة بالاسم ده" : "No matching cities"}
               </div>
             )}
           </div>
@@ -272,7 +272,7 @@ export function CitySelect({
             >
               <PencilSimple size={13} className="text-[#B88460]" />
               <span>
-                {isRTL ? "مدينة أخرى (كتابة يدوية)..." : "Other city (Custom type)..."}
+                {isRTL ? "مدينة تانية (اكتبها بإيدك)..." : "Other city (Custom type)..."}
               </span>
             </button>
           </div>

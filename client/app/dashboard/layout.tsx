@@ -45,7 +45,7 @@ export default function DashboardLayout({
         </div>
         <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#503C2C]">
           <CircleNotch className="w-3.5 h-3.5 animate-spin" />
-          <span>{isRTL ? "جارٍ التحقق من صلاحيات الأتيليه..." : "Verifying Operations Security Token..."}</span>
+          <span>{isRTL ? "ثواني بنتحقق من صلاحيات الدخول..." : "Verifying Operations Security Token..."}</span>
         </div>
       </div>
     );
@@ -58,11 +58,11 @@ export default function DashboardLayout({
           <Lock className="w-6 h-6" />
         </div>
         <h2 className="font-serif text-2xl font-normal mb-2">
-          {isRTL ? "تسجيل الدخول مطلوب" : "Operations Desk Access Required"}
+          {isRTL ? "لازم تسجل دخول الأول" : "Operations Desk Access Required"}
         </h2>
         <p className="text-xs text-[#6B635B] mb-4">
           {isRTL
-            ? "لا يمكن الوصول إلى لوحات تحكم الإشراف الهندسي والإدارة دون تسجيل الدخول. جارٍ توجيهك..."
+            ? "الصفحة دي مخصصة لمهندسي وإدارة فالنتيا، لازم تسجل دخولك الأول. بنحولك دلوقتي..."
             : "Staff credentials required to access the fit-out operations desk. Redirecting..."}
         </p>
       </div>
@@ -75,37 +75,37 @@ export default function DashboardLayout({
   > = {
     PROJECT_MANAGER: {
       label: "PM Desk",
-      labelAr: "إدارة المشاريع",
+      labelAr: "مدير المشاريع",
       icon: <UserGear className="w-4 h-4" />,
       path: "/dashboard/pm",
     },
     ENGINEER: {
       label: "Lead Architect & Site Engineer",
-      labelAr: "الإشراف الهندسي الميداني",
+      labelAr: "مهندس الموقع",
       icon: <Compass className="w-4 h-4" />,
       path: "/dashboard/engineer",
     },
     ADMINISTRATOR: {
       label: "System Admin",
-      labelAr: "إدارة النظام والرقابة",
+      labelAr: "لوحة الأدمن",
       icon: <ShieldCheck className="w-4 h-4" />,
       path: "/dashboard/admin",
     },
     ADMIN: {
       label: "System Admin",
-      labelAr: "إدارة النظام والرقابة",
+      labelAr: "لوحة الأدمن",
       icon: <ShieldCheck className="w-4 h-4" />,
       path: "/dashboard/admin",
     },
     COMPANY_OWNER: {
       label: "Company Owner",
-      labelAr: "الإدارة التنفيذية",
+      labelAr: "صاحب الشركة",
       icon: <Crown className="w-4 h-4" />,
       path: "/dashboard/admin",
     },
     CUSTOMER: {
       label: "Customer Client",
-      labelAr: "بوابة العميل",
+      labelAr: "حساب العميل",
       icon: <Buildings className="w-4 h-4" />,
       path: "/projects",
     },
@@ -133,7 +133,7 @@ export default function DashboardLayout({
                 VALENTIA
               </span>
               <span className="block text-[9px] font-mono tracking-wider text-muted-foreground uppercase">
-                {isRTL ? "مكتب العمليات والإشراف الميداني" : "Operations & Fit-Out Desk"}
+                {isRTL ? "فريق التشطيب وإدارة المواقع" : "Operations & Fit-Out Desk"}
               </span>
             </div>
           </Link>
@@ -179,7 +179,7 @@ export default function DashboardLayout({
             className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs text-foreground shadow-2xs hover:bg-secondary transition-colors"
           >
             <SquaresFour className="w-3.5 h-3.5" />
-            <span>{isRTL ? "بوابة العملاء" : "Client Portal"}</span>
+            <span>{isRTL ? "صفحة العملاء" : "Client Portal"}</span>
           </Link>
 
           {/* Language Switcher */}

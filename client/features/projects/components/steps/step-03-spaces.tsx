@@ -96,11 +96,11 @@ export function StepSpaces({
     .reduce((acc, curr) => acc + (curr.quantity || 1), 0);
 
   const categories = [
-    { id: "all", labelEn: "All Spaces", labelAr: "جميع الفراغات", icon: SquaresFour },
-    { id: "living", labelEn: "Reception & Living", labelAr: "الاستقبال والمعيشة", icon: Armchair },
-    { id: "suites", labelEn: "Suites & Bedrooms", labelAr: "الأجنحة والغرف", icon: Bed },
-    { id: "culinary", labelEn: "Kitchen & Dining", labelAr: "المطبخ والطعام", icon: CookingPot },
-    { id: "outdoor", labelEn: "Terrace & Outdoor", labelAr: "المساحات الخارجية", icon: Sun },
+    { id: "all", labelEn: "All Spaces", labelAr: "كل المساحات", icon: SquaresFour },
+    { id: "living", labelEn: "Reception & Living", labelAr: "الريسبشن والمعيشة", icon: Armchair },
+    { id: "suites", labelEn: "Suites & Bedrooms", labelAr: "غرف النوم والأجنحة", icon: Bed },
+    { id: "culinary", labelEn: "Kitchen & Dining", labelAr: "المطبخ والسفرة", icon: CookingPot },
+    { id: "outdoor", labelEn: "Terrace & Outdoor", labelAr: "التراس والمساحات الخارجية", icon: Sun },
   ];
 
   const filteredCuratedSpaces = CURATED_SPACES.filter((space) => {
@@ -122,15 +122,15 @@ export function StepSpaces({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٣ — ٠٦ • الفراغات المعمارية" : "03 — 06 SELECT SPACES"}
+            {isRTL ? "الخطوة الثالثة • الغرف والمساحات" : "03 — 06 SELECT SPACES"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "ما الفراغات التي تود إدراجها؟" : "Which spaces would you like to include?"}
+          {isRTL ? "إيه الغرف والمساحات اللي حابب تضيفها؟" : "Which spaces would you like to include?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "حدد الفراغات والغرف الخاصة بمشروعك، مع إمكانية تعديل أعداد الغرف أو إضافة مساحات مخصصة."
+            ? "حدد الغرف والمساحات اللي عاوز تشطبها في بيتك، وتقدر تزود أو تقلل عدد الغرف، أو تضيف أي غرفة تانية على ذوقك."
             : "Select the spaces for your project. You can calibrate counts, add custom rooms, or assign specific styles."}
         </p>
       </div>
@@ -140,16 +140,16 @@ export function StepSpaces({
         <div className="flex items-center gap-6 sm:gap-8">
           <div>
             <span className="text-[10px] font-mono uppercase tracking-wider text-[#78716C] block">
-              {isRTL ? "الفراغات المحددة" : "Active Spaces"}
+              {isRTL ? "الغرف المختارة" : "Active Spaces"}
             </span>
             <div className="text-base sm:text-lg font-medium text-[#1C1917] mt-0.5">
-              {totalSelectedRooms} {isRTL ? "غرفة / منطقة" : "Rooms Selected"}
+              {totalSelectedRooms} {isRTL ? "غرفة" : "Rooms Selected"}
             </div>
           </div>
           <div className="h-8 w-px bg-border/80" />
           <div>
             <span className="text-[10px] font-mono uppercase tracking-wider text-[#78716C] block">
-              {isRTL ? "المساحة من بيانات العقار" : "Gross Footprint"}
+              {isRTL ? "المساحة الكلية للعقار" : "Gross Footprint"}
             </span>
             <div className="text-base sm:text-lg font-medium text-[#1C1917] mt-0.5">
               {areaSqm || 480} {isRTL ? "متر مربع" : "m² Area"}
@@ -159,7 +159,7 @@ export function StepSpaces({
 
         <div className="inline-flex items-center gap-2 rounded-full border border-[#D8C8B4] bg-[#FAF7F2] px-3.5 py-1.5 text-xs text-[#503C2C] shadow-2xs">
           <Sparkle size={13} weight="fill" className="text-[#B88460]" />
-          <span className="font-normal">{isRTL ? "توزيع مساحي متوازن ومدروس" : "Optimal Spatial Distribution"}</span>
+          <span className="font-normal">{isRTL ? "توزيع مدروس للمساحات" : "Optimal Spatial Distribution"}</span>
         </div>
       </div>
 
@@ -274,14 +274,14 @@ export function StepSpaces({
                     </div>
                   ) : (
                     <span className="text-[11px] font-mono text-[#A8A29E] px-1 select-none">
-                      {isRTL ? "غير مدرج" : "Qty: 0"}
+                      {isRTL ? "مش مضافة" : "Qty: 0"}
                     </span>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-[#78716C] font-normal select-none">
-                    {isIncluded ? (isRTL ? "مدرج" : "Included") : (isRTL ? "استبعاد" : "Excluded")}
+                    {isIncluded ? (isRTL ? "مضافة للتشطيب" : "Included") : (isRTL ? "مش مضافة" : "Excluded")}
                   </span>
                   <Switch
                     checked={isIncluded}
@@ -310,7 +310,7 @@ export function StepSpaces({
                     {custom.customName}
                   </h4>
                   <span className="text-[#78716C] text-[11px] font-normal mt-0.5 block">
-                    {isRTL ? "فراغ معماري مخصص" : "Bespoke Space"}
+                    {isRTL ? "غرفة خاصة" : "Bespoke Space"}
                   </span>
                 </div>
               </div>
@@ -350,14 +350,14 @@ export function StepSpaces({
                     </div>
                   ) : (
                     <span className="text-[11px] font-mono text-[#A8A29E] px-1 select-none">
-                      {isRTL ? "غير مدرج" : "Qty: 0"}
+                      {isRTL ? "مش مضافة" : "Qty: 0"}
                     </span>
                   )}
                 </div>
 
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-[#78716C] font-normal select-none">
-                    {custom.included ? (isRTL ? "مدرج" : "Included") : (isRTL ? "استبعاد" : "Excluded")}
+                    {custom.included ? (isRTL ? "مضافة للتشطيب" : "Included") : (isRTL ? "مش مضافة" : "Excluded")}
                   </span>
                   <Switch
                     checked={custom.included}
@@ -383,7 +383,7 @@ export function StepSpaces({
           }}
           placeholder={
             isRTL
-              ? "إضافة فراغ مخصص (مثل: غرفة سينما، سبا منزلي، مجلس عربي، ركن قراءة، جيم)..."
+              ? "عاوز تضيف غرفة تانية؟ (مثلاً: غرفة سينما، جيم، دريسنج إضافي، أوفيس، غرفة مربية)..."
               : "Add custom space (e.g. Home Cinema, Private Spa, Library Study, Gym)..."
           }
           className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460] text-xs font-normal"
@@ -394,7 +394,7 @@ export function StepSpaces({
           className="flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors cursor-pointer shrink-0 shadow-2xs text-xs font-normal"
         >
           <Plus size={14} weight="bold" />
-          <span>{isRTL ? "إضافة الفراغ للمشروع" : "Add Space to Scope"}</span>
+          <span>{isRTL ? "إضافة الغرفة" : "Add Space to Scope"}</span>
         </button>
       </div>
     </div>

@@ -41,17 +41,17 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 
 const FUNNEL_STEPS = [
-  { id: 1, code: "01", labelKey: "lifecycle.step_property", defaultEn: "Typology", defaultAr: "النمط المعماري" },
+  { id: 1, code: "01", labelKey: "lifecycle.step_property", defaultEn: "Typology", defaultAr: "نوع العقار" },
   { id: 2, code: "02", labelKey: "lifecycle.step_property_info", defaultEn: "Property Specs", defaultAr: "بيانات وموقع العقار" },
-  { id: 3, code: "03", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الفراغات المعمارية" },
-  { id: 4, code: "04", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الطراز والمواد" },
-  { id: 5, code: "05", labelKey: "lifecycle.step_location", defaultEn: "Your Location", defaultAr: "موقع الإقامة" },
-  { id: 6, code: "06", labelKey: "lifecycle.step_representative", defaultEn: "Representative", defaultAr: "الممثل بمصر" },
-  { id: 7, code: "07", labelKey: "lifecycle.step_scope", defaultEn: "Scope of Work", defaultAr: "نطاق العمل" },
+  { id: 3, code: "03", labelKey: "lifecycle.step_spaces", defaultEn: "Spaces", defaultAr: "الغرف والمساحات" },
+  { id: 4, code: "04", labelKey: "lifecycle.step_style", defaultEn: "Style & Mood", defaultAr: "الستايل والخامات" },
+  { id: 5, code: "05", labelKey: "lifecycle.step_location", defaultEn: "Your Location", defaultAr: "مكان إقامتك" },
+  { id: 6, code: "06", labelKey: "lifecycle.step_representative", defaultEn: "Representative", defaultAr: "النائب بمصر" },
+  { id: 7, code: "07", labelKey: "lifecycle.step_scope", defaultEn: "Scope of Work", defaultAr: "حجم التشطيب" },
   { id: 8, code: "08", labelKey: "lifecycle.step_budget", defaultEn: "Budget", defaultAr: "الميزانية" },
-  { id: 9, code: "09", labelKey: "lifecycle.step_timeline", defaultEn: "Timeline", defaultAr: "الموعد المستهدف" },
-  { id: 10, code: "10", labelKey: "lifecycle.step_drawings", defaultEn: "Drawings", defaultAr: "المخططات" },
-  { id: 11, code: "11", labelKey: "lifecycle.step_review", defaultEn: "Review & Submit", defaultAr: "المراجعة والاعتماد" },
+  { id: 9, code: "09", labelKey: "lifecycle.step_timeline", defaultEn: "Timeline", defaultAr: "ميعاد التسليم" },
+  { id: 10, code: "10", labelKey: "lifecycle.step_drawings", defaultEn: "Drawings", defaultAr: "الرسومات" },
+  { id: 11, code: "11", labelKey: "lifecycle.step_review", defaultEn: "Review & Submit", defaultAr: "مراجعة وتأكيد" },
 ];
 
 function CreateProjectContent() {

@@ -70,13 +70,13 @@ function SignupForm() {
         };
       case 3:
         return {
-          text: isRTL ? "جيدة" : "Good",
+          text: isRTL ? "كويسة" : "Good",
           color: "text-blue-600 bg-blue-100",
         };
       case 4:
       default:
         return {
-          text: isRTL ? "قوية جداً" : "Ultra Secure",
+          text: isRTL ? "قوية جداً ومحمية" : "Ultra Secure",
           color: "text-emerald-700 bg-emerald-100",
         };
     }
@@ -87,7 +87,7 @@ function SignupForm() {
     if (!username.trim() || !password) {
       setError(
         isRTL
-          ? "يرجى ملء جميع الحقول المطلوبة."
+          ? "من فضلك املأ كل البيانات المطلوبة."
           : "Please complete all required credentials."
       );
       return;
@@ -96,7 +96,7 @@ function SignupForm() {
     if (password !== confirmPassword) {
       setError(
         isRTL
-          ? "كلمتا المرور غير متطابقتين."
+          ? "كلمتي السر مش متطابقتين. اتأكد من كتابتهم صح."
           : "Passwords do not match. Please re-enter."
       );
       return;
@@ -105,7 +105,7 @@ function SignupForm() {
     if (password.length < 8) {
       setError(
         isRTL
-          ? "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل."
+          ? "كلمة السر لازم تكون ٨ حروف أو أرقام على الأقل."
           : "Password must be at least 8 characters long."
       );
       return;
@@ -114,7 +114,7 @@ function SignupForm() {
     if (!agreeTerms) {
       setError(
         isRTL
-          ? "يرجى الموافقة على شروط الخدمة وسياسة الخصوصية."
+          ? "من فضلك وافق على شروط الخدمة وسياسة الخصوصية للمتابعة."
           : "Please agree to the terms and privacy policy to continue."
       );
       return;
@@ -146,7 +146,7 @@ function SignupForm() {
       console.error("Signup failed:", err);
       setError(
         isRTL
-          ? "تعذر إنشاء الحساب. اسم المستخدم قد يكون مستخدماً بالفعل."
+          ? "مقدرناش ننشئ الحساب دلوقتي، اسم المستخدم أو الإيميل ده مسجل قبل كده."
           : "Account registration could not be completed. The username may already exist."
       );
     } finally {
@@ -206,7 +206,7 @@ function SignupForm() {
                 VALENTIA
               </span>
               <span className="block text-[10px] tracking-[0.2em] text-[#FAF7F2]/60 uppercase">
-                {isRTL ? "أتيليه التصميم والتنفيذ" : "Design & Build Atelier"}
+                {isRTL ? "أتيليه التصميم والتشطيب المتكامل" : "Design & Build Atelier"}
               </span>
             </div>
           </div>
@@ -220,12 +220,12 @@ function SignupForm() {
           >
             <div className="flex items-center gap-2 mb-4 text-[#B88460] text-xs uppercase tracking-widest font-mono">
               <Sparkle className="w-3.5 h-3.5" weight="fill" />
-              <span>{isRTL ? "مزايا حساب العميل" : "ATELIER PRIVILEGES"}</span>
+              <span>{isRTL ? "مميزات حسابك معانا" : "ATELIER PRIVILEGES"}</span>
             </div>
 
             <h3 className="font-serif text-2xl font-normal text-[#FAF7F2] mb-6">
               {isRTL
-                ? "تجربة تنفيذ حصرية ترقى إلى تطلعاتك"
+                ? "تجربة تشطيب راقية ومريحة تليق ببيتك"
                 : "A Bespoke Fit-Out Experience Crafted Around You"}
             </h3>
 
@@ -236,11 +236,11 @@ function SignupForm() {
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-[#FAF7F2]">
-                    {isRTL ? "مخططات وتصميمات أيزومترية تفاعلية" : "Interactive 3D Axonometrics"}
+                    {isRTL ? "رسومات ومخططات أيزومترية تفاعلية لكل فراغ" : "Interactive 3D Axonometrics"}
                   </span>
                   <span className="text-[11px] text-[#FAF7F2]/60 leading-relaxed block">
                     {isRTL
-                      ? "رؤية ثلاثية الأبعاد لكل غرفة مع اختيار المواد والتشطيبات بدقة متناهية."
+                      ? "هتشوف كل ركن في بيتك مجسم وموضح عليه كل خامة وتشطيب بالتفصيل."
                       : "Explore room layouts with pinpoint material callouts and finish specifications."}
                   </span>
                 </div>
@@ -252,11 +252,11 @@ function SignupForm() {
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-[#FAF7F2]">
-                    {isRTL ? "شفافية مطلقة في جدول الكميات (BOQ)" : "100% Itemized BOQ Transparency"}
+                    {isRTL ? "شفافية كاملة في المقايسة والبنود (BOQ)" : "100% Itemized BOQ Transparency"}
                   </span>
                   <span className="text-[11px] text-[#FAF7F2]/60 leading-relaxed block">
                     {isRTL
-                      ? "تسعير دقيق وواضح لكل بند ومتر تشطيب دون أي تكاليف خفية."
+                      ? "تسعير واضح ومفصل لكل بند ومتر في شقتك أو فيلتك من غير أي مصاريف مستخبية."
                       : "Fixed-rate pricing and itemized breakdown with zero hidden surprises."}
                   </span>
                 </div>
@@ -268,11 +268,11 @@ function SignupForm() {
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-[#FAF7F2]">
-                    {isRTL ? "متابعة أسبوعية مباشرة من مهندس الموقع" : "Weekly Site Architect Reports"}
+                    {isRTL ? "متابعة أسبوعية مباشرة مع مهندس الموقع" : "Weekly Site Architect Reports"}
                   </span>
                   <span className="text-[11px] text-[#FAF7F2]/60 leading-relaxed block">
                     {isRTL
-                      ? "تقارير صور فوتوغرافية ومخطط زمني حي لنسبة الإنجاز حتى التسليم."
+                      ? "صور وتقارير حية أول بأول توضح نسبة إنجاز كل مرحلة لحد الاستلام على المفتاح."
                       : "Direct photo updates and milestone telemetry directly on your dashboard."}
                   </span>
                 </div>
@@ -287,7 +287,7 @@ function SignupForm() {
             <ShieldCheck className="w-4 h-4 text-emerald-400" weight="fill" />
             <span>
               {isRTL
-                ? "خصوصية بياناتك وسرية عقودك مضمونة بنسبة 100%"
+                ? "بياناتك وتفاصيل بيتك في أمان تام وبأعلى درجات الخصوصية."
                 : "100% Privacy Guaranteed & NDA Protected"}
             </span>
           </div>
@@ -302,14 +302,14 @@ function SignupForm() {
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DFD3C1]/50 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
               <Sparkle className="w-3 h-3 text-[#B88460]" />
-              <span>{isRTL ? "فتح ملف مشروع جديد" : "COMMISSION REGISTRATION"}</span>
+              <span>{isRTL ? "حساب عميل جديد" : "COMMISSION REGISTRATION"}</span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal tracking-tight">
-              {isRTL ? "إنشاء حساب في فالنتيا" : "Create Atelier Account"}
+              {isRTL ? "اعمل حسابك في فالنتيا" : "Create Atelier Account"}
             </h1>
             <p className="mt-2 text-sm text-[#6B635B] leading-relaxed">
               {isRTL
-                ? "سجّل بياناتك لبدء تخطيط وتنفيذ مساحتك السكنية الفاخرة."
+                ? "سجل بياناتك عشان تبدأ تخطط وتشطب بيتك الجديد بأرقى مستوى."
                 : "Register to begin your bespoke residential fit-out commission."}
             </p>
           </div>
@@ -330,7 +330,7 @@ function SignupForm() {
                 htmlFor="fullname"
                 className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
               >
-                {isRTL ? "الاسم الكامل" : "Full Name"}
+                {isRTL ? "الاسم بالكامل" : "Full Name"}
               </label>
               <div className="relative">
                 <input
@@ -354,7 +354,7 @@ function SignupForm() {
                 htmlFor="username"
                 className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
               >
-                {isRTL ? "البريد الإلكتروني / اسم المستخدم" : "Email or Username"}
+                {isRTL ? "الإيميل أو اسم المستخدم" : "Email or Username"}
               </label>
               <div className="relative">
                 <input
@@ -376,7 +376,7 @@ function SignupForm() {
             {/* Phone with Country Dial Code */}
             <div>
               <label className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5">
-                {isRTL ? "رقم الهاتف للتواصل" : "Phone Number"}
+                {isRTL ? "رقم الموبايل (واتساب / اتصال)" : "Phone Number"}
               </label>
               <PhoneInputWithCountry
                 phone={phone}
@@ -394,7 +394,7 @@ function SignupForm() {
                   htmlFor="password"
                   className="block text-xs uppercase tracking-wider font-medium text-[#503C2C]"
                 >
-                  {isRTL ? "كلمة المرور" : "Password"}
+                  {isRTL ? "كلمة السر" : "Password"}
                 </label>
                 {password && (
                   <span
@@ -461,7 +461,7 @@ function SignupForm() {
                 htmlFor="confirm-password"
                 className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
               >
-                {isRTL ? "تأكيد كلمة المرور" : "Confirm Password"}
+                {isRTL ? "أكّد كلمة السر" : "Confirm Password"}
               </label>
               <div className="relative">
                 <input
@@ -493,9 +493,9 @@ function SignupForm() {
                 <span className="text-xs text-[#6B635B] leading-relaxed">
                   {isRTL ? (
                     <>
-                      أوافق على{" "}
-                      <span className="text-[#1C1917] underline">شروط تقديم الخدمة</span> و
-                      <span className="text-[#1C1917] underline"> سياسة الخصوصية وسرية التصاميم</span>.
+                      موافق على{" "}
+                      <span className="text-[#1C1917] underline">شروط الخدمة</span> و
+                      <span className="text-[#1C1917] underline"> سياسة الخصوصية وسرية التصميمات الهندسية</span>.
                     </>
                   ) : (
                     <>
@@ -517,13 +517,13 @@ function SignupForm() {
               {isSubmitting || isLoading ? (
                 <>
                   <CircleNotch className="w-4 h-4 animate-spin" />
-                  <span>{isRTL ? "جارٍ تسجيل الحساب..." : "Creating Account..."}</span>
+                  <span>{isRTL ? "ثواني بنسجل حسابك..." : "Creating Account..."}</span>
                 </>
               ) : (
                 <>
                   <span>
                     {isRTL
-                      ? "إنشاء الحساب وبدء المشروع"
+                      ? "إنشاء الحساب وبدء تشطيب بيتي ←"
                       : "Create Account & Start Commission"}
                   </span>
                   {isRTL ? (
@@ -539,7 +539,7 @@ function SignupForm() {
           {/* Switch to Login */}
           <div className="mt-8 text-center border-t border-[#D8C8B4] pt-6">
             <p className="text-xs text-[#6B635B]">
-              {isRTL ? "لديك حساب بالفعل في الأتيليه؟" : "Already an Atelier client?"}{" "}
+              {isRTL ? "عندك حساب بالفعل في فالنتيا؟" : "Already an Atelier client?"}{" "}
               <Link
                 href={
                   redirectParam
@@ -548,7 +548,7 @@ function SignupForm() {
                 }
                 className="font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors"
               >
-                {isRTL ? "تسجيل الدخول" : "Sign in here"}
+                {isRTL ? "سجل دخولك هنا" : "Sign in here"}
               </Link>
             </p>
           </div>

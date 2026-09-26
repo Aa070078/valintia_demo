@@ -15,49 +15,49 @@ const SCOPE_OPTIONS = [
   {
     id: "full_fitout",
     titleEn: "Turnkey Design & Build (Full Fit-Out)",
-    titleAr: "تصميم وتنفيذ متكامل (تسليم مفتاح)",
+    titleAr: "تشطيب كامل وتصميم (استلام على المفتاح)",
     descEn:
       "Comprehensive architectural design, MEP rough-ins, bespoke joinery, finishes, and turnkey handover.",
     descAr:
-      "تصميم معماري وديكور كامل، أعمال كهروميكانيكية، تجاليد وتشطيبات مخصصة، وتسليم نهائي بالمفتاح.",
+      "تصميم معماري وديكور 3D، تأسيس كهرباء وسباكة، نجارة وتجاليد خشب، وتشطيب فاخر متكامل وتسليم على المفتاح.",
     badgeEn: "Most Requested",
-    badgeAr: "الأكثر طلباً",
+    badgeAr: "الأكتر طلباً",
     icon: Hammer,
   },
   {
     id: "renovation",
     titleEn: "Architectural Renovation & Remodel",
-    titleAr: "تجديد وإعادة هيكلة معمارية",
+    titleAr: "تجديد وتطوير شامل للبيت",
     descEn:
       "Structural adjustments, wall reconfiguration, updated infrastructure, and luxury spatial transformation.",
     descAr:
-      "تعديلات إنشائية، إعادة تقسيم المساحات، تحديث كامل لشبكات السباكة والكهرباء، وتطوير شامل للفراغ.",
+      "تكسير وتعديل حوائط، تغيير شبكات السباكة والكهرباء بالكامل، وتجديد شامل للفراغ على أعلى مستوى.",
     badgeEn: "Structural Remodel",
-    badgeAr: "إعادة تأهيل شامل",
+    badgeAr: "تجديد كامل",
     icon: CompassTool,
   },
   {
     id: "interior_design",
     titleEn: "Interior Design & FF&E Procurement",
-    titleAr: "تصميم داخلي واختيار الأثاث والفرش",
+    titleAr: "تصميم داخلي واختيار الفرش والديكور",
     descEn:
       "3D spatial visualizations, technical design packages, lighting design, and curated furniture procurement.",
     descAr:
-      "مخططات ثلاثية الأبعاد، لوحات خامات تفصيلية، دراسات إضاءة، واختيار وتوريد الأثاث والإكسسوارات.",
+      "رسومات 3D واقعية، لوحات خامات وألوان، توزيع إضاءة مدروس، واختيار الفرش والأثاث والإكسسوارات.",
     badgeEn: "Design Package",
-    badgeAr: "حزمة تصميمية",
+    badgeAr: "تصميم وفرش",
     icon: Sparkle,
   },
   {
     id: "other",
     titleEn: "Custom Architectural Scope",
-    titleAr: "نطاق عمل مخصص",
+    titleAr: "طلب خاص أو مساحات خارجية",
     descEn:
       "Landscape and private swimming pools, facade alterations, or tailored boutique commercial spaces.",
     descAr:
-      "تنسيق حدائق ومسابح خاصة، تعديل واجهات خارجية، أو مقرات إدارية وتجارية متخصصة.",
+      "لاندسكيب وحمام سباحة، تشطيب رووف وبلكونة، تعديل واجهات، أو مكاتب ومقرات إدارية خاصة.",
     badgeEn: "Tailored",
-    badgeAr: "مخصص",
+    badgeAr: "طلب خاص",
     icon: Rows,
   },
 ];
@@ -85,15 +85,15 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٧ — ٠٦ • نطاق العمل المطلوب" : "STEP 07 · SCOPE OF WORK"}
+            {isRTL ? "الخطوة السابعة • حجم ونوع التشطيب" : "STEP 07 · SCOPE OF WORK"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "ما هو نطاق العمل المطلوب من فالنتيا؟" : "What is the desired scope of work?"}
+          {isRTL ? "إيه حجم الشغل اللي محتاجه من فالنتيا؟" : "What is the desired scope of work?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "اختر مستوى التدخل الهندسي المناسب، بدءاً من التصميم الداخلي وتوريد الأثاث حتى التنفيذ الشامل وتسليم المفتاح."
+            ? "اختار مستوى الشغل اللي يناسبك، سواء تصميم داخلي واختيار أثاث، أو تشطيب كامل من الألف للياء واستلام على المفتاح."
             : "Select the depth of involvement required from our atelier, from design-only packages through end-to-end turnkey construction."}
         </p>
       </div>
@@ -146,7 +146,7 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
       {/* Custom details / Notes */}
       <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 shadow-xs">
         <label className="text-xs font-medium text-[#503C2C]">
-          {isRTL ? "تفاصيل إضافية أو متطلبات خاصة في التنفيذ" : "Specific Custom Scope Requirements"}
+          {isRTL ? "أي طلبات أو تفاصيل تانية حابب تضيفها؟" : "Specific Custom Scope Requirements"}
         </label>
         <textarea
           rows={3}
@@ -156,7 +156,7 @@ export function StepScope({ scope, onChangeScope }: StepScopeProps) {
           }
           placeholder={
             isRTL
-              ? "مثال: نرغب في إضافة نظام سمارت هوم كامل (KNX)، وعزل صوتي لغرف النوم، وتعديل مكان المطبخ ليكون مفتوحاً على المعيشة..."
+              ? "مثلاً: عاوزين نظام سمارت هوم كامل، عزل صوت لغرف النوم، فتح المطبخ على الريسبشن، رخام مستورد..."
               : "e.g., Integrate full KNX smart home system, acoustic double walls for private quarters, open-concept kitchen island..."
           }
           className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none"

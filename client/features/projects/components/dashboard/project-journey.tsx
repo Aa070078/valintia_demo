@@ -33,9 +33,9 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
       id: "submission",
       stepNumber: "01",
       titleEn: "Commission Submitted",
-      titleAr: "اعتماد وتكليف المشروع",
+      titleAr: "تأكيد طلب المشروع",
       descEn: "Initial specifications received and undergoing atelier review.",
-      descAr: "تم استلام المواصفات وتكليف الاستوديو بالمراجعة الأولية.",
+      descAr: "استلمنا بيانات ومواصفات شقتك/فيلتك وفريق التصميم بيراجعها حالياً.",
       status: isSubmitted ? "completed" : "in_progress",
       icon: CheckCircle,
     },
@@ -43,9 +43,9 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
       id: "consultation",
       stepNumber: "02",
       titleEn: "Virtual Consultation",
-      titleAr: "الاستشارة الافتراضية",
+      titleAr: "مكالمة الاستشارة أونلاين",
       descEn: "Video sync with lead architect to align vision and materials.",
-      descAr: "جلسة فيديو مباشرة مع كبير المعماريين لمناقشة الرؤية والمواد.",
+      descAr: "ميتينج فيديو مع رئيس المهندسين عشان نفهم ذوقك ونظبط تفاصيل التصميم والخامات.",
       status: isSubmitted ? "in_progress" : "upcoming",
       scheduledDate: isSubmitted ? "Estimated: Within 48 Hours" : undefined,
       icon: CalendarCheck,
@@ -54,9 +54,9 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
       id: "site_visit",
       stepNumber: "03",
       titleEn: "3D Lidar Site Survey",
-      titleAr: "المعاينة والمسح الليزري",
+      titleAr: "معاينة ورفع مقاسات الموقع",
       descEn: "Engineering team inspects site and executes 3D point-cloud scan.",
-      descAr: "فريق المسح الميداني يزور العقار لإجراء الرفع الليزري ثلاثي الأبعاد.",
+      descAr: "فريق الهندسة هينزل الموقع يرفع المقاسات بالمللي بماسحات الليزر ثلاثية الأبعاد.",
       status: "upcoming",
       icon: ShieldCheck,
     },
@@ -64,9 +64,9 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
       id: "design_concept",
       stepNumber: "04",
       titleEn: "Concept & 3D Renders",
-      titleAr: "التصميم والرندرات ثلاثية الأبعاد",
+      titleAr: "التصميمات والريندرات 3D",
       descEn: "Bespoke spatial design, moodboards, and VR walkthrough.",
-      descAr: "إعداد المخططات المعمارية، لوحات الخامات، وجولة الواقع الافتراضي.",
+      descAr: "هنجهز لك تصميمات البيت كاملة ثلاثية الأبعاد مع لوحات الخامات وجولة افتراضية.",
       status: "upcoming",
       icon: Sparkle,
     },
@@ -74,9 +74,9 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
       id: "boq_execution",
       stepNumber: "05",
       titleEn: "Turnkey BOQ & Build",
-      titleAr: "جدول الكميات والتنفيذ",
+      titleAr: "المقايسة (BOQ) وبدء التشطيب",
       descEn: "Itemized material pricing, contracts, and on-site fit-out.",
-      descAr: "تسعير تفصيلي لبنود الأعمال، توقيع التعاقد، وبدء التنفيذ الميداني.",
+      descAr: "جدول كميات مفصل بالأسعار، توقيع العقد، والنزول فوراً لبدء أعمال التشطيب والتسليم على المفتاح.",
       status: "upcoming",
       icon: Hammer,
     },
@@ -97,7 +97,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "خارطة طريق المشروع" : "COMMISSION ROADMAP"}
+            {isRTL ? "خطوات تنفيذ مشروعك" : "COMMISSION ROADMAP"}
           </div>
           <h3
             className={cn(
@@ -105,7 +105,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
               isRTL ? "font-sans text-2xl sm:text-3xl font-bold leading-tight" : "font-serif text-2xl sm:text-3xl font-normal"
             )}
           >
-            {isRTL ? "مراحل تطور مشروعك المعماري" : "Your Project Journey"}
+            {isRTL ? "مراحل تطور وتشطيب بيتك" : "Your Project Journey"}
           </h3>
         </div>
         <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
               isRTL ? "text-xs font-bold" : "text-xs font-mono font-medium"
             )}
           >
-            {isRTL ? "مرحلة الدراسة الأولية" : "Initial Review Stage"}
+            {isRTL ? "مرحلة المراجعة الأولية" : "Initial Review Stage"}
           </span>
         </div>
       </div>
@@ -198,7 +198,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
                     )}
                   >
                     <CheckCircle weight="fill" className="w-3.5 h-3.5 text-[#B88460]" />
-                    <span>{isRTL ? "مكتمل" : "Completed"}</span>
+                    <span>{isRTL ? "خلصت" : "Completed"}</span>
                   </span>
                 )}
                 {isCurrent && (
@@ -209,7 +209,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
                     )}
                   >
                     <Clock className="w-3.5 h-3.5" />
-                    <span>{stage.scheduledDate || (isRTL ? "جاري التنسيق" : "Active Stage")}</span>
+                    <span>{stage.scheduledDate || (isRTL ? "شغالين فيها" : "Active Stage")}</span>
                   </span>
                 )}
                 {!isDone && !isCurrent && (
@@ -219,7 +219,7 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
                       isRTL ? "text-xs font-medium" : "text-[10px] font-mono"
                     )}
                   >
-                    {isRTL ? "المرحلة القادمة" : "Upcoming"}
+                    {isRTL ? "المرحلة الجاية" : "Upcoming"}
                   </span>
                 )}
               </div>

@@ -141,7 +141,7 @@ export function StepReviewSubmit({
       }`;
     }
     return isRTL
-      ? "مفتوح لدراسة التكلفة وجدول الكميات"
+      ? "هتتحدد بعد المعاينة والمقايسة (BOQ)"
       : "Open for Preliminary BOQ Study";
   };
 
@@ -152,15 +152,15 @@ export function StepReviewSubmit({
     if (timeline.deadlineType === "duration" && timeline.durationDescription) {
       return timeline.durationDescription;
     }
-    return isRTL ? "جدول زمني مرن يركز على الجودة" : "Flexible Quality Horizon";
+    return isRTL ? "براحتنا ومن غير استعجال (تركيز على الجودة)" : "Flexible Quality Horizon";
   };
 
   const getConditionName = (condId?: string) => {
-    if (condId === "core_and_shell") return isRTL ? "هيكل خرساني / على المحارة" : "Core & Shell";
-    if (condId === "semi_finished") return isRTL ? "نصف تشطيب" : "Semi-Finished";
+    if (condId === "core_and_shell") return isRTL ? "على الطوب الأحمر (Core & Shell)" : "Core & Shell";
+    if (condId === "semi_finished") return isRTL ? "نص تشطيب (محارة وحلوق)" : "Semi-Finished";
     if (condId === "fully_finished") return isRTL ? "تشطيب كامل" : "Fully Finished";
-    if (condId === "renovation") return isRTL ? "تجديد وتأهيل" : "Renovation & Remodel";
-    return isRTL ? "هيكل خرساني" : "Core & Shell";
+    if (condId === "renovation") return isRTL ? "تجديد وتطوير شامل" : "Renovation & Remodel";
+    return isRTL ? "على الطوب الأحمر" : "Core & Shell";
   };
 
   return (
@@ -181,16 +181,16 @@ export function StepReviewSubmit({
               )}
             >
               {isRTL
-                ? "٠٦ — ٠٦ • ملخص التكليف والتصميم المعماري"
+                ? "الخطوة الأخيرة • مراجعة وتأكيد الطلب"
                 : "06 — 06 YOUR DESIGN BRIEF"}
             </span>
           </div>
           <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-            {isRTL ? "ملخص التصميم المعماري والتكليف" : "Here is your design brief"}
+            {isRTL ? "ملخص طلب تشطيب وتصميم بيتك" : "Here is your design brief"}
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
             {isRTL
-              ? "ملخص شامل لكافة اختياراتك ومواصفاتك المعمارية. يمكنك مراجعة وتعديل أي تفصيلة مباشرة قبل إرسال التكليف."
+              ? "ده ملخص سريع لكل اختياراتك وتفاصيل العقار. تقدر تراجع كل حاجة أو تعدل أي خطوة قبل ما تبعت الطلب."
               : "A summary of your selections. You can edit any section before we commission the atelier."}
           </p>
         </div>
@@ -220,7 +220,7 @@ export function StepReviewSubmit({
                   isRTL ? "font-sans text-[11px]" : "font-mono tracking-[0.16em]"
                 )}
               >
-                {isRTL ? "نمط العقار المعماري" : "PROPERTY TYPOLOGY"}
+                {isRTL ? "نوع العقار" : "PROPERTY TYPOLOGY"}
               </span>
               <button
                 type="button"
@@ -269,7 +269,7 @@ export function StepReviewSubmit({
                   isRTL ? "font-sans text-[11px]" : "font-mono tracking-[0.16em]"
                 )}
               >
-                {isRTL ? "مواصفات وموقع العقار" : "PROPERTY SPECS & SITE"}
+                {isRTL ? "موقع ومساحة العقار" : "PROPERTY SPECS & SITE"}
               </span>
               <button
                 type="button"
@@ -283,7 +283,7 @@ export function StepReviewSubmit({
 
             <div className="text-start mt-2 flex flex-col gap-2">
               <h3 className="text-[#1C1917] truncate font-serif text-xl sm:text-2xl font-normal">
-                {property.compound || (isRTL ? "مشروع سكني خاص" : "Private Residence")}
+                {property.compound || (isRTL ? "عقار سكني خاص" : "Private Residence")}
               </h3>
               <p className="text-xs text-[#78716C] font-normal">
                 {property.city || (isRTL ? "القاهرة الجديدة" : "New Cairo")}
@@ -294,7 +294,7 @@ export function StepReviewSubmit({
                   {property.areaSqm || 480} {isRTL ? "م²" : "m²"}
                 </span>
                 <span className="inline-flex items-center rounded-full bg-secondary/80 border border-border px-2.5 py-0.5 text-[11px] font-mono font-medium text-[#503C2C]">
-                  {property.floors || 2} {isRTL ? "طوابق" : "Levels"}
+                  {property.floors || 2} {isRTL ? "أدوار" : "Levels"}
                 </span>
                 <span className="inline-flex items-center rounded-full bg-[#EAE2D7] border border-[#D8C8B4] px-2.5 py-0.5 text-[10px] font-normal text-[#503C2C]">
                   {getConditionName(property.condition)}
@@ -319,7 +319,7 @@ export function StepReviewSubmit({
                   isRTL ? "font-sans text-[11px]" : "font-mono tracking-[0.16em]"
                 )}
               >
-                {isRTL ? "التوجه الجمالي والخامات" : "STYLE & MATERIALS"}
+                {isRTL ? "الستايل والخامات" : "STYLE & MATERIALS"}
               </span>
               <button
                 type="button"
@@ -354,12 +354,12 @@ export function StepReviewSubmit({
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#B88460]/15 border border-[#B88460]/30 px-2 py-0.5 text-[10px] font-medium text-[#503C2C]">
                       <Sparkle size={10} weight="fill" className="text-[#B88460]" />
                       <span>
-                        {perSpaceStyles.length} {isRTL ? "فراغات مخصصة" : "custom zones"}
+                        {perSpaceStyles.length} {isRTL ? "غرف بستايل خاص" : "custom zones"}
                       </span>
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 rounded-full bg-secondary/80 border border-border px-2 py-0.5 text-[10px] font-normal text-[#503C2C]">
-                      <span>{isRTL ? "طراز موحد للمسكن" : "Unified Residence"}</span>
+                      <span>{isRTL ? "ستايل موحد للبيت كله" : "Unified Residence"}</span>
                     </span>
                   )}
                 </div>
@@ -387,7 +387,7 @@ export function StepReviewSubmit({
                 isRTL ? "font-sans text-xs text-[#503C2C]" : "font-mono tracking-[0.16em]"
               )}
             >
-              {isRTL ? "الفراغات المعمارية المعتمدة" : "INCLUDED SPACES"}
+              {isRTL ? "الغرف والمساحات المختارة" : "INCLUDED SPACES"}
             </span>
             <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-[10px] font-mono font-medium text-[#503C2C]">
               {selectedRoomsCount} {isRTL ? "غرفة ومنطقة" : "zones"}
@@ -400,7 +400,7 @@ export function StepReviewSubmit({
             className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
           >
             <PencilSimple size={13} weight="bold" />
-            <span>{isRTL ? "تعديل الفراغات" : "Edit Spaces"}</span>
+            <span>{isRTL ? "تعديل الغرف" : "Edit Spaces"}</span>
           </button>
         </div>
 
@@ -470,7 +470,7 @@ export function StepReviewSubmit({
                     isRTL ? "font-sans text-[11px] text-[#503C2C]" : "font-mono tracking-[0.16em]"
                   )}
                 >
-                  {isRTL ? "معرض الإلهام والمواد" : "INSPIRATION GALLERY"}
+                  {isRTL ? "صور وأجواء الستايل" : "INSPIRATION GALLERY"}
                 </span>
               </div>
               <button
@@ -479,13 +479,13 @@ export function StepReviewSubmit({
                 className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
-                <span>{isRTL ? "استعراض المزيد" : "Explore"}</span>
+                <span>{isRTL ? "شوف باقي الصور" : "Explore"}</span>
               </button>
             </div>
 
             <p className="text-xs text-[#78716C] mb-3 text-start font-normal">
               {isRTL
-                ? "لقطات منتقاة لطرازك المعماري تعبر عن المواد، تدرجات الألوان، وتوزيع الإضاءة."
+                ? "صور مختارة للستايل اللي اخترته بتوضح الخامات، وتنسيق الألوان، وتوزيع الإضاءة."
                 : "Curated architectural renders reflecting the palette, textures, and spatial light."}
             </p>
 
@@ -522,7 +522,7 @@ export function StepReviewSubmit({
                     isRTL ? "font-sans text-[11px] text-[#503C2C]" : "font-mono tracking-[0.16em]"
                   )}
                 >
-                  {isRTL ? "ملاحظاتك المعمارية" : "YOUR NOTES & VISION"}
+                  {isRTL ? "ملاحظاتك وطلباتك للمهندس" : "YOUR NOTES & VISION"}
                 </span>
               </div>
               <button
@@ -543,7 +543,7 @@ export function StepReviewSubmit({
               ) : (
                 <p className="text-[#78716C] italic font-normal">
                   {isRTL
-                    ? "«أرغب في تصميم دافئ وحديث يعتمد على المواد الطبيعية ووفرة الإضاءة النهارية، مع تدرجات لونية هادئة وتفاصيل خشبية مدمجة.»"
+                    ? "«بحب التصميم الهادي والراقي بالخامات الطبيعية مع إضاءة شمس كافية، ألوان محايدة مع لمسات خشب ورخام فاخر.»"
                     : "“I want a warm, modern design with natural materials and a lot of light. I prefer neutral colors with integrated wooden elements and refined stone surfaces.”"}
                 </p>
               )}
@@ -551,7 +551,7 @@ export function StepReviewSubmit({
           </div>
 
           <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-[#78716C]">
-            <span className="font-normal">{isRTL ? "مرفقة مع ملف التكليف" : "Attached to atelier brief"}</span>
+            <span className="font-normal">{isRTL ? "مرفقة مع طلب مشروعك" : "Attached to atelier brief"}</span>
             <span className="font-mono text-[#B88460] font-medium">VALENTIA ATELIER</span>
           </div>
         </div>
@@ -568,7 +568,7 @@ export function StepReviewSubmit({
               isRTL ? "font-sans text-[11px] text-[#503C2C]" : "font-mono tracking-[0.16em]"
             )}
           >
-            {isRTL ? "المعايير التشغيلية والهندسية" : "TECHNICAL & OPERATIONAL PARAMETERS"}
+            {isRTL ? "بيانات التواصل والتنفيذ" : "TECHNICAL & OPERATIONAL PARAMETERS"}
           </span>
         </div>
 
@@ -579,7 +579,7 @@ export function StepReviewSubmit({
               <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <Globe size={16} className="text-[#B88460]" />
                 <span>
-                  {isRTL ? "بلد الإقامة" : "Client Base & Timezone"}
+                  {isRTL ? "مكان إقامتك حالياً" : "Client Base & Timezone"}
                 </span>
               </div>
               <button
@@ -611,7 +611,7 @@ export function StepReviewSubmit({
               <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <UserCheck size={16} className="text-[#B88460]" />
                 <span>
-                  {isRTL ? "الممثل في مصر" : "Representation in Egypt"}
+                  {isRTL ? "مين هينوب عنك في مصر" : "Representation in Egypt"}
                 </span>
               </div>
               <button
@@ -630,7 +630,7 @@ export function StepReviewSubmit({
                       : ""
                   }`
                 : isRTL
-                ? "إشراف وإدارة مباشرة من استوديو فالنتيا"
+                ? "فالنتيا تدير وتشرف على كل حاجة مباشرة"
                 : "Valentia Direct Atelier Management"}
             </div>
           </div>
@@ -641,7 +641,7 @@ export function StepReviewSubmit({
               <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <Hammer size={16} className="text-[#B88460]" />
                 <span>
-                  {isRTL ? "نطاق العمل" : "Scope"}
+                  {isRTL ? "حجم الشغل المطلوب" : "Scope"}
                 </span>
               </div>
               <button
@@ -685,7 +685,7 @@ export function StepReviewSubmit({
               <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <CalendarCheck size={16} className="text-[#B88460]" />
                 <span>
-                  {isRTL ? "الجدول الزمني" : "Target Timeline"}
+                  {isRTL ? "ميعاد الاستلام" : "Target Timeline"}
                 </span>
               </div>
               <button
@@ -707,7 +707,7 @@ export function StepReviewSubmit({
               <div className="flex items-center gap-2 text-xs font-medium text-[#503C2C]">
                 <FilePdf size={16} className="text-[#B88460]" />
                 <span>
-                  {isRTL ? "المخططات الهندسية" : "Drawings & CAD"}
+                  {isRTL ? "الرسومات والمخططات" : "Drawings & CAD"}
                 </span>
               </div>
               <button
@@ -722,7 +722,7 @@ export function StepReviewSubmit({
               {documents.length > 0
                 ? `${documents.length} ${isRTL ? "ملفات مرفوعة" : "files attached"}`
                 : isRTL
-                ? "سيتم المسح الليزري ثلاثي الأبعاد في الموقع"
+                ? "فالنتيا هتعمل رفع مساحي ليزر في الموقع"
                 : "Valentia 3D Site Survey scheduled"}
             </div>
           </div>
@@ -737,15 +737,15 @@ export function StepReviewSubmit({
           <div className="flex items-center gap-2 mb-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-[#B88460] animate-ping" />
             <span className="text-[10px] uppercase font-mono tracking-widest text-[#E5D7C7] font-medium">
-              {isRTL ? "المرحلة النهائية • اعتماد التكليف" : "FINAL STAGE · COMMISSIONING"}
+              {isRTL ? "الخطوة الأخيرة • تأكيد الطلب" : "FINAL STAGE · COMMISSIONING"}
             </span>
           </div>
           <h3 className="font-serif text-2xl sm:text-3xl font-normal leading-tight text-white">
-            {isRTL ? "جاهز لاعتماد وإرسال طلب مشروعك؟" : "Ready to commission your atelier?"}
+            {isRTL ? "جاهز تبعت طلب تشطيب بيتك؟" : "Ready to commission your atelier?"}
           </h3>
           <p className="mt-2 max-w-xl leading-relaxed text-xs text-[#E5D7C7] font-normal">
             {isRTL
-              ? "بمجرد الإرسال، سيتولى فريق فالنتيا مراجعة المواصفات وإتاحة حجز الاستشارة المباشرة وتنسيق زيارة المعاينة الميدانية والمسح الليزري."
+              ? "أول ما تدوس إرسال، مهندسي فالنتيا هيراجعوا تفاصيل طلبك، وهيتواصلوا معاك لتحديد ميعاد معاينة ورفع مساحي للموقع."
               : "Submitting creates your digital project hub. Our lead architects review specifications and open direct video consultation scheduling."}
           </p>
         </div>
@@ -762,12 +762,12 @@ export function StepReviewSubmit({
           {isSubmitting ? (
             <>
               <Spinner className="w-4 h-4 text-white" />
-              <span>{isRTL ? "جاري الاعتماد..." : "Submitting Commission..."}</span>
+              <span>{isRTL ? "جاري إرسال الطلب..." : "Submitting Commission..."}</span>
             </>
           ) : (
             <>
               <CheckCircle weight="fill" size={17} />
-              <span>{isRTL ? "إرسال واعتماد المشروع ←" : "Submit & Commission Atelier →"}</span>
+              <span>{isRTL ? "تأكيد وإرسال الطلب ←" : "Submit & Commission Atelier →"}</span>
             </>
           )}
         </button>

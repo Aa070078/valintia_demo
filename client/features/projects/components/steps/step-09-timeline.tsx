@@ -12,10 +12,10 @@ interface StepTimelineProps {
 }
 
 const DURATIONS = [
-  { value: "3_months", labelEn: "3 Months (Fast Track)", labelAr: "٣ أشهر (مسار سريع)" },
-  { value: "6_months", labelEn: "6 Months (Standard)", labelAr: "٦ أشهر (المدة المعيارية)" },
-  { value: "9_months", labelEn: "9 Months (Extensive)", labelAr: "٩ أشهر (مشروع كبير)" },
-  { value: "12_months", labelEn: "12+ Months (Palatial)", labelAr: "١٢+ شهراً (قصور ومساحات كبرى)" },
+  { value: "3_months", labelEn: "3 Months (Fast Track)", labelAr: "٣ شهور (تسليم سريع)" },
+  { value: "6_months", labelEn: "6 Months (Standard)", labelAr: "٦ شهور (المدة المعتادة)" },
+  { value: "9_months", labelEn: "9 Months (Extensive)", labelAr: "٩ شهور (شغل واسع وتفاصيل خاصة)" },
+  { value: "12_months", labelEn: "12+ Months (Palatial)", labelAr: "سنة أو أكتر (فيلات وقصور ومساحات كبيرة)" },
 ];
 
 export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) {
@@ -41,15 +41,15 @@ export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) 
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٩ — ٠٦ • الجدول الزمني وموعد التسليم" : "STEP 09 · TARGET COMPLETION"}
+            {isRTL ? "الخطوة التاسعة • ميعاد الاستلام" : "STEP 09 · TARGET COMPLETION"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "متى ترغب في استلام مشروعك جاهزاً؟" : "What is your target handover date?"}
+          {isRTL ? "تحب تستلم بيتك متشطب إمتى؟" : "What is your target handover date?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "نحدد خطة التنفيذ وتوريد المواد بناءً على موعدك المستهدف، سواء كان تاريخاً محدداً أو فترة زمنية مرنة."
+            ? "بنحدد خطة التنفيذ وتوريد الخامات بناءً على الميعاد اللي يناسبك، سواء كان تاريخ محدد أو مدة بالشهور أو براحتنا ومن غير استعجال."
             : "Whether aiming for a specific summer handover or a steady milestone cadence, define your completion horizon."}
         </p>
       </div>
@@ -74,10 +74,10 @@ export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) 
           </div>
           <div>
             <h3 className="text-[#1C1917] font-serif text-lg font-normal">
-              {isRTL ? "مدة زمنية تقريبية" : "Target Duration"}
+              {isRTL ? "مدة تقريبية بالشهور" : "Target Duration"}
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
-              {isRTL ? "تحديد مدة كـ ٦ أو ٩ أشهر من التعاقد" : "e.g. 6 or 9 months from signing"}
+              {isRTL ? "مثلاً: ٣ أو ٦ أو ٩ شهور من بداية الشغل" : "e.g. 6 or 9 months from signing"}
             </p>
           </div>
         </div>
@@ -100,10 +100,10 @@ export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) 
           </div>
           <div>
             <h3 className="text-[#1C1917] font-serif text-lg font-normal">
-              {isRTL ? "تاريخ محدد للتسليم" : "Specific Calendar Date"}
+              {isRTL ? "تاريخ تسليم محدد" : "Specific Calendar Date"}
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
-              {isRTL ? "مناسبة خاصة، موسم صيف، زواج، إلخ" : "Before summer, wedding, or relocation"}
+              {isRTL ? "مناسبة، قبل الصيف والساحل، جواز، أو نقلة سكن" : "Before summer, wedding, or relocation"}
             </p>
           </div>
         </div>
@@ -126,10 +126,10 @@ export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) 
           </div>
           <div>
             <h3 className="text-[#1C1917] font-serif text-lg font-normal">
-              {isRTL ? "مرن بدون موعد حرج" : "Flexible Horizon"}
+              {isRTL ? "براحتنا ومن غير استعجال" : "Flexible Horizon"}
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
-              {isRTL ? "التركيز على الجودة الحرفية العالية دون استعجال" : "Priority on artisanal execution"}
+              {isRTL ? "الأهم عندنا الدقة والجودة وأعلى درجات الفينيش" : "Priority on artisanal execution"}
             </p>
           </div>
         </div>
@@ -139,7 +139,7 @@ export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) 
       {timeline.deadlineType === "duration" && (
         <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-3 animate-in fade-in duration-300 shadow-xs">
           <label className="text-xs font-medium text-[#503C2C]">
-            {isRTL ? "اختر المدة الزمنية المستهدفة" : "Select Target Duration"}
+            {isRTL ? "اختار المدة اللي تناسبك" : "Select Target Duration"}
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {DURATIONS.map((dur) => (
@@ -169,7 +169,7 @@ export function StepTimeline({ timeline, onChangeTimeline }: StepTimelineProps) 
       {timeline.deadlineType === "specific_date" && (
         <div className="p-5 rounded-2xl bg-card border border-border flex flex-col gap-2 max-w-sm animate-in fade-in duration-300 shadow-xs">
           <label className="text-xs font-medium text-[#503C2C]">
-            {isRTL ? "تاريخ التسليم المستهدف" : "Target Handover Date"}
+            {isRTL ? "تاريخ الاستلام المستهدف" : "Target Handover Date"}
           </label>
           <input
             type="date"

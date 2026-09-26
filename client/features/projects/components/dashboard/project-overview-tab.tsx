@@ -29,25 +29,25 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
   };
 
   const getBudgetText = () => {
-    if (!project.budget) return isRTL ? "مفتوح لدراسة التكلفة" : "Under Preliminary Study";
+    if (!project.budget) return isRTL ? "هيتحدد بعد المعاينة والمقايسة" : "Under Preliminary Study";
     if (project.budget.budgetType === "exact" && project.budget.exactAmount) {
       return `${project.budget.exactAmount.toLocaleString()} ${project.budget.currency || "EGP"}`;
     }
     if (project.budget.budgetType === "range" && project.budget.minAmount && project.budget.maxAmount) {
       return `${project.budget.minAmount.toLocaleString()} - ${project.budget.maxAmount.toLocaleString()} ${project.budget.currency || "EGP"}`;
     }
-    return isRTL ? "مفتوح لدراسة التكلفة وجدول الكميات" : "Open for Preliminary BOQ Study";
+    return isRTL ? "هيتحدد بعد المقايسة التفصيلية (BOQ)" : "Open for Preliminary BOQ Study";
   };
 
   const getTimelineText = () => {
-    if (!project.timeline) return isRTL ? "مرن بدون موعد حرج" : "Flexible Horizon";
+    if (!project.timeline) return isRTL ? "براحتنا ومن غير استعجال (تركيز على الجودة)" : "Flexible Horizon";
     if (project.timeline.deadlineType === "specific_date" && project.timeline.targetDate) {
       return project.timeline.targetDate;
     }
     if (project.timeline.deadlineType === "duration" && project.timeline.durationDescription) {
       return project.timeline.durationDescription;
     }
-    return isRTL ? "جدول زمني مرن يركز على الجودة" : "Flexible Horizon";
+    return isRTL ? "براحتنا ومن غير استعجال (تركيز على الجودة)" : "Flexible Horizon";
   };
 
   return (
@@ -63,7 +63,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             )}
           >
             <Building className="w-4 h-4 text-[#B88460]" />
-            <span>{isRTL ? "بيانات العقار والنمط المعماري" : "Property & Typology"}</span>
+            <span>{isRTL ? "بيانات ونوع العقار" : "Property & Typology"}</span>
           </div>
           <div className="space-y-1.5 text-xs text-[#1C1917]">
             <div
@@ -99,7 +99,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             )}
           >
             <Globe className="w-4 h-4 text-[#B88460]" />
-            <span>{isRTL ? "موقع إقامة العميل والمنطقة الزمنية" : "Client Base & Timezone"}</span>
+            <span>{isRTL ? "مكان إقامتك الحالي وتوقيتك" : "Client Base & Timezone"}</span>
           </div>
           <div className="space-y-1.5 text-xs text-[#1C1917]">
             <div
@@ -114,7 +114,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             </div>
             <p className={cn("pt-1", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
               {isRTL
-                ? "يتم جدولة الجلسات الافتراضية ومكالمات المراجعة وفق توقيت هذا الموقع."
+                ? "بالمواعيد دي بننسق معاك مكالمات الفيديو والتحديثات حسب توقيت بلدك."
                 : "Virtual sessions and live updates are scheduled around this local time."}
             </p>
           </div>
@@ -129,7 +129,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             )}
           >
             <UserCheck className="w-4 h-4 text-[#B88460]" />
-            <span>{isRTL ? "الممثل والوكيل في مصر" : "Representation in Egypt"}</span>
+            <span>{isRTL ? "مين هينوب عنك في مصر" : "Representation in Egypt"}</span>
           </div>
           <div className="text-xs text-[#1C1917]">
             {project.representative?.hasRepresentative ? (
@@ -141,7 +141,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             ) : (
               <div className={cn("leading-relaxed", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[#78716C]")}>
                 {isRTL
-                  ? "إدارة مباشرة من فالنتيا: يتولى مهندس المشروع استلام المفاتيح والمسح الميداني دون الحاجة لوسيط محلي."
+                  ? "فالنتيا بتدير كل حاجة مباشرة: مهندس الموقع بيستلم المفاتيح وبيعمل المعاينة ورفع المقاسات من غير ما تشيل هم وسيط في مصر."
                   : "Valentia Direct Custody: Our team manages keys, scans, and site logistics directly with you."}
               </div>
             )}
@@ -157,7 +157,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             )}
           >
             <Hammer className="w-4 h-4 text-[#B88460]" />
-            <span>{isRTL ? "نطاق العمل المطلوب" : "Commission Scope"}</span>
+            <span>{isRTL ? "حجم ونوع التشطيب المطلوب" : "Commission Scope"}</span>
           </div>
           <div className="space-y-1.5 text-xs text-[#1C1917]">
             <div
@@ -185,7 +185,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             )}
           >
             <Coins className="w-4 h-4 text-[#B88460]" />
-            <span>{isRTL ? "الميزانية المستهدفة" : "Target Investment"}</span>
+            <span>{isRTL ? "الميزانية التقديرية" : "Target Investment"}</span>
           </div>
           <div className="text-xs text-[#1C1917]">
             <div
@@ -198,7 +198,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             </div>
             <p className={cn("mt-1", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
               {isRTL
-                ? "يتم تدقيق البنود والكميات بالتفصيل في مرحلة جدول الكميات (BOQ)."
+                ? "البنود والأسعار بتتفصّل بدقة في مرحلة المقايسة الهندسية (BOQ)."
                 : "Refined and itemized during the BOQ engineering phase."}
             </p>
           </div>
@@ -213,7 +213,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             )}
           >
             <CalendarCheck className="w-4 h-4 text-[#B88460]" />
-            <span>{isRTL ? "الجدول الزمني المستهدف" : "Target Handover Horizon"}</span>
+            <span>{isRTL ? "ميعاد التسليم المستهدف" : "Target Handover Horizon"}</span>
           </div>
           <div className="text-xs text-[#1C1917]">
             <div
@@ -225,7 +225,7 @@ export function ProjectOverviewTab({ project }: ProjectOverviewTabProps) {
             </div>
             <p className={cn("mt-1", isRTL ? "text-xs font-medium text-[#4A3E31]" : "text-[11px] text-[#78716C]")}>
               {isRTL
-                ? "يتم تتبع مراحل التنفيذ الميداني أسبوعياً مع تحديثات مصورة."
+                ? "بنتابع خطوات التنفيذ في الموقع أسبوعياً وبنبعتلك صور حية أول بأول."
                 : "Tracked weekly with high-resolution photographic milestones."}
             </p>
           </div>

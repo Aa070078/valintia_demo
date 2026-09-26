@@ -110,7 +110,7 @@ export function CountrySelect({
             </>
           ) : (
             <span className="text-[#78716C] truncate">
-              {placeholder || (isRTL ? "اختر الدولة..." : "Select country...")}
+              {placeholder || (isRTL ? "اختار البلد..." : "Select country...")}
             </span>
           )}
         </div>
@@ -147,7 +147,7 @@ export function CountrySelect({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={
-                  isRTL ? "ابحث بالاسم أو كود الدولة..." : "Search country or code..."
+                  isRTL ? "دور باسم البلد أو كود الاتصال..." : "Search country or code..."
                 }
                 className={cn(
                   "w-full py-1.5 text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460]",
@@ -173,7 +173,7 @@ export function CountrySelect({
           <div className="max-h-60 overflow-y-auto p-1.5 space-y-0.5 scrollbar-thin">
             {filteredCountries.length === 0 ? (
               <div className="py-6 text-center text-xs text-[#78716C] font-normal">
-                {isRTL ? "لم يتم العثور على نتائج" : "No countries found"}
+                {isRTL ? "ملقناش البلد دي" : "No countries found"}
               </div>
             ) : (
               filteredCountries.map((c) => {

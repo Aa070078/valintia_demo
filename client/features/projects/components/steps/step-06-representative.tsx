@@ -49,15 +49,15 @@ export function StepRepresentative({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٦ — ٠٦ • الممثل المحلي في مصر" : "STEP 06 · LOCAL REPRESENTATION"}
+            {isRTL ? "الخطوة السادسة • من ينوب عنك في مصر" : "STEP 06 · LOCAL REPRESENTATION"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "هل لديك ممثل أو وكيل داخل مصر؟" : "Do you have a representative in Egypt?"}
+          {isRTL ? "مين هينوب عنك في مصر؟" : "Do you have a representative in Egypt?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "يمكنك تفويض شخص موثوق لاستلام المفاتيح وحضور زيارة المعاينة، أو توكيل فريق فالنتيا بالإشراف والإدارة الكاملة والمباشرة نيابة عنك."
+            ? "تقدر تحدد شخص موثوق في مصر يستلم ويسلم المفاتيح ويحضر المعاينة، أو تسيب الموضوع كله لفالنتيا تدير وتشرف على كل حاجة مباشرة بالنيابة عنك."
             : "Delegate an authorized contact in Egypt for site keys and physical inspections, or authorize Valentia to manage site custody and approvals directly."}
         </p>
       </div>
@@ -84,11 +84,11 @@ export function StepRepresentative({
           </div>
           <div>
             <h3 className="text-[#1C1917] font-serif text-lg sm:text-xl font-normal">
-              {isRTL ? "إدارة مباشرة وشاملة من فالنتيا" : "Valentia Manages Directly"}
+              {isRTL ? "فالنتيا تدير وتشرف على كل حاجة مباشرة" : "Valentia Manages Directly"}
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
-                ? "لا يوجد ممثل محلي. يتولى مهندس مشروعك استلام المفاتيح، والمسح الليزري، والتنسيق المباشر معك عبر المنصة الرقمية."
+                ? "مش محتاج حد ينوب عنك. مهندس مشروعك هيستلم المفاتيح، ويعمل الرفع المساحي بالليزر، ويتواصل معاك لحظة بلحظة عبر المنصة."
                 : "No local representative required. Our lead project engineer receives site keys, oversees scans, and coordinates directly with you digitally."}
             </p>
           </div>
@@ -114,11 +114,11 @@ export function StepRepresentative({
           </div>
           <div>
             <h3 className="text-[#1C1917] font-serif text-lg sm:text-xl font-normal">
-              {isRTL ? "لدي ممثل / وكيل داخل مصر" : "I Have an Authorized Representative"}
+              {isRTL ? "عندي حد هينوب عني في مصر" : "I Have an Authorized Representative"}
             </h3>
             <p className="mt-1 text-xs leading-relaxed text-[#78716C] font-normal">
               {isRTL
-                ? "يوجد شخص موثوق (فرد من العائلة، محامي، مدير أعمال) لحضور تسليم الموقع والتنسيق الميداني."
+                ? "شخص ثقة (حد من العيلة، صديق، محامي) هيحضر المعاينة ويسلم المفاتيح وينسق معانا على الأرض."
                 : "A trusted family member, legal representative, or estate manager in Egypt will attend site appointments on your behalf."}
             </p>
           </div>
@@ -129,7 +129,7 @@ export function StepRepresentative({
       {representative.hasRepresentative && (
         <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border flex flex-col gap-4 animate-in fade-in duration-300 shadow-xs">
           <h4 className="text-[#1C1917] font-serif text-base font-normal">
-            {isRTL ? "بيانات الممثل القانوني أو جهة الاتصال" : "Authorized Contact Details"}
+            {isRTL ? "بيانات الشخص اللي هينوب عنك" : "Authorized Contact Details"}
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -150,7 +150,7 @@ export function StepRepresentative({
 
             {/* Phone */}
             <PhoneInputWithCountry
-              label={isRTL ? "رقم الهاتف للممثل بمصر *" : "Phone Number (Egypt) *"}
+              label={isRTL ? "رقم تليفونه في مصر *" : "Phone Number (Egypt) *"}
               phone={representative.phone || ""}
               countryCode={representative.phoneCountryCode || "+20"}
               onChangePhone={(phone) => updateField("phone", phone)}
@@ -163,7 +163,7 @@ export function StepRepresentative({
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
                 <EnvelopeSimple className="w-3 h-3 text-[#B88460]" />
-                <span>{isRTL ? "البريد الإلكتروني" : "Email Address"}</span>
+                <span>{isRTL ? "البريد الإلكتروني (اختياري)" : "Email Address"}</span>
               </label>
               <input
                 type="email"
@@ -178,13 +178,13 @@ export function StepRepresentative({
             <div className="flex flex-col gap-1.5">
               <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
                 <IdentificationCard className="w-3 h-3 text-[#B88460]" />
-                <span>{isRTL ? "صلة القرابة أو الصفة" : "Relationship / Capacity"}</span>
+                <span>{isRTL ? "صلة القرابة أو المعرفة" : "Relationship / Capacity"}</span>
               </label>
               <input
                 type="text"
                 value={representative.relationship || ""}
                 onChange={(e) => updateField("relationship", e.target.value)}
-                placeholder={isRTL ? "مثال: شقيق، محامي، مدير أعمال" : "e.g. Brother, Legal Counsel, Property Manager"}
+                placeholder={isRTL ? "مثال: أخويا، قريبي، صديق، محامي" : "e.g. Brother, Legal Counsel, Property Manager"}
                 className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
               />
             </div>
@@ -194,7 +194,7 @@ export function StepRepresentative({
           <div className="flex flex-col gap-1.5 pt-2">
             <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
               <Key className="w-3 h-3 text-[#B88460]" />
-              <span>{isRTL ? "نطاق الصلاحيات المفوضة" : "Authorization Scope"}</span>
+              <span>{isRTL ? "صلاحياته إيه بالظبط؟" : "Authorization Scope"}</span>
             </label>
             <input
               type="text"
@@ -202,7 +202,7 @@ export function StepRepresentative({
               onChange={(e) => updateField("authorizationScope", e.target.value)}
               placeholder={
                 isRTL
-                  ? "مثال: تسليم واستلام مفاتيح الموقع ومرافقة مهندس المعاينة فقط"
+                  ? "مثال: تسليم واستلام مفاتيح الموقع ومرافقة المهندس وقت المعاينة"
                   : "e.g. Key handover & physical site access accompaniment only"
               }
               className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"

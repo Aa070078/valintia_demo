@@ -66,7 +66,7 @@ const LIGHTING_PRESETS: Record<
   twilight: {
     id: "twilight",
     nameEn: "2400K Evening Cove Ambience",
-    nameAr: "الإضاءة الليلية الخافتة 2400K",
+    nameAr: "إضاءة ليلية هادئة 2400K",
     kelvin: "2400K",
     image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=85",
     glowColor: "rgba(80, 60, 44, 0.5)",
@@ -100,11 +100,11 @@ const HOTSPOTS: MaterialHotspot[] = [
     x: 40,
     y: 78,
     titleEn: "Living Salon Flooring",
-    titleAr: "أرضيات الصالون والمعيشة",
+    titleAr: "أرضيات الريسبشن والمعيشة",
     materialEn: "Honed Navona Travertine",
-    materialAr: "ترافرتين نافونا المطفي مع فواصل برونزية غائرة",
+    materialAr: "رخام ترافرتين نافونا مطفي مع فواصل برونزية غائرة",
     specEn: "Large format 120×120cm slabs with micro-beveled edges, breathable sealer, and decoupled acoustic sub-mat.",
-    specAr: "ألواح كبيرة قياس 120×120 سم مع حواف دقيقة وطبقة عازلة للصوت وفواصل تمدد مخفية.",
+    specAr: "بلاطات كبيرة 120×120 سم مع فواصل عزل صوت وطبقة حماية ضد البقع.",
     acoustic: "NRC 0.45 · Impact Lw 48dB",
     acousticScore: 68,
     originEn: "Tivoli Quarries, Italy",
@@ -118,11 +118,11 @@ const HOTSPOTS: MaterialHotspot[] = [
     x: 75,
     y: 38,
     titleEn: "Architectural Wall Paneling",
-    titleAr: "التجاليد الخشبية المعمارية",
+    titleAr: "تجاليد خشب معمارية",
     materialEn: "Rift-Cut White Oak & Brass Reveal",
-    materialAr: "خشب السنديان الأبيض المشرح مع إضاءة دافئة 2700K",
+    materialAr: "خشب أرو أبيض طبيعي مع إضاءة ليد مخفية 2700K",
     specEn: "Custom micro-perforated acoustic timber paneling with concealed soft-touch push latches and integrated LED wash.",
-    specAr: "تجاليد خشبية دقيقة التثقيب ممتصة للصدى مع خزائن مخفية وإضاءة خطية مدمجة بالكامل.",
+    specAr: "تكسيات خشبية عازلة للصدى بدواليب خفية وتشطيب مطفي راقي.",
     acoustic: "NRC 0.75 · Class A Absorption",
     acousticScore: 92,
     originEn: "Black Forest, Germany",
@@ -136,11 +136,11 @@ const HOTSPOTS: MaterialHotspot[] = [
     x: 24,
     y: 42,
     titleEn: "Architectural Glazing Curtain",
-    titleAr: "الواجهات الزجاجية المعمارية",
+    titleAr: "واجهات زجاجية عازلة",
     materialEn: "Low-E Double Glazed Curtain Wall",
-    materialAr: "زجاج مزدوج منخفض الانبعاث مع عزل حراري وصوتي فائق",
+    materialAr: "زجاج دبل معزول حرارياً وصوتياً",
     specEn: "Thermal-break aluminum slim frames with acoustic PVB interlayer, framing private courtyards and terraces.",
-    specAr: "قطاعات ألمنيوم معزولة حرارياً مع طبقة PVB عازلة للصوت تفتح على الأفنية والحدائق الخاصة.",
+    specAr: "قطاعات ألومنيوم شيكو ألمانية مع طبقة عزل صوتي متطورة تفتح على الحديقة أو التراس.",
     acoustic: "STC 44 dB Acoustic Isolation",
     acousticScore: 88,
     originEn: "Schüco Atelier, Germany",
@@ -154,11 +154,11 @@ const HOTSPOTS: MaterialHotspot[] = [
     x: 14,
     y: 34,
     titleEn: "Veranda Transition Portal",
-    titleAr: "بوابة الامتداد الخارجي للتراس",
+    titleAr: "بوابة التراس المفتوح",
     materialEn: "Textured Basalt & Plantation Teak",
-    materialAr: "حجر بازلت ملمس مع خشب تيك طبيعي مقاوم للعوامل الجوية",
+    materialAr: "أرضيات بازلت مع خشب تيك طبيعي معالج للرطوبة",
     specEn: "Flush-sill concealed drainage transition system enabling continuous indoor-to-outdoor spatial harmony.",
-    specAr: "عتبة غائرة مستوية بالكامل بنظام تصريف مخفي لربط الصالون بالتراس الخارجي دون أي عوائق.",
+    specAr: "مستوى أرضية واحد بين الصالون والتراس مع صرف مخفي للمطر لراحة وأناقة كاملة.",
     acoustic: "Weatherproof · IP68 Drainage",
     acousticScore: 74,
     originEn: "Java & Sicily Sustainable Mills",
@@ -175,42 +175,42 @@ const TYPOLOGIES = [
     vol: "VOLUME 01",
     coords: "30.0131° N, 31.4913° E",
     titleEn: "Grand Private Villas",
-    titleAr: "الفلل المستقلة والقصور",
+    titleAr: "فيلات مستقلة وقصور",
     area: "450 – 1,200 m²",
     height: "3.8m – 7.2m Ceiling",
     locationEn: "New Cairo & Sheikh Zayed",
-    locationAr: "القاهرة الجديدة والشيخ زايد",
+    locationAr: "التجمع الخامس والشيخ زايد",
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
     descEn: "Complete turnkey structural and interior fit-out, double-height light wells, private spa wellness suites, and master courtyards.",
-    descAr: "تنفيذ معماري متكامل يشمل بهو الاستقبال المزدوج، أجنحة الاستجمام والسبا الخاصة، والحدائق الداخلية المتصلة.",
+    descAr: "تشطيب معماري وديكور متكامل، صالونات دبل هايت، أجنحة ماستر واسعة، وتراسات وحدائق خاصة.",
   },
   {
     id: "penthouse",
     vol: "VOLUME 02",
     coords: "25.1124° N, 55.1390° E",
     titleEn: "Sky Penthouses",
-    titleAr: "بنتهاوس الأفق البانورامي",
+    titleAr: "بنتهاوس بروف بانورامي",
     area: "320 – 680 m²",
     height: "3.4m Floor-to-Ceiling Glazing",
     locationEn: "Palm Jumeirah & Nile View",
-    locationAr: "نخلة جميرا وإطلالات كورنيش النيل",
+    locationAr: "إطلالات النيل والشيخ زايد والتجمع",
     image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
     descEn: "Panoramic acoustic curtain glazing, bespoke floating ceiling rafts, private plunge pools, and seamless indoor-outdoor horizon living.",
-    descAr: "واجهات زجاجية بانورامية ممتدة، أسقف عازلة للصوت بنظام طافي، مسابح أفقية خاصة، وتراسات معلقة بإطلالات خلابة.",
+    descAr: "واجهات زجاجية بانورامية، أسقف جبسية بإضاءة مخفية، وجاكوزي وتراس مفتوح في الهواء الطلق.",
   },
   {
     id: "duplex",
     vol: "VOLUME 03",
     coords: "30.0444° N, 31.2357° E",
     titleEn: "Urban Duplexes",
-    titleAr: "الدوبلكس العصري الفاخر",
+    titleAr: "دوبلكس عصري فاخر",
     area: "240 – 420 m²",
     height: "Double-Height Atrium",
     locationEn: "New Capital & Diplomatic Quarter",
-    locationAr: "العاصمة الإدارية والحي الدبلوماسي",
+    locationAr: "العاصمة الإدارية والتجمع والحي الدبلوماسي",
     image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80",
     descEn: "Sculptural floating cantilever staircases, mezzanine libraries, concealed acoustic joinery, and fully integrated building automation.",
-    descAr: "سلالم معلقة ذات طابع نحتي، ميزانين مكتبات، دواليب خشبية مدمجة ممتصة للصدى، ونظم تحكم منزلي فندقية ذكية.",
+    descAr: "سلم معلق بتصميم ديكوري، ليفينج وغرف نوم في الدور العلوي، ومطبخ مفتوح مع نظام سمارت هوم كامل.",
   },
 ];
 
@@ -219,47 +219,47 @@ const METHODOLOGY = [
   {
     step: "01",
     titleEn: "Laser Survey & Structural Audit",
-    titleAr: "المسح الليزري والتدقيق الإنشائي",
+    titleAr: "رفع مساحي ليزر وفحص إنشائي",
     descEn: "Millimeter-precise 3D LiDAR point cloud scan of your property with acoustic calibration and MEP conduit tracing.",
-    descAr: "مسح ثلاثي الأبعاد بالليزر (LiDAR) بدقة المليمتر لفحص الاستواء الإنشائي ومسارات التغذية والعزل.",
+    descAr: "مسح 3D بالليزر للوحدة بدقة المليمتر لفحص الحوائط والخرسانات وشبكات التغذية.",
     badgeEn: "0.02mm Precision",
-    badgeAr: "دقة 0.02 ملم",
+    badgeAr: "دقة ليزر 0.02 مم",
   },
   {
     step: "02",
     titleEn: "3D Spatial Architecture & Moodboard",
-    titleAr: "التصميم المكاني ثلاثي الأبعاد واللوحات",
+    titleAr: "تصميم 3D واقعي واختيار الخامات",
     descEn: "Bespoke axonometric layout, lighting choreography (2700K circadian), and physical material tactile box delivered to your residence.",
-    descAr: "تخطيط أيزومتري مفصل، دراسة الإضاءة البيولوجية، وصندوق عينات المواد الطبيعية الفاخرة واصل لمنزلك.",
+    descAr: "رسومات ثلاثية الأبعاد كاملة، دراسة الإضاءة، وتوصيل بوكس عينات الخامات لحد عندك في البيت.",
     badgeEn: "Physical Samples",
-    badgeAr: "عينات مواد فعلية",
+    badgeAr: "عينات خامات حقيقية",
   },
   {
     step: "03",
     titleEn: "100% Itemized BOQ & Pricing Lock",
-    titleAr: "جدول الكميات والتسعير الثابت",
+    titleAr: "مقايسة تفصيلية (BOQ) وسعر ثابت",
     descEn: "Legally locked contract pricing with zero variation order surprises. Direct quarry allocations from Italy and European mills.",
-    descAr: "تسعير تعاقدي ثابت وملزم بدون أي بنود مستحدثة أو مفاجآت، مع حجز مباشر من مقالع الرخام الأوروبية.",
+    descAr: "سعر تعاقدي ثابت وملزم بدون أي بنود مستحدثة أو مفاجآت، مع حجز مباشر من مقالع الرخام الأوروبية.",
     badgeEn: "Zero Cost Creep",
-    badgeAr: "ضمان ثبات التكلفة",
+    badgeAr: "سعر ثابت مفيش زيادات",
   },
   {
     step: "04",
     titleEn: "Atelier Joinery & On-Site Execution",
-    titleAr: "التنفيذ المعماري وأعمال النجارة الحرفية",
+    titleAr: "تنفيذ هندسي ونجارة وتشطيب في الموقع",
     descEn: "Dedicated on-site lead architect managing precision MEP, custom stone cladding, acoustic walls, and weekly video walkthroughs.",
-    descAr: "مهندس موقع أول مخصص يدير الأعمال الكهروميكانيكية، التكسيات الحجرية، والنجارة الفندقية مع تقرير أسبوعي مرئي.",
+    descAr: "مهندس موقع متفرغ لمشروعك بيشرف على التأسيس والتشطيبات، مع تقارير وفيديوهات أسبوعية للمتابعة.",
     badgeEn: "Dedicated Lead Architect",
-    badgeAr: "إشراف هندسي متفرغ",
+    badgeAr: "مهندس متفرغ في موقعك",
   },
   {
     step: "05",
     titleEn: "White-Glove Handover & 10-Yr Warranty",
-    titleAr: "التسليم الفندقي والضمان العشري المعتمد",
+    titleAr: "تسليم فندقي على المفتاح وضمان ١٠ سنين",
     descEn: "Deep detailing, custom signature ambient scent curation, comprehensive O&M digital dossier, and our 10-year structural warranty.",
-    descAr: "تعقيم فندقي دقيق، تعطير المكان برائحة فالنتيا الخاصة، تسليم ملف التشغيل الرقمي، وضمان معتمد لمدة 10 سنوات.",
+    descAr: "تنظيف وتعقيم فندقي شامل، تعطير البيت، تسليم كتيب الصيانة والتشغيل، وضمان معتمد لمدة 10 سنين.",
     badgeEn: "10-Year Certificate",
-    badgeAr: "شهادة ضمان 10 سنوات",
+    badgeAr: "ضمان معتمد 10 سنين",
   },
 ];
 
@@ -267,43 +267,43 @@ const METHODOLOGY = [
 const COMPARISON_ROWS = [
   {
     featureEn: "Project Cost Certainty",
-    featureAr: "ثبات تكلفة المشروع",
+    featureAr: "ثبات تكلفة التشطيب",
     traditionalEn: "Frequent 20% – 40% cost overruns via variation orders",
-    traditionalAr: "زيادات متكررة بنسبة 20% إلى 40% عبر بنود مستحدثة",
+    traditionalAr: "زيادات متكررة من 20% لـ 40% في نص الشغل ببنود مستحدثة",
     valentiaEn: "100% Fixed Itemized BOQ with zero surprise surcharges",
-    valentiaAr: "جدول كميات تعاقدي ثابت 100% بدون أي زيادات مفاجئة",
+    valentiaAr: "مقايسة تفصيلية وسعر تعاقدي ثابت 100% بدون أي مفاجآت",
   },
   {
     featureEn: "Site Measurements",
-    featureAr: "دقة رفع المقاسات الموقعية",
+    featureAr: "دقة مقاسات الموقع",
     traditionalEn: "Manual tape measures prone to human error & misfits",
-    traditionalAr: "أشرطة قياس يدوية عرضة لأخطاء بشرية وتفاوت في المقاسات",
+    traditionalAr: "شريط قياس يدوي بيعمل أخطاء في المقاسات وتفاوت في التركيبات",
     valentiaEn: "3D LiDAR Point Cloud Laser Scan accurate to 0.02 mm",
-    valentiaAr: "مسح ليزري رقمي 3D LiDAR بدقة متناهية تصل إلى 0.02 ملم",
+    valentiaAr: "رفع مساحي ليزر 3D دقيق جداً لكل سنتيمتر في الشقة",
   },
   {
     featureEn: "Project Oversight",
-    featureAr: "الإشراف والمسؤولية الموقعية",
+    featureAr: "المتابعة والمسؤولية في الموقع",
     traditionalEn: "Fragmented sub-contractors blaming each other for defects",
-    traditionalAr: "مقاولون بالباطن متفرقون يتبادلون إلقاء اللوم عند حدوث أخطاء",
+    traditionalAr: "صنايعية ومقاولين متفرقين كل واحد يرمي الغلط على التاني",
     valentiaEn: "Single Atelier Lead Architect with full on-site accountability",
-    valentiaAr: "مهندس معماري أول مخصص للأتيليه بمسؤولية كاملة وشاملة",
+    valentiaAr: "مهندس فالنتيا مسؤول بالكامل عن الموقع من أول يوم للتسليم",
   },
   {
     featureEn: "Material Origin",
-    featureAr: "مصدر وجودة الخامات",
+    featureAr: "جودة ومصدر الخامات",
     traditionalEn: "Local commercial grade stock with unverified durability",
-    traditionalAr: "مواد تجارية محلية غير موثوقة المصدر أو درجات المقاومة",
+    traditionalAr: "خامات تجارية من السوق المحلي مش مضمونة المصدر ولا المتانة",
     valentiaEn: "Direct European quarry stone & certified acoustic joinery",
-    valentiaAr: "توريد مباشر من المقالع الإيطالية ومصانع الأخشاب الأوروبية المعتمدة",
+    valentiaAr: "توريد مباشر لأجود أنواع الرخام والأخشاب المستوردة والمحلية الفاخرة",
   },
   {
     featureEn: "Post-Handover Support",
     featureAr: "خدمات ما بعد التسليم",
     traditionalEn: "Vanishing support once final payment is collected",
-    traditionalAr: "صعوبة التواصل وانعدام الدعم فور استلام الدفعة الأخيرة",
+    traditionalAr: "صعب تلاقيهم أو تتواصل معاهم بعد استلام الدفعة الأخيرة",
     valentiaEn: "10-Year certified structural warranty & concierge maintenance",
-    valentiaAr: "ضمان إنشائي وتشغيلي معتمد لمدة 10 سنوات مع صيانة فندقية",
+    valentiaAr: "ضمان 10 سنين وصيانة فندقية ومتابعة دورية بعد السكن",
   },
 ];
 
@@ -357,7 +357,7 @@ export default function LandingPage() {
                 VALENTIA
               </span>
               <span className="block text-[9px] tracking-[0.22em] text-[#707070] uppercase font-mono">
-                {isRTL ? "أتيليه التصميم والتنفيذ المعماري" : "Design & Build Atelier"}
+                {isRTL ? "أتيليه التصميم والتشطيب المعماري" : "Design & Build Atelier"}
               </span>
             </div>
           </Link>
@@ -369,35 +369,35 @@ export default function LandingPage() {
               data-cursor="pointer"
               className="hover:text-[#1C1917] transition-colors"
             >
-              {isRTL ? "الفلسفة" : "Philosophy"}
+              {isRTL ? "رؤيتنا" : "Philosophy"}
             </a>
             <a
               href="#blueprints"
               data-cursor="pointer"
               className="hover:text-[#1C1917] transition-colors"
             >
-              {isRTL ? "المخططات والمواد" : "Blueprints"}
+              {isRTL ? "المخططات والخامات" : "Blueprints"}
             </a>
             <a
               href="#typologies"
               data-cursor="pointer"
               className="hover:text-[#1C1917] transition-colors"
             >
-              {isRTL ? "المشاريع والنماذج" : "Typologies"}
+              {isRTL ? "نماذج العقارات" : "Typologies"}
             </a>
             <a
               href="#comparison"
               data-cursor="pointer"
               className="hover:text-[#1C1917] transition-colors"
             >
-              {isRTL ? "معيار الأتيليه" : "Atelier Standard"}
+              {isRTL ? "ليه فالنتيا؟" : "Atelier Standard"}
             </a>
             <a
               href="#methodology"
               data-cursor="pointer"
               className="hover:text-[#1C1917] transition-colors"
             >
-              {isRTL ? "منهجية التنفيذ" : "Methodology"}
+              {isRTL ? "مراحل الشغل" : "Methodology"}
             </a>
           </nav>
 
@@ -448,7 +448,7 @@ export default function LandingPage() {
                   data-cursor-text="COMMISSION"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer hover:shadow-md active:scale-98"
                 >
-                  <span>{isRTL ? "بدء مشروعك" : "Commission"}</span>
+                  <span>{isRTL ? "ابدأ تشطيب بيتك" : "Commission"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
                 </Link>
               </div>
@@ -486,7 +486,7 @@ export default function LandingPage() {
               <span className="w-2 h-2 rounded-full bg-[#B88460] animate-pulse" />
               <span>
                 {isRTL
-                  ? "أتيليه فالنتيا للتصميم والتنفيذ · القاهرة | دبي"
+                  ? "أتيليه فالنتيا للتصميم والتشطيب المعماري · القاهرة"
                   : "VALENTIA DESIGN & BUILD ATELIER · EST. 2026"}
               </span>
             </div>
@@ -495,7 +495,7 @@ export default function LandingPage() {
             <h1 className="font-serif text-4xl sm:text-5xl xl:text-6xl text-[#1C1917] font-normal tracking-tight leading-[1.18]">
               {isRTL ? (
                 <>
-                  من مجرد مساحة{" "}
+                  من مجرد مكان{" "}
                   <span
                     data-cursor="inspect"
                     data-cursor-text="VILLA"
@@ -509,7 +509,7 @@ export default function LandingPage() {
                     />
                   </span>
                   <br />
-                  إلى أسلوب حياة{" "}
+                  لأسلوب حياة راقي{" "}
                   <span
                     data-cursor="inspect"
                     data-cursor-text="LIVING"
@@ -522,7 +522,7 @@ export default function LandingPage() {
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </span>
-                  <span className="italic font-light text-[#503C2C]"> استثنائي.</span>
+                  <span className="italic font-light text-[#503C2C]"> في مصر.</span>
                 </>
               ) : (
                 <>
@@ -560,7 +560,7 @@ export default function LandingPage() {
 
             <p className="text-sm sm:text-base text-[#6B635B] leading-relaxed max-w-xl">
               {isRTL
-                ? "نصمم وننفذ أرقى المساحات السكنية والقصور في مصر والخليج بأسلوب فندقي فاخر. نجمع بين الدقة الهندسية متناهية الصغر والحرفية الإيطالية الرفيعة، مع شفافية كاملة في جدول الكميات ومتابعة حية عبر منصتك الخاصة."
+                ? "بنصمم ونشطب بيتك في مصر بأعلى معايير الجودة الفندقية. بنجمع بين الدقة الهندسية بالليزر وأرقى الخامات، مع شفافية كاملة في المقايسة وتقدر تتابع موقعك لحظة بلحظة وأنت في مكانك."
                 : "We engineer and execute bespoke residential estates and sky penthouses across Egypt and the GCC. Combining millimeter laser precision with Italian artisanal finishes, absolute BOQ transparency, and live telemetry from anywhere in the world."}
             </p>
 
@@ -572,7 +572,7 @@ export default function LandingPage() {
                 data-cursor-text="START"
                 className="h-12 px-7 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs uppercase tracking-widest font-medium transition-all shadow-md hover:shadow-lg flex items-center gap-2.5 cursor-pointer group active:scale-98"
               >
-                <span>{isRTL ? "ابدأ تصميم مسكنك الآن" : "Commission Your Estate"}</span>
+                <span>{isRTL ? "ابدأ تشطيب بيتك دلوقتي" : "Commission Your Estate"}</span>
                 {isRTL ? (
                   <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 ) : (
@@ -587,7 +587,7 @@ export default function LandingPage() {
                 className="h-12 px-6 rounded-full bg-white/80 hover:bg-white border border-[#D8C8B4] text-[#1C1917] text-xs uppercase tracking-widest font-medium transition-colors shadow-xs flex items-center gap-2 active:scale-98"
               >
                 <Compass className="w-4 h-4 text-[#B88460]" />
-                <span>{isRTL ? "استعراض المخططات والمواد" : "Explore Blueprints"}</span>
+                <span>{isRTL ? "شوف الخامات والمخططات" : "Explore Blueprints"}</span>
               </a>
             </div>
 
@@ -598,7 +598,7 @@ export default function LandingPage() {
                   380+
                 </span>
                 <span className="block text-[11px] text-[#6B635B] uppercase tracking-wider font-mono">
-                  {isRTL ? "فيلا وبنتهاوس" : "Residences"}
+                  {isRTL ? "فيلا وشقة فاخرة" : "Residences"}
                 </span>
               </div>
               <div>
@@ -606,7 +606,7 @@ export default function LandingPage() {
                   0.02 mm
                 </span>
                 <span className="block text-[11px] text-[#6B635B] uppercase tracking-wider font-mono">
-                  {isRTL ? "دقة المسح الليزري" : "Laser Accuracy"}
+                  {isRTL ? "دقة الرفع بالليزر" : "Laser Accuracy"}
                 </span>
               </div>
               <div>
@@ -614,7 +614,7 @@ export default function LandingPage() {
                   100%
                 </span>
                 <span className="block text-[11px] text-[#6B635B] uppercase tracking-wider font-mono">
-                  {isRTL ? "شفافية BOQ" : "BOQ Integrity"}
+                  {isRTL ? "ثبات سعر المقايسة" : "BOQ Integrity"}
                 </span>
               </div>
             </div>
@@ -650,7 +650,7 @@ export default function LandingPage() {
                   {/* Floating Depth Badges */}
                   <div className="absolute top-4 start-4 flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-[#FAF7F2] text-xs font-mono">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>{isRTL ? "قيد التنفيذ · القاهرة الجديدة" : "Live Commission · Horizon Villa"}</span>
+                    <span>{isRTL ? "شغالين في الموقع · القاهرة الجديدة" : "Live Commission · Horizon Villa"}</span>
                   </div>
 
                   {/* Lighting Kelvin Badge */}
@@ -662,15 +662,15 @@ export default function LandingPage() {
                   <div className="absolute bottom-4 start-4 end-4 flex items-end justify-between text-[#FAF7F2]">
                     <div>
                       <span className="block text-xs uppercase tracking-widest text-[#FAF7F2]/70 font-mono">
-                        {isRTL ? "مساحة 520 م² · طابع معاصر دافئ" : "520 m² · Warm Minimalist"}
+                        {isRTL ? "مساحة 520 م² · مودرن راقي وهادئ" : "520 m² · Warm Minimalist"}
                       </span>
                       <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#FAF7F2]">
-                        {isRTL ? "قصر الباتيو · التجمع الخامس" : "The Patio Villa · New Cairo"}
+                        {isRTL ? "فيلا الباتيو · التجمع الخامس" : "The Patio Villa · New Cairo"}
                       </h3>
                     </div>
 
                     <div className="px-3 py-1 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-xs font-medium">
-                      {isRTL ? "المرحلة 04 / 05" : "Phase 04 / 05"}
+                      {isRTL ? "المرحلة الرابعة من خمسة" : "Phase 04 / 05"}
                     </div>
                   </div>
                 </div>
@@ -680,7 +680,7 @@ export default function LandingPage() {
                   <div className="flex items-center gap-1.5 text-[11px] font-mono text-[#503C2C] px-2">
                     <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
                     <span className="hidden sm:inline">
-                      {isRTL ? "الإضاءة المعمارية:" : "Lighting Study:"}
+                      {isRTL ? "دراسة الإضاءة:" : "Lighting Study:"}
                     </span>
                   </div>
 
@@ -698,7 +698,7 @@ export default function LandingPage() {
                       )}
                     >
                       <Sun className="w-3 h-3" />
-                      <span>{isRTL ? "نهار" : "Daylight"}</span>
+                      <span>{isRTL ? "ضوء النهار" : "Daylight"}</span>
                     </button>
 
                     <button
@@ -714,7 +714,7 @@ export default function LandingPage() {
                       )}
                     >
                       <SunHorizon className="w-3 h-3" />
-                      <span>{isRTL ? "غروب" : "Sunset"}</span>
+                      <span>{isRTL ? "غروب دافي" : "Sunset"}</span>
                     </button>
 
                     <button
@@ -730,7 +730,7 @@ export default function LandingPage() {
                       )}
                     >
                       <Moon className="w-3 h-3" />
-                      <span>{isRTL ? "ليل" : "Twilight"}</span>
+                      <span>{isRTL ? "إضاءة ليلية" : "Twilight"}</span>
                     </button>
                   </div>
                 </div>
@@ -743,10 +743,10 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <span className="block text-xs font-medium text-[#1C1917]">
-                        {isRTL ? "منزل يعكس هويتك وتفردك" : "A home that feels like you"}
+                        {isRTL ? "بيت معمول على مقاسك وذوقك" : "A home that feels like you"}
                       </span>
                       <span className="block text-[11px] text-[#6B635B]">
-                        {isRTL ? "متابعة مباشرة لنسب الإنجاز وجودة التشطيب" : "Live telemetry & milestone quality audit"}
+                        {isRTL ? "متابعة مباشرة لنسب الإنجاز وجودة الفينيش" : "Live telemetry & milestone quality audit"}
                       </span>
                     </div>
                   </div>
@@ -757,7 +757,7 @@ export default function LandingPage() {
                     data-cursor-text="INTAKE"
                     className="inline-flex items-center gap-1.5 text-xs font-medium text-[#B88460] hover:text-[#503C2C] underline underline-offset-4 shrink-0 transition-colors"
                   >
-                    <span>{isRTL ? "ابدأ مواصفاتك" : "Configure Specifications"}</span>
+                    <span>{isRTL ? "اختار مواصفات بيتك" : "Configure Specifications"}</span>
                     {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
                   </Link>
                 </div>
@@ -780,7 +780,7 @@ export default function LandingPage() {
                 <Ruler className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">0.02 mm</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
-                  {isRTL ? "دقة مسح السحب النقطية بالليزر" : "Laser Point Cloud Precision"}
+                  {isRTL ? "دقة الرفع المساحي بالليزر 3D" : "Laser Point Cloud Precision"}
                 </p>
               </div>
             </RevealOnScroll>
@@ -794,7 +794,7 @@ export default function LandingPage() {
                 <SealCheck className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">100%</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
-                  {isRTL ? "شفافية مطلقة في تسعير BOQ" : "Fixed Itemized BOQ Rates"}
+                  {isRTL ? "مقايسة تفصيلية وسعر ثابت" : "Fixed Itemized BOQ Rates"}
                 </p>
               </div>
             </RevealOnScroll>
@@ -808,7 +808,7 @@ export default function LandingPage() {
                 <ShieldCheck className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">10 Years</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
-                  {isRTL ? "ضمان إنشائي وتشغيلي معتمد" : "Comprehensive Warranty"}
+                  {isRTL ? "ضمان شامل معتمد لمدة 10 سنين" : "Comprehensive Warranty"}
                 </p>
               </div>
             </RevealOnScroll>
@@ -822,7 +822,7 @@ export default function LandingPage() {
                 <ClockCountdown className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">On-Time</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
-                  {isRTL ? "التزام تعاقدي بمواعيد التسليم" : "Turnkey Handover SLA"}
+                  {isRTL ? "تسليم في الميعاد المتفق عليه" : "Turnkey Handover SLA"}
                 </p>
               </div>
             </RevealOnScroll>
@@ -835,27 +835,27 @@ export default function LandingPage() {
         <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
             <Compass className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "الهندسة المعمارية التفاعلية" : "AXONOMETRIC SPECIFICATION"}</span>
+            <span>{isRTL ? "الخامات وتفاصيل التشطيب" : "AXONOMETRIC SPECIFICATION"}</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal">
             {isRTL
-              ? "الدقة الهندسية تلتقي بالحرفية الفاخرة"
+              ? "الدقة الهندسية مع أرقى الخامات والفينيش"
               : "Precision Engineering Meets Artisanal Finishes"}
           </h2>
           <p className="mt-3 text-sm text-[#6B635B] leading-relaxed">
             {isRTL
-              ? "انقر على نقاط التحديد داخل المخطط ثلاثي الأبعاد لاكتشاف مواصفات المواد، معايير العزل الصوتي، وحلول التشطيب المخصصة."
+              ? "دوس على أي نقطة في الرسمة عشان تشوف نوع الخامة، وعزل الصوت، وجودة التنفيذ اللي بنوفرها ليك."
               : "Interact with material pins across the axonometric model to inspect finish grades, acoustic ratings, and architectural joinery."}
           </p>
 
           {/* Category Filter Pills */}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
             {[
-              { id: "all", labelEn: "All Finishes", labelAr: "كافة المواد" },
-              { id: "stone", labelEn: "Navona Travertine", labelAr: "ترافرتين إيطالي" },
-              { id: "wood", labelEn: "Acoustic Oak", labelAr: "سنديان ألماني" },
-              { id: "glass", labelEn: "Fluted Glazing", labelAr: "زجاج مضلع" },
-              { id: "outdoor", labelEn: "Basalt Veranda", labelAr: "بازلت وتيك خارجي" },
+              { id: "all", labelEn: "All Finishes", labelAr: "كل الخامات" },
+              { id: "stone", labelEn: "Navona Travertine", labelAr: "رخام ترافرتين" },
+              { id: "wood", labelEn: "Acoustic Oak", labelAr: "خشب أرو عازل" },
+              { id: "glass", labelEn: "Fluted Glazing", labelAr: "زجاج دبل عازل" },
+              { id: "outdoor", labelEn: "Basalt Veranda", labelAr: "أرضيات التراس" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -940,7 +940,7 @@ export default function LandingPage() {
                 {/* Floating Bottom Instructions */}
                 <div className="absolute bottom-4 start-4 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[#D8C8B4] text-xs text-[#503C2C] font-mono flex items-center gap-2 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>{isRTL ? "انقر على النقاط لاكتشاف المواصفات" : "Click pins to inspect specifications"}</span>
+                  <span>{isRTL ? "دوس على النقط عشان تشوف مواصفات الخامة" : "Click pins to inspect specifications"}</span>
                 </div>
               </div>
             </RevealOnScroll>
@@ -958,7 +958,7 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between border-b border-[#D8C8B4]/60 pb-4 mb-4">
                   <div className="flex items-center gap-2 text-xs font-mono uppercase text-[#B88460]">
                     <Sparkle className="w-3.5 h-3.5" />
-                    <span>{isRTL ? "ملف المواصفات المعمارية" : "SPECIFICATION DOSSIER"}</span>
+                    <span>{isRTL ? "تفاصيل ومواصفات الخامة" : "SPECIFICATION DOSSIER"}</span>
                   </div>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#DFD3C1]/50 text-[#503C2C]">
                     {activeHotspot.fireRating.split(" ")[0]}
@@ -982,7 +982,7 @@ export default function LandingPage() {
                   <div className="flex items-center justify-between text-xs mb-2">
                     <span className="flex items-center gap-1.5 font-medium text-[#503C2C]">
                       <Waveform className="w-4 h-4 text-[#B88460]" />
-                      <span>{isRTL ? "معامل امتصاص الصوت:" : "Acoustic Attenuation:"}</span>
+                      <span>{isRTL ? "عزل وامتصاص الصوت:" : "Acoustic Attenuation:"}</span>
                     </span>
                     <span className="font-mono text-[11px] font-bold text-[#1C1917]">
                       {activeHotspot.acousticScore}%
@@ -1015,9 +1015,9 @@ export default function LandingPage() {
                     <span className="font-medium text-[#1C1917]">{activeHotspot.fireRating}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-[#6B635B]">{isRTL ? "الضمان الإنشائي:" : "Warranty:"}</span>
+                    <span className="text-[#6B635B]">{isRTL ? "الضمان المعتمد:" : "Warranty:"}</span>
                     <span className="font-medium text-emerald-700">
-                      {isRTL ? "10 سنوات شامل" : "10 Years Full Coverage"}
+                      {isRTL ? "10 سنين شامل" : "10 Years Full Coverage"}
                     </span>
                   </div>
                 </div>
@@ -1028,7 +1028,7 @@ export default function LandingPage() {
                   data-cursor-text="ADD"
                   className="w-full mt-6 h-11 rounded-xl bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-98"
                 >
-                  <span>{isRTL ? "تضمين هذه المادة في مشروعي" : "Include in My Commission"}</span>
+                  <span>{isRTL ? "إضافة الخامة دي لمشروعي" : "Include in My Commission"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
                 </Link>
               </TiltCard>
@@ -1044,10 +1044,10 @@ export default function LandingPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
                 <HouseLine className="w-3.5 h-3.5" />
-                <span>{isRTL ? "نماذج معمارية مخصصة" : "BESPOKE TYPOLOGIES"}</span>
+                <span>{isRTL ? "نماذج العقارات اللي بنشطبها" : "BESPOKE TYPOLOGIES"}</span>
               </div>
               <h2 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal">
-                {isRTL ? "مساحات مصممة لترتقي بتفاصيل حياتك" : "Curated Architectural Volumes"}
+                {isRTL ? "مساحات مصممة بأعلى درجات الراحة والفخامة" : "Curated Architectural Volumes"}
               </h2>
             </div>
 
@@ -1057,7 +1057,7 @@ export default function LandingPage() {
               data-cursor-text="COMMISSION"
               className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors shrink-0"
             >
-              <span>{isRTL ? "بدء تحديد نموذجك المعماري" : "Commission Your Custom Layout"}</span>
+              <span>{isRTL ? "حدد نوع ومواصفات عقارك" : "Commission Your Custom Layout"}</span>
               {isRTL ? <ArrowLeft className="w-4 h-4" /> : <ArrowRight className="w-4 h-4" />}
             </Link>
           </RevealOnScroll>
@@ -1113,7 +1113,7 @@ export default function LandingPage() {
                       data-cursor-text="COMMISSION"
                       className="inline-flex items-center justify-between w-full pt-4 border-t border-[#D8C8B4]/60 text-xs font-medium text-[#1C1917] group/link hover:text-[#B88460] transition-colors"
                     >
-                      <span>{isRTL ? "مواصفات هذا النموذج" : "Commission This Volume"}</span>
+                      <span>{isRTL ? "تفاصيل تشطيب النموذج ده" : "Commission This Volume"}</span>
                       {isRTL ? (
                         <ArrowLeft className="w-4 h-4 group-hover/link:-translate-x-1 transition-transform" />
                       ) : (
@@ -1133,14 +1133,14 @@ export default function LandingPage() {
         <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
             <Sliders className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "معيار فالنتيا المعماري" : "THE ATELIER STANDARD"}</span>
+            <span>{isRTL ? "الفرق بيننا وبين السوق" : "THE ATELIER STANDARD"}</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal">
-            {isRTL ? "لماذا يختار عملاء النخبة أتيليه فالنتيا؟" : "Why Discerning Clients Choose Valentia"}
+            {isRTL ? "ليه عملاء فالنتيا بيطمنوا معانا؟" : "Why Discerning Clients Choose Valentia"}
           </h2>
           <p className="mt-3 text-sm text-[#6B635B] leading-relaxed">
             {isRTL
-              ? "مقارنة دقيقة توضح الفارق الجذري بين المقاولات التقليدية ومنهجية الأتيليه الهندسية الصارمة."
+              ? "مقارنة سريعة توضح لك الفرق بين شغل المقاولين العاديين وبين الشغل الهندسي المنظم مع فالنتيا."
               : "A transparent side-by-side comparison between conventional contractors and our architectural atelier protocol."}
           </p>
         </RevealOnScroll>
@@ -1149,14 +1149,14 @@ export default function LandingPage() {
           <div className="rounded-3xl overflow-hidden border border-[#D8C8B4] bg-white shadow-xl">
             <div className="grid grid-cols-12 bg-[#FAF7F2] p-5 border-b border-[#E6DDD2] text-xs font-mono uppercase tracking-wider text-[#503C2C] font-semibold">
               <div className="col-span-4 sm:col-span-3">
-                {isRTL ? "المعيار الهندسي" : "Evaluation Metric"}
+                {isRTL ? "وجه المقارنة" : "Evaluation Metric"}
               </div>
               <div className="col-span-4 sm:col-span-4 text-red-900/70">
                 {isRTL ? "المقاولون التقليديون" : "Conventional Contractors"}
               </div>
               <div className="col-span-4 sm:col-span-5 text-[#1C1917] font-bold flex items-center gap-1.5">
                 <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-                <span>{isRTL ? "أتيليه فالنتيا (المعيار المعتمد)" : "Valentia Atelier Standard"}</span>
+                <span>{isRTL ? "أتيليه فالنتيا (شغل هندسي مضمون)" : "Valentia Atelier Standard"}</span>
               </div>
             </div>
 
@@ -1189,14 +1189,14 @@ export default function LandingPage() {
         <RevealOnScroll direction="up" className="text-center max-w-2xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
             <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "منهجية العمل المتكاملة" : "TURNKEY METHODOLOGY"}</span>
+            <span>{isRTL ? "مراحل الشغل خطوة بخطوة" : "TURNKEY METHODOLOGY"}</span>
           </div>
           <h2 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal">
-            {isRTL ? "رحلة إنجاز متقنة من الفكرة حتى المفتاح" : "The 5-Stage Atelier Execution"}
+            {isRTL ? "من أول المعاينة لحد ما تستلم المفتاح" : "The 5-Stage Atelier Execution"}
           </h2>
           <p className="mt-3 text-sm text-[#6B635B] leading-relaxed">
             {isRTL
-              ? "نلغي أي مجال للعشوائية من خلال منهجية هندسية منضبطة تضمن تنفيذ كل تفصيلة وفق أعلى المعايير العالمية."
+              ? "مفيش مكان للعشوائية؛ شغالين بنظام هندسي واضح بيضمن لك أعلى جودة وأنت مطمن ومرتاح."
               : "We eliminate execution ambiguity through an architectural workflow engineered for absolute precision and turnkey peace of mind."}
           </p>
         </RevealOnScroll>
@@ -1228,7 +1228,7 @@ export default function LandingPage() {
 
                 <div className="mt-6 pt-4 border-t border-[#D8C8B4]/40 flex items-center gap-2 text-[10px] font-mono text-[#6B635B]">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{isRTL ? "بند تسليم تعاقدي معتمد" : "Verified Milestone Gate"}</span>
+                  <span>{isRTL ? "مرحلة تسليم تعاقدية معتمدة" : "Verified Milestone Gate"}</span>
                 </div>
               </div>
             </RevealOnScroll>
@@ -1253,18 +1253,18 @@ export default function LandingPage() {
             <div className="relative z-10 max-w-2xl space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-mono uppercase tracking-widest text-[#FAF7F2]">
                 <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-                <span>{isRTL ? "فتح باب الحجوزات المعمارية" : "EXCLUSIVE COMMISSIONS OPEN"}</span>
+                <span>{isRTL ? "متاح فتح مشاريع جديدة حالياً" : "EXCLUSIVE COMMISSIONS OPEN"}</span>
               </div>
 
               <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-normal text-[#FAF7F2] leading-tight">
                 {isRTL
-                  ? "هل أنت مستعد لبدء تصميم مسكن أحلامك؟"
+                  ? "جاهز تبدأ تشطيب بيت أحلامك في مصر؟"
                   : "Ready to Commission Your Bespoke Living Space?"}
               </h2>
 
               <p className="text-sm sm:text-base text-[#FAF7F2]/80 leading-relaxed">
                 {isRTL
-                  ? "ابدأ بتحديد متطلبات عقارك ومساحاتك المفضلة وسيقوم فريقنا المعماري بإعداد الدراسة الهندسية الأولية وعينات المواد الخاصة بك."
+                  ? "حدد بيانات عقارك والغرف اللي تحب تشطبها، ومهندسينا هيجهزوا لك مقترح التصميم والخامات والمقايسة."
                   : "Specify your property dimensions, room distributions, and design direction. Our senior atelier architects will engineer your bespoke dossier."}
               </p>
 
@@ -1275,7 +1275,7 @@ export default function LandingPage() {
                   data-cursor-text="START"
                   className="h-12 px-8 rounded-full bg-[#FAF7F2] hover:bg-white text-[#1C1917] text-xs uppercase tracking-widest font-medium transition-all shadow-lg flex items-center gap-2 cursor-pointer group active:scale-98"
                 >
-                  <span>{isRTL ? "ابدأ مواصفات المشروع" : "Start Project Intake"}</span>
+                  <span>{isRTL ? "ابدأ تشطيب بيتك الآن" : "Start Project Intake"}</span>
                   {isRTL ? (
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                   ) : (
@@ -1314,14 +1314,14 @@ export default function LandingPage() {
             </div>
             <p className="text-xs leading-relaxed text-[#6B635B] max-w-xs">
               {isRTL
-                ? "أتيليه التصميم والتنفيذ المعماري الفاخر. متواجدون في القاهرة، دبي، والرياض."
+                ? "أتيليه التصميم والتشطيب المعماري الراقي في مصر والخليج."
                 : "Bespoke interior architecture, turnkey fit-out, and artisanal joinery. Operating across Cairo, Dubai, and Riyadh."}
             </p>
           </div>
 
           <div>
             <span className="block font-mono text-[11px] uppercase tracking-wider text-[#1C1917] mb-3">
-              {isRTL ? "المواقع والاستوديوهات" : "Atelier Studios"}
+              {isRTL ? "فروعنا ومكاتبنا" : "Atelier Studios"}
             </span>
             <ul className="space-y-2 text-xs">
               <li>{isRTL ? "الزمالك، القاهرة · مصر" : "Zamalek, Cairo · Egypt"}</li>
@@ -1332,7 +1332,7 @@ export default function LandingPage() {
 
           <div>
             <span className="block font-mono text-[11px] uppercase tracking-wider text-[#1C1917] mb-3">
-              {isRTL ? "بوابة الأتيليه" : "Atelier Navigation"}
+              {isRTL ? "روابط سريعة" : "Atelier Navigation"}
             </span>
             <ul className="space-y-2 text-xs">
               <li>
@@ -1341,7 +1341,7 @@ export default function LandingPage() {
                   data-cursor="pointer"
                   className="hover:text-[#1C1917] transition-colors"
                 >
-                  {isRTL ? "بدء مشروع جديد" : "Commission Project"}
+                  {isRTL ? "ابدأ مشروع جديد" : "Commission Project"}
                 </Link>
               </li>
               <li>
@@ -1359,7 +1359,7 @@ export default function LandingPage() {
                   data-cursor="pointer"
                   className="hover:text-[#1C1917] transition-colors"
                 >
-                  {isRTL ? "تسجيل الدخول للأتيليه" : "Client Portal Sign In"}
+                  {isRTL ? "تسجيل الدخول" : "Client Portal Sign In"}
                 </Link>
               </li>
             </ul>
@@ -1367,7 +1367,7 @@ export default function LandingPage() {
 
           <div>
             <span className="block font-mono text-[11px] uppercase tracking-wider text-[#1C1917] mb-3">
-              {isRTL ? "الأمان والضمان" : "Compliance & Standards"}
+              {isRTL ? "الأمان والخصوصية" : "Compliance & Standards"}
             </span>
             <div className="space-y-2 text-xs">
               <div className="flex items-center gap-2 text-emerald-700">
@@ -1376,7 +1376,7 @@ export default function LandingPage() {
               </div>
               <p className="text-[11px] text-[#6B635B]">
                 {isRTL
-                  ? "جميع حقوق التصاميم والمخططات محمية بموجب اتفاقيات السرية والملكية الفكرية."
+                  ? "جميع تصميماتك ورسوماتك محمية بالكامل بأعلى معايير الخصوصية والأمان."
                   : "All architectural intellectual property protected under mutual non-disclosure."}
               </p>
             </div>

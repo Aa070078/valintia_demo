@@ -24,7 +24,7 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
               isRTL ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]" : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "مستودع المخططات والوثائق" : "ARCHITECTURAL ARCHIVE"}
+            {isRTL ? "أرشيف الرسومات والمخططات" : "ARCHITECTURAL ARCHIVE"}
           </div>
           <h4
             className={cn(
@@ -32,7 +32,7 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
               isRTL ? "font-sans text-lg font-bold" : "font-serif text-lg"
             )}
           >
-            {isRTL ? "ملفات ومخططات المشروع" : "Project Blueprints & Records"}
+            {isRTL ? "رسومات ومخططات المشروع" : "Project Blueprints & Records"}
           </h4>
           <p
             className={cn(
@@ -41,7 +41,7 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
             )}
           >
             {isRTL
-              ? "مخططات الكاد التنفيذية، رسومات الأوتوكاد، ونتائج المسح الليزري ثلاثي الأبعاد."
+              ? "رسومات الأوتوكاد (CAD) التنفيذية، والمخططات الهندسية، ورفع المقاسات بالليزر ثلاثي الأبعاد."
               : "Executive CAD drawings, architectural schematics, and lidar survey scans."}
           </p>
         </div>
@@ -95,7 +95,7 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
               isRTL ? "text-sm font-bold" : "text-xs font-semibold"
             )}
           >
-            {isRTL ? "لا توجد ملفات مرفوعة حالياً" : "No Drawings Uploaded"}
+            {isRTL ? "لسه مفيش ملفات مرفوعة لحد دلوقتي" : "No Drawings Uploaded"}
           </h5>
           <p
             className={cn(
@@ -104,7 +104,7 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
             )}
           >
             {isRTL
-              ? "سيتم رفع مخططات المسح الليزري ثلاثي الأبعاد والرسومات التنفيذية هنا بعد اكتمال المعاينة الميدانية."
+              ? "فريق الهندسة هيرفع هنا كل رسومات الأوتوكاد ورفع المقاسات بالليزر أول ما نخلص معاينة الموقع."
               : "3D lidar point-clouds and CAD schematics will be uploaded here by the engineering atelier following the site visit."}
           </p>
         </div>

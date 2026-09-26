@@ -51,7 +51,7 @@ function LoginForm() {
     if (!username.trim() || !password) {
       setError(
         isRTL
-          ? "يرجى إدخال اسم المستخدم أو البريد الإلكتروني وكلمة المرور."
+          ? "من فضلك اكتب اسم المستخدم أو الإيميل وكلمة السر."
           : "Please enter your username/email and password."
       );
       return;
@@ -80,7 +80,7 @@ function LoginForm() {
       console.error("Login failed:", err);
       setError(
         isRTL
-          ? "بيانات الدخول غير صحيحة. يرجى التأكد من اسم المستخدم وكلمة المرور."
+          ? "بيانات الدخول مش صحيحة. اتأكد من اسم المستخدم وكلمة السر وجرب تاني."
           : "Invalid credentials. Please verify your username and password."
       );
     } finally {
@@ -141,7 +141,7 @@ function LoginForm() {
                 VALENTIA
               </span>
               <span className="block text-[10px] tracking-[0.2em] text-[#FAF7F2]/60 uppercase">
-                {isRTL ? "أتيليه التصميم والتنفيذ" : "Design & Build Atelier"}
+                {isRTL ? "أتيليه التصميم والتشطيب المتكامل" : "Design & Build Atelier"}
               </span>
             </div>
           </div>
@@ -155,12 +155,12 @@ function LoginForm() {
           >
             <div className="flex items-center gap-2 mb-4 text-[#B88460] text-xs uppercase tracking-widest font-mono">
               <Sparkle className="w-3.5 h-3.5" weight="fill" />
-              <span>{isRTL ? "ميثاق الأتيليه" : "ATELIER PHILOSOPHY"}</span>
+              <span>{isRTL ? "فلسفتنا في التصميم" : "ATELIER PHILOSOPHY"}</span>
             </div>
 
             <p className="font-serif text-2xl xl:text-3xl leading-relaxed font-normal text-[#FAF7F2]/95 italic">
               {isRTL
-                ? "«الهندسة ليست مجرد تنظيم للمساحة، بل تجسيدٌ لحياة مفعمة بالأناقة والسكينة الخالدة.»"
+                ? "«التصميم مش مجرد رص حيطان ومساحات، ده أسلوب حياة بيجمع بين الراحة والجمال الراقي الخالد.»"
                 : "“Architecture is not merely the organization of space, but the physical embodiment of timeless serenity and bespoke living.”"}
             </p>
 
@@ -170,12 +170,12 @@ function LoginForm() {
                   {isRTL ? "أتيليه فالنتيا المعماري" : "Valentia Design & Build"}
                 </span>
                 <span className="block text-xs text-[#FAF7F2]/60">
-                  {isRTL ? "القاهرة · دبي · الرياض" : "Cairo · Dubai · Riyadh"}
+                  {isRTL ? "الشيخ زايد · التجمع · الساحل · الجونة" : "Cairo · Dubai · Riyadh"}
                 </span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] text-[#FAF7F2]/80 font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{isRTL ? "نشط · مشاريع حصرية" : "Active Commissions"}</span>
+                <span>{isRTL ? "شغالين على مشاريع حالية" : "Active Commissions"}</span>
               </div>
             </div>
           </TiltCard>
@@ -187,7 +187,7 @@ function LoginForm() {
             <ShieldCheck className="w-4 h-4 text-emerald-400" weight="fill" />
             <span>
               {isRTL
-                ? "تشفير بنكي 256-bit AES · مصادقة JWT آمنة"
+                ? "تشفير بنكي آمن 256-bit · حماية كاملة لبياناتك"
                 : "256-bit AES Encryption · Bearer JWT Authentication"}
             </span>
           </div>
@@ -202,14 +202,14 @@ function LoginForm() {
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DFD3C1]/50 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
               <Lock className="w-3 h-3" />
-              <span>{isRTL ? "بوابة الأتيليه الآمنة" : "SECURE ATELIER PORTAL"}</span>
+              <span>{isRTL ? "تسجيل دخول آمن" : "SECURE ATELIER PORTAL"}</span>
             </div>
             <h1 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal tracking-tight">
               {isRTL ? "تسجيل الدخول" : "Sign In to Atelier"}
             </h1>
             <p className="mt-2 text-sm text-[#6B635B] leading-relaxed">
               {isRTL
-                ? "أدخل بياناتك للوصول إلى تفاصيل مشروعك المعماري ومتابعة التنفيذ وجدول الكميات."
+                ? "سجل دخولك عشان تتابع تفاصيل تشطيب بيتك، المقايسة والمواصفات خطوة بخطوة."
                 : "Access your architectural blueprints, itemized BOQ, and turnkey milestone updates."}
             </p>
           </div>
@@ -218,10 +218,10 @@ function LoginForm() {
           <div className="mb-6 p-4 rounded-xl bg-white/70 border border-[#D8C8B4] shadow-sm">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-mono uppercase tracking-wider text-[#6B635B]">
-                {isRTL ? "أدوار المعاينة السريعة" : "DEMO ACCESS PERSONAS"}
+                {isRTL ? "تجربة سريعة للأدوار" : "DEMO ACCESS PERSONAS"}
               </span>
               <span className="text-[10px] text-[#B88460] font-medium">
-                {isRTL ? "انقر للملء التلقائي" : "Click to Autofill"}
+                {isRTL ? "دوس للتعبئة السريعة" : "Click to Autofill"}
               </span>
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
@@ -248,8 +248,8 @@ function LoginForm() {
                     : role === "PROJECT_MANAGER"
                     ? isRTL ? "مدير مشروع" : "PM"
                     : role === "COMPANY_OWNER"
-                    ? isRTL ? "المالك" : "Owner"
-                    : isRTL ? "مسؤول" : "Admin"}
+                    ? isRTL ? "صاحب الشركة" : "Owner"
+                    : isRTL ? "الأدمن" : "Admin"}
                 </button>
               ))}
             </div>
@@ -261,7 +261,7 @@ function LoginForm() {
               <Lock className="w-4 h-4 text-[#B88460] shrink-0" />
               <span>
                 {isRTL
-                  ? "يرجى تسجيل الدخول للمتابعة إلى صفحات الأتيليه المحمية."
+                  ? "سجل دخولك الأول عشان تقدر تفتح وتتابع مشاريعك الخاصة."
                   : "Please authenticate to access your atelier projects and commission workspace."}
               </span>
             </div>
@@ -283,7 +283,7 @@ function LoginForm() {
                 htmlFor="username"
                 className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
               >
-                {isRTL ? "اسم المستخدم أو البريد الإلكتروني" : "Username or Email"}
+                {isRTL ? "اسم المستخدم أو الإيميل" : "Username or Email"}
               </label>
               <div className="relative">
                 <input
@@ -311,13 +311,13 @@ function LoginForm() {
                   htmlFor="password"
                   className="block text-xs uppercase tracking-wider font-medium text-[#503C2C]"
                 >
-                  {isRTL ? "كلمة المرور" : "Password"}
+                  {isRTL ? "كلمة السر" : "Password"}
                 </label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-[#B88460] hover:text-[#503C2C] transition-colors"
                 >
-                  {isRTL ? "نسيت كلمة المرور؟" : "Forgot Password?"}
+                  {isRTL ? "نسيت كلمة السر؟" : "Forgot Password?"}
                 </Link>
               </div>
               <div className="relative">
@@ -359,7 +359,7 @@ function LoginForm() {
                   className="w-4 h-4 rounded border-[#D8C8B4] text-[#1C1917] focus:ring-[#1C1917]"
                 />
                 <span className="text-xs text-[#6B635B]">
-                  {isRTL ? "تذكر هذا الجهاز" : "Remember this workstation"}
+                  {isRTL ? "افتكرني على الجهاز ده" : "Remember this workstation"}
                 </span>
               </label>
             </div>
@@ -373,11 +373,11 @@ function LoginForm() {
               {isSubmitting || isLoading ? (
                 <>
                   <CircleNotch className="w-4 h-4 animate-spin" />
-                  <span>{isRTL ? "جارٍ التحقق..." : "Authenticating..."}</span>
+                  <span>{isRTL ? "ثواني بنسجل دخولك..." : "Authenticating..."}</span>
                 </>
               ) : (
                 <>
-                  <span>{isRTL ? "تسجيل الدخول للأتيليه" : "Sign In to Atelier"}</span>
+                  <span>{isRTL ? "دخول لحسابي" : "Sign In to Atelier"}</span>
                   {isRTL ? (
                     <ArrowLeft className="w-4 h-4" />
                   ) : (
@@ -391,7 +391,7 @@ function LoginForm() {
           {/* Switch to Signup */}
           <div className="mt-8 text-center border-t border-[#D8C8B4] pt-6">
             <p className="text-xs text-[#6B635B]">
-              {isRTL ? "عميل جديد في فالنتيا؟" : "New client commissioning a project?"}{" "}
+              {isRTL ? "أول مرة تشطب معانا في فالنتيا؟" : "New client commissioning a project?"}{" "}
               <Link
                 href={
                   redirectParam
@@ -400,7 +400,7 @@ function LoginForm() {
                 }
                 className="font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors"
               >
-                {isRTL ? "أنشئ حسابك وابدأ مشروعك" : "Create an account & start commission"}
+                {isRTL ? "اعمل حساب جديد وابدأ تشطيب بيتك ←" : "Create an account & start commission"}
               </Link>
             </p>
           </div>
@@ -411,7 +411,7 @@ function LoginForm() {
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
               <span>
                 {isRTL
-                  ? "بيئة معمارية مشفرة بالكامل تضمن خصوصية وسرية مواصفات مشروعك"
+                  ? "بيانات ومواصفات تشطيب بيتك محمية ومشفرة بأعلى معايير الأمان."
                   : "Encrypted atelier portal protecting architectural and engineering confidentiality"}
               </span>
             </div>

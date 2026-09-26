@@ -59,11 +59,11 @@ export default function ProjectDetailsPage() {
             "text-2xl text-[#1C1917]",
             isRTL ? "font-sans font-bold" : "font-serif font-medium"
           )}>
-            {isRTL ? "المشروع غير موجود" : "Commission Not Found"}
+            {isRTL ? "المشروع مش موجود" : "Commission Not Found"}
           </h2>
           <p className="text-xs font-medium text-[#503C2C]">
             {isRTL
-              ? "لم يتم العثور على هذا المشروع في سجلات الأتيليه الخاصة بك."
+              ? "ملقيناش المشروع ده في حسابك أو ممكن يكون اتحذف."
               : "The requested commission does not exist or has been moved."}
           </p>
           <Link
@@ -73,7 +73,7 @@ export default function ProjectDetailsPage() {
               isRTL ? "font-sans font-bold tracking-normal" : "font-semibold uppercase tracking-wider"
             )}
           >
-            {isRTL ? "العودة لقائمة المشاريع" : "Back to Projects"}
+            {isRTL ? "الرجوع لمشاريعي" : "Back to Projects"}
           </Link>
         </div>
       </CustomerShell>
@@ -100,25 +100,25 @@ export default function ProjectDetailsPage() {
     {
       id: "overview",
       labelEn: "Overview & Specs",
-      labelAr: "المواصفات العامة",
+      labelAr: "المواصفات وتفاصيل التشطيب",
       icon: SquaresFour,
     },
     {
       id: "spaces",
       labelEn: `Spaces (${project.spaces?.length || 0})`,
-      labelAr: `الفراغات (${project.spaces?.length || 0})`,
+      labelAr: `الغرف والمساحات (${project.spaces?.length || 0})`,
       icon: HouseLine,
     },
     {
       id: "team",
       labelEn: "Atelier Team & Survey",
-      labelAr: "فريق الأتيليه والمعاينة",
+      labelAr: "فريق العمل والمعاينة",
       icon: UsersThree,
     },
     {
       id: "documents",
       labelEn: `Blueprints (${project.documents?.length || 0})`,
-      labelAr: `المخططات (${project.documents?.length || 0})`,
+      labelAr: `الرسومات والمخططات (${project.documents?.length || 0})`,
       icon: FilePdf,
     },
   ];
@@ -141,7 +141,7 @@ export default function ProjectDetailsPage() {
               ) : (
                 <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
               )}
-              <span>{isRTL ? "العودة للمشاريع" : "Back to Projects"}</span>
+              <span>{isRTL ? "الرجوع للمشاريع" : "Back to Projects"}</span>
             </Link>
 
             <StatusChip status={project.status} />
@@ -151,7 +151,7 @@ export default function ProjectDetailsPage() {
             eyebrow={`COMMISSION · ${project.id}`}
             title={displayTitle}
             description={`${
-              isRTL ? "تاريخ التكليف:" : "Commissioned on"
+              isRTL ? "تاريخ الطلب:" : "Commissioned on"
             } ${new Date(project.createdAt).toLocaleDateString(
               isRTL ? "ar-EG" : "en-US",
               { month: "long", day: "numeric", year: "numeric" }
@@ -170,12 +170,12 @@ export default function ProjectDetailsPage() {
                   {submitMutation.isPending ? (
                     <>
                       <Spinner className="h-3.5 w-3.5 text-white" />
-                      <span>{isRTL ? "جاري الاعتماد..." : "Submitting..."}</span>
+                      <span>{isRTL ? "ثواني بنعتمد طلبك..." : "Submitting..."}</span>
                     </>
                   ) : (
                     <>
                       <PaperPlaneTilt size={13} weight="bold" />
-                      <span>{isRTL ? "اعتماد وإرسال التكليف" : "Commission Atelier"}</span>
+                      <span>{isRTL ? "تأكيد وإرسال طلب التشطيب ←" : "Commission Atelier"}</span>
                     </>
                   )}
                 </button>

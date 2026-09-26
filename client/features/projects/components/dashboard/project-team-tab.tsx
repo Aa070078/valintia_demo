@@ -24,7 +24,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
               isRTL ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]" : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "الفريق المعماري المخصص" : "ASSIGNED ATELIER TEAM"}
+            {isRTL ? "فريق العمل المعماري" : "ASSIGNED ATELIER TEAM"}
           </div>
           <h4
             className={cn(
@@ -32,7 +32,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
               isRTL ? "font-sans text-xl font-bold" : "font-serif text-xl"
             )}
           >
-            {isRTL ? "فريق إدارة وهندسة المشروع" : "Project Leadership"}
+            {isRTL ? "مهندسين المشروع والمسؤولين عنك" : "Project Leadership"}
           </h4>
           <p
             className={cn(
@@ -41,7 +41,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
             )}
           >
             {isRTL
-              ? "مهندسوك المعماريون المخصصون لمتابعة الرؤية التصميمية، والمسح الميداني، وضمان الجودة الحرفية."
+              ? "المهندسين المعماريين اللي هيتابعوا معاك كل تفصيلة في التصميم، ورفع المقاسات، واستلام الشغل على أعلى مستوى."
               : "Dedicated architectural leads coordinating your spatial vision, lidar scans, and execution quality."}
           </p>
         </div>
@@ -67,7 +67,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                   isRTL ? "text-xs font-bold" : "text-[11px] text-[#B88460]"
                 )}
               >
-                {isRTL ? "كبير المعماريين ورئيس الأتيليه" : "Senior Architectural Partner"}
+                {isRTL ? "رئيس المهندسين المعماريين" : "Senior Architectural Partner"}
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                   isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[11px]"
                 )}
               >
-                {isRTL ? "مدير التنفيذ والموقع" : "Fit-Out Project Director"}
+                {isRTL ? "مدير التنفيذ والإشراف على الموقع" : "Fit-Out Project Director"}
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
               isRTL ? "font-sans text-xs font-bold tracking-normal text-[#503C2C]" : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "المحطات القادمة" : "UPCOMING MILESTONES"}
+            {isRTL ? "المحطات الجاية" : "UPCOMING MILESTONES"}
           </div>
           <h4
             className={cn(
@@ -116,7 +116,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
               isRTL ? "font-sans text-xl font-bold" : "font-serif text-xl"
             )}
           >
-            {isRTL ? "جلسة الاستشارة والمعاينة" : "Consultation & Survey"}
+            {isRTL ? "ميعاد الاستشارة ومعاينة الموقع" : "Consultation & Survey"}
           </h4>
           <p
             className={cn(
@@ -125,7 +125,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
             )}
           >
             {isRTL
-              ? "سيقوم فريق فالنتيا بالتواصل معك عبر الواتساب لتأكيد موعد مكالمة الفيديو وجدول زيارة المعاينة الميدانية."
+              ? "فريق فالنتيا هيكلمك على الواتساب عشان نحدد ميعاد مكالمة الفيديو ونرتب ميعاد نزول الموقع لرفع المقاسات."
               : "Valentia concierge will reach out to confirm your virtual briefing call and coordinate site key handover."}
           </p>
         </div>
@@ -142,7 +142,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                     isRTL ? "text-sm font-bold" : "text-xs font-semibold"
                   )}
                 >
-                  {isRTL ? "مكالمة الفيديو الاستشارية" : "Virtual Consultation Session"}
+                  {isRTL ? "مكالمة الاستشارة أونلاين" : "Virtual Consultation Session"}
                 </div>
                 <div
                   className={cn(
@@ -150,7 +150,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                     isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[11px]"
                   )}
                 >
-                  {isRTL ? "عبر Google Meet / Zoom المباشر" : "Direct video conference with Lead Architect"}
+                  {isRTL ? "ميتينج فيديو مع رئيس المهندسين" : "Direct video conference with Lead Architect"}
                 </div>
               </div>
             </div>
@@ -160,7 +160,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                 isRTL ? "text-xs font-bold tracking-normal" : "text-[10px] font-mono"
               )}
             >
-              {isRTL ? "قيد التنسيق" : "Pending Sync"}
+              {isRTL ? "بننسق الميعاد" : "Pending Sync"}
             </span>
           </div>
 
@@ -175,7 +175,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                     isRTL ? "text-sm font-bold" : "text-xs font-semibold"
                   )}
                 >
-                  {isRTL ? "المسح الليزري ثلاثي الأبعاد" : "3D Lidar Site Survey"}
+                  {isRTL ? "رفع المقاسات بالليزر ثلاثي الأبعاد" : "3D Lidar Site Survey"}
                 </div>
                 <div
                   className={cn(
@@ -183,7 +183,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                     isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[11px]"
                   )}
                 >
-                  {isRTL ? "زيارة ميدانية وتوثيق سحابي للموقع" : "Point-cloud precision spatial scan"}
+                  {isRTL ? "معاينة ميدانية في موقع البيت بدقة متناهية" : "Point-cloud precision spatial scan"}
                 </div>
               </div>
             </div>

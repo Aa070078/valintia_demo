@@ -105,7 +105,7 @@ export function PhoneInputWithCountry({
             type="button"
             onClick={() => setIsOpen(!isOpen)}
             className="flex items-center gap-1.5 px-3 py-2.5 text-xs text-[#1C1917] hover:bg-secondary/50 rounded-s-xl transition-colors cursor-pointer select-none"
-            title={isRTL ? "تغيير كود الدولة" : "Change country code"}
+            title={isRTL ? "تغيير كود البلد" : "Change country code"}
           >
             <span className="text-base leading-none">{activeCountry.flag}</span>
             <span className="font-mono text-xs font-medium text-[#503C2C] ltr:direction-ltr" dir="ltr">
@@ -144,7 +144,7 @@ export function PhoneInputWithCountry({
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder={
-                      isRTL ? "ابحث بالدولة أو الكود..." : "Search country or code..."
+                      isRTL ? "دور باسم البلد أو كود الاتصال..." : "Search country or code..."
                     }
                     className={cn(
                       "w-full py-1.5 text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460]",

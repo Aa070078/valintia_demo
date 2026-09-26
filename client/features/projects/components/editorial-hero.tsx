@@ -33,22 +33,30 @@ const PREVIEW_ROOMS = [
 const PROCESS_STEPS = [
   {
     title: "01 · Concept & Architectural Vision",
+    titleAr: "٠١ · الفكرة والتصميم المعماري",
     desc: "Collaborative discovery with our senior design leads. We curate moodboards, 3D spatial renders, and material boards tailored to your lifestyle.",
+    descAr: "جلسات مع مهندسي الديكور عشان نحدد ذوقك ونعمل Moodboards ورسومات 3D واقعية لكل ركن.",
     icon: Compass,
   },
   {
     title: "02 · Detailed Technical Design & BOQ",
+    titleAr: "٠٢ · الرسومات الهندسية والمقايسة (BOQ)",
     desc: "Rigorous CAD floorplans, MEP engineering schematics, and itemized bill-of-quantities with guaranteed price points before construction begins.",
+    descAr: "مخططات CAD تفصيلية، شبكات الكهرباء والسباكة، ومقايسة مسعرة بدقة ومن غير أي مصاريف مستخبية.",
     icon: Sparkle,
   },
   {
     title: "03 · Turnkey Execution & Site Supervision",
+    titleAr: "٠٣ · التنفيذ المباشر والإشراف على الموقع",
     desc: "Master craftsmen and dedicated site engineers execute every millimeter, logged daily with real-time milestone photos and progress tracking.",
+    descAr: "فريق صنايعية ومهندسين موقع محترفين بينفذوا كل ملّي، مع تقارير صور حية ونسب إنجاز أسبوعية.",
     icon: Hammer,
   },
   {
     title: "04 · Handover & 10-Year Warranty",
+    titleAr: "٠٤ · الاستلام والضمان الشامل",
     desc: "Final architectural snagging, white-glove staging, and immediate issuance of structural and finishing warranties.",
+    descAr: "معاينة هندسية دقيقة لتسليم الشقة أو الفيلا على المفتاح مع شهادة ضمان معتمدة على كل بند.",
     icon: CheckCircle,
   },
 ];
@@ -318,19 +326,27 @@ export function EditorialHero() {
 
             <div className="flex items-center gap-2">
               <span className="h-px w-6 bg-foreground/40" />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-foreground/80">
-                The Valentia Method
+              <span className={cn(
+                "text-[11px] font-semibold text-foreground/80",
+                isRTL ? "tracking-normal font-sans font-bold text-[#503C2C]" : "uppercase tracking-[0.2em]"
+              )}>
+                {isRTL ? "طريقة شغل فالنتيا" : "The Valentia Method"}
               </span>
             </div>
 
-            <h3 className="mt-2 font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
-              Turnkey Interior Fit-Out, Engineered
+            <h3 className={cn(
+              "mt-2 text-2xl font-medium tracking-tight text-foreground sm:text-3xl",
+              isRTL ? "font-sans font-bold leading-snug" : "font-serif"
+            )}>
+              {isRTL
+                ? "تشطيب بيتك على المفتاح بأعلى جودة هندسية"
+                : "Turnkey Interior Fit-Out, Engineered"}
             </h3>
 
             <p className="mt-2 text-xs text-muted-foreground leading-relaxed sm:text-sm">
-              Discover how we turn high-end residential architecture into
-              reality with end-to-end design, construction management, and
-              uncompromising execution standards in Egypt.
+              {isRTL
+                ? "شوف إزاي بنحوّل بيتك في مصر من مجرد شقة أو فيلا لتحفة معمارية متكاملة، بتصميم مدروس وتنفيذ دقيق وإشراف هندسي يومي."
+                : "Discover how we turn high-end residential architecture into reality with end-to-end design, construction management, and uncompromising execution standards in Egypt."}
             </p>
 
             <div className="mt-6 flex flex-col gap-4">
@@ -339,17 +355,20 @@ export function EditorialHero() {
                 return (
                   <div
                     key={idx}
-                    className="flex items-start gap-3.5 rounded-xl border border-border/80 bg-background/50 p-3.5 transition-colors hover:border-foreground/30"
+                    className="flex items-start gap-3.5 rounded-xl border border-border/80 bg-background/50 p-3.5 transition-colors hover:border-foreground/30 text-start"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground/5 text-foreground">
                       <Icon size={16} weight="bold" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-semibold tracking-wide text-foreground">
-                        {step.title}
+                      <h4 className={cn(
+                        "text-xs font-semibold text-foreground",
+                        isRTL && "font-sans font-bold"
+                      )}>
+                        {isRTL ? step.titleAr : step.title}
                       </h4>
                       <p className="mt-0.5 text-xs text-muted-foreground leading-relaxed">
-                        {step.desc}
+                        {isRTL ? step.descAr : step.desc}
                       </p>
                     </div>
                   </div>
@@ -359,15 +378,22 @@ export function EditorialHero() {
 
             <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
               <span className="text-xs text-muted-foreground">
-                Ready to build with Valentia?
+                {isRTL ? "جاهز تبدأ تشطيب بيتك مع فالنتيا؟" : "Ready to build with Valentia?"}
               </span>
               <Link
                 href="/projects/new?step=2"
                 onClick={() => setIsVideoOpen(false)}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-xs transition-opacity hover:opacity-90"
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs text-primary-foreground shadow-xs transition-opacity hover:opacity-90",
+                  isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-wider"
+                )}
               >
-                <span>Get Started Now</span>
-                <ArrowRight size={13} weight="bold" />
+                <span>{isRTL ? "ابدأ دلوقتي" : "Get Started Now"}</span>
+                {isRTL ? (
+                  <ArrowRight size={13} weight="bold" className="rotate-180" />
+                ) : (
+                  <ArrowRight size={13} weight="bold" />
+                )}
               </Link>
             </div>
           </div>

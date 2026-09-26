@@ -133,15 +133,15 @@ export function StepCustomerLocation({
                 : "font-mono text-[10px] font-semibold uppercase tracking-[0.2em]"
             )}
           >
-            {isRTL ? "٠٥ — ٠٦ • موقع إقامتك وبيانات التواصل" : "05 — 06 TIMEZONE & RESIDENCE"}
+            {isRTL ? "الخطوة الخامسة • مكان إقامتك ورقم التواصل" : "05 — 06 TIMEZONE & RESIDENCE"}
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {isRTL ? "أين تتواجد حالياً؟" : "Where are you currently based?"}
+          {isRTL ? "مكان إقامتك حالياً فين؟" : "Where are you currently based?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "يقيم العديد من عملاء فالنتيا في دول الخليج أو أوروبا أو أمريكا. اختر دولتك ومدينتك لتنسيق الاستشارات وتلقي إشعارات تطورات التصميم والموقع في توقيتك المناسب."
+            ? "كتير من عملاء فالنتيا عايشين برة مصر (في الخليج، أوروبا، أو أمريكا). اختار بلدك ومدينتك عشان ننسق مواعيد الاستشارات ومتابعة تشطيب بيتك في التوقيت المناسب ليك."
             : "Many of our clients reside overseas in the GCC, Europe, or the Americas. Selecting your country, city, and contact details ensures presentations and site alerts synchronize smoothly with your schedule."}
         </p>
       </div>
@@ -150,7 +150,7 @@ export function StepCustomerLocation({
       <div className="flex flex-col gap-3">
         <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
           <GlobeHemisphereWest className="w-3.5 h-3.5 text-[#B88460]" />
-          <span>{isRTL ? "المناطق الأكثر شيوعاً بين عملائنا" : "Frequent Client Locations"}</span>
+          <span>{isRTL ? "أكتر بلاد عملاءنا مقيمين فيها" : "Frequent Client Locations"}</span>
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           {COMMON_REGIONS.map((region, idx) => {
@@ -195,7 +195,7 @@ export function StepCustomerLocation({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Country Dropdown */}
           <CountrySelect
-            label={isRTL ? "الدولة (اختر من القائمة) *" : "Country (Dropdown menu) *"}
+            label={isRTL ? "البلد (اختار من القائمة) *" : "Country (Dropdown menu) *"}
             value={location.country || ""}
             onChange={handleCountryChange}
             required
@@ -203,7 +203,7 @@ export function StepCustomerLocation({
 
           {/* City Dependent Dropdown */}
           <CitySelect
-            label={isRTL ? "المدينة (تتحدث بحسب الدولة) *" : "City (Dependent on Country) *"}
+            label={isRTL ? "المدينة (بتتحدث تلقائياً حسب البلد) *" : "City (Dependent on Country) *"}
             country={currentCountryObj}
             value={location.city || ""}
             onChange={(city) => onChangeLocation({ ...location, city })}
@@ -214,7 +214,7 @@ export function StepCustomerLocation({
           <div className="flex flex-col gap-1.5">
             <label className="flex items-center gap-1 text-xs font-medium text-[#503C2C]">
               <Clock className="w-3.5 h-3.5 text-[#B88460]" />
-              <span>{isRTL ? "المنطقة الزمنية *" : "Timezone *"}</span>
+              <span>{isRTL ? "التوقيت المحلي (Timezone) *" : "Timezone *"}</span>
             </label>
             <input
               type="text"
@@ -232,10 +232,10 @@ export function StepCustomerLocation({
         {/* Direct Contact Phone Number with Country Code Picker */}
         <div className="pt-2 border-t border-border/70">
           <PhoneInputWithCountry
-            label={isRTL ? "رقم هاتفك للتواصل ومتابعة المشروع *" : "Your Contact Phone Number *"}
+            label={isRTL ? "رقم تليفونك للتواصل والمتابعة *" : "Your Contact Phone Number *"}
             description={
               isRTL
-                ? "يتم استخدام الكود الدولي لتنسيق استشارات التصميم ومشاركة تقارير الإشراف الميداني عبر واتساب أو الاتصال المباشر."
+                ? "بنستخدم كود الدولة للتواصل معاك عبر الواتساب والمكالمات لمتابعة كل مراحل التشطيب والتصميم أول بأول."
                 : "Includes country dial code for seamless consultation scheduling and digital site updates."
             }
             phone={location.phone || ""}

@@ -53,7 +53,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
       if (result.redirectUrl) {
         setRedirectMessage(
           isRTL
-            ? "تم تسجيل الدخول بنجاح بصلاحية داخلية. جارٍ التوجيه إلى لوحة تحكم العمليات..."
+            ? "تم تسجيل الدخول بنجاح. بنحولك دلوقتي للوحة العمليات..."
             : "Authenticated as internal role. Redirecting to Valentia Operations Dashboard..."
         );
         setTimeout(() => {
@@ -65,7 +65,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
     } catch {
       setErrorMsg(
         isRTL
-          ? "فشل تسجيل الدخول. يرجى التحقق من البريد وكلمة المرور."
+          ? "بيانات الدخول مش صحيحة. اتأكد من الإيميل وكلمة السر."
           : "Authentication failed. Please check credentials."
       );
     }
@@ -76,7 +76,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
     if (newPassword.length < 8) {
       setErrorMsg(
         isRTL
-          ? "يجب أن تكون كلمة المرور 8 أحرف على الأقل."
+          ? "كلمة السر لازم تكون ٨ حروف أو أرقام على الأقل."
           : "Password must be at least 8 characters long."
       );
       return;
@@ -84,7 +84,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
     if (newPassword !== confirmPassword) {
       setErrorMsg(
         isRTL
-          ? "كلمتا المرور غير متطابقتين."
+          ? "كلمتي السر مش متطابقتين."
           : "Passwords do not match."
       );
       return;
@@ -106,7 +106,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
     if (result.redirectUrl) {
       setRedirectMessage(
         isRTL
-          ? `تم التبديل إلى دور (${role}). جارٍ التوجيه إلى لوحة العمليات الداخلية...`
+          ? `تم التبديل لصلاحية (${role}). بنحولك دلوقتي للوحة المتابعة...`
           : `Switched to ${role}. Redirecting to internal dashboard...`
       );
       setTimeout(() => {
@@ -152,7 +152,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
               "text-2xl text-foreground",
               isRTL ? "font-sans font-bold" : "font-serif font-medium"
             )}>
-              {t("auth.create_new_password") || (isRTL ? "تعيين كلمة المرور الدائمة" : "Set Your Permanent Password")}
+              {t("auth.create_new_password") || (isRTL ? "تعيين كلمة السر الدائمة" : "Set Your Permanent Password")}
             </h3>
             <p className={cn(
               "mt-1 text-xs leading-relaxed",
@@ -160,7 +160,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
             )}>
               {t("auth.temp_password_desc") ||
                 (isRTL
-                  ? "لقد قمت بتسجيل الدخول باستخدام كلمة مرور مؤقتة. يرجى تعيين كلمة مرور جديدة وآمنة لحسابك للمتابعة."
+                  ? "أنت مسجل دخول بكلمة سر مؤقتة. من فضلك اختار كلمة سر جديدة لحسابك عشان تكمل."
                   : "You logged in with a temporary password. Please set a secure password for your Valentia account to proceed.")}
             </p>
 
@@ -170,7 +170,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   "block text-xs font-semibold text-foreground mb-1",
                   isRTL && "font-sans"
                 )}>
-                  {isRTL ? "كلمة المرور الجديدة *" : "New Password *"}
+                  {isRTL ? "كلمة السر الجديدة *" : "New Password *"}
                 </label>
                 <input
                   type="password"
@@ -187,14 +187,14 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   "block text-xs font-semibold text-foreground mb-1",
                   isRTL && "font-sans"
                 )}>
-                  {isRTL ? "تأكيد كلمة المرور *" : "Confirm Password *"}
+                  {isRTL ? "تأكيد كلمة السر *" : "Confirm Password *"}
                 </label>
                 <input
                   type="password"
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder={isRTL ? "أعد إدخال كلمة المرور" : "Re-type new password"}
+                  placeholder={isRTL ? "أعد كتابة كلمة السر" : "Re-type new password"}
                   className="w-full rounded-xl border border-border bg-background px-3.5 py-2.5 text-xs text-foreground outline-none focus:border-primary transition-colors"
                 />
               </div>
@@ -211,7 +211,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   isRTL ? "tracking-normal font-sans font-bold" : "font-semibold uppercase tracking-[0.14em]"
                 )}
               >
-                {isLoading ? <Spinner className="h-4 w-4" /> : <span>{isRTL ? "تحديث والمتابعة" : "Update & Continue"}</span>}
+                {isLoading ? <Spinner className="h-4 w-4" /> : <span>{isRTL ? "تحديث والمتابعة ←" : "Update & Continue"}</span>}
               </button>
             </form>
           </div>
@@ -234,7 +234,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
             )}>
               {isAuthenticated
                 ? isRTL
-                  ? "حساب المستخدم النشط"
+                  ? "حساب المستخدم الحالي"
                   : "Active Session"
                 : isRTL
                 ? "تسجيل الدخول"
@@ -270,7 +270,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                     onClick={onClose}
                     className="rounded-full bg-[#1C1917] px-6 py-2 text-xs font-semibold text-[#FAF7F2] shadow-xs cursor-pointer dark:bg-[#FAF7F2] dark:text-[#1C1917]"
                   >
-                    {isRTL ? "إغلاق" : "Done"}
+                    {isRTL ? "تمام" : "Done"}
                   </button>
                 </div>
               </div>
@@ -281,14 +281,14 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   isRTL ? "font-medium text-[#4A3E31]" : "text-muted-foreground"
                 )}>
                   {isRTL
-                    ? "سجل الدخول بحساب العميل لمتابعة مشاريعك، أو اختر دوراً للاختبار السريع."
+                    ? "سجل دخولك بحساب العميل لمتابعة تشطيب بيتك، أو اختار دور للتجربة السريعة."
                     : "Sign in with your customer account, or pick a role to test post-login routing."}
                 </p>
 
                 <form onSubmit={handleLoginSubmit} className="mt-5 flex flex-col gap-3.5">
                   <div>
                     <label className={cn("block text-xs font-semibold text-foreground mb-1", isRTL && "font-sans")}>
-                      {isRTL ? "البريد الإلكتروني" : "Email Address"}
+                      {isRTL ? "الإيميل" : "Email Address"}
                     </label>
                     <input
                       type="email"
@@ -301,7 +301,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
 
                   <div>
                     <label className={cn("block text-xs font-semibold text-foreground mb-1", isRTL && "font-sans")}>
-                      {isRTL ? "كلمة المرور" : "Password"}
+                      {isRTL ? "كلمة السر" : "Password"}
                     </label>
                     <input
                       type="password"
@@ -356,7 +356,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   isRTL ? "tracking-normal font-sans font-bold" : "font-mono uppercase tracking-[0.18em]"
                 )}>
                   <Sparkle size={11} weight="fill" />
-                  <span>{isRTL ? "تبديل الصلاحيات (تجريبي للتطوير)" : "DEVELOPMENT ROLE SWITCHER (PROTOTYPE)"}</span>
+                  <span>{isRTL ? "تبديل الصلاحيات (تجربة سريعة)" : "DEVELOPMENT ROLE SWITCHER (PROTOTYPE)"}</span>
                 </span>
               </div>
 
