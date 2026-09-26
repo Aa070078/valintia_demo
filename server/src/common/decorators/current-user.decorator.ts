@@ -1,18 +1,24 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
+import { Role } from '../../generated/prisma/client.js';
 
-/** Minimal JWT payload shape (filled once AuthModule lands). */
 export type RequestUser = {
-  sub: string;
-  email?: string;
-  role?: string;
+  id: number;
+  sub: number;
+  role: Role;
+  username?: string;
 };
 
 type RequestWithUser = Request & { user?: RequestUser };
 
 export const CurrentUser = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): RequestUser | undefined => {
+  (
+    data: keyof RequestUser | undefined,
+    ctx: ExecutionContext,
+  ): RequestUser | RequestUser[keyof RequestUser] | undefined => {
     const request = ctx.switchToHttp().getRequest<RequestWithUser>();
-    return request.user;
+    const user = request.user;
+    if (!user) return undefined;
+    return data ? user[data] : user;
   },
 );

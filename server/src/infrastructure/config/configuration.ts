@@ -23,6 +23,7 @@ export const redisConfig = registerAs('redis', () => ({
 }));
 
 export const jwtConfig = registerAs('jwt', () => ({
+  secret: process.env.JWT_SECRET ?? process.env.JWT_ACCESS_SECRET ?? '',
   accessSecret: process.env.JWT_ACCESS_SECRET ?? '',
   refreshSecret: process.env.JWT_REFRESH_SECRET ?? '',
 }));

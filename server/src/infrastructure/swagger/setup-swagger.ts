@@ -92,7 +92,6 @@ export function setupSwagger(
       },
       'access-token',
     )
-    .addServer(`/${apiPrefix}`, 'API prefix')
     .build();
 
   const document = SwaggerModule.createDocument(app, documentConfig, {

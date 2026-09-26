@@ -1,119 +1,193 @@
-import 'dotenv/config';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
-import { PrismaClient, Role, SpaceType } from '../src/generated/prisma/client.js';
+import { PrismaClient, Role, ProjectStatus, SpaceType } from "../src/generated/prisma/client.js";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import bcrypt from "bcrypt";
+import "dotenv/config";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  'postgresql://postgres:postgres@localhost:5432/fitout_db?schema=public';
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
-const pool = new Pool({ connectionString });
 const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter } as any);
+
+const prisma = new PrismaClient({
+  adapter,
+});
 
 const users = [
   {
-    username: 'customer@test.com',
-    passwordHash: '$2b$10$K7g2S8e5J9r0t1u2v3w4x.e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t', // Password: Customer123!
+    username: "customer1@test.com",
+    password: "Customer123!",
     role: Role.CUSTOMER,
   },
   {
-    username: 'engineer@test.com',
-    passwordHash: '$2b$10$L8h3T9f6K0s1u2v3w4x5y.f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0', // Password: Engineer123!
+    username: "customer2@test.com",
+    password: "Customer123!",
+    role: Role.CUSTOMER,
+  },
+  {
+    username: "engineer1@test.com",
+    password: "Engineer123!",
     role: Role.ENGINEER,
   },
   {
-    username: 'pm@test.com',
-    passwordHash: '$2b$10$M9i4U0g7L1t2v3w4x5y6z.g7h8i9j0k1l2m3n4o5p6q7r8s9t0u', // Password: ProjectManager123!
+    username: "engineer2@test.com",
+    password: "Engineer123!",
+    role: Role.ENGINEER,
+  },
+  {
+    username: "pm@test.com",
+    password: "ProjectManager123!",
     role: Role.PROJECT_MANAGER,
   },
   {
-    username: 'owner@test.com',
-    passwordHash: '$2b$10$N0j5V1h8M2u3v4w5x6y7z.h8i9j0k1l2m3n4o5p6q7r8s9t0u1', // Password: Owner123!
+    username: "owner@test.com",
+    password: "Owner123!",
     role: Role.COMPANY_OWNER,
   },
   {
-    username: 'admin@test.com',
-    passwordHash: '$2b$10$O1k6W2i9N3v4w5x6y7z8a.i9j0k1l2m3n4o5p6q7r8s9t0u1v', // Password: Admin123!
+    username: "admin@test.com",
+    password: "Admin123!",
     role: Role.ADMINISTRATOR,
   },
 ];
 
 async function main() {
-  console.log('Seeding Sprint 1 database...');
+  // -------------------------
+  // 1. Seed users
+  // -------------------------
 
-  const createdUsers: Record<string, any> = {};
+  const createdUsers = new Map<string, number>();
 
   for (const user of users) {
-    const seededUser = await prisma.user.upsert({
+    const passwordHash = await bcrypt.hash(user.password, 10);
+
+    const mustChangePassword = user.role === Role.CUSTOMER ? false : true;
+
+    const createdUser = await prisma.user.upsert({
       where: {
         username: user.username,
       },
       update: {
-        passwordHash: user.passwordHash,
+        passwordHash,
         role: user.role,
-        mustChangePassword: true,
+        mustChangePassword,
       },
       create: {
         username: user.username,
-        passwordHash: user.passwordHash,
+        passwordHash,
         role: user.role,
-        mustChangePassword: true,
+        mustChangePassword,
       },
     });
 
-    createdUsers[user.role] = seededUser;
+    createdUsers.set(user.username, createdUser.id);
   }
 
-  console.log('Development users seeded successfully.');
+  const customer1Id = createdUsers.get("customer1@test.com")!;
+  const customer2Id = createdUsers.get("customer2@test.com")!;
+  const engineer1Id = createdUsers.get("engineer1@test.com")!;
+  const engineer2Id = createdUsers.get("engineer2@test.com")!;
 
-  // Seed sample project using customer@test.com and engineer@test.com
-  if (createdUsers[Role.CUSTOMER] && createdUsers[Role.ENGINEER]) {
-    const customerUser = createdUsers[Role.CUSTOMER];
-    const engineerUser = createdUsers[Role.ENGINEER];
+  // -------------------------
+  // 2. Seed projects
+  // -------------------------
 
-    const existingProject = await prisma.project.findFirst({
-      where: {
-        title: 'Palm Hills Villa Fitout',
-        clientId: customerUser.id,
+  const project1 = await prisma.project.create({
+    data: {
+      title: "Customer 1 Living Space",
+      status: ProjectStatus.DRAFT,
+      notes: "Development test project owned by Customer 1.",
+      clientId: customer1Id,
+    },
+  });
+
+  const project2 = await prisma.project.create({
+    data: {
+      title: "Customer 2 Villa",
+      status: ProjectStatus.SUBMITTED,
+      notes: "Development test project owned by Customer 2.",
+      clientId: customer2Id,
+    },
+  });
+
+  // -------------------------
+  // 3. Seed properties
+  // -------------------------
+
+  await prisma.property.create({
+    data: {
+      projectId: project1.id,
+      propertyType: "Apartment",
+      areaSqm: 150,
+      city: "Cairo",
+      compound: "Test Compound 1",
+    },
+  });
+
+  await prisma.property.create({
+    data: {
+      projectId: project2.id,
+      propertyType: "Villa",
+      areaSqm: 300,
+      city: "Cairo",
+      compound: "Test Compound 2",
+    },
+  });
+
+  // -------------------------
+  // 4. Seed spaces
+  // -------------------------
+
+  await prisma.space.createMany({
+    data: [
+      {
+        projectId: project1.id,
+        type: SpaceType.LIVING_ROOM,
       },
-    });
+      {
+        projectId: project1.id,
+        type: SpaceType.KITCHEN,
+      },
+      {
+        projectId: project1.id,
+        type: SpaceType.MASTER_BEDROOM,
+      },
+      {
+        projectId: project2.id,
+        type: SpaceType.LIVING_ROOM,
+      },
+      {
+        projectId: project2.id,
+        type: SpaceType.BATHROOM,
+      },
+    ],
+  });
 
-    if (!existingProject) {
-      const sampleProject = await prisma.project.create({
-        data: {
-          title: 'Palm Hills Villa Fitout',
-          status: 'DRAFT',
-          notes: 'Natural wood finishes and travertine flooring.',
-          clientId: customerUser.id,
-          property: {
-            create: {
-              propertyType: 'villa',
-              areaSqm: 450.0,
-              city: '6th of October',
-              compound: 'Palm Hills Golf Views',
-            },
-          },
-          spaces: {
-            create: [
-              { type: SpaceType.LIVING_ROOM },
-              { type: SpaceType.KITCHEN },
-              { type: SpaceType.MASTER_BEDROOM },
-              { type: SpaceType.BATHROOM },
-              { type: SpaceType.BATHROOM },
-              { type: SpaceType.BATHROOM },
-            ],
-          },
-          assignment: {
-            create: {
-              engineerId: engineerUser.id,
-            },
-          },
-        },
-      });
-      console.log('Sample project seeded with ID:', sampleProject.id);
-    }
-  }
+  // -------------------------
+  // 5. Seed engineer assignments
+  // -------------------------
+
+  await prisma.projectAssignment.create({
+    data: {
+      projectId: project1.id,
+      engineerId: engineer1Id,
+    },
+  });
+
+  await prisma.projectAssignment.create({
+    data: {
+      projectId: project2.id,
+      engineerId: engineer2Id,
+    },
+  });
+
+  console.log("Development database seeded successfully.");
+  console.log("Users: 7");
+  console.log("Projects: 2");
+  console.log("Properties: 2");
+  console.log("Spaces: 5");
+  console.log("Assignments: 2");
 }
 
 main()

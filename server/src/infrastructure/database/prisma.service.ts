@@ -18,7 +18,9 @@ export class PrismaService
   private readonly pool: Pool;
 
   constructor(configService: ConfigService) {
-    const url = configService.get<string>('database.url');
+    const url =
+      (configService && configService.get<string>('database.url')) ||
+      process.env.DATABASE_URL;
     if (!url) {
       throw new Error('DATABASE_URL is missing');
     }
