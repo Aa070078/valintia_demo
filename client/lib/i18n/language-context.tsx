@@ -550,10 +550,10 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
 };
 
 const LanguageContext = React.createContext<LanguageContextType>({
-  language: "en",
+  language: "ar",
   setLanguage: () => {},
   toggleLanguage: () => {},
-  isRTL: false,
+  isRTL: true,
   t: (key) => key,
 });
 
@@ -569,7 +569,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         // ignore
       }
     }
-    return "en";
+    return "ar";
   });
 
   React.useEffect(() => {

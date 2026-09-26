@@ -7,11 +7,8 @@ import {
   Lock,
   ArrowRight,
   ArrowLeft,
-  ArrowSquareOut,
-  Sparkle,
 } from "@phosphor-icons/react";
 import { useAuth } from "../context/auth-context";
-import type { UserRole } from "../types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
@@ -30,7 +27,6 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
     login,
     logout,
     changePassword,
-    devSwitchRole,
     isLoading,
   } = useAuth();
 
@@ -99,23 +95,6 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
     }
   };
 
-  const handleRoleQuickPick = async (role: UserRole) => {
-    setErrorMsg(null);
-    setRedirectMessage(null);
-    const result = await devSwitchRole(role);
-    if (result.redirectUrl) {
-      setRedirectMessage(
-        isRTL
-          ? `تم التبديل لصلاحية (${role}). بنحولك دلوقتي للوحة المتابعة...`
-          : `Switched to ${role}. Redirecting to internal dashboard...`
-      );
-      setTimeout(() => {
-        window.location.href = result.redirectUrl!;
-      }, 1200);
-    } else {
-      onClose();
-    }
-  };
 
   return (
     <div
@@ -281,8 +260,8 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   isRTL ? "font-medium text-[#4A3E31]" : "text-muted-foreground"
                 )}>
                   {isRTL
-                    ? "سجل دخولك بحساب العميل لمتابعة تشطيب بيتك، أو اختار دور للتجربة السريعة."
-                    : "Sign in with your customer account, or pick a role to test post-login routing."}
+                    ? "سجل دخولك بحسابك لمتابعة تشطيب وتصميم بيتك والاطلاع على تفاصيل المشروع."
+                    : "Sign in to access your fit-out project workspace and track construction progress."}
                 </p>
 
                 <form onSubmit={handleLoginSubmit} className="mt-5 flex flex-col gap-3.5">
@@ -347,51 +326,6 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                 </form>
               </>
             )}
-
-            {/* Development-Only Role Switcher */}
-            <div className="mt-6 border-t border-border pt-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className={cn(
-                  "text-[9px] font-semibold flex items-center gap-1 text-[#503C2C]",
-                  isRTL ? "tracking-normal font-sans font-bold" : "font-mono uppercase tracking-[0.18em]"
-                )}>
-                  <Sparkle size={11} weight="fill" />
-                  <span>{isRTL ? "تبديل الصلاحيات (تجربة سريعة)" : "DEVELOPMENT ROLE SWITCHER (PROTOTYPE)"}</span>
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {(["CUSTOMER", "ENGINEER", "PROJECT_MANAGER", "ADMIN"] as UserRole[]).map((r) => {
-                  const isCurrent = user?.role === r;
-                  const isInternal = r !== "CUSTOMER";
-                  return (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => handleRoleQuickPick(r)}
-                      className={cn(
-                        "flex flex-col items-center justify-center p-2.5 rounded-xl border text-center transition-all cursor-pointer",
-                        isCurrent
-                          ? "border-primary bg-primary text-primary-foreground font-bold shadow-xs"
-                          : "border-border bg-background text-foreground hover:border-foreground/50 hover:bg-secondary font-medium"
-                      )}
-                    >
-                      <span className="text-[10px] font-bold tracking-tight">{r}</span>
-                      <span className="text-[8px] opacity-70 flex items-center gap-0.5 mt-0.5">
-                        {isInternal ? (
-                          <>
-                            <span>Dashboard</span>
-                            <ArrowSquareOut size={8} />
-                          </>
-                        ) : (
-                          "Client App"
-                        )}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
           </div>
         )}
       </div>

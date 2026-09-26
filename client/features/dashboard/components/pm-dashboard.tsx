@@ -212,9 +212,95 @@ export function PmDashboard() {
             </div>
           </div>
 
-          {/* Projects Table */}
+          {/* Projects View: Responsive Mobile Cards + Desktop Table */}
           <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
-            <div className="overflow-x-auto">
+            {/* Mobile Cards (Viewports < md) */}
+            <div className="md:hidden divide-y divide-border">
+              {filteredProjects.map((p) => (
+                <div
+                  key={p.id}
+                  onClick={() => setSelectedProject(p)}
+                  className="p-4 space-y-3 hover:bg-muted/20 transition-colors cursor-pointer active:bg-muted/40"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="font-semibold text-foreground text-sm">{p.title}</div>
+                      <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
+                        {p.code} · {p.typology} ({p.areaM2}m²)
+                      </div>
+                    </div>
+                    <span
+                      className={cn(
+                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-medium shrink-0",
+                        p.health === "ON_SCHEDULE"
+                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200"
+                          : p.health === "AT_RISK"
+                          ? "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200"
+                          : "bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300 border border-red-200"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "w-1.5 h-1.5 rounded-full",
+                          p.health === "ON_SCHEDULE"
+                            ? "bg-emerald-500"
+                            : p.health === "AT_RISK"
+                            ? "bg-amber-500"
+                            : "bg-red-500"
+                        )}
+                      />
+                      {p.health === "ON_SCHEDULE"
+                        ? isRTL ? "في الميعاد" : "ON SCHEDULE"
+                        : p.health === "AT_RISK"
+                        ? isRTL ? "تحت المتابعة" : "AT RISK"
+                        : isRTL ? "متأخر" : "DELAYED"}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-border/60">
+                    <div>
+                      <span className="text-[10px] text-muted-foreground block">{isRTL ? "العميل والكمبوند" : "Client & Compound"}</span>
+                      <span className="font-medium text-foreground">{p.clientName}</span>
+                      <span className="text-[10px] text-muted-foreground block">{p.compound}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-muted-foreground block">{isRTL ? "قيمة العقد" : "Contract Value"}</span>
+                      <span className="font-mono font-semibold text-foreground">
+                        EGP {(p.budgetEgp / 1_000_000).toFixed(2)}M
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-2 border-t border-border/60">
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-[11px] text-muted-foreground whitespace-nowrap">{isRTL ? "المهندس:" : "Engineer:"}</span>
+                      <select
+                        value={p.leadEngineerId || ""}
+                        onChange={(e) =>
+                          handleAssignEngineer(p.id, Number(e.target.value))
+                        }
+                        className="h-8 px-2.5 rounded-lg border border-border bg-background text-xs text-foreground focus:ring-1 focus:ring-primary outline-none cursor-pointer flex-1"
+                      >
+                        {engineers.map((eng) => (
+                          <option key={eng.id} value={eng.id}>
+                            {eng.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="text-[11px] text-muted-foreground text-end">
+                      <span>{isRTL ? "القادم: " : "Next: "}</span>
+                      <span className="font-medium text-foreground">{p.nextMilestone}</span>
+                      <span className="font-mono text-[10px] block text-muted-foreground">({p.nextMilestoneDate})</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Desktop Table (Viewports >= md) */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/50 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
                   <tr>

@@ -279,121 +279,228 @@ export function EngineerDashboard() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs text-left">
-            <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
-              <tr>
-                <th className="py-3 px-4">{isRTL ? "الغرفة والبيان" : "Room & Parameter"}</th>
-                <th className="py-3 px-4">{isRTL ? "إدخال العميل" : "Customer Entered"}</th>
-                <th className="py-3 px-4">{isRTL ? "استخراج CAD" : "CAD Extracted"}</th>
-                <th className="py-3 px-4">{isRTL ? "تقدير الذكاء الاصطناعي" : "AI Inferred"}</th>
-                <th className="py-3 px-4">{isRTL ? "المعتمد بالليزر (النهائي)" : "Engineer Certified"}</th>
-                <th className="py-3 px-4 text-center">{isRTL ? "مرجعية البيانات" : "Data Authority"}</th>
-                <th className="py-3 px-4 text-end">{isRTL ? "إجراء المهندس" : "Action"}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {dimensionItems.map((item) => (
-                <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="py-3.5 px-4 font-medium text-foreground">
-                    <div>{item.spaceName}</div>
-                    <div className="text-[10px] text-muted-foreground">{item.parameter}</div>
-                  </td>
+        {/* Dimensions Studio: Mobile Cards + Desktop Table */}
+        <div>
+          {/* Mobile Cards (Viewports < md) */}
+          <div className="md:hidden divide-y divide-border">
+            {dimensionItems.map((item) => (
+              <div key={item.id} className="p-4 space-y-3 hover:bg-muted/20 transition-colors">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <div className="font-semibold text-foreground text-sm">{item.spaceName}</div>
+                    <div className="text-[11px] text-muted-foreground mt-0.5">{item.parameter}</div>
+                  </div>
+                  <span
+                    className={cn(
+                      "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold shrink-0",
+                      item.status === "ENGINEER_VERIFIED"
+                        ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                        : item.status === "CAD_EXTRACTED"
+                        ? "bg-blue-100 text-blue-800 border border-blue-300"
+                        : "bg-purple-100 text-purple-800 border border-purple-300"
+                    )}
+                  >
+                    {item.status.replace("_", " ")}
+                  </span>
+                </div>
 
-                  <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                    {item.customerEntered}
-                  </td>
+                <div className="grid grid-cols-3 gap-2 text-[11px] font-mono pt-1 border-t border-border/60">
+                  <div className="p-2 rounded-lg bg-muted/30">
+                    <span className="text-[9px] text-muted-foreground block uppercase">{isRTL ? "العميل" : "Client"}</span>
+                    <span className="text-foreground">{item.customerEntered}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-muted/30">
+                    <span className="text-[9px] text-muted-foreground block uppercase">CAD</span>
+                    <span className="text-foreground">{item.cadExtracted || "—"}</span>
+                  </div>
+                  <div className="p-2 rounded-lg bg-muted/30">
+                    <span className="text-[9px] text-muted-foreground block uppercase">AI</span>
+                    <span className="text-foreground">{item.aiInferred || "—"}</span>
+                  </div>
+                </div>
 
-                  <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                    {item.cadExtracted || "—"}
-                  </td>
-
-                  <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                    {item.aiInferred || "—"}
-                  </td>
-
-                  <td className="py-3.5 px-4 font-mono font-medium text-foreground">
-                    {editingItemId === item.id ? (
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="text"
-                          value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
-                          placeholder="e.g. 7.95m × 5.90m"
-                          className="h-7 w-32 px-2 rounded border border-primary bg-background text-xs font-mono outline-none"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleCertifyDimension(item.id, editValue || item.cadExtracted || item.customerEntered)}
-                          className="p-1 rounded bg-emerald-600 text-white"
-                        >
-                          <Check size={12} />
-                        </button>
-                      </div>
-                    ) : item.engineerVerified ? (
-                      <span className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1 font-semibold">
-                        <CheckCircle className="w-3.5 h-3.5" />
+                <div className="pt-2 border-t border-border/60">
+                  <div className="text-[11px] text-muted-foreground mb-1.5">{isRTL ? "المقاس المعتمد بالليزر (النهائي):" : "Laser Verified Dimension:"}</div>
+                  {editingItemId === item.id ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={editValue}
+                        onChange={(e) => setEditValue(e.target.value)}
+                        placeholder="e.g. 7.95m × 5.90m"
+                        className="h-9 px-3 rounded-lg border border-primary bg-background text-xs font-mono outline-none flex-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleCertifyDimension(item.id, editValue || item.cadExtracted || item.customerEntered)}
+                        className="h-9 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium flex items-center gap-1 cursor-pointer"
+                      >
+                        <Check size={14} />
+                        <span>{isRTL ? "تأكيد" : "Save"}</span>
+                      </button>
+                    </div>
+                  ) : item.engineerVerified ? (
+                    <div className="flex items-center justify-between">
+                      <span className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 font-semibold text-sm font-mono">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
                         <span>{item.engineerVerified}</span>
                       </span>
-                    ) : (
-                      <span className="text-muted-foreground italic">
-                        {isRTL ? "بانتظار مسح الليزر" : "Pending Laser Verification"}
-                      </span>
-                    )}
-                  </td>
-
-                  <td className="py-3.5 px-4 text-center">
-                    <span
-                      className={cn(
-                        "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold",
-                        item.status === "ENGINEER_VERIFIED"
-                          ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                          : item.status === "CAD_EXTRACTED"
-                          ? "bg-blue-100 text-blue-800 border border-blue-300"
-                          : "bg-purple-100 text-purple-800 border border-purple-300"
-                      )}
-                    >
-                      {item.status.replace("_", " ")}
-                    </span>
-                  </td>
-
-                  <td className="py-3.5 px-4 text-end">
-                    {item.status !== "ENGINEER_VERIFIED" ? (
-                      <div className="inline-flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditingItemId(item.id);
-                            setEditValue(item.cadExtracted || item.aiInferred || item.customerEntered);
-                          }}
-                          className="p-1.5 rounded border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
-                          title={isRTL ? "كتابة رقم مخصص" : "Type manual measurement"}
-                        >
-                          <PencilSimple size={12} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleCertifyDimension(
-                              item.id,
-                              item.cadExtracted || item.aiInferred || item.customerEntered
-                            )
-                          }
-                          className="h-7 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
-                        >
-                          {isRTL ? "اعتماد بالليزر" : "Certify Laser Scan"}
-                        </button>
-                      </div>
-                    ) : (
                       <span className="text-[10px] font-mono text-muted-foreground">
                         {isRTL ? "معتمد بواسطة " : "Certified by "} {item.verifiedBy?.split(" ")[1] || "Engineer"}
                       </span>
-                    )}
-                  </td>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingItemId(item.id);
+                          setEditValue(item.cadExtracted || item.aiInferred || item.customerEntered);
+                        }}
+                        className="h-9 px-3 rounded-lg border border-border bg-card hover:bg-muted text-xs text-foreground flex items-center gap-1.5 cursor-pointer"
+                        title={isRTL ? "كتابة رقم يدوي" : "Type manual"}
+                      >
+                        <PencilSimple size={14} />
+                        <span>{isRTL ? "تعديل" : "Edit"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleCertifyDimension(
+                            item.id,
+                            item.cadExtracted || item.aiInferred || item.customerEntered
+                          )
+                        }
+                        className="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium flex-1 flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <SealCheck size={15} />
+                        <span>{isRTL ? "اعتماد مقاس الليزر" : "Certify Laser"}</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table (Viewports >= md) */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
+                <tr>
+                  <th className="py-3 px-4">{isRTL ? "الغرفة والبيان" : "Room & Parameter"}</th>
+                  <th className="py-3 px-4">{isRTL ? "إدخال العميل" : "Customer Entered"}</th>
+                  <th className="py-3 px-4">{isRTL ? "استخراج CAD" : "CAD Extracted"}</th>
+                  <th className="py-3 px-4">{isRTL ? "تقدير الذكاء الاصطناعي" : "AI Inferred"}</th>
+                  <th className="py-3 px-4">{isRTL ? "المعتمد بالليزر (النهائي)" : "Engineer Certified"}</th>
+                  <th className="py-3 px-4 text-center">{isRTL ? "مرجعية البيانات" : "Data Authority"}</th>
+                  <th className="py-3 px-4 text-end">{isRTL ? "إجراء المهندس" : "Action"}</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {dimensionItems.map((item) => (
+                  <tr key={item.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="py-3.5 px-4 font-medium text-foreground">
+                      <div>{item.spaceName}</div>
+                      <div className="text-[10px] text-muted-foreground">{item.parameter}</div>
+                    </td>
+
+                    <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                      {item.customerEntered}
+                    </td>
+
+                    <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                      {item.cadExtracted || "—"}
+                    </td>
+
+                    <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                      {item.aiInferred || "—"}
+                    </td>
+
+                    <td className="py-3.5 px-4 font-mono font-medium text-foreground">
+                      {editingItemId === item.id ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                            placeholder="e.g. 7.95m × 5.90m"
+                            className="h-7 w-32 px-2 rounded border border-primary bg-background text-xs font-mono outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleCertifyDimension(item.id, editValue || item.cadExtracted || item.customerEntered)}
+                            className="p-1 rounded bg-emerald-600 text-white"
+                          >
+                            <Check size={12} />
+                          </button>
+                        </div>
+                      ) : item.engineerVerified ? (
+                        <span className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1 font-semibold">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          <span>{item.engineerVerified}</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground italic">
+                          {isRTL ? "بانتظار مسح الليزر" : "Pending Laser Verification"}
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="py-3.5 px-4 text-center">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold",
+                          item.status === "ENGINEER_VERIFIED"
+                            ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                            : item.status === "CAD_EXTRACTED"
+                            ? "bg-blue-100 text-blue-800 border border-blue-300"
+                            : "bg-purple-100 text-purple-800 border border-purple-300"
+                        )}
+                      >
+                        {item.status.replace("_", " ")}
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-end">
+                      {item.status !== "ENGINEER_VERIFIED" ? (
+                        <div className="inline-flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingItemId(item.id);
+                              setEditValue(item.cadExtracted || item.aiInferred || item.customerEntered);
+                            }}
+                            className="p-1.5 rounded border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground"
+                            title={isRTL ? "كتابة رقم مخصص" : "Type manual measurement"}
+                          >
+                            <PencilSimple size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleCertifyDimension(
+                                item.id,
+                                item.cadExtracted || item.aiInferred || item.customerEntered
+                              )
+                            }
+                            className="h-7 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
+                          >
+                            {isRTL ? "اعتماد بالليزر" : "Certify Laser Scan"}
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-mono text-muted-foreground">
+                          {isRTL ? "معتمد بواسطة " : "Certified by "} {item.verifiedBy?.split(" ")[1] || "Engineer"}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

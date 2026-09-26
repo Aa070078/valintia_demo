@@ -11,7 +11,7 @@ import type {
 } from "../types";
 
 /**
- * Pre-configured development personas for prototype and demonstration testing.
+ * Pre-configured atelier team and client seed accounts.
  */
 export const DEMO_PERSONAS: Record<UserRole, User> = {
   CUSTOMER: {
@@ -85,7 +85,7 @@ export const DEMO_FIRST_LOGIN_STAFF: User = {
   id: 301,
   username: "tarek.ramzy@valentia.com",
   email: "tarek.ramzy@valentia.com",
-  name: "Eng. Tarek Ramzy (First Login Demo)",
+  name: "م. طارق رمزي",
   role: "ENGINEER",
   phone: "+20 109 444 3322",
   mustChangePassword: true,

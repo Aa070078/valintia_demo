@@ -281,40 +281,27 @@ export function AdminDashboard() {
             </button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
-                <tr>
-                  <th className="py-3 px-4">{isRTL ? "المستخدم" : "User"}</th>
-                  <th className="py-3 px-4">{isRTL ? "الإيميل والهاتف" : "Email & Phone"}</th>
-                  <th className="py-3 px-4">{isRTL ? "الصلاحية" : "Active Role"}</th>
-                  <th className="py-3 px-4">{isRTL ? "المشاريع المسندة" : "Active Workload"}</th>
-                  <th className="py-3 px-4">{isRTL ? "حالة أول دخول" : "Security & Status"}</th>
-                  <th className="py-3 px-4 text-end">{isRTL ? "إجراءات" : "Action"}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {users.map((u) => {
-                  const isCopied = copiedUserId === u.id;
-                  const needsPasswordChange = Boolean(u.mustChangePassword);
+          {/* Users List: Responsive Mobile Cards + Desktop Table */}
+          <div>
+            {/* Mobile Cards (Viewports < md) */}
+            <div className="md:hidden divide-y divide-border">
+              {users.map((u) => {
+                const isCopied = copiedUserId === u.id;
+                const needsPasswordChange = Boolean(u.mustChangePassword);
 
-                  return (
-                    <tr key={u.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="py-3.5 px-4">
-                        <div className="font-semibold text-foreground">{u.name}</div>
-                        <div className="text-[10px] font-mono text-muted-foreground">ID: #{u.id}</div>
-                      </td>
+                return (
+                  <div key={u.id} className="p-4 space-y-3 hover:bg-muted/20 transition-colors">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <div className="font-semibold text-foreground text-sm">{u.name}</div>
+                        <div className="text-[11px] font-mono text-muted-foreground mt-0.5">ID: #{u.id}</div>
+                      </div>
 
-                      <td className="py-3.5 px-4 text-muted-foreground">
-                        <div className="font-mono text-[11px] text-foreground">{u.email || u.username}</div>
-                        <div className="text-[10px] font-mono">{u.phone || "—"}</div>
-                      </td>
-
-                      <td className="py-3.5 px-4">
+                      <div onClick={(e) => e.stopPropagation()}>
                         <select
                           value={u.role}
                           onChange={(e) => handleRoleChange(u.id, e.target.value as Role)}
-                          className="h-7 px-2 rounded-lg border border-border bg-background text-[11px] font-mono uppercase focus:ring-1 focus:ring-primary outline-none cursor-pointer"
+                          className="h-8 px-2 rounded-lg border border-border bg-background text-[11px] font-mono uppercase focus:ring-1 focus:ring-primary outline-none cursor-pointer"
                         >
                           <option value="CUSTOMER">CUSTOMER</option>
                           <option value="ENGINEER">ENGINEER</option>
@@ -322,51 +309,140 @@ export function AdminDashboard() {
                           <option value="COMPANY_OWNER">COMPANY_OWNER</option>
                           <option value="ADMINISTRATOR">ADMINISTRATOR</option>
                         </select>
-                      </td>
+                      </div>
+                    </div>
 
-                      <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                        {u.activeProjectsCount ? `${u.activeProjectsCount} ${isRTL ? "مشاريع" : "Projects"}` : "—"}
-                      </td>
+                    <div className="space-y-1 text-xs text-muted-foreground pt-1 border-t border-border/60">
+                      <div className="font-mono text-[11px] text-foreground">{u.email || u.username}</div>
+                      {u.phone && <div className="text-[10px] font-mono text-muted-foreground">{u.phone}</div>}
+                    </div>
 
-                      <td className="py-3.5 px-4">
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/60">
+                      <div>
                         {needsPasswordChange ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
                             <Key className="w-3 h-3 text-amber-600" />
-                            <span>{isRTL ? "أول دخول - كلمة سر مؤقتة" : "TEMPORARY PASSWORD"}</span>
+                            <span>{isRTL ? "أول دخول • كلمة سر مؤقتة" : "TEMP PASSWORD"}</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
                             <Check className="w-3 h-3 text-emerald-600" />
                             <span>{isRTL ? "مفعل ومؤكد" : "VERIFIED"}</span>
                           </span>
                         )}
-                      </td>
+                      </div>
 
-                      <td className="py-3.5 px-4 text-end">
-                        <button
-                          type="button"
-                          onClick={() => handleCopyCredentials(u)}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-border bg-card hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
-                          title={isRTL ? "نسخ بيانات الدخول" : "Copy credentials"}
-                        >
-                          {isCopied ? (
-                            <>
-                              <Check size={12} className="text-emerald-500" />
-                              <span className="text-emerald-600 font-semibold">{isRTL ? "تم" : "Done"}</span>
-                            </>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyCredentials(u)}
+                        className="h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted text-xs font-mono text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
+                      >
+                        {isCopied ? (
+                          <>
+                            <Check size={14} className="text-emerald-500" />
+                            <span className="text-emerald-600 font-semibold">{isRTL ? "تم النسخ" : "Copied"}</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={14} />
+                            <span>{isRTL ? "نسخ البيانات" : "Copy Info"}</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Table (Viewports >= md) */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
+                  <tr>
+                    <th className="py-3 px-4">{isRTL ? "المستخدم" : "User"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الإيميل والهاتف" : "Email & Phone"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الصلاحية" : "Active Role"}</th>
+                    <th className="py-3 px-4">{isRTL ? "المشاريع المسندة" : "Active Workload"}</th>
+                    <th className="py-3 px-4">{isRTL ? "حالة أول دخول" : "Security & Status"}</th>
+                    <th className="py-3 px-4 text-end">{isRTL ? "إجراءات" : "Action"}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {users.map((u) => {
+                    const isCopied = copiedUserId === u.id;
+                    const needsPasswordChange = Boolean(u.mustChangePassword);
+
+                    return (
+                      <tr key={u.id} className="hover:bg-muted/20 transition-colors">
+                        <td className="py-3.5 px-4">
+                          <div className="font-semibold text-foreground">{u.name}</div>
+                          <div className="text-[10px] font-mono text-muted-foreground">ID: #{u.id}</div>
+                        </td>
+
+                        <td className="py-3.5 px-4 text-muted-foreground">
+                          <div className="font-mono text-[11px] text-foreground">{u.email || u.username}</div>
+                          <div className="text-[10px] font-mono">{u.phone || "—"}</div>
+                        </td>
+
+                        <td className="py-3.5 px-4">
+                          <select
+                            value={u.role}
+                            onChange={(e) => handleRoleChange(u.id, e.target.value as Role)}
+                            className="h-7 px-2 rounded-lg border border-border bg-background text-[11px] font-mono uppercase focus:ring-1 focus:ring-primary outline-none cursor-pointer"
+                          >
+                            <option value="CUSTOMER">CUSTOMER</option>
+                            <option value="ENGINEER">ENGINEER</option>
+                            <option value="PROJECT_MANAGER">PROJECT_MANAGER</option>
+                            <option value="COMPANY_OWNER">COMPANY_OWNER</option>
+                            <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+                          </select>
+                        </td>
+
+                        <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                          {u.activeProjectsCount ? `${u.activeProjectsCount} ${isRTL ? "مشاريع" : "Projects"}` : "—"}
+                        </td>
+
+                        <td className="py-3.5 px-4">
+                          {needsPasswordChange ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
+                              <Key className="w-3 h-3 text-amber-600" />
+                              <span>{isRTL ? "أول دخول - كلمة سر مؤقتة" : "TEMPORARY PASSWORD"}</span>
+                            </span>
                           ) : (
-                            <>
-                              <Copy size={12} />
-                              <span>{isRTL ? "نسخ" : "Copy"}</span>
-                            </>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              <Check className="w-3 h-3 text-emerald-600" />
+                              <span>{isRTL ? "مفعل ومؤكد" : "VERIFIED"}</span>
+                            </span>
                           )}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+
+                        <td className="py-3.5 px-4 text-end">
+                          <button
+                            type="button"
+                            onClick={() => handleCopyCredentials(u)}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-border bg-card hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
+                            title={isRTL ? "نسخ بيانات الدخول" : "Copy credentials"}
+                          >
+                            {isCopied ? (
+                              <>
+                                <Check size={12} className="text-emerald-500" />
+                                <span className="text-emerald-600 font-semibold">{isRTL ? "تم" : "Done"}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={12} />
+                                <span>{isRTL ? "نسخ" : "Copy"}</span>
+                              </>
+                            )}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}

@@ -16,8 +16,6 @@ import {
   Sparkle,
 } from "@phosphor-icons/react";
 import { useAuth } from "@/features/auth/context/auth-context";
-import { DEMO_PERSONAS } from "@/features/auth/api/auth.api";
-import type { UserRole } from "@/features/auth/types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
@@ -35,22 +33,6 @@ function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-
-  // Quick fill helper for demonstration personas
-  const handleSelectDemoPersona = (role: UserRole | "FIRST_LOGIN_STAFF") => {
-    if (role === "FIRST_LOGIN_STAFF") {
-      setUsername("tarek.ramzy@valentia.com");
-      setPassword("Temp@2026");
-      setError(null);
-      return;
-    }
-    const persona = DEMO_PERSONAS[role];
-    if (persona) {
-      setUsername(persona.username || persona.email || "");
-      setPassword("Valentia@2026");
-      setError(null);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,66 +202,6 @@ function LoginForm() {
             </p>
           </div>
 
-          {/* Demonstration Personas Selector (Quick Dev / Preview Access) */}
-          <div className="mb-6 p-4 rounded-xl bg-white/70 border border-[#D8C8B4] shadow-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-[#6B635B]">
-                {isRTL ? "تجربة سريعة للأدوار" : "DEMO ACCESS PERSONAS"}
-              </span>
-              <span className="text-[10px] text-[#B88460] font-medium">
-                {isRTL ? "دوس للتعبئة السريعة" : "Click to Autofill"}
-              </span>
-            </div>
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
-              {(
-                [
-                  "CUSTOMER",
-                  "ENGINEER",
-                  "PROJECT_MANAGER",
-                  "COMPANY_OWNER",
-                  "ADMINISTRATOR",
-                ] as UserRole[]
-              ).map((role) => (
-                <button
-                  key={role}
-                  type="button"
-                  onClick={() => handleSelectDemoPersona(role)}
-                  className="px-2 py-1.5 rounded-lg bg-[#FAF7F2] hover:bg-[#1C1917] hover:text-[#FAF7F2] border border-[#D8C8B4]/60 text-[10px] font-medium text-[#503C2C] transition-all text-center truncate cursor-pointer"
-                  title={role}
-                >
-                  {role === "CUSTOMER"
-                    ? isRTL ? "عميل" : "Client"
-                    : role === "ENGINEER"
-                    ? isRTL ? "مهندس" : "Engineer"
-                    : role === "PROJECT_MANAGER"
-                    ? isRTL ? "مدير مشروع" : "PM"
-                    : role === "COMPANY_OWNER"
-                    ? isRTL ? "صاحب الشركة" : "Owner"
-                    : isRTL ? "الأدمن" : "Admin"}
-                </button>
-              ))}
-            </div>
-
-            {/* Quick First-Login Demo Button */}
-            <div className="mt-2.5 pt-2.5 border-t border-[#D8C8B4]/60">
-              <button
-                type="button"
-                onClick={() => handleSelectDemoPersona("FIRST_LOGIN_STAFF")}
-                className="w-full py-2 px-3 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-medium flex items-center justify-between transition-colors cursor-pointer"
-                title="Test First-Login Pop-Up Flow"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                  <span className="font-semibold">
-                    {isRTL ? "🔑 تجربة بوب أب أول دخول (مهندس جديد)" : "🔑 Test First-Login Pop-Up (New Engineer)"}
-                  </span>
-                </div>
-                <span className="font-mono text-[10px] text-amber-700 bg-amber-200/60 px-1.5 py-0.5 rounded">
-                  Temp@2026
-                </span>
-              </button>
-            </div>
-          </div>
 
           {/* Redirect Notice */}
           {redirectParam && (

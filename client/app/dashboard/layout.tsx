@@ -27,7 +27,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, isAuthenticated, isLoading, devSwitchRole, logout } = useAuth();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
   const { isRTL, language, toggleLanguage } = useLanguage();
 
   const activeRole: UserRole = user?.role || "PROJECT_MANAGER";
@@ -112,20 +112,37 @@ export default function DashboardLayout({
     },
   };
 
-  const handleRoleSelect = async (role: UserRole) => {
-    await devSwitchRole(role);
-    if (role === "PROJECT_MANAGER") router.push("/dashboard/pm");
-    else if (role === "ENGINEER") router.push("/dashboard/engineer");
-    else if (role === "COMPANY_OWNER") router.push("/dashboard/owner");
-    else if (role === "ADMINISTRATOR" || role === "ADMIN") router.push("/dashboard/admin");
-    else if (role === "CUSTOMER") router.push("/projects");
-  };
+  const isExecutive = activeRole === "COMPANY_OWNER" || activeRole === "ADMINISTRATOR" || activeRole === "ADMIN";
+
+  const executiveTabs = [
+    {
+      id: "owner",
+      label: "Executive Desk",
+      labelAr: "المكتب التنفيذي",
+      icon: <Crown className="w-3.5 h-3.5" />,
+      path: "/dashboard/owner",
+    },
+    {
+      id: "pm",
+      label: "PM Portfolio",
+      labelAr: "إدارة المشاريع",
+      icon: <UserGear className="w-3.5 h-3.5" />,
+      path: "/dashboard/pm",
+    },
+    {
+      id: "admin",
+      label: "System Admin",
+      labelAr: "لوحة الأدمن",
+      icon: <ShieldCheck className="w-3.5 h-3.5" />,
+      path: "/dashboard/admin",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col antialiased">
       {/* Top Operations Header */}
-      <header className="h-16 border-b border-border bg-card/85 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
-        <div className="flex items-center gap-4">
+      <header className="h-16 border-b border-border bg-card/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between sticky top-0 z-40">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-full bg-[#1C1917] text-[#FAF7F2] flex items-center justify-center font-bold shadow-2xs group-hover:scale-105 transition-transform">
               <Buildings className="w-4 h-4" />
@@ -135,46 +152,43 @@ export default function DashboardLayout({
                 VALENTIA
               </span>
               <span className="block text-[9px] font-mono tracking-wider text-muted-foreground uppercase">
-                {isRTL ? "فريق التشطيب وإدارة المواقع" : "Operations & Fit-Out Desk"}
+                {isRTL ? "منظومة التشطيب والعمليات" : "Operations & Fit-Out"}
               </span>
             </div>
           </Link>
 
-          {/* Quick Role Switcher Pills for Testing Personas (Desktop) */}
-          <div className="hidden lg:flex items-center gap-1.5 ms-6 p-1 rounded-xl border border-border bg-secondary/50">
-            {(
-              [
-                "PROJECT_MANAGER",
-                "ENGINEER",
-                "COMPANY_OWNER",
-                "ADMINISTRATOR",
-                "CUSTOMER",
-              ] as UserRole[]
-            ).map((r) => {
-              const cfg = roleConfigs[r];
-              const isSelected = activeRole === r;
-              return (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => handleRoleSelect(r)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-[11px] font-mono transition-all cursor-pointer flex items-center gap-1.5",
-                    isSelected
-                      ? "bg-card text-foreground font-semibold shadow-2xs ring-1 ring-border"
-                      : "text-muted-foreground hover:text-foreground hover:bg-card/40"
-                  )}
-                  title={`Switch persona to ${cfg.label}`}
-                >
-                  {cfg.icon}
-                  <span>{isRTL ? cfg.labelAr : cfg.label}</span>
-                </button>
-              );
-            })}
+          {/* Active Role Badge (Enterprise Identity) */}
+          <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-secondary/50 text-[11px] font-mono font-medium text-foreground">
+            {roleConfigs[activeRole]?.icon}
+            <span>{isRTL ? roleConfigs[activeRole]?.labelAr : roleConfigs[activeRole]?.label}</span>
           </div>
+
+          {/* Executive Multi-Desk Navigation (Only for Owner and Admin) */}
+          {isExecutive && (
+            <div className="hidden lg:flex items-center gap-1 ms-3 p-1 rounded-xl border border-border bg-secondary/30">
+              {executiveTabs.map((tab) => {
+                const isActive = pathname === tab.path;
+                return (
+                  <Link
+                    key={tab.id}
+                    href={tab.path}
+                    className={cn(
+                      "px-3 py-1 rounded-lg text-[11px] font-mono transition-all flex items-center gap-1.5",
+                      isActive
+                        ? "bg-card text-foreground font-semibold shadow-2xs border border-border"
+                        : "text-muted-foreground hover:text-foreground hover:bg-card/40"
+                    )}
+                  >
+                    {tab.icon}
+                    <span>{isRTL ? tab.labelAr : tab.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3">
           {/* Client Portal Link */}
           <Link
             href="/projects"
@@ -188,21 +202,21 @@ export default function DashboardLayout({
           <button
             type="button"
             onClick={toggleLanguage}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-2xs hover:bg-secondary cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground shadow-2xs hover:bg-secondary cursor-pointer"
           >
-            <span className={cn(language === "en" ? "font-bold text-foreground" : "text-muted-foreground")}>
-              EN
-            </span>
-            <span className="text-border">|</span>
             <span className={cn(language === "ar" ? "font-bold text-foreground" : "text-muted-foreground")}>
               عربي
+            </span>
+            <span className="text-border">|</span>
+            <span className={cn(language === "en" ? "font-bold text-foreground" : "text-muted-foreground")}>
+              EN
             </span>
           </button>
 
           {/* User & Sign Out */}
-          <div className="flex items-center gap-2 border-s border-border ps-3">
+          <div className="flex items-center gap-2 border-s border-border ps-2.5 sm:ps-3">
             <span className="text-xs font-mono font-medium text-foreground hidden md:inline-block">
-              {user?.name || "Architect"}
+              {user?.name || (isRTL ? "المهندس" : "Staff")}
             </span>
             <button
               type="button"
@@ -219,42 +233,60 @@ export default function DashboardLayout({
         </div>
       </header>
 
-      {/* Mobile Role Switcher Sub-header */}
-      <div className="lg:hidden border-b border-border bg-secondary/30 px-3 py-2 overflow-x-auto no-scrollbar flex items-center gap-2">
-        {(
-          [
-            "PROJECT_MANAGER",
-            "ENGINEER",
-            "COMPANY_OWNER",
-            "ADMINISTRATOR",
-            "CUSTOMER",
-          ] as UserRole[]
-        ).map((r) => {
-          const cfg = roleConfigs[r];
-          const isSelected = activeRole === r;
-          return (
-            <button
-              key={r}
-              type="button"
-              onClick={() => handleRoleSelect(r)}
-              className={cn(
-                "px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0",
-                isSelected
-                  ? "bg-card text-foreground font-semibold shadow-xs border border-border"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {cfg.icon}
-              <span>{isRTL ? cfg.labelAr : cfg.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Main Dashboard Canvas */}
-      <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+      {/* Main Dashboard Canvas with Mobile-First padding */}
+      <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pb-24 md:pb-8">
         {children}
       </main>
+
+      {/* Mobile Ergonomic Bottom Navigation Bar */}
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border px-3 py-2 flex items-center justify-around shadow-lg">
+        <Link
+          href={roleConfigs[activeRole]?.path || "/dashboard"}
+          className={cn(
+            "flex flex-col items-center gap-1 px-3 py-1 rounded-xl text-[10px] font-mono transition-colors",
+            pathname.startsWith("/dashboard")
+              ? "text-primary font-bold"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {roleConfigs[activeRole]?.icon || <Buildings className="w-4 h-4" />}
+          <span>{isRTL ? "العمليات" : "Dashboard"}</span>
+        </Link>
+
+        <Link
+          href="/projects"
+          className={cn(
+            "flex flex-col items-center gap-1 px-3 py-1 rounded-xl text-[10px] font-mono transition-colors",
+            pathname.startsWith("/projects")
+              ? "text-primary font-bold"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <SquaresFour className="w-4 h-4" />
+          <span>{isRTL ? "العملاء" : "Clients"}</span>
+        </Link>
+
+        <button
+          type="button"
+          onClick={toggleLanguage}
+          className="flex flex-col items-center gap-1 px-3 py-1 rounded-xl text-[10px] font-mono text-muted-foreground hover:text-foreground cursor-pointer"
+        >
+          <span className="font-bold text-xs">{language === "ar" ? "EN" : "عربي"}</span>
+          <span>{isRTL ? "English" : "عربي"}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={async () => {
+            await logout();
+            router.replace("/login");
+          }}
+          className="flex flex-col items-center gap-1 px-3 py-1 rounded-xl text-[10px] font-mono text-muted-foreground hover:text-destructive cursor-pointer"
+        >
+          <SignOut className="w-4 h-4" />
+          <span>{isRTL ? "خروج" : "Sign Out"}</span>
+        </button>
+      </nav>
 
       {/* Mandatory First-Login Password Modal (Unskippable if mustChangePassword is true) */}
       <FirstLoginPasswordModal

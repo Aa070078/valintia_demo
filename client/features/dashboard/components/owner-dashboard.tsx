@@ -248,123 +248,214 @@ export function OwnerDashboard() {
               </div>
             </div>
 
-            {/* Staff Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
-                  <tr>
-                    <th className="py-3 px-4">{isRTL ? "الاسم والمعرف" : "Name & ID"}</th>
-                    <th className="py-3 px-4">{isRTL ? "بيانات التواصل" : "Contact"}</th>
-                    <th className="py-3 px-4">{isRTL ? "الصلاحية" : "System Role"}</th>
-                    <th className="py-3 px-4">{isRTL ? "المشاريع النشطة" : "Active Workload"}</th>
-                    <th className="py-3 px-4">{isRTL ? "حالة أول تسجيل دخول" : "Security & Password Status"}</th>
-                    <th className="py-3 px-4 text-end">{isRTL ? "الإجراءات" : "Action"}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredStaff.map((u) => {
-                    const isCopied = copiedUserId === u.id;
-                    const isFirstLogin = Boolean(u.mustChangePassword || u.requiresPasswordChange);
+            {/* Staff List: Mobile Cards + Desktop Table */}
+            <div>
+              {/* Mobile Cards (Viewports < md) */}
+              <div className="md:hidden divide-y divide-border">
+                {filteredStaff.map((u) => {
+                  const isCopied = copiedUserId === u.id;
+                  const isFirstLogin = Boolean(u.mustChangePassword || u.requiresPasswordChange);
 
-                    return (
-                      <tr key={u.id} className="hover:bg-muted/20 transition-colors">
-                        {/* Name & ID */}
-                        <td className="py-3.5 px-4">
-                          <div className="font-semibold text-foreground flex items-center gap-1.5">
+                  return (
+                    <div key={u.id} className="p-4 space-y-3 hover:bg-muted/20 transition-colors">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="font-semibold text-foreground flex items-center gap-1.5 text-sm">
                             <span>{u.name}</span>
                             {u.role === "COMPANY_OWNER" && (
                               <Crown className="w-3.5 h-3.5 text-[#B88460]" weight="fill" />
                             )}
                           </div>
-                          <div className="text-[10px] font-mono text-muted-foreground">
+                          <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
                             ID: #{u.id}
                           </div>
-                        </td>
+                        </div>
 
-                        {/* Contact */}
-                        <td className="py-3.5 px-4 text-muted-foreground">
-                          <div className="flex items-center gap-1.5">
-                            <EnvelopeSimple className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
-                            <span className="font-mono text-[11px] text-foreground">{u.username || u.email}</span>
+                        <span
+                          className={cn(
+                            "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold shrink-0",
+                            u.role === "ENGINEER"
+                              ? "bg-amber-100 text-amber-900 border border-amber-300"
+                              : u.role === "PROJECT_MANAGER"
+                              ? "bg-blue-100 text-blue-900 border border-blue-300"
+                              : u.role === "COMPANY_OWNER"
+                              ? "bg-purple-100 text-purple-900 border border-purple-300"
+                              : "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                          )}
+                        >
+                          {u.role}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1.5 text-xs text-muted-foreground pt-1 border-t border-border/60">
+                        <div className="flex items-center gap-2">
+                          <EnvelopeSimple className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                          <span className="font-mono text-[11px] text-foreground">{u.username || u.email}</span>
+                        </div>
+                        {u.phone && (
+                          <div className="flex items-center gap-2">
+                            <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                            <span className="font-mono text-[11px] text-foreground">{u.phone}</span>
                           </div>
-                          {u.phone && (
-                            <div className="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono">
-                              <Phone className="w-3 h-3 text-muted-foreground" />
-                              <span>{u.phone}</span>
-                            </div>
-                          )}
-                        </td>
+                        )}
+                      </div>
 
-                        {/* Role */}
-                        <td className="py-3.5 px-4">
-                          <span
-                            className={cn(
-                              "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold",
-                              u.role === "ENGINEER"
-                                ? "bg-amber-100 text-amber-900 border border-amber-300"
-                                : u.role === "PROJECT_MANAGER"
-                                ? "bg-blue-100 text-blue-900 border border-blue-300"
-                                : u.role === "COMPANY_OWNER"
-                                ? "bg-purple-100 text-purple-900 border border-purple-300"
-                                : "bg-emerald-100 text-emerald-900 border border-emerald-300"
-                            )}
-                          >
-                            {u.role}
-                          </span>
-                        </td>
-
-                        {/* Workload */}
-                        <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                          {u.activeProjectsCount ? (
-                            <span className="font-medium text-foreground">
-                              {u.activeProjectsCount} {isRTL ? "مشاريع" : "Projects"}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground/60">—</span>
-                          )}
-                        </td>
-
-                        {/* Security & Password Status */}
-                        <td className="py-3.5 px-4">
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/60">
+                        <div>
                           {isFirstLogin ? (
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-mono font-medium animate-pulse">
+                            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-mono font-medium animate-pulse">
                               <WarningCircle className="w-3.5 h-3.5 text-amber-600" />
-                              <span>{isRTL ? "أول دخول • كلمة سر مؤقتة" : "FIRST LOGIN • PENDING"}</span>
+                              <span>{isRTL ? "أول دخول • كلمة سر مؤقتة" : "FIRST LOGIN"}</span>
                             </div>
                           ) : (
-                            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-mono font-medium">
+                            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-mono font-medium">
                               <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>{isRTL ? "مفعل ومؤكد" : "VERIFIED & ACTIVE"}</span>
+                              <span>{isRTL ? "مفعل ومؤكد" : "ACTIVE"}</span>
                             </div>
                           )}
-                        </td>
+                        </div>
 
-                        {/* Actions */}
-                        <td className="py-3.5 px-4 text-end">
-                          <button
-                            type="button"
-                            onClick={() => handleCopyVoucher(u)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-border bg-card hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
-                            title={isRTL ? "نسخ بيانات الدخول لتسليمها للموظف" : "Copy credentials voucher"}
-                          >
-                            {isCopied ? (
-                              <>
-                                <Check size={12} className="text-emerald-500" />
-                                <span className="text-emerald-600 font-semibold">{isRTL ? "تم النسخ" : "Copied"}</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={12} />
-                                <span>{isRTL ? "نسخ البيانات" : "Copy Info"}</span>
-                              </>
+                        <button
+                          type="button"
+                          onClick={() => handleCopyVoucher(u)}
+                          className="h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted text-xs font-mono text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                          {isCopied ? (
+                            <>
+                              <Check size={14} className="text-emerald-500" />
+                              <span className="text-emerald-600 font-semibold">{isRTL ? "تم النسخ" : "Copied"}</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={14} />
+                              <span>{isRTL ? "نسخ البيانات" : "Copy Voucher"}</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Desktop Table (Viewports >= md) */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
+                    <tr>
+                      <th className="py-3 px-4">{isRTL ? "الاسم والمعرف" : "Name & ID"}</th>
+                      <th className="py-3 px-4">{isRTL ? "بيانات التواصل" : "Contact"}</th>
+                      <th className="py-3 px-4">{isRTL ? "الصلاحية" : "System Role"}</th>
+                      <th className="py-3 px-4">{isRTL ? "المشاريع النشطة" : "Active Workload"}</th>
+                      <th className="py-3 px-4">{isRTL ? "حالة أول تسجيل دخول" : "Security & Password Status"}</th>
+                      <th className="py-3 px-4 text-end">{isRTL ? "الإجراءات" : "Action"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {filteredStaff.map((u) => {
+                      const isCopied = copiedUserId === u.id;
+                      const isFirstLogin = Boolean(u.mustChangePassword || u.requiresPasswordChange);
+
+                      return (
+                        <tr key={u.id} className="hover:bg-muted/20 transition-colors">
+                          {/* Name & ID */}
+                          <td className="py-3.5 px-4">
+                            <div className="font-semibold text-foreground flex items-center gap-1.5">
+                              <span>{u.name}</span>
+                              {u.role === "COMPANY_OWNER" && (
+                                <Crown className="w-3.5 h-3.5 text-[#B88460]" weight="fill" />
+                              )}
+                            </div>
+                            <div className="text-[10px] font-mono text-muted-foreground">
+                              ID: #{u.id}
+                            </div>
+                          </td>
+
+                          {/* Contact */}
+                          <td className="py-3.5 px-4 text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                              <EnvelopeSimple className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+                              <span className="font-mono text-[11px] text-foreground">{u.username || u.email}</span>
+                            </div>
+                            {u.phone && (
+                              <div className="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono">
+                                <Phone className="w-3 h-3 text-muted-foreground" />
+                                <span>{u.phone}</span>
+                              </div>
                             )}
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          </td>
+
+                          {/* Role */}
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={cn(
+                                "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold",
+                                u.role === "ENGINEER"
+                                  ? "bg-amber-100 text-amber-900 border border-amber-300"
+                                  : u.role === "PROJECT_MANAGER"
+                                  ? "bg-blue-100 text-blue-900 border border-blue-300"
+                                  : u.role === "COMPANY_OWNER"
+                                  ? "bg-purple-100 text-purple-900 border border-purple-300"
+                                  : "bg-emerald-100 text-emerald-900 border border-emerald-300"
+                              )}
+                            >
+                              {u.role}
+                            </span>
+                          </td>
+
+                          {/* Workload */}
+                          <td className="py-3.5 px-4 font-mono text-muted-foreground">
+                            {u.activeProjectsCount ? (
+                              <span className="font-medium text-foreground">
+                                {u.activeProjectsCount} {isRTL ? "مشاريع" : "Projects"}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground/60">—</span>
+                            )}
+                          </td>
+
+                          {/* Security & Password Status */}
+                          <td className="py-3.5 px-4">
+                            {isFirstLogin ? (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-mono font-medium animate-pulse">
+                                <WarningCircle className="w-3.5 h-3.5 text-amber-600" />
+                                <span>{isRTL ? "أول دخول • كلمة سر مؤقتة" : "FIRST LOGIN • PENDING"}</span>
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-mono font-medium">
+                                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>{isRTL ? "مفعل ومؤكد" : "VERIFIED & ACTIVE"}</span>
+                              </div>
+                            )}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="py-3.5 px-4 text-end">
+                            <button
+                              type="button"
+                              onClick={() => handleCopyVoucher(u)}
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-border bg-card hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
+                              title={isRTL ? "نسخ بيانات الدخول لتسليمها للموظف" : "Copy credentials voucher"}
+                            >
+                              {isCopied ? (
+                                <>
+                                  <Check size={12} className="text-emerald-500" />
+                                  <span className="text-emerald-600 font-semibold">{isRTL ? "تم النسخ" : "Copied"}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={12} />
+                                  <span>{isRTL ? "نسخ البيانات" : "Copy Info"}</span>
+                                </>
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
