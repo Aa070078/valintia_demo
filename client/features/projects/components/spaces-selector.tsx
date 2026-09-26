@@ -131,8 +131,8 @@ export function SpacesSelector({ spaces, onChange }: SpacesSelectorProps) {
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-[#EDE7DF]/30 flex items-center justify-center border border-border/50">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/isometric-floorplan.jpg"
-            alt="3D Architectural Isometric Floorplan Model"
+            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85"
+            alt="Architectural Spatial Model"
             className="h-full w-full object-cover transition-transform duration-700 ease-out hover:scale-[1.02]"
           />
 

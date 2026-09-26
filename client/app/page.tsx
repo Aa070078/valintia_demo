@@ -97,8 +97,8 @@ const HOTSPOTS: MaterialHotspot[] = [
   {
     id: "travertine",
     category: "stone",
-    x: 38,
-    y: 62,
+    x: 40,
+    y: 78,
     titleEn: "Living Salon Flooring",
     titleAr: "أرضيات الصالون والمعيشة",
     materialEn: "Honed Navona Travertine",
@@ -115,8 +115,8 @@ const HOTSPOTS: MaterialHotspot[] = [
   {
     id: "joinery",
     category: "wood",
-    x: 68,
-    y: 42,
+    x: 75,
+    y: 38,
     titleEn: "Architectural Wall Paneling",
     titleAr: "التجاليد الخشبية المعمارية",
     materialEn: "Rift-Cut White Oak & Brass Reveal",
@@ -133,26 +133,26 @@ const HOTSPOTS: MaterialHotspot[] = [
   {
     id: "glass",
     category: "glass",
-    x: 48,
-    y: 28,
-    titleEn: "Dining Gallery Partition",
-    titleAr: "قاطع غرفة الطعام الزجاجي",
-    materialEn: "Fluted Low-Iron Acoustic Glass",
-    materialAr: "زجاج مضلع عازل للصوت مع إطار ألمنيوم برونزي",
-    specEn: "Laminated acoustic safety glass with 12mm fluted texture, providing visual privacy while channeling natural light.",
-    specAr: "زجاج مصفح آمن متعدد الطبقات بتضليعات ناعمة توفر الخصوصية وتمرر الضوء الطبيعي بانسيابية.",
-    acoustic: "STC 42 dB Acoustic Isolation",
-    acousticScore: 84,
-    originEn: "Murano Atelier, Italy",
-    originAr: "أتيليه مورانو، إيطاليا",
-    fireRating: "EI-30 Fire Barrier",
+    x: 24,
+    y: 42,
+    titleEn: "Architectural Glazing Curtain",
+    titleAr: "الواجهات الزجاجية المعمارية",
+    materialEn: "Low-E Double Glazed Curtain Wall",
+    materialAr: "زجاج مزدوج منخفض الانبعاث مع عزل حراري وصوتي فائق",
+    specEn: "Thermal-break aluminum slim frames with acoustic PVB interlayer, framing private courtyards and terraces.",
+    specAr: "قطاعات ألمنيوم معزولة حرارياً مع طبقة PVB عازلة للصوت تفتح على الأفنية والحدائق الخاصة.",
+    acoustic: "STC 44 dB Acoustic Isolation",
+    acousticScore: 88,
+    originEn: "Schüco Atelier, Germany",
+    originAr: "أنظمة شيكو، ألمانيا",
+    fireRating: "EI-30 Certified",
     image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80",
   },
   {
     id: "terrace",
     category: "outdoor",
-    x: 22,
-    y: 35,
+    x: 14,
+    y: 34,
     titleEn: "Veranda Transition Portal",
     titleAr: "بوابة الامتداد الخارجي للتراس",
     materialEn: "Textured Basalt & Plantation Teak",
@@ -886,8 +886,8 @@ export default function LandingPage() {
                 className="relative aspect-[16/10] rounded-3xl overflow-hidden bg-[#241F1B] border border-[#D8C8B4] shadow-xl group"
               >
                 <Image
-                  src="/images/isometric-floorplan.jpg"
-                  alt="3D Axonometric Blueprint Model"
+                  src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1800&q=85"
+                  alt="Architectural Material & Spatial Explorer"
                   fill
                   className="object-cover opacity-90 transition-transform duration-700 group-hover:scale-102"
                 />

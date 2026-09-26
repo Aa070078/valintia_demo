@@ -118,8 +118,11 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
     "brief.your_notes": "Your Notes",
     "brief.notes_placeholder": "I want a warm, modern design with natural materials and a lot of light...",
 
-    // Step 1: Welcome
+    // Step 1: Welcome & Property Typology
     "step1.eyebrow": "01 — 06 • WELCOME / INITIATION",
+    "step1.headline": "What are we creating?",
+    "step1.subheadline":
+      "Select the foundational architectural volume for your residence or commercial commission in Egypt.",
     "step1.title": "From a place to a lifestyle",
     "step1.desc":
       "We design and build exceptional spaces in Egypt, while you stay connected from anywhere.",
@@ -381,8 +384,11 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
     "brief.your_notes": "ملاحظاتك المعمارية",
     "brief.notes_placeholder": "أفضل تصميماً دافئاً بمواد طبيعية، وأخشاب راقية، وإضاءة طبيعية وافرة...",
 
-    // Step 1: Welcome
+    // Step 1: Welcome & Property Typology
     "step1.eyebrow": "٠١ — ٠٦ • البداية والمقدمة",
+    "step1.headline": "ما هو النمط المعماري لمسكنك؟",
+    "step1.subheadline":
+      "اختر الكتلة المعمارية لمسكنك أو مشروعك في مصر لبدء تحديد المتطلبات والمواصفات المعمارية.",
     "step1.title": "من مجرّد مساحة إلى أسلوب حياة",
     "step1.desc":
       "نصمم وننفّذ مشاريع معمارية وتشطيبات متكاملة راقية في مصر، مع متابعة لحظية أينما كنت.",

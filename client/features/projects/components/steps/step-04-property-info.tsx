@@ -145,42 +145,50 @@ export function StepPropertyInfo({
           </div>
         </div>
 
-        {/* City / District */}
+        {/* City / District Dropdown */}
         <div className="flex flex-col gap-2">
           <label className="flex items-center gap-1.5 text-xs font-medium text-[#503C2C]">
             <MapPin className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "المدينة / الحي *" : "City / District *"}</span>
+            <span>{isRTL ? "المدينة / المنطقة في مصر (اختر من القائمة) *" : "City / District in Egypt (Select from list) *"}</span>
           </label>
-          <input
-            type="text"
-            required
-            value={property.city || ""}
-            onChange={(e) => updateField("city", e.target.value)}
-            placeholder={
-              isRTL
-                ? "مثال: القاهرة الجديدة، الشيخ زايد، الساحل الشمالي، الجونة..."
-                : "e.g. New Cairo, Sheikh Zayed, North Coast, El Gouna..."
-            }
-            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
-          />
-          {/* Preset City Tags */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {PRESET_CITIES.map((c) => {
-              const label = isRTL ? c.ar : c.en;
-              return (
-                <button
-                  key={c.en}
-                  type="button"
-                  onClick={() => updateField("city", label)}
-                  className="text-[10px] font-normal px-2 py-0.5 rounded-md bg-card border border-border text-[#503C2C] hover:text-[#1C1917] hover:border-[#B88460] transition-colors cursor-pointer"
-                >
-                  {label}
-                </button>
-              );
-            })}
+          <div className="flex gap-2">
+            <select
+              value={
+                PRESET_CITIES.some((c) => (isRTL ? c.ar : c.en) === property.city)
+                  ? property.city
+                  : "custom"
+              }
+              onChange={(e) => {
+                if (e.target.value !== "custom") {
+                  updateField("city", e.target.value);
+                }
+              }}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] cursor-pointer"
+            >
+              <option value="" disabled>
+                {isRTL ? "-- اختر المدينة أو المنطقة --" : "-- Select Egyptian City or Region --"}
+              </option>
+              {PRESET_CITIES.map((c) => (
+                <option key={c.en} value={isRTL ? c.ar : c.en}>
+                  {isRTL ? c.ar : c.en}
+                </option>
+              ))}
+              <option value="custom">
+                {isRTL ? "منطقة أخرى (كتابة مخصصة)..." : "Other District (Type custom)..."}
+              </option>
+            </select>
           </div>
+          {(!PRESET_CITIES.some((c) => (isRTL ? c.ar : c.en) === property.city) || property.city === "") && (
+            <input
+              type="text"
+              value={property.city || ""}
+              onChange={(e) => updateField("city", e.target.value)}
+              placeholder={isRTL ? "اكتب اسم المدينة أو الحي هنا..." : "Type custom city or district..."}
+              className="px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            />
+          )}
           <span className="text-[#78716C] text-[10px] font-normal">
-            {isRTL ? "يحدد فريق الإشراف الهندسي الأقرب" : "Determines logistical dispatch atelier"}
+            {isRTL ? "يحدد فريق الإشراف الهندسي الميداني الأقرب" : "Calibrates field engineering logistical dispatch in Egypt"}
           </span>
         </div>
 

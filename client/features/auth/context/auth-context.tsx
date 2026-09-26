@@ -25,8 +25,6 @@ interface AuthContextValue {
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
-const DASHBOARD_URL = process.env.NEXT_PUBLIC_DASHBOARD_URL || "http://localhost:3001";
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -46,11 +44,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const handleRoleRedirection = (role: UserRole): { redirectUrl?: string } => {
-    if (role !== "CUSTOMER") {
-      // Internal staff roles redirect to dashboard entry
-      return { redirectUrl: DASHBOARD_URL };
+    if (role === "PROJECT_MANAGER") {
+      return { redirectUrl: "/dashboard/pm" };
     }
-    return {};
+    if (role === "ENGINEER") {
+      return { redirectUrl: "/dashboard/engineer" };
+    }
+    if (role === "ADMINISTRATOR" || role === "COMPANY_OWNER") {
+      return { redirectUrl: "/dashboard/admin" };
+    }
+    return { redirectUrl: "/projects" };
   };
 
   const login = async (dto: ProposedLoginDto): Promise<{ redirectUrl?: string }> => {

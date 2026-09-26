@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { Plus, Minus, HouseLine, Cube } from "@phosphor-icons/react";
+import { Plus, Minus, HouseLine, Sparkle, SquaresFour, Bed, CookingPot, Armchair, Sun } from "@phosphor-icons/react";
 import type { SpaceEntity, PendingStyleSelection } from "../../types";
 import { CURATED_SPACES } from "../spaces-architecture";
 import { Switch } from "@/components/ui/switch";
@@ -16,6 +16,8 @@ interface StepSpacesProps {
   areaSqm: number;
 }
 
+type SpaceCategory = "all" | "living" | "suites" | "culinary" | "outdoor";
+
 export function StepSpaces({
   spaces,
   onChangeSpaces,
@@ -23,6 +25,7 @@ export function StepSpaces({
   areaSqm,
 }: StepSpacesProps) {
   const { t, isRTL } = useLanguage();
+  const [selectedCategory, setSelectedCategory] = React.useState<SpaceCategory>("all");
   const [customSpaceName, setCustomSpaceName] = React.useState("");
 
   // Map pending styles to spaces if assigned (only explicit per-space styles, not global default)
@@ -92,9 +95,22 @@ export function StepSpaces({
     .filter((s) => s.included && (s.quantity ?? 1) > 0)
     .reduce((acc, curr) => acc + (curr.quantity || 1), 0);
 
+  const categories = [
+    { id: "all", labelEn: "All Spaces", labelAr: "جميع الفراغات", icon: SquaresFour },
+    { id: "living", labelEn: "Reception & Living", labelAr: "الاستقبال والمعيشة", icon: Armchair },
+    { id: "suites", labelEn: "Suites & Bedrooms", labelAr: "الأجنحة والغرف", icon: Bed },
+    { id: "culinary", labelEn: "Kitchen & Dining", labelAr: "المطبخ والطعام", icon: CookingPot },
+    { id: "outdoor", labelEn: "Terrace & Outdoor", labelAr: "المساحات الخارجية", icon: Sun },
+  ];
+
+  const filteredCuratedSpaces = CURATED_SPACES.filter((space) => {
+    if (selectedCategory === "all") return true;
+    return space.category === selectedCategory;
+  });
+
   return (
     <div className="flex flex-col gap-8 animate-in fade-in duration-300">
-      {/* Step Header matching Reference */}
+      {/* Step Header */}
       <div className="text-start">
         <div className="flex items-center gap-2">
           <span className="h-px w-6 bg-foreground/50" />
@@ -114,124 +130,120 @@ export function StepSpaces({
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "حدد الفراغات والغرف الخاصة بمشروعك، مع إمكانية تعديل أعداد الغرف أو إضافتها لاحقاً."
-            : "Select the spaces for your project. You can always adjust counts, add or remove spaces later."}
+            ? "حدد الفراغات والغرف الخاصة بمشروعك، مع إمكانية تعديل أعداد الغرف أو إضافة مساحات مخصصة."
+            : "Select the spaces for your project. You can calibrate counts, add custom rooms, or assign specific styles."}
         </p>
       </div>
 
-      {/* Main 2-Column Responsive Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: 3D Isometric Architectural Floorplan Cutaway */}
-        <div className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-editorial group transition-all duration-300 hover:shadow-xl">
-            {/* Cutaway Image */}
-            <div className="relative aspect-square w-full overflow-hidden bg-[#FAF6F0]">
-              <Image
-                src="/images/isometric-floorplan.jpg"
-                alt="3D Isometric Architectural Floorplan"
-                fill
-                priority
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                sizes="(max-width: 1024px) 100vw, 420px"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60" />
-
-              {/* Floating Top Badge */}
-              <div className={cn("absolute top-3.5 z-10", isRTL ? "right-3.5" : "left-3.5")}>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/60 bg-white/90 px-3 py-1 text-[10px] font-medium text-[#1C1917] backdrop-blur-md shadow-xs">
-                  <Cube size={12} weight="bold" className="text-[#B88460]" />
-                  <span>{isRTL ? "مخطط أيزومتري ثلاثي الأبعاد" : "3D Isometric Blueprint"}</span>
-                </span>
-              </div>
-
-              {/* Bottom Metrics Overlay on Image */}
-              <div className="absolute bottom-3 inset-x-3 rounded-2xl border border-white/40 bg-[#FAF7F2]/90 p-3 backdrop-blur-md shadow-xs flex items-center justify-between text-start">
-                <div>
-                  <span className="text-[9px] font-mono uppercase tracking-wider text-[#78716C]">
-                    {isRTL ? "الفراغات النشطة" : "Active Zones"}
-                  </span>
-                  <div className="text-sm font-semibold text-[#1C1917]">
-                    {totalSelectedRooms} {isRTL ? "غرف / مناطق" : "Selected"}
-                  </div>
-                </div>
-                <div className="h-6 w-px bg-border/80" />
-                <div>
-                  <span className="text-[9px] font-mono uppercase tracking-wider text-[#78716C]">
-                    {isRTL ? "المساحة الإجمالية" : "Est. Area"}
-                  </span>
-                  <div className="text-sm font-semibold text-[#1C1917]">
-                    {areaSqm || 480} {isRTL ? "م²" : "m²"}
-                  </div>
-                </div>
-                <div className="h-6 w-px bg-border/80" />
-                <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#B88460]">
-                  <span className="h-2 w-2 rounded-full bg-[#B88460] animate-pulse" />
-                  <span>{isRTL ? "توزيع مثالي" : "Optimized"}</span>
-                </div>
-              </div>
+      {/* Top Spatial Metrics Bar */}
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-6 sm:gap-8">
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#78716C] block">
+              {isRTL ? "الفراغات المحددة" : "Active Spaces"}
+            </span>
+            <div className="text-base sm:text-lg font-medium text-[#1C1917] mt-0.5">
+              {totalSelectedRooms} {isRTL ? "غرفة / منطقة" : "Rooms Selected"}
+            </div>
+          </div>
+          <div className="h-8 w-px bg-border/80" />
+          <div>
+            <span className="text-[10px] font-mono uppercase tracking-wider text-[#78716C] block">
+              {isRTL ? "المساحة من بيانات العقار" : "Gross Footprint"}
+            </span>
+            <div className="text-base sm:text-lg font-medium text-[#1C1917] mt-0.5">
+              {areaSqm || 480} {isRTL ? "متر مربع" : "m² Area"}
             </div>
           </div>
         </div>
 
-        {/* Right Column: Interactive Spaces List with Switch AND Counter */}
-        <div className="lg:col-span-7 flex flex-col gap-3.5">
-          {CURATED_SPACES.map((curated) => {
-            const existing = spaces.find((s) => s.id === curated.id);
-            const isIncluded = existing ? existing.included : false;
-            const quantity = existing ? (existing.quantity ?? existing.count ?? 1) : curated.defaultCount;
-            const assignedStyle = getStyleForSpace(curated.id);
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#D8C8B4] bg-[#FAF7F2] px-3.5 py-1.5 text-xs text-[#503C2C] shadow-2xs">
+          <Sparkle size={13} weight="fill" className="text-[#B88460]" />
+          <span className="font-normal">{isRTL ? "توزيع مساحي متوازن ومدروس" : "Optimal Spatial Distribution"}</span>
+        </div>
+      </div>
 
-            return (
-              <div
-                key={curated.id}
-                className={cn(
-                  "p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 flex items-center justify-between gap-3 bg-card",
-                  isIncluded
-                    ? "border-[#503C2C]/50 shadow-xs ring-1 ring-[#503C2C]/10"
-                    : "border-border/70 opacity-60 hover:opacity-90"
-                )}
-              >
-                {/* Left space identity */}
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 border border-border bg-muted">
-                    <Image
-                      src={curated.imageSrc}
-                      alt={curated.defaultName}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
-                    />
-                  </div>
-                  <div className="min-w-0 text-start">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4
-                        className="text-[#1C1917] truncate text-sm font-medium"
-                      >
-                        {(t(curated.nameKey) !== curated.nameKey && t(curated.nameKey)) || curated.defaultName}
-                      </h4>
-                      {assignedStyle && isIncluded && (
-                        <span
-                          className={cn(
-                            "px-2 py-0.5 rounded-full bg-[#EAE2D7] text-[#503C2C] shrink-0 border border-[#D8C8B4]",
-                            isRTL ? "text-[10px] font-normal tracking-normal" : "font-mono text-[9px]"
-                          )}
-                        >
-                          {assignedStyle}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] text-[#78716C] font-normal truncate mt-0.5">
-                      {isRTL ? curated.descAr : curated.desc}
-                    </p>
-                  </div>
+      {/* Category Filter Tabs */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        {categories.map((cat) => {
+          const Icon = cat.icon;
+          const isActive = selectedCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setSelectedCategory(cat.id as SpaceCategory)}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-normal whitespace-nowrap transition-all cursor-pointer",
+                isActive
+                  ? "bg-[#503C2C] text-[#FAF7F2] shadow-2xs font-medium"
+                  : "bg-card border border-border/80 text-[#6B635B] hover:text-[#1C1917] hover:border-[#B88460]/60"
+              )}
+            >
+              <Icon size={14} weight={isActive ? "fill" : "regular"} />
+              <span>{isRTL ? cat.labelAr : cat.labelEn}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Responsive 2-Column Grid of Spaces */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredCuratedSpaces.map((curated) => {
+          const existing = spaces.find((s) => s.id === curated.id);
+          const isIncluded = existing ? existing.included : false;
+          const quantity = existing ? (existing.quantity ?? existing.count ?? 1) : curated.defaultCount;
+          const assignedStyle = getStyleForSpace(curated.id);
+
+          return (
+            <div
+              key={curated.id}
+              className={cn(
+                "p-4 rounded-2xl border transition-all duration-200 flex flex-col justify-between gap-4 bg-card",
+                isIncluded
+                  ? "border-[#503C2C]/50 shadow-xs ring-1 ring-[#503C2C]/10"
+                  : "border-border/70 opacity-65 hover:opacity-90"
+              )}
+            >
+              {/* Top Row: Photo Thumbnail + Details */}
+              <div className="flex items-start gap-3.5 min-w-0">
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-border bg-muted shadow-2xs">
+                  <Image
+                    src={curated.imageSrc}
+                    alt={curated.defaultName}
+                    fill
+                    className="object-cover transition-transform duration-500 hover:scale-105"
+                    sizes="64px"
+                  />
                 </div>
+                <div className="min-w-0 flex-1 text-start">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="text-[#1C1917] text-sm font-medium leading-snug">
+                      {(t(curated.nameKey) !== curated.nameKey && t(curated.nameKey)) || curated.defaultName}
+                    </h4>
+                    {assignedStyle && isIncluded && (
+                      <span
+                        className={cn(
+                          "px-2 py-0.5 rounded-full bg-[#EAE2D7] text-[#503C2C] shrink-0 border border-[#D8C8B4]",
+                          isRTL ? "text-[10px] font-normal" : "font-mono text-[9px]"
+                        )}
+                      >
+                        {assignedStyle}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#78716C] font-normal leading-relaxed mt-1">
+                    {isRTL ? curated.descAr : curated.desc}
+                  </p>
+                </div>
+              </div>
 
-                {/* Right controls: Counter (-/+) AND Switch */}
-                <div className="flex items-center gap-3 shrink-0" dir="ltr">
-                  {/* Quantity Counter */}
+              {/* Bottom Controls Row: Counter (-/+) and Toggle Switch */}
+              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                <div className="flex items-center gap-2" dir="ltr">
                   {isIncluded ? (
                     <div
-                      className="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E2D8CC] rounded-full px-2 py-0.5 shadow-2xs select-none"
+                      className="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E2D8CC] rounded-full px-2.5 py-1 shadow-2xs select-none"
                       dir="ltr"
                     >
                       <button
@@ -245,7 +257,7 @@ export function StepSpaces({
                       >
                         <Minus size={11} weight="bold" />
                       </button>
-                      <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917]">
+                      <span className="font-mono text-xs font-medium w-5 text-center text-[#1C1917]">
                         {quantity}
                       </span>
                       <button
@@ -265,43 +277,49 @@ export function StepSpaces({
                       {isRTL ? "غير مدرج" : "Qty: 0"}
                     </span>
                   )}
+                </div>
 
-                  {/* Toggle Switch */}
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-[#78716C] font-normal select-none">
+                    {isIncluded ? (isRTL ? "مدرج" : "Included") : (isRTL ? "استبعاد" : "Excluded")}
+                  </span>
                   <Switch
                     checked={isIncluded}
                     onCheckedChange={() => toggleSpace(curated.id, isIncluded)}
                   />
                 </div>
               </div>
-            );
-          })}
+            </div>
+          );
+        })}
 
-          {/* Custom Spaces Added by User */}
-          {spaces
-            .filter((s) => s.spaceType === "custom")
-            .map((custom) => (
-              <div
-                key={custom.id}
-                className="p-3.5 sm:p-4 rounded-2xl border border-[#503C2C]/50 bg-card flex items-center justify-between gap-3 shadow-xs ring-1 ring-[#503C2C]/10"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-background border border-border flex items-center justify-center shrink-0 text-[#503C2C]">
-                    <HouseLine size={22} weight="bold" />
-                  </div>
-                  <div className="text-start">
-                    <h4 className="text-[#1C1917] text-sm font-medium">
-                      {custom.customName}
-                    </h4>
-                    <span className="text-[#78716C] text-[11px] font-normal">
-                      {isRTL ? "فراغ معماري مخصص" : "Bespoke Space"}
-                    </span>
-                  </div>
+        {/* Custom Spaces Added by User */}
+        {spaces
+          .filter((s) => s.spaceType === "custom")
+          .map((custom) => (
+            <div
+              key={custom.id}
+              className="p-4 rounded-2xl border border-[#503C2C]/50 bg-card flex flex-col justify-between gap-4 shadow-xs ring-1 ring-[#503C2C]/10"
+            >
+              <div className="flex items-start gap-3.5">
+                <div className="w-16 h-16 rounded-xl bg-background border border-border flex items-center justify-center shrink-0 text-[#503C2C] shadow-2xs">
+                  <HouseLine size={24} weight="regular" />
                 </div>
+                <div className="text-start min-w-0 flex-1">
+                  <h4 className="text-[#1C1917] text-sm font-medium">
+                    {custom.customName}
+                  </h4>
+                  <span className="text-[#78716C] text-[11px] font-normal mt-0.5 block">
+                    {isRTL ? "فراغ معماري مخصص" : "Bespoke Space"}
+                  </span>
+                </div>
+              </div>
 
-                <div className="flex items-center gap-3 shrink-0" dir="ltr">
+              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                <div className="flex items-center gap-2" dir="ltr">
                   {custom.included ? (
                     <div
-                      className="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E2D8CC] rounded-full px-2 py-0.5 shadow-2xs select-none"
+                      className="flex items-center gap-1.5 bg-[#FAF6F0] border border-[#E2D8CC] rounded-full px-2.5 py-1 shadow-2xs select-none"
                       dir="ltr"
                     >
                       <button
@@ -315,7 +333,7 @@ export function StepSpaces({
                       >
                         <Minus size={11} weight="bold" />
                       </button>
-                      <span className="font-mono text-xs font-semibold w-4 text-center text-[#1C1917]">
+                      <span className="font-mono text-xs font-medium w-5 text-center text-[#1C1917]">
                         {custom.quantity}
                       </span>
                       <button
@@ -335,38 +353,49 @@ export function StepSpaces({
                       {isRTL ? "غير مدرج" : "Qty: 0"}
                     </span>
                   )}
+                </div>
 
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-[#78716C] font-normal select-none">
+                    {custom.included ? (isRTL ? "مدرج" : "Included") : (isRTL ? "استبعاد" : "Excluded")}
+                  </span>
                   <Switch
                     checked={custom.included}
                     onCheckedChange={() => toggleSpace(custom.id, custom.included)}
                   />
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
+      </div>
 
-          {/* Add Custom Space input */}
-          <div className="flex gap-2 p-3 rounded-2xl bg-card border border-dashed border-border mt-2">
-            <input
-              type="text"
-              value={customSpaceName}
-              onChange={(e) => setCustomSpaceName(e.target.value)}
-              placeholder={
-                isRTL
-                  ? "إضافة فراغ مخصص (مثل: غرفة سينما، سبا، مجلس عربي، ركن قراءة)..."
-                  : "Add custom space (e.g. Cinema Room, Private Spa, Library Lounge)..."
-              }
-              className="flex-1 px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:border-primary text-xs font-normal"
-            />
-            <button
-              type="button"
-              onClick={handleAddCustomSpace}
-              className="flex items-center gap-1.5 px-5 py-2 rounded-xl bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors cursor-pointer shrink-0 shadow-2xs text-xs font-medium"
-            >
-              <Plus size={14} weight="bold" />
-              <span>{isRTL ? "إضافة فراغ" : "Add Space"}</span>
-            </button>
-          </div>
-        </div>
+      {/* Add Custom Space input */}
+      <div className="flex flex-col sm:flex-row gap-2.5 p-3.5 rounded-2xl bg-card border border-dashed border-border mt-2">
+        <input
+          type="text"
+          value={customSpaceName}
+          onChange={(e) => setCustomSpaceName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddCustomSpace();
+            }
+          }}
+          placeholder={
+            isRTL
+              ? "إضافة فراغ مخصص (مثل: غرفة سينما، سبا منزلي، مجلس عربي، ركن قراءة، جيم)..."
+              : "Add custom space (e.g. Home Cinema, Private Spa, Library Study, Gym)..."
+          }
+          className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] focus:outline-none focus:ring-1 focus:ring-[#B88460] text-xs font-normal"
+        />
+        <button
+          type="button"
+          onClick={handleAddCustomSpace}
+          className="flex items-center justify-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3D2E22] transition-colors cursor-pointer shrink-0 shadow-2xs text-xs font-normal"
+        >
+          <Plus size={14} weight="bold" />
+          <span>{isRTL ? "إضافة الفراغ للمشروع" : "Add Space to Scope"}</span>
+        </button>
       </div>
     </div>
   );

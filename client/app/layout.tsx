@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Cormorant_Garamond, Readex_Pro, Amiri } from "next/font/google";
+import { Inter, Cormorant_Garamond, IBM_Plex_Sans_Arabic, Alexandria } from "next/font/google";
 
 import "./globals.css";
 import { Providers } from "@/components/providers";
@@ -8,22 +8,22 @@ import { cn } from "@/lib/utils";
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   variable: "--font-heading",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
 });
 
-const readex = Readex_Pro({
-  subsets: ["arabic", "latin"],
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
   variable: "--font-arabic",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500"],
   display: "swap",
 });
 
-const amiri = Amiri({
+const alexandria = Alexandria({
   subsets: ["arabic", "latin"],
   variable: "--font-arabic-heading",
-  weight: ["400", "700"],
+  weight: ["300", "400", "500"],
   display: "swap",
 });
 
@@ -51,8 +51,8 @@ export default function RootLayout({
         "antialiased",
         inter.variable,
         cormorant.variable,
-        readex.variable,
-        amiri.variable,
+        ibmPlexArabic.variable,
+        alexandria.variable,
         "font-sans"
       )}
     >

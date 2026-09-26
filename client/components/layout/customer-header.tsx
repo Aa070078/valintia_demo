@@ -46,14 +46,14 @@ export function CustomerHeader() {
           </div>
           <div className="flex flex-col">
             <span className={cn(
-              "font-sans font-semibold text-foreground transition-colors group-hover:opacity-80",
-              isRTL ? "text-[15px] font-bold tracking-normal" : "text-[13px] tracking-[0.28em]"
+              "font-sans font-medium text-foreground transition-colors group-hover:opacity-80",
+              isRTL ? "text-sm font-medium tracking-normal" : "text-[13px] tracking-[0.28em] font-semibold"
             )}>
               {t("brand.name")}
             </span>
             <span className={cn(
-              "font-medium text-muted-foreground",
-              isRTL ? "text-[11px] font-semibold tracking-normal text-[#503C2C]" : "text-[9px] uppercase tracking-[0.22em]"
+              "text-muted-foreground",
+              isRTL ? "text-[10px] font-normal tracking-normal text-[#503C2C]" : "text-[9px] uppercase tracking-[0.22em] font-medium"
             )}>
               {t("brand.tagline")}
             </span>
@@ -66,11 +66,11 @@ export function CustomerHeader() {
             href="/projects"
             className={cn(
               "relative py-1 transition-all duration-200 hover:-translate-y-0.5",
-              isRTL ? "text-sm font-bold tracking-normal" : "text-xs font-semibold uppercase tracking-[0.16em]",
+              isRTL ? "text-xs font-normal" : "text-xs font-semibold uppercase tracking-[0.16em]",
               pathname === "/projects" ||
                 (pathname.startsWith("/projects/") &&
                   pathname !== "/projects/new")
-                ? "text-foreground font-bold after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-foreground after:rounded-full"
+                ? "text-foreground font-medium after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-foreground after:rounded-full"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
@@ -80,14 +80,30 @@ export function CustomerHeader() {
             href="/projects/new"
             className={cn(
               "relative py-1 transition-all duration-200 hover:-translate-y-0.5",
-              isRTL ? "text-sm font-bold tracking-normal" : "text-xs font-semibold uppercase tracking-[0.16em]",
+              isRTL ? "text-xs font-normal" : "text-xs font-semibold uppercase tracking-[0.16em]",
               pathname === "/projects/new"
-                ? "text-foreground font-bold after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-foreground after:rounded-full"
+                ? "text-foreground font-medium after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-foreground after:rounded-full"
                 : "text-muted-foreground hover:text-foreground"
             )}
           >
             {t("nav.start_project")}
           </Link>
+
+          {/* Operations Desk Link for Staff */}
+          {isAuthenticated && role !== "CUSTOMER" && (
+            <Link
+              href={role === "ENGINEER" ? "/dashboard/engineer" : role === "PROJECT_MANAGER" ? "/dashboard/pm" : "/dashboard/admin"}
+              className={cn(
+                "relative py-1 transition-all duration-200 hover:-translate-y-0.5",
+                isRTL ? "text-xs font-normal text-[#B88460]" : "text-xs font-semibold uppercase tracking-[0.16em] text-[#B88460]",
+                pathname.startsWith("/dashboard")
+                  ? "text-[#B88460] font-medium after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-full after:bg-[#B88460] after:rounded-full"
+                  : "text-[#B88460]/80 hover:text-[#B88460]"
+              )}
+            >
+              {isRTL ? "لوحة العمليات" : "Operations Desk"}
+            </Link>
+          )}
         </nav>
 
         {/* Right Actions */}
@@ -96,7 +112,7 @@ export function CustomerHeader() {
             href="/projects/new"
             className={cn(
               "hidden sm:inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-primary-foreground shadow-xs transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.97]",
-              isRTL ? "text-xs font-bold tracking-normal" : "text-xs font-semibold uppercase tracking-[0.12em]"
+              isRTL ? "text-xs font-normal" : "text-xs font-semibold uppercase tracking-[0.12em]"
             )}
           >
             <Plus size={13} weight="bold" />

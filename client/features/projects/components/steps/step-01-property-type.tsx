@@ -32,7 +32,7 @@ export const PROPERTY_TYPOLOGIES: Array<{
     tag: "Primary Typology",
     tagAr: "النمط الأساسي",
     imageSrc:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "apartment",
@@ -44,7 +44,7 @@ export const PROPERTY_TYPOLOGIES: Array<{
     tag: "High-rise & mid-rise",
     tagAr: "أبراج سكنية وشقق",
     imageSrc:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "duplex",
@@ -56,7 +56,7 @@ export const PROPERTY_TYPOLOGIES: Array<{
     tag: "Dual floor levels",
     tagAr: "مستويين متصلين",
     imageSrc:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "penthouse",
@@ -68,31 +68,31 @@ export const PROPERTY_TYPOLOGIES: Array<{
     tag: "Private rooftop access",
     tagAr: "رووف وتراس بانورامي",
     imageSrc:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "commercial",
     volume: "VOLUME 05",
     titleKey: "property.commercial",
     descKey: "property.commercial_desc",
-    defaultTitle: "Commercial",
+    defaultTitle: "Commercial & Office",
     defaultDesc: "Bespoke executive suites, creative studios & showrooms.",
     tag: "Executive suites",
     tagAr: "أجنحة تنفيذية راقية",
     imageSrc:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "other",
     volume: "VOLUME 06",
     titleKey: "property.other",
     descKey: "property.other_desc",
-    defaultTitle: "Other",
-    defaultDesc: "Bespoke architectural pavilions & coastal vacation chalets.",
+    defaultTitle: "Coastal Chalet & Other",
+    defaultDesc: "Bespoke architectural pavilions & coastal Sahel chalets.",
     tag: "Custom scope",
     tagAr: "نطاق تصميم مخصص",
     imageSrc:
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85",
   },
 ];
 
@@ -116,13 +116,12 @@ export function StepPropertyType({
           </span>
         </div>
         <h2 className="mt-2 text-[#1C1917] dark:text-[#FAF7F2] font-serif text-3xl sm:text-4xl lg:text-5xl font-normal tracking-tight">
-          {t("step1.headline") || (isRTL ? "ما هو النمط المعماري لمسكنك؟" : "What are we creating?")}
+          {isRTL ? "ما هو النمط المعماري لمسكنك؟" : "What are we creating?"}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-muted-foreground font-normal leading-relaxed max-w-xl">
-          {t("step1.subheadline") ||
-            (isRTL
-              ? "حدد الكتلة المعمارية الأساسية لمسكنك أو وحدتك التجارية لبدء دراسة الفراغات والمواصفات."
-              : "Select the foundational architectural volume for your residence or commercial commission.")}
+          {isRTL
+            ? "اختر نوع العقار المراد تصميمه وتنفيذه لبدء تحديد المواصفات المعمارية الخاصة بك في مصر."
+            : "Select the architectural typology of your residence to begin shaping its specifications in Egypt."}
         </p>
       </div>
 

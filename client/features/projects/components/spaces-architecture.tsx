@@ -7,14 +7,27 @@ import { Switch } from "@/components/ui/switch";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 
-export const CURATED_SPACES = [
+export interface CuratedSpaceItem {
+  id: string;
+  nameKey: string;
+  defaultName: string;
+  category: "living" | "suites" | "culinary" | "outdoor";
+  desc: string;
+  descAr: string;
+  imageSrc: string;
+  hasCounter: boolean;
+  defaultCount: number;
+}
+
+export const CURATED_SPACES: CuratedSpaceItem[] = [
   {
     id: "living",
     nameKey: "space.living",
     defaultName: "Living Room",
+    category: "living",
     desc: "Formal lounge & conversation salon",
     descAr: "صالون استقبال رسمي ومساحة محادثة مفتوحة",
-    imageSrc: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80",
     hasCounter: false,
     defaultCount: 1,
   },
@@ -22,9 +35,10 @@ export const CURATED_SPACES = [
     id: "dining",
     nameKey: "space.dining",
     defaultName: "Dining Room",
+    category: "living",
     desc: "10-seat banqueting area",
     descAr: "منطقة طعام تتسع لـ ١٠ أشخاص بتشطيب راقٍ",
-    imageSrc: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=600&q=80",
     hasCounter: false,
     defaultCount: 1,
   },
@@ -32,9 +46,10 @@ export const CURATED_SPACES = [
     id: "kitchen",
     nameKey: "space.kitchen",
     defaultName: "Kitchen & Pantry",
+    category: "culinary",
     desc: "Chef prep island & concealed pantry",
     descAr: "جزيرة طهي رخامية ومخزن مؤن مخفي",
-    imageSrc: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=600&q=80",
     hasCounter: false,
     defaultCount: 1,
   },
@@ -42,9 +57,10 @@ export const CURATED_SPACES = [
     id: "master_bedroom",
     nameKey: "space.master_bedroom",
     defaultName: "Master Bedroom Suite",
+    category: "suites",
     desc: "Private retreat, walk-in dressing room",
     descAr: "جناح نوم رئيسي وغرفة ملابس فندقية",
-    imageSrc: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=600&q=80",
     hasCounter: false,
     defaultCount: 1,
   },
@@ -52,9 +68,10 @@ export const CURATED_SPACES = [
     id: "guest_bedrooms",
     nameKey: "space.bedroom",
     defaultName: "Guest Bedrooms",
+    category: "suites",
     desc: "Family & hospitality quarters",
     descAr: "غرف نوم إضافية للعائلة والضيوف",
-    imageSrc: "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1560185007-c5ca9d2c014d?auto=format&fit=crop&w=600&q=80",
     hasCounter: true,
     defaultCount: 3,
   },
@@ -62,9 +79,10 @@ export const CURATED_SPACES = [
     id: "bathrooms",
     nameKey: "space.bathrooms",
     defaultName: "Bathrooms & Spa",
+    category: "suites",
     desc: "En-suites and powder vanity",
     descAr: "حمامات ماستر ملحقة ووحدة ضيوف فاخرة",
-    imageSrc: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80",
     hasCounter: true,
     defaultCount: 4,
   },
@@ -72,9 +90,10 @@ export const CURATED_SPACES = [
     id: "terrace",
     nameKey: "space.terrace",
     defaultName: "Private Terrace & Loggia",
+    category: "outdoor",
     desc: "Lounge deck & landscaping",
     descAr: "تراس خارجي بإطلالة ومساحات خضراء",
-    imageSrc: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=600&q=80",
     hasCounter: true,
     defaultCount: 2,
   },
@@ -82,9 +101,21 @@ export const CURATED_SPACES = [
     id: "office",
     nameKey: "space.office",
     defaultName: "Home Office / Library",
+    category: "living",
     desc: "Acoustic paneling & custom joinery",
     descAr: "مكتب منزلي معزول مع تجاليد خشبية مدمجة",
-    imageSrc: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=300&q=80",
+    imageSrc: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=600&q=80",
+    hasCounter: false,
+    defaultCount: 0,
+  },
+  {
+    id: "dressing",
+    nameKey: "space.dressing",
+    defaultName: "Walk-in Dressing Room",
+    category: "suites",
+    desc: "Illuminated glass wardrobes & vanity",
+    descAr: "غرفة ملابس واسعة بخزائن زجاجية مضيئة",
+    imageSrc: "https://images.unsplash.com/photo-1558997519-83ea9252def8?auto=format&fit=crop&w=600&q=80",
     hasCounter: false,
     defaultCount: 0,
   },
@@ -255,8 +286,8 @@ export function SpacesArchitecture({
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EDE6DC]/40 border border-[#E8DFD3] dark:border-[#2C2C32] flex items-center justify-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/isometric-floorplan.jpg"
-                alt="Architectural Axonometric Cutaway Blueprint"
+                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85"
+                alt="Architectural Spatial Layout"
                 className="h-full w-full object-cover transition-transform duration-300"
                 style={{ transform: `scale(${zoomLevel})` }}
               />

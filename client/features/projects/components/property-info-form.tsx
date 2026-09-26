@@ -15,44 +15,44 @@ const PROPERTY_TYPES: Array<{
   {
     id: "villa",
     title: "Villa",
-    description: "Standalone luxury residences, twin houses, and townhouses.",
+    description: "Standalone luxury residences, twin houses, and estates.",
     imageSrc:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "apartment",
     title: "Apartment",
     description: "Single-level contemporary residences and flats.",
     imageSrc:
-      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "duplex",
     title: "Duplex",
     description: "Multi-level apartments with dedicated internal stairs.",
     imageSrc:
-      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "penthouse",
     title: "Penthouse",
     description: "Top-floor units with expansive private terraces.",
     imageSrc:
-      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "commercial",
-    title: "Commercial / Office",
+    title: "Commercial & Office",
     description: "Administrative workspaces, studios, and retail boutiques.",
     imageSrc:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=85",
   },
   {
     id: "other",
-    title: "Bespoke Space",
+    title: "Coastal Chalet & Other",
     description: "Chalets, vacation homes, and specialized properties.",
     imageSrc:
-      "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=1200&q=85",
   },
 ];
 
