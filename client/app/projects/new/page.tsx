@@ -65,6 +65,18 @@ function CreateProjectContent() {
   const [internalStep, setInternalStep] = React.useState<number>(1);
   const currentStep = stepQuery >= 1 && stepQuery <= 11 ? stepQuery : internalStep;
 
+  const activeStepRef = React.useRef<HTMLButtonElement | null>(null);
+
+  React.useEffect(() => {
+    if (activeStepRef.current && window.innerWidth < 1024) {
+      activeStepRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+    }
+  }, [currentStep]);
+
   // 11 Step Form State
   const [propertyType, setPropertyType] = React.useState<PropertyType>("villa");
   const [primaryStyleId, setPrimaryStyleId] = React.useState("japandi");
@@ -311,7 +323,7 @@ function CreateProjectContent() {
           )}
         >
           <div>
-            <div className="pb-3 flex items-center justify-between">
+            <div className="pb-2 sm:pb-3 flex items-center justify-between">
               <span className={cn(
                 "text-[10px]",
                 isRTL ? "font-sans text-xs font-medium text-[#78716C]" : "font-mono uppercase tracking-[0.2em] font-bold text-foreground/80"
@@ -323,8 +335,16 @@ function CreateProjectContent() {
               </span>
             </div>
 
+            {/* Mobile Progress Bar */}
+            <div className="lg:hidden h-1 w-full bg-[#E6DDD2] rounded-full overflow-hidden mb-3">
+              <div
+                style={{ width: `${(currentStep / 11) * 100}%` }}
+                className="h-full bg-[#503C2C] transition-all duration-300"
+              />
+            </div>
+
             {/* Steps List */}
-            <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-none">
+            <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 scrollbar-none touch-scroll -mx-4 px-4 sm:mx-0 sm:px-0">
               {FUNNEL_STEPS.map((step) => {
                 const isCurrent = step.id === currentStep;
                 const isCompleted = step.id < currentStep;
@@ -332,10 +352,11 @@ function CreateProjectContent() {
                 return (
                   <button
                     key={step.id}
+                    ref={isCurrent ? activeStepRef : null}
                     type="button"
                     onClick={() => goToStep(step.id)}
                     className={cn(
-                      "group flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-150 cursor-pointer select-none text-start",
+                      "group flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-150 cursor-pointer select-none text-start touch-manipulation",
                       isCurrent
                         ? "bg-sidebar-accent font-semibold text-foreground shadow-2xs"
                         : "text-[#5A4F45] hover:bg-secondary/60 hover:text-foreground font-normal"
@@ -495,12 +516,12 @@ function CreateProjectContent() {
 
           {/* Sticky / Fixed Navigation Footer for Steps 1 - 10 */}
           {currentStep < 11 && (
-            <div className="mt-12 pt-6 border-t border-border flex items-center justify-between">
+            <div className="sticky bottom-0 z-30 -mx-5 -mb-5 sm:mx-0 sm:mb-0 sm:static bg-[#FAF7F2]/95 backdrop-blur-md border-t border-border p-4 sm:p-0 sm:mt-12 sm:pt-6 sm:bg-transparent pb-safe flex items-center justify-between shadow-md sm:shadow-none transition-all">
               <button
                 type="button"
                 onClick={handleBack}
                 className={cn(
-                  "flex items-center gap-2 px-5 py-2.5 rounded-full border border-border bg-card text-xs font-bold text-foreground hover:bg-secondary transition-all cursor-pointer shadow-2xs",
+                  "flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full border border-border bg-card text-xs font-bold text-foreground hover:bg-secondary transition-all cursor-pointer shadow-2xs touch-manipulation active:scale-95",
                   isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
                 )}
               >
@@ -512,7 +533,7 @@ function CreateProjectContent() {
                 type="button"
                 onClick={handleNext}
                 className={cn(
-                  "flex items-center gap-2 px-7 py-2.5 rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer",
+                  "flex items-center gap-2 px-6 sm:px-7 py-2.5 rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer touch-manipulation",
                   isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
                 )}
               >

@@ -89,7 +89,7 @@ export function CountrySelect({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full px-3.5 py-2.5 rounded-xl border bg-background text-[#1C1917] text-xs font-normal transition-all duration-200 flex items-center justify-between gap-2 shadow-2xs hover:border-[#B88460]/60 cursor-pointer text-start",
+          "w-full px-3.5 py-2.5 rounded-xl border bg-background text-[#1C1917] text-xs font-normal transition-all duration-200 flex items-center justify-between gap-2 shadow-2xs hover:border-[#B88460]/60 cursor-pointer text-start min-h-[44px] touch-manipulation",
           isOpen
             ? "border-[#B88460] ring-1 ring-[#B88460]/30"
             : "border-border"
@@ -150,7 +150,7 @@ export function CountrySelect({
                   isRTL ? "دور باسم البلد أو كود الاتصال..." : "Search country or code..."
                 }
                 className={cn(
-                  "w-full py-1.5 text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460]",
+                  "w-full py-2 sm:py-1.5 text-base sm:text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460] touch-manipulation",
                   isRTL ? "pr-8 pl-7 text-right" : "pl-8 pr-7 text-left"
                 )}
               />

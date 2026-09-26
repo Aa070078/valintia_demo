@@ -147,7 +147,7 @@ export function PhoneInputWithCountry({
                       isRTL ? "دور باسم البلد أو كود الاتصال..." : "Search country or code..."
                     }
                     className={cn(
-                      "w-full py-1.5 text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460]",
+                      "w-full py-1.5 text-base sm:text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460] touch-manipulation",
                       isRTL ? "pr-7 pl-6 text-right" : "pl-7 pr-6 text-left"
                     )}
                   />
@@ -227,7 +227,7 @@ export function PhoneInputWithCountry({
           }
           dir="ltr"
           className={cn(
-            "w-full px-3.5 py-2.5 bg-transparent text-[#1C1917] text-xs font-normal focus:outline-none placeholder:text-[#78716C]/60",
+            "w-full px-3.5 py-2.5 bg-transparent text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none placeholder:text-[#78716C]/60 touch-manipulation",
             isRTL ? "text-right" : "text-left"
           )}
         />

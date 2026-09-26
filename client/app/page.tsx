@@ -19,6 +19,7 @@ import {
   Sliders,
   Check,
   X,
+  List,
   Waveform,
   GlobeHemisphereWest,
   Sun,
@@ -315,6 +316,7 @@ export default function LandingPage() {
   const [selectedCategory, setSelectedCategory] = React.useState<string>("all");
   const [lightingMood, setLightingMood] = React.useState<LightingMood>("daylight");
   const [mouseSpotlight, setMouseSpotlight] = React.useState({ x: 50, y: 35 });
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   // Dynamic Destination URL based on Auth State
   const commissionUrl = isAuthenticated ? "/projects/new" : "/login?redirect=/projects/new";
@@ -341,23 +343,23 @@ export default function LandingPage() {
 
       {/* 1. STICKY ATELIER NAVBAR */}
       <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#FAF7F2]/90 backdrop-blur-xl border-b border-[#E6DDD2] shadow-xs">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 h-20 flex items-center justify-between">
           {/* Brand Monogram */}
           <Link
             href="/"
-            className="flex items-center gap-3.5 group"
+            className="flex items-center gap-3 group shrink-0"
             data-cursor="pointer"
             data-cursor-text="VALENTIA"
           >
-            <div className="w-10 h-10 rounded-full bg-[#1C1917] text-[#FAF7F2] flex items-center justify-center border border-[#1C1917] shadow-sm group-hover:bg-[#503C2C] transition-colors">
-              <Buildings className="w-5 h-5" weight="light" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#1C1917] text-[#FAF7F2] flex items-center justify-center border border-[#1C1917] shadow-sm group-hover:bg-[#503C2C] transition-colors shrink-0">
+              <Buildings className="w-4 h-4 sm:w-5 sm:h-5" weight="light" />
             </div>
             <div>
-              <span className="block text-sm tracking-[0.25em] font-light uppercase text-[#1C1917]">
+              <span className="block text-xs sm:text-sm tracking-[0.22em] font-light uppercase text-[#1C1917]">
                 VALENTIA
               </span>
-              <span className="block text-[9px] tracking-[0.22em] text-[#707070] uppercase font-mono">
-                {isRTL ? "أتيليه التصميم والتشطيب المعماري" : "Design & Build Atelier"}
+              <span className="block text-[8px] sm:text-[9px] tracking-[0.18em] text-[#707070] uppercase font-mono">
+                {isRTL ? "أتيليه التصميم والتشطيب" : "Design & Build"}
               </span>
             </div>
           </Link>
@@ -402,43 +404,44 @@ export default function LandingPage() {
           </nav>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3.5">
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
               type="button"
               data-cursor="pointer"
               data-cursor-text={language === "en" ? "AR" : "EN"}
-              className="text-xs font-medium tracking-wider text-[#503C2C] hover:text-[#1C1917] transition-colors bg-white/70 hover:bg-white px-3.5 py-1.5 rounded-full border border-[#D8C8B4] shadow-xs cursor-pointer active:scale-95"
+              className="text-[11px] sm:text-xs font-medium tracking-wider text-[#503C2C] hover:text-[#1C1917] transition-colors bg-white/70 hover:bg-white px-3 py-1.5 rounded-full border border-[#D8C8B4] shadow-xs cursor-pointer active:scale-95 touch-manipulation"
             >
               {language === "en" ? "العربية" : "English"}
             </button>
 
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   href={projectsUrl}
                   data-cursor="pointer"
                   data-cursor-text="PROJECTS"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer active:scale-98"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer active:scale-98"
                 >
-                  <span>{isRTL ? "مشاريعي" : "My Projects"}</span>
+                  <span className="hidden sm:inline">{isRTL ? "مشاريعي" : "My Projects"}</span>
+                  <span className="sm:hidden">{isRTL ? "المشاريع" : "Projects"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
                 </Link>
                 <div
                   title={user?.name || user?.username || "Authenticated"}
-                  className="w-8 h-8 rounded-full bg-[#DFD3C1] border border-[#D8C8B4] flex items-center justify-center text-xs font-medium text-[#1C1917] uppercase"
+                  className="w-8 h-8 rounded-full bg-[#DFD3C1] border border-[#D8C8B4] flex items-center justify-center text-xs font-medium text-[#1C1917] uppercase shrink-0"
                 >
                   {user?.name?.[0] || user?.username?.[0] || <User className="w-4 h-4" />}
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-3">
                 <Link
                   href="/login"
                   data-cursor="pointer"
                   data-cursor-text="SIGN IN"
-                  className="px-3.5 py-1.5 rounded-full text-xs font-medium text-[#503C2C] hover:text-[#1C1917] hover:bg-white/60 transition-colors"
+                  className="hidden sm:inline-flex px-3 py-1.5 rounded-full text-xs font-medium text-[#503C2C] hover:text-[#1C1917] hover:bg-white/60 transition-colors"
                 >
                   {isRTL ? "تسجيل الدخول" : "Sign In"}
                 </Link>
@@ -446,15 +449,94 @@ export default function LandingPage() {
                   href={commissionUrl}
                   data-cursor="pointer"
                   data-cursor-text="COMMISSION"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer hover:shadow-md active:scale-98"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium tracking-wider uppercase transition-all shadow-sm cursor-pointer hover:shadow-md active:scale-98 touch-manipulation"
                 >
-                  <span>{isRTL ? "ابدأ تشطيب بيتك" : "Commission"}</span>
+                  <span className="hidden xs:inline">{isRTL ? "ابدأ تشطيب بيتك" : "Commission"}</span>
+                  <span className="xs:hidden">{isRTL ? "تشطيب" : "Start"}</span>
                   {isRTL ? <ArrowLeft className="w-3.5 h-3.5" /> : <ArrowRight className="w-3.5 h-3.5" />}
                 </Link>
               </div>
             )}
+
+            {/* Mobile Hamburger Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+              className="lg:hidden p-2 rounded-full border border-[#D8C8B4] bg-white/80 text-[#503C2C] hover:text-[#1C1917] transition-colors cursor-pointer active:scale-95 touch-manipulation"
+            >
+              {isMobileMenuOpen ? <X size={18} weight="bold" /> : <List size={18} weight="bold" />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Slide-down Drawer Menu */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden bg-[#FAF7F2]/98 backdrop-blur-2xl border-b border-[#E6DDD2] shadow-xl px-6 py-6 flex flex-col gap-5 animate-in slide-in-from-top-2 duration-200">
+            <nav className="flex flex-col gap-2 text-sm font-medium text-[#503C2C]">
+              <a
+                href="#philosophy"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl hover:bg-white/70 transition-colors flex items-center justify-between"
+              >
+                <span>{isRTL ? "رؤيتنا وفلسفة التصميم" : "Philosophy & Atelier Vision"}</span>
+                {isRTL ? <ArrowLeft size={13} className="text-[#B88460]" /> : <ArrowRight size={13} className="text-[#B88460]" />}
+              </a>
+              <a
+                href="#blueprints"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl hover:bg-white/70 transition-colors flex items-center justify-between"
+              >
+                <span>{isRTL ? "المخططات ثلاثية الأبعاد والخامات" : "Interactive Blueprints & Materials"}</span>
+                {isRTL ? <ArrowLeft size={13} className="text-[#B88460]" /> : <ArrowRight size={13} className="text-[#B88460]" />}
+              </a>
+              <a
+                href="#typologies"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl hover:bg-white/70 transition-colors flex items-center justify-between"
+              >
+                <span>{isRTL ? "نماذج العقارات والوحدات" : "Architectural Typologies"}</span>
+                {isRTL ? <ArrowLeft size={13} className="text-[#B88460]" /> : <ArrowRight size={13} className="text-[#B88460]" />}
+              </a>
+              <a
+                href="#comparison"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl hover:bg-white/70 transition-colors flex items-center justify-between"
+              >
+                <span>{isRTL ? "الفرق بيننا وبين السوق" : "The Atelier Standard"}</span>
+                {isRTL ? <ArrowLeft size={13} className="text-[#B88460]" /> : <ArrowRight size={13} className="text-[#B88460]" />}
+              </a>
+              <a
+                href="#methodology"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2.5 rounded-xl hover:bg-white/70 transition-colors flex items-center justify-between"
+              >
+                <span>{isRTL ? "مراحل الشغل خطوة بخطوة" : "5-Stage Turnkey Methodology"}</span>
+                {isRTL ? <ArrowLeft size={13} className="text-[#B88460]" /> : <ArrowRight size={13} className="text-[#B88460]" />}
+              </a>
+            </nav>
+
+            <div className="pt-4 border-t border-[#E6DDD2] flex flex-col gap-2.5">
+              {!isAuthenticated && (
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full py-2.5 rounded-xl bg-white border border-[#D8C8B4] text-xs font-semibold text-center text-[#503C2C] shadow-2xs"
+                >
+                  {isRTL ? "تسجيل الدخول إلى حسابك" : "Sign In to Atelier Portal"}
+                </Link>
+              )}
+              <Link
+                href={commissionUrl}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full py-3 rounded-full bg-[#1C1917] text-[#FAF7F2] text-xs font-semibold text-center uppercase tracking-wider shadow-sm flex items-center justify-center gap-2"
+              >
+                <span>{isRTL ? "ابدأ تشطيب بيتك الآن" : "Commission Your Estate"}</span>
+                {isRTL ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* 2. FLAGSHIP HERO: INLINE-IMAGE TYPOGRAPHY, AMBIENT SPOTLIGHT & 3D TILT CENTERPIECE */}
@@ -906,7 +988,7 @@ export default function LandingPage() {
                       data-cursor-text="MATERIAL"
                       aria-label={spot.titleEn}
                       className={cn(
-                        "absolute -translate-x-1/2 -translate-y-1/2 z-20 group/pin cursor-pointer transition-all duration-300",
+                        "absolute -translate-x-1/2 -translate-y-1/2 z-20 group/pin cursor-pointer transition-all duration-300 touch-manipulation p-2 -m-2",
                         isSelected ? "scale-125" : "hover:scale-110"
                       )}
                     >
@@ -1147,35 +1229,70 @@ export default function LandingPage() {
 
         <RevealOnScroll direction="up" delayMs={100}>
           <div className="rounded-3xl overflow-hidden border border-[#D8C8B4] bg-white shadow-xl">
-            <div className="grid grid-cols-12 bg-[#FAF7F2] p-5 border-b border-[#E6DDD2] text-xs font-mono uppercase tracking-wider text-[#503C2C] font-semibold">
-              <div className="col-span-4 sm:col-span-3">
-                {isRTL ? "وجه المقارنة" : "Evaluation Metric"}
+            {/* Desktop Table View (hidden on mobile) */}
+            <div className="hidden sm:block">
+              <div className="grid grid-cols-12 bg-[#FAF7F2] p-5 border-b border-[#E6DDD2] text-xs font-mono uppercase tracking-wider text-[#503C2C] font-semibold">
+                <div className="col-span-3">
+                  {isRTL ? "وجه المقارنة" : "Evaluation Metric"}
+                </div>
+                <div className="col-span-4 text-red-900/70">
+                  {isRTL ? "المقاولون التقليديون" : "Conventional Contractors"}
+                </div>
+                <div className="col-span-5 text-[#1C1917] font-bold flex items-center gap-1.5">
+                  <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
+                  <span>{isRTL ? "أتيليه فالنتيا (شغل هندسي مضمون)" : "Valentia Atelier Standard"}</span>
+                </div>
               </div>
-              <div className="col-span-4 sm:col-span-4 text-red-900/70">
-                {isRTL ? "المقاولون التقليديون" : "Conventional Contractors"}
-              </div>
-              <div className="col-span-4 sm:col-span-5 text-[#1C1917] font-bold flex items-center gap-1.5">
-                <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-                <span>{isRTL ? "أتيليه فالنتيا (شغل هندسي مضمون)" : "Valentia Atelier Standard"}</span>
+
+              <div className="divide-y divide-[#E6DDD2]">
+                {COMPARISON_ROWS.map((row, idx) => (
+                  <div
+                    key={idx}
+                    className="grid grid-cols-12 p-5 text-xs items-center hover:bg-[#FAF7F2]/40 transition-colors"
+                  >
+                    <div className="col-span-3 font-medium text-[#1C1917]">
+                      {isRTL ? row.featureAr : row.featureEn}
+                    </div>
+                    <div className="col-span-4 text-[#707070] flex items-start gap-2">
+                      <X className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                      <span>{isRTL ? row.traditionalAr : row.traditionalEn}</span>
+                    </div>
+                    <div className="col-span-5 text-[#1C1917] font-medium flex items-start gap-2 bg-[#F5EEE6]/50 p-2.5 rounded-xl border border-[#D8C8B4]/60">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>{isRTL ? row.valentiaAr : row.valentiaEn}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="divide-y divide-[#E6DDD2]">
+            {/* Mobile Card View (sm:hidden) */}
+            <div className="sm:hidden p-4 divide-y divide-[#E6DDD2] space-y-4">
               {COMPARISON_ROWS.map((row, idx) => (
-                <div
-                  key={idx}
-                  className="grid grid-cols-12 p-5 text-xs items-center hover:bg-[#FAF7F2]/40 transition-colors"
-                >
-                  <div className="col-span-4 sm:col-span-3 font-medium text-[#1C1917]">
-                    {isRTL ? row.featureAr : row.featureEn}
+                <div key={idx} className="pt-4 first:pt-0 space-y-2.5">
+                  <div className="font-semibold text-xs text-[#1C1917] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#B88460] shrink-0" />
+                    <span>{isRTL ? row.featureAr : row.featureEn}</span>
                   </div>
-                  <div className="col-span-4 sm:col-span-4 text-[#707070] flex items-start gap-2">
-                    <X className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-                    <span>{isRTL ? row.traditionalAr : row.traditionalEn}</span>
-                  </div>
-                  <div className="col-span-4 sm:col-span-5 text-[#1C1917] font-medium flex items-start gap-2 bg-[#F5EEE6]/50 p-2.5 rounded-xl border border-[#D8C8B4]/60">
-                    <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>{isRTL ? row.valentiaAr : row.valentiaEn}</span>
+                  <div className="space-y-2">
+                    <div className="p-3 rounded-xl bg-red-50/60 border border-red-100 text-xs text-[#707070] flex items-start gap-2">
+                      <X className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="block text-[10px] font-mono uppercase text-red-800/80 mb-0.5">
+                          {isRTL ? "المقاولون التقليديون" : "Conventional Contractors"}
+                        </span>
+                        <span>{isRTL ? row.traditionalAr : row.traditionalEn}</span>
+                      </div>
+                    </div>
+                    <div className="p-3 rounded-xl bg-[#F5EEE6] border border-[#D8C8B4] text-xs text-[#1C1917] font-medium flex items-start gap-2 shadow-2xs">
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <div>
+                        <span className="block text-[10px] font-mono uppercase text-[#B88460] font-bold mb-0.5">
+                          {isRTL ? "أتيليه فالنتيا (شغل هندسي)" : "Valentia Atelier Standard"}
+                        </span>
+                        <span>{isRTL ? row.valentiaAr : row.valentiaEn}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               ))}

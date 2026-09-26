@@ -252,12 +252,12 @@ export function StepSpaces({
                           e.stopPropagation();
                           updateQuantity(curated.id, -1);
                         }}
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
+                        className="flex h-8 w-8 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer touch-manipulation active:scale-90"
                         title={isRTL ? "تقليل العدد" : "Decrease count"}
                       >
-                        <Minus size={11} weight="bold" />
+                        <Minus size={13} weight="bold" />
                       </button>
-                      <span className="font-mono text-xs font-medium w-5 text-center text-[#1C1917]">
+                      <span className="font-mono text-xs font-medium w-6 text-center text-[#1C1917]">
                         {quantity}
                       </span>
                       <button
@@ -266,10 +266,10 @@ export function StepSpaces({
                           e.stopPropagation();
                           updateQuantity(curated.id, 1);
                         }}
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
+                        className="flex h-8 w-8 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer touch-manipulation active:scale-90"
                         title={isRTL ? "زيادة العدد" : "Increase count"}
                       >
-                        <Plus size={11} weight="bold" />
+                        <Plus size={13} weight="bold" />
                       </button>
                     </div>
                   ) : (
@@ -328,12 +328,12 @@ export function StepSpaces({
                           e.stopPropagation();
                           updateQuantity(custom.id, -1);
                         }}
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
+                        className="flex h-8 w-8 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer touch-manipulation active:scale-90"
                         title={isRTL ? "تقليل العدد" : "Decrease count"}
                       >
-                        <Minus size={11} weight="bold" />
+                        <Minus size={13} weight="bold" />
                       </button>
-                      <span className="font-mono text-xs font-medium w-5 text-center text-[#1C1917]">
+                      <span className="font-mono text-xs font-medium w-6 text-center text-[#1C1917]">
                         {custom.quantity}
                       </span>
                       <button
@@ -342,10 +342,10 @@ export function StepSpaces({
                           e.stopPropagation();
                           updateQuantity(custom.id, 1);
                         }}
-                        className="flex h-5 w-5 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer"
+                        className="flex h-8 w-8 sm:h-6 sm:w-6 items-center justify-center rounded-full text-[#78716C] hover:bg-[#EFE8DD] hover:text-[#1C1917] transition-colors cursor-pointer touch-manipulation active:scale-90"
                         title={isRTL ? "زيادة العدد" : "Increase count"}
                       >
-                        <Plus size={11} weight="bold" />
+                        <Plus size={13} weight="bold" />
                       </button>
                     </div>
                   ) : (

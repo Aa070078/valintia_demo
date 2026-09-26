@@ -128,7 +128,7 @@ export function StepPropertyInfo({
                 ? "مثال: بالم هيلز، قطامية ديونز، مراسي، ميفيدا..."
                 : "e.g. Palm Hills Golf, Katameya Dunes, Marassi..."
             }
-            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] sm:min-h-0 touch-manipulation"
           />
           {/* Preset tags */}
           <div className="flex flex-wrap gap-1.5 pt-1">
@@ -137,7 +137,7 @@ export function StepPropertyInfo({
                 key={c}
                 type="button"
                 onClick={() => updateField("compound", c)}
-                className="text-[10px] font-normal px-2 py-0.5 rounded-md bg-card border border-border text-[#503C2C] hover:text-[#1C1917] hover:border-[#B88460] transition-colors cursor-pointer"
+                className="text-[10px] font-normal px-2.5 py-1 sm:py-0.5 rounded-md bg-card border border-border text-[#503C2C] hover:text-[#1C1917] hover:border-[#B88460] transition-colors cursor-pointer touch-manipulation active:scale-95"
               >
                 {c}
               </button>
@@ -163,7 +163,7 @@ export function StepPropertyInfo({
                   updateField("city", e.target.value);
                 }
               }}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] cursor-pointer"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] cursor-pointer min-h-[44px] sm:min-h-0 touch-manipulation"
             >
               <option value="" disabled>
                 {isRTL ? "-- اختار المدينة أو المنطقة --" : "-- Select Egyptian City or Region --"}
@@ -184,7 +184,7 @@ export function StepPropertyInfo({
               value={property.city || ""}
               onChange={(e) => updateField("city", e.target.value)}
               placeholder={isRTL ? "اكتب اسم المدينة أو الحي هنا..." : "Type custom city or district..."}
-              className="px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+              className="px-3.5 py-2 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] sm:min-h-0 touch-manipulation"
             />
           )}
           <span className="text-[#78716C] text-[10px] font-normal">
@@ -206,9 +206,9 @@ export function StepPropertyInfo({
               value={property.areaSqm || ""}
               onChange={(e) => updateField("areaSqm", Number(e.target.value))}
               placeholder="e.g. 450"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] sm:min-h-0 touch-manipulation"
             />
-            <span className="absolute end-3 top-2.5 text-xs font-normal text-[#78716C]">
+            <span className="absolute end-3 top-2.5 sm:top-2.5 text-xs font-normal text-[#78716C]">
               {isRTL ? "م²" : "m²"}
             </span>
           </div>
@@ -297,7 +297,7 @@ export function StepPropertyInfo({
               ? "مثلاً: مواعيد العمل في الكمبوند، تصاريح أمن البوابة، أو وجود أسانسير خدمات..."
               : "e.g., Service elevator access available, compound permits construction between 8 AM - 5 PM..."
           }
-          className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none"
+          className="px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] resize-none touch-manipulation min-h-[64px]"
         />
       </div>
     </div>

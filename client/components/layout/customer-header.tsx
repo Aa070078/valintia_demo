@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { User, Plus } from "@phosphor-icons/react";
+import { User, Plus, List, X } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { useAuth } from "@/features/auth/context/auth-context";
@@ -14,6 +14,7 @@ export function CustomerHeader() {
   const { language, setLanguage, t, isRTL } = useLanguage();
   const { user, isAuthenticated, role } = useAuth();
   const [isAuthOpen, setIsAuthOpen] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
   const initials = user?.name
     ? user.name
@@ -154,7 +155,7 @@ export function CustomerHeader() {
             onClick={() => setIsAuthOpen(true)}
             aria-label="User Profile & Sign In"
             title={isAuthenticated && user ? `${user.name} (${role})` : "Sign In"}
-            className="flex items-center gap-2 rounded-full border border-border bg-card p-1 text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer pr-2.5"
+            className="flex items-center gap-2 rounded-full border border-border bg-card p-1 text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer pr-2.5 touch-manipulation"
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground/5 text-foreground text-[10px] font-bold">
               {isAuthenticated && initials ? (
@@ -163,12 +164,93 @@ export function CustomerHeader() {
                 <User size={14} weight="bold" />
               )}
             </div>
-            <span className="text-[10px] font-semibold tracking-wider uppercase text-foreground">
+            <span className="hidden xs:inline text-[10px] font-semibold tracking-wider uppercase text-foreground">
               {isAuthenticated && user ? user.name.split(" ")[0] : t("nav.sign_in") || "Sign In"}
             </span>
           </button>
+
+          {/* Mobile Hamburger Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle mobile menu"
+            className="md:hidden p-2 rounded-full border border-border bg-card text-[#503C2C] hover:text-[#1C1917] transition-colors cursor-pointer active:scale-95 touch-manipulation"
+          >
+            {isMobileMenuOpen ? <X size={17} weight="bold" /> : <List size={17} weight="bold" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Slide-Down Drawer */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-background/98 backdrop-blur-2xl border-b border-border shadow-xl px-6 py-5 flex flex-col gap-4 animate-in slide-in-from-top-2 duration-200">
+          <nav className="flex flex-col gap-1.5 text-xs font-medium text-[#503C2C]">
+            <Link
+              href="/projects"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={cn(
+                "p-3 rounded-xl transition-colors flex items-center justify-between",
+                pathname === "/projects"
+                  ? "bg-secondary text-[#1C1917] font-semibold"
+                  : "hover:bg-secondary/60 text-[#6B635B]"
+              )}
+            >
+              <span>{t("nav.portfolio") || (isRTL ? "مشاريعي" : "My Projects")}</span>
+            </Link>
+            <Link
+              href="/projects/new"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={cn(
+                "p-3 rounded-xl transition-colors flex items-center justify-between",
+                pathname === "/projects/new"
+                  ? "bg-secondary text-[#1C1917] font-semibold"
+                  : "hover:bg-secondary/60 text-[#6B635B]"
+              )}
+            >
+              <span>{t("nav.start_project") || (isRTL ? "بدء مشروع جديد" : "Commission New Project")}</span>
+              <Plus size={14} weight="bold" className="text-[#B88460]" />
+            </Link>
+
+            {isAuthenticated && role !== "CUSTOMER" && (
+              <Link
+                href={role === "ENGINEER" ? "/dashboard/engineer" : role === "PROJECT_MANAGER" ? "/dashboard/pm" : "/dashboard/admin"}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-3 rounded-xl hover:bg-[#B88460]/10 text-[#B88460] font-medium flex items-center justify-between transition-colors"
+              >
+                <span>{isRTL ? "لوحة العمليات والمهندسين" : "Operations Desk"}</span>
+              </Link>
+            )}
+          </nav>
+
+          <div className="pt-3 border-t border-border flex items-center justify-between">
+            <span className="text-xs text-[#78716C]">
+              {isRTL ? "اللغة:" : "Language:"}
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={cn(
+                  "px-3 py-1 rounded-lg text-xs font-mono font-medium",
+                  language === "en" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-[#6B635B]"
+                )}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("ar")}
+                className={cn(
+                  "px-3 py-1 rounded-lg text-xs font-sans font-medium",
+                  language === "ar" ? "bg-primary text-primary-foreground" : "bg-card border border-border text-[#6B635B]"
+                )}
+              >
+                عربي
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
 
     <SignInModal open={isAuthOpen} onClose={() => setIsAuthOpen(false)} />

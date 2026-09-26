@@ -198,9 +198,9 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
               value={budget.exactAmount || ""}
               onChange={(e) => updateField("exactAmount", Number(e.target.value))}
               placeholder="e.g. 3,500,000"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] sm:min-h-0 touch-manipulation"
             />
-            <span className="absolute end-3.5 top-2.5 text-xs font-medium text-[#B88460]">
+            <span className="absolute end-3.5 top-3 sm:top-2.5 text-xs font-medium text-[#B88460]">
               {budget.currency || "EGP"}
             </span>
           </div>
@@ -221,9 +221,9 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
                 value={budget.minAmount || ""}
                 onChange={(e) => updateField("minAmount", Number(e.target.value))}
                 placeholder="e.g. 2,000,000"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] sm:min-h-0 touch-manipulation"
               />
-              <span className="absolute end-3.5 top-2.5 text-xs font-medium text-[#B88460]">
+              <span className="absolute end-3.5 top-3 sm:top-2.5 text-xs font-medium text-[#B88460]">
                 {budget.currency || "EGP"}
               </span>
             </div>
@@ -241,9 +241,9 @@ export function StepBudget({ budget, onChangeBudget }: StepBudgetProps) {
                 value={budget.maxAmount || ""}
                 onChange={(e) => updateField("maxAmount", Number(e.target.value))}
                 placeholder="e.g. 4,500,000"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] sm:min-h-0 touch-manipulation"
               />
-              <span className="absolute end-3.5 top-2.5 text-xs font-medium text-[#B88460]">
+              <span className="absolute end-3.5 top-3 sm:top-2.5 text-xs font-medium text-[#B88460]">
                 {budget.currency || "EGP"}
               </span>
             </div>

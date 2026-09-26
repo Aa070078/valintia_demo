@@ -255,3 +255,21 @@ html[dir="rtl"] .tracking-widest {
 @utility shadow-3d-floating {
   box-shadow: 0 30px 70px -15px rgba(18, 18, 20, 0.14), 0 10px 25px -5px rgba(18, 18, 20, 0.04);
 }
+
+@utility touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@utility pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@utility pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+@utility touch-scroll {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Cormorant_Garamond, IBM_Plex_Sans_Arabic, Alexandria } from "next/font/google";
 
 import "./globals.css";
@@ -36,6 +36,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Valentia — Design & Build",
   description: "Interior Design & Fit-Out Management Platform",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#FAF7F2",
 };
 
 export default function RootLayout({

@@ -126,7 +126,7 @@ export function CitySelect({
             placeholder={
               placeholder || (isRTL ? "اكتب اسم مدينتك..." : "Enter city name...")
             }
-            className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#B88460] bg-background text-[#1C1917] text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460]"
+            className="flex-1 px-3.5 py-2.5 rounded-xl border border-[#B88460] bg-background text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] min-h-[44px] touch-manipulation"
           />
           <button
             type="button"
@@ -135,7 +135,7 @@ export function CitySelect({
               setIsOpen(true);
             }}
             title={isRTL ? "ارجع للقائمة" : "Choose from list"}
-            className="px-2.5 py-2.5 rounded-xl border border-border bg-card text-[#78716C] hover:text-[#1C1917] hover:border-[#B88460] text-xs transition-colors cursor-pointer"
+            className="px-3 py-2.5 rounded-xl border border-border bg-card text-[#78716C] hover:text-[#1C1917] hover:border-[#B88460] text-xs transition-colors cursor-pointer min-h-[44px] touch-manipulation"
           >
             <CaretDown size={14} />
           </button>
@@ -146,7 +146,7 @@ export function CitySelect({
           type="button"
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "w-full px-3.5 py-2.5 rounded-xl border bg-background text-[#1C1917] text-xs font-normal transition-all duration-200 flex items-center justify-between gap-2 shadow-2xs hover:border-[#B88460]/60 cursor-pointer text-start",
+            "w-full px-3.5 py-2.5 rounded-xl border bg-background text-[#1C1917] text-xs font-normal transition-all duration-200 flex items-center justify-between gap-2 shadow-2xs hover:border-[#B88460]/60 cursor-pointer text-start min-h-[44px] touch-manipulation",
             isOpen
               ? "border-[#B88460] ring-1 ring-[#B88460]/30"
               : "border-border"
@@ -196,7 +196,7 @@ export function CitySelect({
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={isRTL ? "دور على مدينتك..." : "Search city..."}
                 className={cn(
-                  "w-full py-1.5 text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460]",
+                  "w-full py-2 sm:py-1.5 text-base sm:text-xs bg-card border border-border rounded-lg text-[#1C1917] placeholder:text-[#78716C]/70 focus:outline-none focus:border-[#B88460] touch-manipulation",
                   isRTL ? "pr-8 pl-7 text-right" : "pl-8 pr-7 text-left"
                 )}
               />
