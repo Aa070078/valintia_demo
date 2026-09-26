@@ -1,53 +1,50 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 
+import { Role } from '../generated/prisma/client.js';
 import { PrismaService } from '../infrastructure/database/prisma.service.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { LoginDto } from './dto/login.dto.js';
+import { RegisterDto } from './dto/register.dto.js';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
   ) {}
 
   async login(loginDto: LoginDto) {
     const { username, password } = loginDto;
 
-    // 1. Find the user by username
     const user = await this.prisma.user.findUnique({
-      where: {
-        username,
-      },
+      where: { username },
     });
 
-    // 2. User does not exist
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 3. Compare submitted password with stored bcrypt hash
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.passwordHash,
-    );
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
 
-    // 4. Password is incorrect
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // 5. Create JWT payload
     const payload = {
       sub: user.id,
       role: user.role,
     };
 
-    // 6. Sign the JWT
     const accessToken = await this.jwtService.signAsync(payload);
 
-    // 7. Return authentication result
     return {
       accessToken,
       user: {
@@ -56,6 +53,81 @@ export class AuthService {
         role: user.role,
         mustChangePassword: user.mustChangePassword,
       },
+    };
+  }
+
+  async register(registerDto: RegisterDto) {
+    const { username, password } = registerDto;
+
+    const existingUser = await this.prisma.user.findUnique({
+      where: { username },
+    });
+
+    if (existingUser) {
+      throw new ConflictException('Username is already taken');
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const newUser = await this.prisma.user.create({
+      data: {
+        username,
+        passwordHash,
+        role: Role.CUSTOMER,
+        mustChangePassword: false,
+      },
+    });
+
+    return {
+      id: newUser.id,
+      username: newUser.username,
+      role: newUser.role,
+      mustChangePassword: newUser.mustChangePassword,
+      createdAt: newUser.createdAt,
+    };
+  }
+
+  async getMe(userId: number) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return {
+      id: user.id,
+      username: user.username,
+      role: user.role,
+      mustChangePassword: user.mustChangePassword,
+    };
+  }
+
+  async changePassword(userId: number, changePasswordDto: ChangePasswordDto) {
+    const { newPassword } = changePasswordDto;
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        passwordHash,
+        mustChangePassword: false,
+      },
+    });
+
+    return {
+      message: 'Password changed successfully',
+      mustChangePassword: false,
     };
   }
 }

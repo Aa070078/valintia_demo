@@ -8,9 +8,16 @@ export class RedisService implements OnModuleDestroy {
   private readonly client: Redis;
 
   constructor(private readonly configService: ConfigService) {
-    const host = this.configService.get<string>('redis.host');
-    const port = this.configService.get<number>('redis.port');
-    const password = this.configService.get<string>('redis.password');
+    const host =
+      (configService && configService.get<string>('redis.host')) ||
+      process.env.REDIS_HOST ||
+      'localhost';
+    const port =
+      (configService && configService.get<number>('redis.port')) ||
+      parseInt(process.env.REDIS_PORT || '6379', 10);
+    const password =
+      (configService && configService.get<string>('redis.password')) ||
+      process.env.REDIS_PASSWORD;
 
     this.client = new Redis({
       host,
