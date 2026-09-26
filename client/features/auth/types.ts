@@ -30,8 +30,10 @@ export interface User {
    */
   mustChangePassword?: boolean;
   requiresPasswordChange?: boolean;
+  isFirstLogin?: boolean;
   phone?: string;
   avatarUrl?: string;
+  activeProjectsCount?: number;
 }
 
 export interface AuthSession {
@@ -52,6 +54,14 @@ export interface ProposedSignupDto {
   name?: string;
   phone?: string;
   role?: UserRole;
+}
+
+export interface CreateStaffDto {
+  name: string;
+  username: string;
+  role: UserRole;
+  phone?: string;
+  temporaryPassword: string;
 }
 
 export interface ProposedChangePasswordDto {

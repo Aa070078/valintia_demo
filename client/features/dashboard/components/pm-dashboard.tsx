@@ -17,21 +17,30 @@ import {
   Check,
   X,
 } from "@phosphor-icons/react";
+import { authApi } from "@/features/auth/api/auth.api";
+import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 
 export function PmDashboard() {
+  const { isRTL } = useLanguage();
   const [projects, setProjects] = React.useState<ProjectOverview[]>(MOCK_PROJECTS);
   const [search, setSearch] = React.useState("");
   const [healthFilter, setHealthFilter] = React.useState<string>("ALL");
   const [changeOrders, setChangeOrders] = React.useState<ChangeOrder[]>(MOCK_CHANGE_ORDERS);
   const [selectedProject, setSelectedProject] = React.useState<ProjectOverview | null>(null);
+  const [engineers] = React.useState<{ id: number | string; name: string }[]>(() => {
+    const allStaff = authApi.getAllStaffUsers();
+    const engs = allStaff
+      .filter((u) => u.role === "ENGINEER")
+      .map((u) => ({ id: u.id, name: u.name }));
 
-  // Engineers list
-  const engineers = MOCK_USERS.filter((u) => u.role === "ENGINEER");
+    if (engs.length > 0) return engs;
+    return MOCK_USERS.filter((u) => u.role === "ENGINEER").map((u) => ({ id: u.id, name: u.name }));
+  });
 
   // Reassign engineer handler
-  const handleAssignEngineer = (projectId: string, engineerId: number) => {
-    const engineer = engineers.find((e) => e.id === engineerId);
+  const handleAssignEngineer = (projectId: string, engineerId: number | string) => {
+    const engineer = engineers.find((e) => String(e.id) === String(engineerId));
     if (!engineer) return;
 
     setProjects((prev) =>
@@ -75,27 +84,29 @@ export function PmDashboard() {
   const atRiskCount = projects.filter((p) => p.health !== "ON_SCHEDULE").length;
 
   return (
-    <div className="space-y-8 p-6 lg:p-8">
+    <div className="space-y-8 p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
       {/* Top Banner & Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono uppercase tracking-wider mb-2">
             <UserGear className="w-3.5 h-3.5" />
-            <span>PROJECT MANAGEMENT OPS DESK</span>
+            <span>{isRTL ? "مكتب إدارة ومتابعة المشاريع" : "PROJECT MANAGEMENT OPS DESK"}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-foreground">
-            Portfolio Command & Delivery Matrix
+            {isRTL ? "متابعة تنفيذ المشاريع وجداول التسليم" : "Portfolio Command & Delivery Matrix"}
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Supervise fit-out progress, assign site engineers, monitor milestone SLA, and resolve client change requests.
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            {isRTL
+              ? "متابعة نسب إنجاز التشطيب، توزيع مهندسي الموقع، إدارة التعديلات (Change Orders)، والالتزام بمواعيد التسليم."
+              : "Supervise fit-out progress, assign site engineers, monitor milestone SLA, and resolve client change requests."}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3.5 py-1.5 rounded-lg border border-border bg-card text-xs flex items-center gap-2">
+          <div className="px-3.5 py-1.5 rounded-lg border border-border bg-card text-xs flex items-center gap-2 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-muted-foreground font-mono">LIVE SYNC:</span>
-            <span className="font-semibold text-foreground">6 ACTIVE FIT-OUTS</span>
+            <span className="text-muted-foreground font-mono">{isRTL ? "مشاريع نشطة:" : "LIVE SYNC:"}</span>
+            <span className="font-semibold text-foreground">{projects.length} {isRTL ? "فلل تحت التنفيذ" : "ACTIVE FIT-OUTS"}</span>
           </div>
         </div>
       </div>
@@ -104,53 +115,55 @@ export function PmDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Total Portfolio Value</span>
+            <span className="font-mono uppercase">{isRTL ? "إجمالي قيمة المشاريع" : "Total Portfolio Value"}</span>
             <CurrencyDollar className="w-4 h-4 text-primary" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
             EGP {(totalValue / 1_000_000).toFixed(1)}M
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Across 6 contracted residences
+            {isRTL ? `موزعة على ${projects.length} عقارات سكنية` : `Across ${projects.length} contracted residences`}
           </p>
         </div>
 
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Schedule Adherence</span>
+            <span className="font-mono uppercase">{isRTL ? "نسبة الالتزام بالجدول" : "Schedule Adherence"}</span>
             <CheckCircle className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
             {Math.round((onScheduleCount / projects.length) * 100)}%
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            {onScheduleCount} on track · {atRiskCount} flagged for review
+            {isRTL
+              ? `${onScheduleCount} ماشي في ميعاده · ${atRiskCount} محتاج متابعة`
+              : `${onScheduleCount} on track · ${atRiskCount} flagged for review`}
           </p>
         </div>
 
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Lead Engineers Active</span>
+            <span className="font-mono uppercase">{isRTL ? "المهندسون المشرفون" : "Lead Engineers Active"}</span>
             <HardHat className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
-            {engineers.length} Architects
+            {engineers.length} {isRTL ? "مهندسين" : "Architects"}
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Average workload 2.8 projects/eng
+            {isRTL ? "متوسط ٢.٨ مشروع لكل مهندس" : "Average workload 2.8 projects/eng"}
           </p>
         </div>
 
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Pending Change Orders</span>
+            <span className="font-mono uppercase">{isRTL ? "طلبات التعديل المعلقة" : "Pending Change Orders"}</span>
             <Clock className="w-4 h-4 text-blue-500" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
             {changeOrders.filter((c) => c.status === "PENDING_REVIEW").length}
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Requires cost/schedule approval
+            {isRTL ? "بانتظار اعتماد التكلفة والوقت" : "Requires cost/schedule approval"}
           </p>
         </div>
       </div>
@@ -166,26 +179,34 @@ export function PmDashboard() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by code, villa, client..."
+                placeholder={isRTL ? "بحث بالكود، العميل، الكمبوند..." : "Search by code, villa, client..."}
                 className="w-full h-9 px-3 ps-8 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
               />
-              <MagnifyingGlass className="w-3.5 h-3.5 absolute left-2.5 top-3 text-muted-foreground" />
+              <MagnifyingGlass className="w-3.5 h-3.5 absolute start-2.5 top-3 text-muted-foreground" />
             </div>
 
-            <div className="flex items-center gap-1.5 w-full sm:w-auto">
-              <span className="text-[11px] font-mono text-muted-foreground mr-1">HEALTH:</span>
+            <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto no-scrollbar">
+              <span className="text-[11px] font-mono text-muted-foreground mr-1">
+                {isRTL ? "الحالة:" : "HEALTH:"}
+              </span>
               {(["ALL", "ON_SCHEDULE", "AT_RISK", "DELAYED"] as const).map((h) => (
                 <button
                   key={h}
                   onClick={() => setHealthFilter(h)}
                   className={cn(
-                    "px-2.5 py-1 rounded text-[10px] font-medium font-mono uppercase transition-colors cursor-pointer",
+                    "px-2.5 py-1 rounded text-[10px] font-medium font-mono uppercase transition-colors cursor-pointer whitespace-nowrap",
                     healthFilter === h
                       ? "bg-primary text-primary-foreground font-semibold"
                       : "bg-muted text-muted-foreground hover:bg-muted/80"
                   )}
                 >
-                  {h.replace("_", " ")}
+                  {h === "ALL"
+                    ? isRTL ? "الكل" : "ALL"
+                    : h === "ON_SCHEDULE"
+                    ? isRTL ? "في الميعاد" : "ON SCHEDULE"
+                    : h === "AT_RISK"
+                    ? isRTL ? "تحت المراقبة" : "AT RISK"
+                    : isRTL ? "متأخر" : "DELAYED"}
                 </button>
               ))}
             </div>
@@ -197,12 +218,12 @@ export function PmDashboard() {
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/50 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
                   <tr>
-                    <th className="py-3 px-4">Code & Project</th>
-                    <th className="py-3 px-4">Client & Compound</th>
-                    <th className="py-3 px-4">Budget</th>
-                    <th className="py-3 px-4">Health</th>
-                    <th className="py-3 px-4">Lead Engineer</th>
-                    <th className="py-3 px-4">Next Milestone</th>
+                    <th className="py-3 px-4">{isRTL ? "الكود والمشروع" : "Code & Project"}</th>
+                    <th className="py-3 px-4">{isRTL ? "العميل والكمبوند" : "Client & Compound"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الميزانية" : "Budget"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الحالة" : "Health"}</th>
+                    <th className="py-3 px-4">{isRTL ? "المهندس المسؤول" : "Lead Engineer"}</th>
+                    <th className="py-3 px-4">{isRTL ? "المرحلة القادمة" : "Next Milestone"}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
@@ -249,7 +270,11 @@ export function PmDashboard() {
                                 : "bg-red-500"
                             )}
                           />
-                          {p.health.replace("_", " ")}
+                          {p.health === "ON_SCHEDULE"
+                            ? isRTL ? "في الميعاد" : "ON SCHEDULE"
+                            : p.health === "AT_RISK"
+                            ? isRTL ? "تحت المتابعة" : "AT RISK"
+                            : isRTL ? "متأخر" : "DELAYED"}
                         </span>
                       </td>
 
@@ -259,7 +284,7 @@ export function PmDashboard() {
                           onChange={(e) =>
                             handleAssignEngineer(p.id, Number(e.target.value))
                           }
-                          className="h-7 px-2 rounded border border-border bg-background text-[11px] text-foreground focus:ring-1 focus:ring-primary outline-none cursor-pointer"
+                          className="h-7 px-2 rounded-lg border border-border bg-background text-[11px] text-foreground focus:ring-1 focus:ring-primary outline-none cursor-pointer"
                         >
                           {engineers.map((eng) => (
                             <option key={eng.id} value={eng.id}>
@@ -274,7 +299,7 @@ export function PmDashboard() {
                           {p.nextMilestone}
                         </div>
                         <div className="text-[10px] font-mono text-muted-foreground">
-                          Due: {p.nextMilestoneDate}
+                          {isRTL ? "الميعاد: " : "Due: "} {p.nextMilestoneDate}
                         </div>
                       </td>
                     </tr>
@@ -292,7 +317,7 @@ export function PmDashboard() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-xs font-mono uppercase text-foreground">
                 <HardHat className="w-4 h-4 text-primary" />
-                <span className="font-semibold">Engineer Allocation Matrix</span>
+                <span className="font-semibold">{isRTL ? "توزيع مهندسي المواقع" : "Engineer Allocation Matrix"}</span>
               </div>
               <span className="text-[10px] text-muted-foreground font-mono">MAX 4 / ENG</span>
             </div>
@@ -307,7 +332,7 @@ export function PmDashboard() {
                     <div className="flex items-center justify-between text-xs mb-1.5">
                       <span className="font-medium text-foreground">{eng.name}</span>
                       <span className="font-mono text-[11px] text-muted-foreground">
-                        {count} / 4 Projects
+                        {count} / 4 {isRTL ? "مشاريع" : "Projects"}
                       </span>
                     </div>
 
@@ -335,10 +360,10 @@ export function PmDashboard() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2 text-xs font-mono uppercase text-foreground">
                 <Clock className="w-4 h-4 text-primary" />
-                <span className="font-semibold">Change Orders Pending PM Review</span>
+                <span className="font-semibold">{isRTL ? "طلبات التعديل (Change Orders)" : "Change Orders Pending Review"}</span>
               </div>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                {changeOrders.filter((c) => c.status === "PENDING_REVIEW").length} PENDING
+                {changeOrders.filter((c) => c.status === "PENDING_REVIEW").length} {isRTL ? "معلق" : "PENDING"}
               </span>
             </div>
 
@@ -349,7 +374,7 @@ export function PmDashboard() {
                     <span className="font-mono text-[10px] text-muted-foreground">{co.projectName}</span>
                     <span
                       className={cn(
-                        "text-[10px] font-mono uppercase px-1.5 py-0.2 rounded",
+                        "text-[10px] font-mono uppercase px-1.5 py-0.5 rounded",
                         co.status === "APPROVED"
                           ? "bg-emerald-100 text-emerald-800"
                           : co.status === "REJECTED"
@@ -357,7 +382,11 @@ export function PmDashboard() {
                           : "bg-amber-100 text-amber-800"
                       )}
                     >
-                      {co.status.replace("_", " ")}
+                      {co.status === "APPROVED"
+                        ? isRTL ? "معتمد" : "APPROVED"
+                        : co.status === "REJECTED"
+                        ? isRTL ? "مرفوض" : "REJECTED"
+                        : isRTL ? "قيد المراجعة" : "PENDING"}
                     </span>
                   </div>
 
@@ -371,7 +400,7 @@ export function PmDashboard() {
 
                   <div className="flex items-center justify-between border-t border-border pt-2 text-[11px]">
                     <span className="font-mono font-medium text-foreground">
-                      +EGP {co.costImpactEgp.toLocaleString()} · +{co.timeImpactDays} Days
+                      +EGP {co.costImpactEgp.toLocaleString()} · +{co.timeImpactDays} {isRTL ? "يوم" : "Days"}
                     </span>
 
                     {co.status === "PENDING_REVIEW" && (
@@ -382,7 +411,7 @@ export function PmDashboard() {
                           className="h-6 px-2.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <Check className="w-3 h-3" />
-                          <span>Approve</span>
+                          <span>{isRTL ? "اعتماد" : "Approve"}</span>
                         </button>
                         <button
                           type="button"
@@ -390,7 +419,7 @@ export function PmDashboard() {
                           className="h-6 px-2 rounded bg-muted hover:bg-red-100 text-red-600 text-[10px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <X className="w-3 h-3" />
-                          <span>Reject</span>
+                          <span>{isRTL ? "رفض" : "Reject"}</span>
                         </button>
                       </div>
                     )}
@@ -426,37 +455,37 @@ export function PmDashboard() {
 
             <div className="space-y-3 text-xs">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Client Name:</span>
+                <span className="text-muted-foreground">{isRTL ? "اسم العميل:" : "Client Name:"}</span>
                 <span className="font-medium text-foreground">{selectedProject.clientName}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Client Phone:</span>
+                <span className="text-muted-foreground">{isRTL ? "هاتف العميل:" : "Client Phone:"}</span>
                 <span className="font-mono text-foreground">{selectedProject.clientPhone}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Location & Compound:</span>
+                <span className="text-muted-foreground">{isRTL ? "الموقع والكمبوند:" : "Location & Compound:"}</span>
                 <span className="text-foreground">{selectedProject.compound}, {selectedProject.location}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Contracted Area:</span>
+                <span className="text-muted-foreground">{isRTL ? "المساحة التعاقدية:" : "Contracted Area:"}</span>
                 <span className="font-mono text-foreground">{selectedProject.areaM2} m²</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Budget:</span>
+                <span className="text-muted-foreground">{isRTL ? "إجمالي الميزانية:" : "Total Budget:"}</span>
                 <span className="font-mono font-medium text-foreground">
                   EGP {selectedProject.budgetEgp.toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Lead Architect:</span>
-                <span className="font-medium text-foreground">{selectedProject.leadEngineerName || "Unassigned"}</span>
+                <span className="text-muted-foreground">{isRTL ? "المهندس المشرف:" : "Lead Architect:"}</span>
+                <span className="font-medium text-foreground">{selectedProject.leadEngineerName || (isRTL ? "غير محدد" : "Unassigned")}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Current Phase:</span>
+                <span className="text-muted-foreground">{isRTL ? "المرحلة الحالية:" : "Current Phase:"}</span>
                 <span className="font-mono uppercase font-semibold text-primary">{selectedProject.status}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Next Milestone:</span>
+                <span className="text-muted-foreground">{isRTL ? "المستخلص القادم:" : "Next Milestone:"}</span>
                 <span className="text-foreground font-medium">{selectedProject.nextMilestone} ({selectedProject.nextMilestoneDate})</span>
               </div>
             </div>
@@ -467,7 +496,7 @@ export function PmDashboard() {
                 onClick={() => setSelectedProject(null)}
                 className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors"
               >
-                Close Dossier
+                {isRTL ? "إغلاق الملف" : "Close Dossier"}
               </button>
             </div>
           </div>

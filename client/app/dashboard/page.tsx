@@ -5,6 +5,7 @@ import { useAuth } from "@/features/auth/context/auth-context";
 import { PmDashboard } from "@/features/dashboard/components/pm-dashboard";
 import { EngineerDashboard } from "@/features/dashboard/components/engineer-dashboard";
 import { AdminDashboard } from "@/features/dashboard/components/admin-dashboard";
+import { OwnerDashboard } from "@/features/dashboard/components/owner-dashboard";
 
 export default function DashboardIndexPage() {
   const { role } = useAuth();
@@ -13,7 +14,11 @@ export default function DashboardIndexPage() {
     return <EngineerDashboard />;
   }
 
-  if (role === "ADMINISTRATOR" || role === "COMPANY_OWNER") {
+  if (role === "COMPANY_OWNER") {
+    return <OwnerDashboard />;
+  }
+
+  if (role === "ADMINISTRATOR" || role === "ADMIN") {
     return <AdminDashboard />;
   }
 

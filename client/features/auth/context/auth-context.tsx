@@ -50,7 +50,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (role === "ENGINEER") {
       return { redirectUrl: "/dashboard/engineer" };
     }
-    if (role === "ADMINISTRATOR" || role === "COMPANY_OWNER") {
+    if (role === "COMPANY_OWNER") {
+      return { redirectUrl: "/dashboard/owner" };
+    }
+    if (role === "ADMINISTRATOR" || role === "ADMIN") {
       return { redirectUrl: "/dashboard/admin" };
     }
     return { redirectUrl: "/projects" };
@@ -88,7 +91,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authApi.changePassword(dto);
       if (user) {
-        setUser({ ...user, requiresPasswordChange: false });
+        setUser({
+          ...user,
+          mustChangePassword: false,
+          requiresPasswordChange: false,
+          isFirstLogin: false,
+        });
       }
       return true;
     } finally {
@@ -111,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     role: user?.role || "CUSTOMER",
     isAuthenticated: Boolean(user),
-    requiresPasswordChange: Boolean(user?.requiresPasswordChange),
+    requiresPasswordChange: Boolean(user?.requiresPasswordChange || user?.mustChangePassword),
     isLoading,
     login,
     signup,

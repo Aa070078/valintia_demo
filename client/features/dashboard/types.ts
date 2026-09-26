@@ -55,7 +55,7 @@ export type SiteVisitStatus =
   | "COMPLETED";
 
 export interface User {
-  id: number;
+  id: number | string;
   username: string;
   name: string;
   email: string;
@@ -69,7 +69,7 @@ export interface User {
 export interface ProjectAssignment {
   id: string;
   projectId: string;
-  engineerId: number;
+  engineerId: number | string;
   engineerName: string;
   role: "LEAD_ARCHITECT" | "SITE_SUPERVISOR" | "MEP_ENGINEER";
   assignedAt: string;
@@ -162,7 +162,7 @@ export interface ProjectOverview {
   budgetEgp: number;
   status: ProjectStatus;
   health: ScheduleHealth;
-  leadEngineerId: number;
+  leadEngineerId: number | string;
   leadEngineerName: string;
   completionPercent: number;
   nextMilestone: string;

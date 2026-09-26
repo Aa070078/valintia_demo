@@ -18,6 +18,7 @@ import {
 import type { UserRole } from "@/features/auth/types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
+import { FirstLoginPasswordModal } from "@/features/auth/components/first-login-password-modal";
 
 export default function DashboardLayout({
   children,
@@ -85,6 +86,12 @@ export default function DashboardLayout({
       icon: <Compass className="w-4 h-4" />,
       path: "/dashboard/engineer",
     },
+    COMPANY_OWNER: {
+      label: "Owner Executive Desk",
+      labelAr: "المالك التنفيذي",
+      icon: <Crown className="w-4 h-4" />,
+      path: "/dashboard/owner",
+    },
     ADMINISTRATOR: {
       label: "System Admin",
       labelAr: "لوحة الأدمن",
@@ -95,12 +102,6 @@ export default function DashboardLayout({
       label: "System Admin",
       labelAr: "لوحة الأدمن",
       icon: <ShieldCheck className="w-4 h-4" />,
-      path: "/dashboard/admin",
-    },
-    COMPANY_OWNER: {
-      label: "Company Owner",
-      labelAr: "صاحب الشركة",
-      icon: <Crown className="w-4 h-4" />,
       path: "/dashboard/admin",
     },
     CUSTOMER: {
@@ -115,7 +116,8 @@ export default function DashboardLayout({
     await devSwitchRole(role);
     if (role === "PROJECT_MANAGER") router.push("/dashboard/pm");
     else if (role === "ENGINEER") router.push("/dashboard/engineer");
-    else if (role === "ADMINISTRATOR" || role === "ADMIN" || role === "COMPANY_OWNER") router.push("/dashboard/admin");
+    else if (role === "COMPANY_OWNER") router.push("/dashboard/owner");
+    else if (role === "ADMINISTRATOR" || role === "ADMIN") router.push("/dashboard/admin");
     else if (role === "CUSTOMER") router.push("/projects");
   };
 
@@ -138,14 +140,14 @@ export default function DashboardLayout({
             </div>
           </Link>
 
-          {/* Quick Role Switcher Pills for Testing Personas */}
+          {/* Quick Role Switcher Pills for Testing Personas (Desktop) */}
           <div className="hidden lg:flex items-center gap-1.5 ms-6 p-1 rounded-xl border border-border bg-secondary/50">
             {(
               [
                 "PROJECT_MANAGER",
                 "ENGINEER",
-                "ADMINISTRATOR",
                 "COMPANY_OWNER",
+                "ADMINISTRATOR",
                 "CUSTOMER",
               ] as UserRole[]
             ).map((r) => {
@@ -217,10 +219,47 @@ export default function DashboardLayout({
         </div>
       </header>
 
+      {/* Mobile Role Switcher Sub-header */}
+      <div className="lg:hidden border-b border-border bg-secondary/30 px-3 py-2 overflow-x-auto no-scrollbar flex items-center gap-2">
+        {(
+          [
+            "PROJECT_MANAGER",
+            "ENGINEER",
+            "COMPANY_OWNER",
+            "ADMINISTRATOR",
+            "CUSTOMER",
+          ] as UserRole[]
+        ).map((r) => {
+          const cfg = roleConfigs[r];
+          const isSelected = activeRole === r;
+          return (
+            <button
+              key={r}
+              type="button"
+              onClick={() => handleRoleSelect(r)}
+              className={cn(
+                "px-2.5 py-1 rounded-lg text-[10px] font-mono whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0",
+                isSelected
+                  ? "bg-card text-foreground font-semibold shadow-xs border border-border"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {cfg.icon}
+              <span>{isRTL ? cfg.labelAr : cfg.label}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Main Dashboard Canvas */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
         {children}
       </main>
+
+      {/* Mandatory First-Login Password Modal (Unskippable if mustChangePassword is true) */}
+      <FirstLoginPasswordModal
+        open={Boolean(user?.mustChangePassword || user?.requiresPasswordChange)}
+      />
     </div>
   );
 }
