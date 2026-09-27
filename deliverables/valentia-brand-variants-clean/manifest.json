@@ -1,0 +1,88 @@
+{
+  "source": "Rebuilt as native vector geometry from the supplied board and print reference.",
+  "palette": {
+    "brown": "#4B3A2B",
+    "bronze": "#C79A6B",
+    "gray": "#6E6E6E",
+    "sand": "#D8C9B8"
+  },
+  "typography": {
+    "primary": "Montserrat",
+    "logoBrandName": "Montserrat Light (300)",
+    "supportingText": "Montserrat Regular (400)"
+  },
+  "variants": [
+    {
+      "name": "01-symbol-primary",
+      "size": [1200, 1200],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "02-logo-stacked",
+      "size": [1800, 1800],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "03-app-icon",
+      "size": [1200, 1200],
+      "nativeVector": true,
+      "transparent": false
+    },
+    {
+      "name": "04-logo-horizontal",
+      "size": [2500, 900],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "05-wordmark-divider",
+      "size": [2000, 600],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "06-logo-compact-stacked",
+      "size": [1400, 1600],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "07-symbol-construction-grid",
+      "size": [1200, 1200],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "08-logo-horizontal-compact",
+      "size": [2200, 700],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "09-wordmark-only",
+      "size": [2200, 600],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "10-alternative-mark-v",
+      "size": [1200, 1200],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "11-alternative-mark-3",
+      "size": [1200, 1200],
+      "nativeVector": true,
+      "transparent": true
+    },
+    {
+      "name": "12-alternative-mark-d",
+      "size": [1200, 1200],
+      "nativeVector": true,
+      "transparent": true
+    }
+  ]
+}
