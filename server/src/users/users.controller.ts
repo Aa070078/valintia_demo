@@ -10,7 +10,7 @@ import { UsersService } from './users.service.js';
 @ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 export class UsersController {
   constructor(
     @Inject(UsersService) private readonly usersService: UsersService,

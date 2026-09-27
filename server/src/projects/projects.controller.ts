@@ -23,7 +23,7 @@ import { ProjectsService } from './projects.service.js';
 @ApiTags('projects')
 @Controller('projects')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@ApiBearerAuth()
+@ApiBearerAuth('access-token')
 export class ProjectsController {
   constructor(
     @Inject(ProjectsService) private readonly projectsService: ProjectsService,
