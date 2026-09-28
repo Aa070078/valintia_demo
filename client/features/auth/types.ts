@@ -69,6 +69,11 @@ export interface ProposedChangePasswordDto {
   newPassword: string;
 }
 
+export interface ChangePasswordResponse {
+  message: string;
+  mustChangePassword: boolean;
+}
+
 /**
  * Target application destination by role.
  * CUSTOMER remains in the client application.

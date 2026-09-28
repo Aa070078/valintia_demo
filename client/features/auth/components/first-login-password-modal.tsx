@@ -12,7 +12,7 @@ import {
 } from "@phosphor-icons/react";
 import { useAuth } from "../context/auth-context";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 interface FirstLoginPasswordModalProps {
   open: boolean;
@@ -23,7 +23,6 @@ export function FirstLoginPasswordModal({ open, onSuccess }: FirstLoginPasswordM
   const { user, changePassword, logout } = useAuth();
   const { isRTL } = useLanguage();
 
-  const [currentPassword, setCurrentPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
@@ -58,7 +57,6 @@ export function FirstLoginPasswordModal({ open, onSuccess }: FirstLoginPasswordM
     setIsSubmitting(true);
     try {
       await changePassword({
-        currentPassword,
         newPassword,
       });
 
@@ -68,10 +66,12 @@ export function FirstLoginPasswordModal({ open, onSuccess }: FirstLoginPasswordM
       }, 1200);
     } catch (err: unknown) {
       console.error("Failed to update password:", err);
+      const apiMsg = getErrorMessage(err);
       setError(
-        isRTL
+        apiMsg ||
+        (isRTL
           ? "حدث خطأ أثناء تحديث كلمة المرور. يرجى المحاولة مرة أخرى."
-          : "Failed to update password. Please verify current password and try again."
+          : "Failed to update password. Please try again.")
       );
     } finally {
       setIsSubmitting(false);
@@ -144,21 +144,6 @@ export function FirstLoginPasswordModal({ open, onSuccess }: FirstLoginPasswordM
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Current / Temporary Password */}
-            <div>
-              <label className="block text-xs font-medium text-[#503C2C] mb-1.5">
-                {isRTL ? "كلمة المرور المؤقتة الحالية" : "Current Temporary Password"}
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                value={currentPassword}
-                onChange={(e) => setCurrentPassword(e.target.value)}
-                placeholder={isRTL ? "اكتب كلمة السر المؤقتة..." : "Enter temporary password..."}
-                className="w-full h-11 px-3.5 rounded-xl border border-[#D8C8B4] bg-white text-[#1C1917] text-base sm:text-xs font-normal focus:outline-none focus:ring-1 focus:ring-[#B88460] touch-manipulation"
-              />
-            </div>
-
             {/* New Permanent Password */}
             <div>
               <div className="flex items-center justify-between mb-1.5">

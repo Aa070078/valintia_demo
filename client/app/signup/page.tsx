@@ -24,7 +24,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { PhoneInputWithCountry } from "@/features/projects/components/phone-input-with-country";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 
 function SignupForm() {
   const router = useRouter();
@@ -144,10 +144,12 @@ function SignupForm() {
       }
     } catch (err: unknown) {
       console.error("Signup failed:", err);
+      const apiMsg = getErrorMessage(err);
       setError(
-        isRTL
+        apiMsg ||
+        (isRTL
           ? "مقدرناش ننشئ الحساب دلوقتي، اسم المستخدم أو الإيميل ده مسجل قبل كده."
-          : "Account registration could not be completed. The username may already exist."
+          : "Account registration could not be completed. The username may already exist.")
       );
     } finally {
       setIsSubmitting(false);

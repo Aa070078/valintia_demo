@@ -14,6 +14,7 @@ interface AuthContextValue {
   user: User | null;
   role: UserRole;
   isAuthenticated: boolean;
+  mustChangePassword: boolean;
   requiresPasswordChange: boolean;
   isLoading: boolean;
   login: (dto: ProposedLoginDto) => Promise<{ redirectUrl?: string }>;
@@ -119,6 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     role: user?.role || "CUSTOMER",
     isAuthenticated: Boolean(user),
+    mustChangePassword: Boolean(user?.mustChangePassword || user?.requiresPasswordChange),
     requiresPasswordChange: Boolean(user?.requiresPasswordChange || user?.mustChangePassword),
     isLoading,
     login,

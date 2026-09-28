@@ -7,6 +7,7 @@ import type {
   ProposedLoginDto,
   ProposedSignupDto,
   ProposedChangePasswordDto,
+  ChangePasswordResponse,
   CreateStaffDto,
 } from "../types";
 
@@ -148,6 +149,19 @@ function saveLocalUser(user: User | null, persistent: boolean = true) {
   }
 }
 
+const IS_MOCK_FALLBACK_ALLOWED =
+  process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true";
+
+interface BackendAuthResponse {
+  accessToken: string;
+  user: {
+    id: number | string;
+    username: string;
+    role: UserRole;
+    mustChangePassword?: boolean;
+  };
+}
+
 export const authApi = {
   /**
    * Endpoint: POST /auth/login
@@ -160,11 +174,26 @@ export const authApi = {
     };
 
     try {
-      const response = await apiClient.post<AuthSession>("/auth/login", loginPayload);
-      tokenStorage.setToken(response.data.token);
-      saveLocalUser(response.data.user, dto.rememberMe !== false);
-      return response.data;
-    } catch {
+      const response = await apiClient.post<BackendAuthResponse>("/auth/login", loginPayload);
+      const backendUser = response.data.user;
+      const user: User = {
+        id: backendUser.id,
+        username: backendUser.username,
+        name: backendUser.username.split("@")[0],
+        role: backendUser.role,
+        mustChangePassword: Boolean(backendUser.mustChangePassword),
+        requiresPasswordChange: Boolean(backendUser.mustChangePassword),
+      };
+      tokenStorage.setToken(response.data.accessToken);
+      saveLocalUser(user, dto.rememberMe !== false);
+      return {
+        token: response.data.accessToken,
+        user,
+      };
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        throw error;
+      }
       // Mock / Prototype Fallback
       const identifier = (dto.username || dto.email || "").trim().toLowerCase();
       
@@ -220,15 +249,44 @@ export const authApi = {
   },
 
   /**
-   * Endpoint: POST /auth/signup (or /auth/register)
+   * Endpoint: POST /auth/register followed by real login
    */
   async signup(dto: ProposedSignupDto): Promise<AuthSession> {
     try {
-      const response = await apiClient.post<AuthSession>("/auth/signup", dto);
-      tokenStorage.setToken(response.data.token);
-      saveLocalUser(response.data.user, true);
-      return response.data;
-    } catch {
+      // 1. Customer registration on real Backend
+      await apiClient.post("/auth/register", {
+        username: dto.username,
+        password: dto.password,
+      });
+
+      // 2. Immediate real login to obtain access token
+      const loginResponse = await apiClient.post<BackendAuthResponse>("/auth/login", {
+        username: dto.username,
+        password: dto.password,
+      });
+
+      const backendUser = loginResponse.data.user;
+      const user: User = {
+        id: backendUser.id,
+        username: backendUser.username,
+        name: dto.name || backendUser.username.split("@")[0],
+        role: "CUSTOMER", // Customer signup always creates CUSTOMER
+        phone: dto.phone,
+        mustChangePassword: false,
+        requiresPasswordChange: false,
+      };
+
+      tokenStorage.setToken(loginResponse.data.accessToken);
+      saveLocalUser(user, true);
+
+      return {
+        token: loginResponse.data.accessToken,
+        user,
+      };
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        throw error;
+      }
       const newUser: User = {
         id: Math.floor(Math.random() * 10000) + 100,
         username: dto.username,
@@ -263,6 +321,11 @@ export const authApi = {
       saveLocalUser(response.data);
       return response.data;
     } catch {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        tokenStorage.removeToken();
+        saveLocalUser(null);
+        return null;
+      }
       return getLocalUser();
     }
   },
@@ -271,11 +334,11 @@ export const authApi = {
    * Endpoint: POST /auth/change-password
    * Clears mustChangePassword and sets the user's permanent password.
    */
-  async changePassword(dto: ProposedChangePasswordDto): Promise<{ success: boolean }> {
+  async changePassword(dto: ProposedChangePasswordDto): Promise<ChangePasswordResponse> {
     try {
-      const response = await apiClient.post<{ success: boolean }>(
+      const response = await apiClient.post<ChangePasswordResponse>(
         "/auth/change-password",
-        dto
+        { newPassword: dto.newPassword }
       );
       const currentUser = getLocalUser();
       if (currentUser) {
@@ -287,7 +350,10 @@ export const authApi = {
         });
       }
       return response.data;
-    } catch {
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        throw error;
+      }
       // Mock Fallback: Update user in session and in stored staff list
       const currentUser = getLocalUser();
       if (currentUser) {
@@ -318,7 +384,10 @@ export const authApi = {
         });
         saveStoredStaffList(updatedList);
       }
-      return { success: true };
+      return {
+        message: "Password changed successfully",
+        mustChangePassword: false,
+      };
     }
   },
 

@@ -10,7 +10,7 @@ import {
 } from "@phosphor-icons/react";
 import { useAuth } from "../context/auth-context";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 
 interface SignInModalProps {
@@ -58,11 +58,13 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
       } else {
         onClose();
       }
-    } catch {
+    } catch (err: unknown) {
+      const apiMsg = getErrorMessage(err);
       setErrorMsg(
-        isRTL
+        apiMsg ||
+        (isRTL
           ? "بيانات الدخول مش صحيحة. اتأكد من الإيميل وكلمة السر."
-          : "Authentication failed. Please check credentials."
+          : "Authentication failed. Please check credentials.")
       );
     }
   };
@@ -90,8 +92,14 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
       await changePassword({ newPassword });
       setErrorMsg(null);
       onClose();
-    } catch {
-      setErrorMsg("Failed to update password.");
+    } catch (err: unknown) {
+      const apiMsg = getErrorMessage(err);
+      setErrorMsg(
+        apiMsg ||
+        (isRTL
+          ? "فشل تحديث كلمة المرور. يرجى المحاولة مرة أخرى."
+          : "Failed to update password.")
+      );
     }
   };
 

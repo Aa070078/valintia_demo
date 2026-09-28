@@ -110,7 +110,7 @@ export function EditorialHero() {
                 {stepsLocalized.map((step, idx) => (
                   <Link
                     key={step.num}
-                    href={`/projects/new?step=${step.stepId}`}
+                    href="/projects/new"
                     className={cn(
                       "group flex items-center gap-3 text-xs transition-all duration-200 hover:-translate-y-0.5",
                       step.active
@@ -270,7 +270,7 @@ export function EditorialHero() {
 
                   {/* '+' Explore Button */}
                   <Link
-                    href="/projects/new?step=2"
+                    href="/projects/new"
                     aria-label="Explore Styles"
                     className="flex aspect-[4/3] items-center justify-center rounded-xl border border-dashed border-border bg-background/50 text-muted-foreground transition-all duration-200 hover:border-foreground hover:bg-foreground/5 hover:text-foreground active:scale-95 cursor-pointer group/btn"
                   >
@@ -381,7 +381,7 @@ export function EditorialHero() {
                 {isRTL ? "جاهز تبدأ تشطيب بيتك مع فالنتيا؟" : "Ready to build with Valentia?"}
               </span>
               <Link
-                href="/projects/new?step=2"
+                href="/projects/new"
                 onClick={() => setIsVideoOpen(false)}
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-xs text-primary-foreground shadow-xs transition-opacity hover:opacity-90",

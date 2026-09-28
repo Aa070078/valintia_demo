@@ -17,6 +17,7 @@ import {
 } from "@phosphor-icons/react";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { getErrorMessage } from "@/lib/utils";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
 
@@ -66,10 +67,12 @@ function LoginForm() {
       }
     } catch (err: unknown) {
       console.error("Login failed:", err);
+      const apiMsg = getErrorMessage(err);
       setError(
-        isRTL
+        apiMsg ||
+        (isRTL
           ? "بيانات الدخول مش صحيحة. اتأكد من اسم المستخدم وكلمة السر وجرب تاني."
-          : "Invalid credentials. Please verify your username and password."
+          : "Invalid credentials. Please verify your username and password.")
       );
     } finally {
       setIsSubmitting(false);

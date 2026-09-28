@@ -9,6 +9,8 @@ import {
   SquaresFour,
   User,
   CheckCircle,
+  Lock,
+  X,
 } from "@phosphor-icons/react";
 import { StepPropertyType } from "@/features/projects/components/steps/step-01-property-type";
 import { StepStyleDiscovery } from "@/features/projects/components/steps/step-02-style-discovery";
@@ -25,6 +27,12 @@ import { useCreateProject } from "@/features/projects/hooks/use-projects";
 import { projectsApi } from "@/features/projects/api/projects.api";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { SignInModal } from "@/features/auth/components/sign-in-modal";
+import {
+  validateStep,
+  getMaxUnlockedStep,
+  getInitialWizardState,
+  type WizardFormData,
+} from "@/features/projects/lib/wizard-validation";
 import type {
   PropertyType,
   PropertyEntity,
@@ -61,9 +69,77 @@ function CreateProjectContent() {
   const { user } = useAuth();
   const [isSignInOpen, setIsSignInOpen] = React.useState(false);
 
+  // Centralized initial state (empty in real API mode, showcase defaults in demo mode)
+  const initialData = React.useMemo(() => getInitialWizardState(), []);
+
+  // 11 Step Form State
+  const [propertyType, setPropertyType] = React.useState<PropertyType>(
+    initialData.propertyType as PropertyType
+  );
+  const [primaryStyleId, setPrimaryStyleId] = React.useState(initialData.primaryStyleId);
+  const [pendingStyles, setPendingStyles] = React.useState<PendingStyleSelection[]>(
+    initialData.pendingStyles
+  );
+  const [spaces, setSpaces] = React.useState<SpaceEntity[]>(initialData.spaces);
+  const [property, setProperty] = React.useState<PropertyEntity>(initialData.property);
+  const [customerLocation, setCustomerLocation] = React.useState<CustomerLocation>(
+    initialData.customerLocation
+  );
+  const [representative, setRepresentative] = React.useState<AuthorizedRepresentative>(
+    initialData.representative
+  );
+  const [scope, setScope] = React.useState<ProjectScope>(initialData.scope);
+  const [budget, setBudget] = React.useState<ProjectBudget>(initialData.budget);
+  const [timeline, setTimeline] = React.useState<TargetCompletion>(initialData.timeline);
+  const [documents, setDocuments] = React.useState<ProjectDocument[]>(initialData.documents);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [validationError, setValidationError] = React.useState<string | null>(null);
+
+  const formData: WizardFormData = React.useMemo(
+    () => ({
+      propertyType,
+      property,
+      spaces,
+      primaryStyleId,
+      pendingStyles,
+      customerLocation,
+      representative,
+      scope,
+      budget,
+      timeline,
+      documents,
+    }),
+    [
+      propertyType,
+      property,
+      spaces,
+      primaryStyleId,
+      pendingStyles,
+      customerLocation,
+      representative,
+      scope,
+      budget,
+      timeline,
+      documents,
+    ]
+  );
+
+  const maxAllowedStep = React.useMemo(() => getMaxUnlockedStep(formData), [formData]);
+
   const stepQuery = Number(searchParams.get("step"));
   const [internalStep, setInternalStep] = React.useState<number>(1);
-  const currentStep = stepQuery >= 1 && stepQuery <= 11 ? stepQuery : internalStep;
+
+  // Clamp step if URL parameter attempts to skip ahead past incomplete steps
+  React.useEffect(() => {
+    if (stepQuery > maxAllowedStep) {
+      router.replace(`/projects/new?step=${maxAllowedStep}`);
+    }
+  }, [stepQuery, maxAllowedStep, router]);
+
+  const currentStep = Math.min(
+    stepQuery >= 1 && stepQuery <= 11 ? stepQuery : internalStep,
+    maxAllowedStep
+  );
 
   const activeStepRef = React.useRef<HTMLButtonElement | null>(null);
 
@@ -77,81 +153,15 @@ function CreateProjectContent() {
     }
   }, [currentStep]);
 
-  // 11 Step Form State
-  const [propertyType, setPropertyType] = React.useState<PropertyType>("villa");
-  const [primaryStyleId, setPrimaryStyleId] = React.useState("japandi");
-  const [pendingStyles, setPendingStyles] = React.useState<PendingStyleSelection[]>([
-    {
-      targetSpaceKey: "general",
-      styleId: "japandi",
-      styleName: "Japandi & Warm Minimal",
-      referenceImages: [
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
-      ],
-      notes: "",
-    },
-  ]);
-
-  const [spaces, setSpaces] = React.useState<SpaceEntity[]>([
-    { id: "living", spaceType: "living", customName: "Living Room & Salon", included: true, quantity: 1 },
-    { id: "dining", spaceType: "dining", customName: "Formal Dining Area", included: true, quantity: 1 },
-    { id: "kitchen", spaceType: "kitchen", customName: "Chef Kitchen & Pantry", included: true, quantity: 1 },
-    { id: "master_bedroom", spaceType: "master_bedroom", customName: "Master Suite", included: true, quantity: 1 },
-    { id: "guest_bedrooms", spaceType: "guest_bedrooms", customName: "Guest Bedrooms", included: true, quantity: 3 },
-    { id: "bathrooms", spaceType: "bathrooms", customName: "Bathrooms & Spa", included: true, quantity: 4 },
-    { id: "terrace", spaceType: "terrace", customName: "Private Terrace & Loggia", included: true, quantity: 2 },
-    { id: "office", spaceType: "office", customName: "Home Office & Library", included: false, quantity: 0 },
-  ]);
-
-  const [property, setProperty] = React.useState<PropertyEntity>({
-    propertyType: "villa",
-    compound: "Palm Hills Golf Extensions",
-    city: "New Cairo",
-    areaSqm: 480,
-    floors: 2,
-    condition: "semi_finished",
-    accessibilityNotes: "",
-  });
-
-  const [customerLocation, setCustomerLocation] = React.useState<CustomerLocation>({
-    country: "Egypt",
-    countryCode: "EG",
-    city: "Cairo",
-    timezone: "Africa/Cairo (GMT+2)",
-    phone: "",
-    phoneCountryCode: "+20",
-  });
-
-  const [representative, setRepresentative] = React.useState<AuthorizedRepresentative>({
-    hasRepresentative: false,
-    valentiaManagedDirectly: true,
-    phone: "",
-    phoneCountryCode: "+20",
-  });
-
-  const [scope, setScope] = React.useState<ProjectScope>({
-    scopeType: "full_fitout",
-    customDetails: "",
-  });
-
-  const [budget, setBudget] = React.useState<ProjectBudget>({
-    budgetType: "range",
-    minAmount: 2500000,
-    maxAmount: 4500000,
-    currency: "EGP",
-  });
-
-  const [timeline, setTimeline] = React.useState<TargetCompletion>({
-    deadlineType: "duration",
-    durationDescription: "6 Months (Standard)",
-  });
-
-  const [documents, setDocuments] = React.useState<ProjectDocument[]>([]);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-
   const createMutation = useCreateProject();
 
   const goToStep = (stepNumber: number) => {
+    if (stepNumber > maxAllowedStep) {
+      const stepRes = validateStep(currentStep, formData);
+      setValidationError(isRTL ? stepRes.errorAr || null : stepRes.errorEn || null);
+      return;
+    }
+    setValidationError(null);
     const clamped = Math.max(1, Math.min(11, stepNumber));
     setInternalStep(clamped);
     router.replace(`/projects/new?step=${clamped}`);
@@ -159,6 +169,13 @@ function CreateProjectContent() {
   };
 
   const handleNext = () => {
+    const stepRes = validateStep(currentStep, formData);
+    if (!stepRes.isValid) {
+      setValidationError(isRTL ? stepRes.errorAr || null : stepRes.errorEn || null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    setValidationError(null);
     if (currentStep < 11) {
       goToStep(currentStep + 1);
     } else {
@@ -167,6 +184,7 @@ function CreateProjectContent() {
   };
 
   const handleBack = () => {
+    setValidationError(null);
     if (currentStep > 1) {
       goToStep(currentStep - 1);
     } else {
@@ -348,18 +366,25 @@ function CreateProjectContent() {
               {FUNNEL_STEPS.map((step) => {
                 const isCurrent = step.id === currentStep;
                 const isCompleted = step.id < currentStep;
+                const isLocked = step.id > maxAllowedStep;
 
                 return (
                   <button
                     key={step.id}
                     ref={isCurrent ? activeStepRef : null}
                     type="button"
+                    disabled={isLocked}
                     onClick={() => goToStep(step.id)}
                     className={cn(
-                      "group flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-150 cursor-pointer select-none text-start touch-manipulation",
+                      "group flex shrink-0 items-center gap-2.5 rounded-xl px-3 py-2 text-xs transition-all duration-150 select-none text-start touch-manipulation",
+                      isLocked
+                        ? "opacity-40 cursor-not-allowed pointer-events-none text-muted-foreground"
+                        : "cursor-pointer",
                       isCurrent
                         ? "bg-sidebar-accent font-semibold text-foreground shadow-2xs"
-                        : "text-[#5A4F45] hover:bg-secondary/60 hover:text-foreground font-normal"
+                        : !isLocked
+                        ? "text-[#5A4F45] hover:bg-secondary/60 hover:text-foreground font-normal"
+                        : ""
                     )}
                   >
                     <span
@@ -381,6 +406,12 @@ function CreateProjectContent() {
                       <CheckCircle
                         weight="fill"
                         className="w-3.5 h-3.5 text-[#B88460] ms-auto shrink-0 hidden lg:block"
+                      />
+                    )}
+                    {isLocked && (
+                      <Lock
+                        size={12}
+                        className="text-muted-foreground/60 ms-auto shrink-0 hidden lg:block"
                       />
                     )}
                   </button>
@@ -407,6 +438,27 @@ function CreateProjectContent() {
         {/* Main Stage Content */}
         <main className="flex-1 min-w-0 flex flex-col justify-between p-5 sm:p-8 lg:p-12">
           <div className="mx-auto w-full max-w-4xl flex-1 flex flex-col">
+            {/* Validation Alert Banner */}
+            {validationError && (
+              <div
+                role="alert"
+                className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm font-medium flex items-center justify-between gap-3 animate-in fade-in duration-200 shadow-xs"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                  <span>{validationError}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setValidationError(null)}
+                  className="text-amber-800 dark:text-amber-300 hover:opacity-75 p-1 cursor-pointer shrink-0"
+                  aria-label="Dismiss alert"
+                >
+                  <X size={15} weight="bold" />
+                </button>
+              </div>
+            )}
+
             {/* STEP 01: Typology */}
             {currentStep === 1 && (
               <StepPropertyType
