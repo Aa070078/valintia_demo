@@ -47,7 +47,7 @@ interface StepReviewSubmitProps {
   budget: ProjectBudget;
   timeline: TargetCompletion;
   documents: ProjectDocument[];
-  onJumpToStep: (stepNumber: number) => void;
+  onJumpToStep: (stepNumber: number, returnTo?: number) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
 }
@@ -198,7 +198,7 @@ export function StepReviewSubmit({
         {/* Edit Selections shortcut button */}
         <button
           type="button"
-          onClick={() => onJumpToStep(1)}
+          onClick={() => onJumpToStep(1, 11)}
           className="self-start inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-foreground shadow-2xs hover:bg-secondary active:scale-95 transition-all cursor-pointer shrink-0"
         >
           <PencilSimple size={14} weight="bold" className="text-[#B88460]" />
@@ -224,7 +224,7 @@ export function StepReviewSubmit({
               </span>
               <button
                 type="button"
-                onClick={() => onJumpToStep(1)}
+                onClick={() => onJumpToStep(1, 11)}
                 className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -273,7 +273,7 @@ export function StepReviewSubmit({
               </span>
               <button
                 type="button"
-                onClick={() => onJumpToStep(2)}
+                onClick={() => onJumpToStep(2, 11)}
                 className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -323,7 +323,7 @@ export function StepReviewSubmit({
               </span>
               <button
                 type="button"
-                onClick={() => onJumpToStep(4)}
+                onClick={() => onJumpToStep(4, 11)}
                 className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -396,7 +396,7 @@ export function StepReviewSubmit({
 
           <button
             type="button"
-            onClick={() => onJumpToStep(3)}
+            onClick={() => onJumpToStep(3, 11)}
             className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
           >
             <PencilSimple size={13} weight="bold" />
@@ -475,7 +475,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(4)}
+                onClick={() => onJumpToStep(4, 11)}
                 className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -527,7 +527,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(4)}
+                onClick={() => onJumpToStep(4, 11)}
                 className="flex items-center gap-1 text-[11px] font-medium text-[#B88460] hover:text-[#503C2C] cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -584,7 +584,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(5)}
+                onClick={() => onJumpToStep(5, 11)}
                 className="text-[#B88460] hover:text-[#503C2C] text-[11px] font-medium cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -616,7 +616,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(6)}
+                onClick={() => onJumpToStep(6, 11)}
                 className="text-[#B88460] hover:text-[#503C2C] text-[11px] font-medium cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -629,9 +629,13 @@ export function StepReviewSubmit({
                       ? ` (${representative.phoneCountryCode || "+20"} ${representative.phone})`
                       : ""
                   }`
+                : representative.valentiaManagedDirectly
+                ? isRTL
+                  ? "الشركة / فالنتيا تدير وتشرف بالكامل"
+                  : "Valentia Direct Atelier Management"
                 : isRTL
-                ? "فالنتيا تدير وتشرف على كل حاجة مباشرة"
-                : "Valentia Direct Atelier Management"}
+                ? "أنا بنفسي موجود في مصر للمتابعة"
+                : "Client In Person (Direct Site Follow-up)"}
             </div>
           </div>
 
@@ -646,7 +650,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(7)}
+                onClick={() => onJumpToStep(7, 11)}
                 className="text-[#B88460] hover:text-[#503C2C] text-[11px] font-medium cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -668,7 +672,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(8)}
+                onClick={() => onJumpToStep(8, 11)}
                 className="text-[#B88460] hover:text-[#503C2C] text-[11px] font-medium cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -690,7 +694,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(9)}
+                onClick={() => onJumpToStep(9, 11)}
                 className="text-[#B88460] hover:text-[#503C2C] text-[11px] font-medium cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -712,7 +716,7 @@ export function StepReviewSubmit({
               </div>
               <button
                 type="button"
-                onClick={() => onJumpToStep(10)}
+                onClick={() => onJumpToStep(10, 11)}
                 className="text-[#B88460] hover:text-[#503C2C] text-[11px] font-medium cursor-pointer"
               >
                 <PencilSimple size={13} weight="bold" />
@@ -722,8 +726,8 @@ export function StepReviewSubmit({
               {documents.length > 0
                 ? `${documents.length} ${isRTL ? "ملفات مرفوعة" : "files attached"}`
                 : isRTL
-                ? "فالنتيا هتعمل رفع مساحي ليزر في الموقع"
-                : "Valentia 3D Site Survey scheduled"}
+                ? "فالنتيا هتعمل رفع مساحي هندسي في الموقع"
+                : "Valentia Architectural Site Survey scheduled"}
             </div>
           </div>
         </div>

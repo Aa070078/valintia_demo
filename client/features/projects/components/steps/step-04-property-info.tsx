@@ -214,8 +214,8 @@ export function StepPropertyInfo({
           </div>
           <span className="text-[#78716C] text-[10px] font-normal">
             {isRTL
-              ? "مساحة تقريبية، والمهندس هيعمل رفع مساحي ليزر دقيق لما يعاين"
-              : "Approximate footprint; 3D laser survey will verify exact dimensions"}
+              ? "مساحة تقريبية، والمهندس هيعمل رفع مساحي هندسي دقيق لما يعاين"
+              : "Approximate footprint; engineering site survey will verify exact dimensions"}
           </span>
         </div>
 

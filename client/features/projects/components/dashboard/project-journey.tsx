@@ -53,10 +53,10 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
     {
       id: "site_visit",
       stepNumber: "03",
-      titleEn: "3D Lidar Site Survey",
+      titleEn: "Architectural Site Survey",
       titleAr: "معاينة ورفع مقاسات الموقع",
-      descEn: "Engineering team inspects site and executes 3D point-cloud scan.",
-      descAr: "فريق الهندسة هينزل الموقع يرفع المقاسات بالمللي بماسحات الليزر ثلاثية الأبعاد.",
+      descEn: "Engineering team inspects site and executes comprehensive spatial survey.",
+      descAr: "فريق الهندسة هينزل الموقع يرفع المقاسات الهندسية الدقيقة للمكان بالكامل.",
       status: "upcoming",
       icon: ShieldCheck,
     },

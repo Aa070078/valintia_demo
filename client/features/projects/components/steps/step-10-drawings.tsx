@@ -62,8 +62,8 @@ export function StepDrawings({
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-[#78716C] font-normal leading-relaxed max-w-xl">
           {isRTL
-            ? "لو معاك مخططات الشقة أو الفيلا من شركة التطوير العقاري ارفعها هنا. ولو مش معاك متقلقش، مهندسي فالنتيا هيعملوا رفع مساحي ليزر كامل للمكان في أول معاينة."
-            : "Upload developer blueprints, CAD files, or sketches if available. If you don't have drawings, our engineering team will perform a full 3D lidar scan during site inspection."}
+            ? "لو معاك مخططات الشقة أو الفيلا من شركة التطوير العقاري ارفعها هنا. ولو مش معاك متقلقش، مهندسي فالنتيا هيعملوا رفع مساحي هندسي كامل للمكان في أول معاينة."
+            : "Upload developer blueprints, CAD files, or sketches if available. If you don't have drawings, our engineering team will perform a comprehensive site survey during initial inspection."}
         </p>
       </div>
 
@@ -79,8 +79,8 @@ export function StepDrawings({
             </h4>
             <p className="mt-0.5 leading-relaxed text-[11px] text-[#78716C] font-normal">
               {isRTL
-                ? "عادي جداً ومفيش قلق. مهندس فالنتيا هيزور الموقع ويعمل رفع مساحي ليزر 3D دقيق جداً لكل زاوية في الشقة أو الفيلا."
-                : "No problem at all. Valentia conducts an exhaustive 3D point-cloud lidar scan during the physical survey visit."}
+                ? "عادي جداً ومفيش قلق. مهندس فالنتيا هيزور الموقع ويعمل رفع مساحي هندسي دقيق لكل زاوية في الشقة أو الفيلا."
+                : "No problem at all. Valentia conducts an exhaustive architectural survey during the physical site visit."}
             </p>
           </div>
         </div>

@@ -166,7 +166,7 @@ export const MOCK_PROJECTS: ProjectOverview[] = [
     leadEngineerId: 2,
     leadEngineerName: "Eng. Maya Zein",
     completionPercent: 8,
-    nextMilestone: "Precision Laser Survey & Point Cloud Scan",
+    nextMilestone: "Precision Architectural Survey & Point Cloud Scan",
     nextMilestoneDate: "2026-09-26",
     createdAt: "2026-09-18",
   },
@@ -365,7 +365,7 @@ export const MOCK_AUDIT_LOGS: AuditLogEntry[] = [
     actorRole: "ENGINEER",
     action: "VERIFY_DIMENSIONS",
     targetEntity: "Project VAL-2026-081 (Living Salon)",
-    details: "Laser point cloud certified at 74.82 m² (superseding CAD extraction 74.80 m²).",
+    details: "Architectural point cloud certified at 74.82 m² (superseding CAD extraction 74.80 m²).",
   },
   {
     id: "log-3",

@@ -41,8 +41,8 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
             )}
           >
             {isRTL
-              ? "رسومات الأوتوكاد (CAD) التنفيذية، والمخططات الهندسية، ورفع المقاسات بالليزر ثلاثي الأبعاد."
-              : "Executive CAD drawings, architectural schematics, and lidar survey scans."}
+              ? "رسومات الأوتوكاد (CAD) التنفيذية، والمخططات الهندسية، ورفع المقاسات الهندسي المعتمد."
+              : "Executive CAD drawings, architectural schematics, and certified engineering site survey scans."}
           </p>
         </div>
       </div>
@@ -104,8 +104,8 @@ export function ProjectDocumentsTab({ documents }: ProjectDocumentsTabProps) {
             )}
           >
             {isRTL
-              ? "فريق الهندسة هيرفع هنا كل رسومات الأوتوكاد ورفع المقاسات بالليزر أول ما نخلص معاينة الموقع."
-              : "3D lidar point-clouds and CAD schematics will be uploaded here by the engineering atelier following the site visit."}
+              ? "فريق الهندسة هيرفع هنا كل رسومات الأوتوكاد ورفع المقاسات الهندسي أول ما نخلص معاينة الموقع."
+              : "CAD schematics and certified site surveys will be uploaded here by the engineering atelier following the site visit."}
           </p>
         </div>
       )}

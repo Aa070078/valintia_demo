@@ -52,125 +52,215 @@ export function validateStep(
 
     case 2: {
       // Step 2: Property Information / Specs (City required, Area > 0; compound is OPTIONAL)
-      const hasCity = Boolean(data.property?.city && data.property.city.trim().length > 0);
-      const hasArea = Boolean(data.property?.areaSqm && Number(data.property.areaSqm) > 0);
-      const valid = hasCity && hasArea;
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : !hasCity
-          ? "Please enter the city or region in Egypt."
-          : "Please enter a valid total area (m²).",
-        errorAr: valid
-          ? undefined
-          : !hasCity
-          ? "يرجى إدخال المدينة أو المنطقة في مصر."
-          : "يرجى إدخال إجمالي المساحة بالمتر المربع (م²).",
-      };
+      const city = data.property?.city?.trim() || "";
+      const hasCity = city.length >= 2;
+      const area = Number(data.property?.areaSqm);
+      const hasArea = !isNaN(area) && area > 0 && area <= 50000;
+      const condition = data.property?.condition?.trim() || "";
+      const hasCondition = condition.length > 0;
+
+      if (!hasCity) {
+        return {
+          isValid: false,
+          errorEn: "Please enter the city or region in Egypt (at least 2 characters).",
+          errorAr: "يرجى إدخال اسم المدينة أو المنطقة في مصر (حرفين على الأقل).",
+        };
+      }
+      if (!hasArea) {
+        return {
+          isValid: false,
+          errorEn: "Please enter a valid total area between 1 and 50,000 m².",
+          errorAr: "يرجى إدخال إجمالي المساحة بالمتر المربع بشكل صحيح (بين 1 و 50,000 م²).",
+        };
+      }
+      if (!hasCondition) {
+        return {
+          isValid: false,
+          errorEn: "Please select the handover condition of the property.",
+          errorAr: "يرجى تحديد حالة استلام العقار (نصف تشطيب، ع المحارة، إلخ).",
+        };
+      }
+      return { isValid: true };
     }
 
     case 3: {
       // Step 3: Spaces (At least one included space with quantity > 0)
-      const valid = Boolean(
-        data.spaces &&
-          data.spaces.some(
-            (s) => s.included && (Number(s.quantity) > 0 || Number(s.count) > 0)
-          )
+      const spaces = data.spaces || [];
+      const includedSpaces = spaces.filter(
+        (s) => s.included !== false && (Number(s.quantity ?? s.count ?? 0) > 0 || s.included === true)
       );
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : "Please select at least one space or room for fit-out.",
-        errorAr: valid
-          ? undefined
-          : "يرجى إضافة فراغ أو غرفة واحدة على الأقل للتشطيب.",
-      };
+
+      if (includedSpaces.length === 0) {
+        return {
+          isValid: false,
+          errorEn: "Please select at least one space or room for fit-out.",
+          errorAr: "يرجى إضافة فراغ أو غرفة واحدة على الأقل للتشطيب.",
+        };
+      }
+
+      // Check if any included space has quantity <= 0
+      const invalidQuantitySpace = includedSpaces.find(
+        (s) => Number(s.quantity ?? s.count ?? 0) <= 0
+      );
+      if (invalidQuantitySpace) {
+        const name = invalidQuantitySpace.customName || invalidQuantitySpace.spaceType || "Space";
+        return {
+          isValid: false,
+          errorEn: `Please specify a valid count (at least 1) for "${name}".`,
+          errorAr: `يرجى تحديد عدد أو كمية صالحة (1 على الأقل) لـ "${name}".`,
+        };
+      }
+
+      return { isValid: true };
     }
 
     case 4: {
-      // Step 4: Style Discovery (Primary style OR pending style/reference selection required)
-      const hasPrimary = Boolean(data.primaryStyleId && data.primaryStyleId.trim().length > 0);
-      const hasPending = Boolean(data.pendingStyles && data.pendingStyles.length > 0);
-      const valid = hasPrimary || hasPending;
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : "Please choose an aesthetic style direction.",
-        errorAr: valid
-          ? undefined
-          : "يرجى اختيار التوجه الجمالي والتصميمي للوحدة.",
-      };
+      // Step 4: Style Discovery
+      // Mode 1: Atelier / Designer curated
+      const isDesigner = data.pendingStyles?.some((p) => p.targetSpaceKey === "designer_curated");
+      if (isDesigner) {
+        return { isValid: true };
+      }
+
+      // Mode 2: Unified (single style for all)
+      const hasUnified = data.pendingStyles?.some((p) => p.targetSpaceKey === "general");
+      if (hasUnified && data.primaryStyleId && data.primaryStyleId.trim().length > 0) {
+        return { isValid: true };
+      }
+
+      // Mode 3: Per-space curation (Every included active space must have an assigned style)
+      const activeSpaces = (data.spaces || []).filter(
+        (s) => s.included !== false && (Number(s.quantity ?? s.count ?? 0) > 0 || s.included === true)
+      );
+
+      if (activeSpaces.length === 0) {
+        return {
+          isValid: false,
+          errorEn: "Please configure your spaces in the previous step first.",
+          errorAr: "يرجى تحديد الغرف في الخطوة السابقة أولاً.",
+        };
+      }
+
+      // Spaces missing a style assignment
+      const unassignedSpaces = activeSpaces.filter((space) => {
+        return !data.pendingStyles?.some(
+          (p) =>
+            p.targetSpaceKey === space.id &&
+            p.targetSpaceKey !== "general" &&
+            p.targetSpaceKey !== "designer_curated" &&
+            Boolean(p.styleId && p.styleId.trim().length > 0)
+        );
+      });
+
+      if (unassignedSpaces.length > 0) {
+        const missingNames = unassignedSpaces.map((s) => s.customName || s.spaceType || s.id);
+        const previewMissing = missingNames.slice(0, 3).join("، ");
+        const moreSuffix = missingNames.length > 3 ? ` وغيرها (${missingNames.length})` : "";
+        const previewMissingEn = missingNames.slice(0, 3).join(", ");
+        const moreSuffixEn = missingNames.length > 3 ? ` and ${missingNames.length - 3} more` : "";
+
+        return {
+          isValid: false,
+          errorEn: `Please assign a style to all remaining spaces before proceeding (${unassignedSpaces.length} unassigned: ${previewMissingEn}${moreSuffixEn}).`,
+          errorAr: `يرجى تحديد الستايل لبقية الغرف للمتابعة (${unassignedSpaces.length} غرف متبقية: ${previewMissing}${moreSuffix}).`,
+        };
+      }
+
+      // If no pending styles at all
+      if (!data.pendingStyles || data.pendingStyles.length === 0) {
+        return {
+          isValid: false,
+          errorEn: "Please choose an aesthetic style direction for your residence.",
+          errorAr: "يرجى اختيار التوجه الجمالي والتصميمي للوحدة.",
+        };
+      }
+
+      return { isValid: true };
     }
 
     case 5: {
       // Step 5: Customer Location / Timezone (Country, City, Phone required)
-      const hasCountry = Boolean(
-        data.customerLocation?.country && data.customerLocation.country.trim().length > 0
-      );
-      const hasCity = Boolean(
-        data.customerLocation?.city && data.customerLocation.city.trim().length > 0
-      );
-      const hasPhone = Boolean(
-        data.customerLocation?.phone &&
-          data.customerLocation.phone.trim().replace(/\s+/g, "").length >= 7
-      );
-      const valid = hasCountry && hasCity && hasPhone;
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : "Please provide your residence country, city, and a valid phone number.",
-        errorAr: valid
-          ? undefined
-          : "يرجى إدخال دولة الإقامة والمدينة ورقم هاتف صالح للتواصل.",
-      };
+      const country = data.customerLocation?.country?.trim() || "";
+      const city = data.customerLocation?.city?.trim() || "";
+      const rawPhone = data.customerLocation?.phone?.trim() || "";
+      const phoneDigits = rawPhone.replace(/\D/g, "");
+
+      if (country.length < 2) {
+        return {
+          isValid: false,
+          errorEn: "Please specify your country of residence.",
+          errorAr: "يرجى تحديد دولة الإقامة الحالية.",
+        };
+      }
+      if (city.length < 2) {
+        return {
+          isValid: false,
+          errorEn: "Please specify your city of residence.",
+          errorAr: "يرجى كتابة مدينة الإقامة الحالية.",
+        };
+      }
+      if (phoneDigits.length < 7) {
+        return {
+          isValid: false,
+          errorEn: "Please provide a valid phone number (at least 7 digits).",
+          errorAr: "يرجى إدخال رقم هاتف صالح للتواصل (٧ أرقام على الأقل).",
+        };
+      }
+
+      return { isValid: true };
     }
 
     case 6: {
-      // Step 6: Authorized Representative (If representative selected, name & phone required; if false, valid)
+      // Step 6: Authorized Representative
       if (!data.representative?.hasRepresentative) {
         return { isValid: true };
       }
-      const hasName = Boolean(
-        data.representative.name && data.representative.name.trim().length >= 2
-      );
-      const hasPhone = Boolean(
-        data.representative.phone &&
-          data.representative.phone.trim().replace(/\s+/g, "").length >= 7
-      );
-      const valid = hasName && hasPhone;
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : "Please provide the representative's full name and valid phone number.",
-        errorAr: valid
-          ? undefined
-          : "يرجى إدخال اسم ورقم هاتف المفوض بمصر للمتابعة.",
-      };
+      const name = data.representative.name?.trim() || "";
+      const rawPhone = data.representative.phone?.trim() || "";
+      const phoneDigits = rawPhone.replace(/\D/g, "");
+
+      if (name.length < 2) {
+        return {
+          isValid: false,
+          errorEn: "Please provide the representative's full name (at least 2 characters).",
+          errorAr: "يرجى إدخال اسم المفوض بمصر بالكامل (حرفين على الأقل).",
+        };
+      }
+      if (phoneDigits.length < 7) {
+        return {
+          isValid: false,
+          errorEn: "Please provide a valid phone number for the representative.",
+          errorAr: "يرجى إدخال رقم هاتف صالح للمفوض بمصر (٧ أرقام على الأقل).",
+        };
+      }
+      return { isValid: true };
     }
 
     case 7: {
-      // Step 7: Scope of Work (scopeType required)
-      const valid = Boolean(
-        data.scope?.scopeType && data.scope.scopeType.trim().length > 0
-      );
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : "Please select the scope of work for this commission.",
-        errorAr: valid
-          ? undefined
-          : "يرجى تحديد حجم ونطاق أعمال التشطيب المطلوبة.",
-      };
+      // Step 7: Scope of Work
+      const scopeType = data.scope?.scopeType?.trim() || "";
+      if (!scopeType) {
+        return {
+          isValid: false,
+          errorEn: "Please select the scope of work for this commission.",
+          errorAr: "يرجى تحديد حجم ونطاق أعمال التشطيب المطلوبة.",
+        };
+      }
+      if (scopeType === "custom" || scopeType === "other") {
+        const details = data.scope?.customDetails?.trim() || "";
+        if (details.length < 5) {
+          return {
+            isValid: false,
+            errorEn: "Please provide brief details for your custom scope of work (at least 5 characters).",
+            errorAr: "يرجى كتابة تفاصيل ونطاق العمل المطلوب (٥ أحرف على الأقل).",
+          };
+        }
+      }
+      return { isValid: true };
     }
 
     case 8: {
-      // Step 8: Budget (exact: exactAmount > 0; range: min > 0 and max >= min; undecided: valid)
+      // Step 8: Budget
       const type = data.budget?.budgetType;
       if (type === "undecided") {
         return { isValid: true };
@@ -180,12 +270,8 @@ export function validateStep(
         const valid = !isNaN(exact) && exact > 0;
         return {
           isValid: valid,
-          errorEn: valid
-            ? undefined
-            : "Please enter a valid target budget amount.",
-          errorAr: valid
-            ? undefined
-            : "يرجى إدخال قيمة الميزانية التقديرية بشكل صحيح.",
+          errorEn: valid ? undefined : "Please enter a valid target budget amount greater than 0.",
+          errorAr: valid ? undefined : "يرجى إدخال قيمة الميزانية التقديرية بشكل صحيح (أكبر من 0).",
         };
       }
       if (type === "range") {
@@ -196,10 +282,14 @@ export function validateStep(
           isValid: valid,
           errorEn: valid
             ? undefined
-            : "Please specify a valid budget range where maximum is greater than or equal to minimum.",
+            : !min || min <= 0
+            ? "Please specify a minimum budget amount greater than 0."
+            : "The maximum budget must be greater than or equal to the minimum budget.",
           errorAr: valid
             ? undefined
-            : "يرجى تحديد مدى ميزانية صالح بحيث يكون الحد الأقصى أكبر من أو يساوي الحد الأدنى.",
+            : !min || min <= 0
+            ? "يرجى تحديد حد أدنى للميزانية أكبر من 0."
+            : "يجب أن يكون الحد الأقصى للميزانية أكبر من أو يساوي الحد الأدنى.",
         };
       }
       return {
@@ -210,19 +300,36 @@ export function validateStep(
     }
 
     case 9: {
-      // Step 9: Target Completion (deadlineType selected)
-      const valid = Boolean(
-        data.timeline?.deadlineType && data.timeline.deadlineType.trim().length > 0
-      );
-      return {
-        isValid: valid,
-        errorEn: valid
-          ? undefined
-          : "Please select your target completion timeline.",
-        errorAr: valid
-          ? undefined
-          : "يرجى تحديد الموعد المستهدف للتسليم.",
-      };
+      // Step 9: Target Completion
+      const deadlineType = data.timeline?.deadlineType?.trim() || "";
+      if (!deadlineType) {
+        return {
+          isValid: false,
+          errorEn: "Please select your target completion timeline.",
+          errorAr: "يرجى تحديد الموعد المستهدف للتسليم.",
+        };
+      }
+      if (deadlineType === "duration") {
+        const desc = data.timeline?.durationDescription?.trim() || "";
+        if (!desc) {
+          return {
+            isValid: false,
+            errorEn: "Please specify the expected project duration.",
+            errorAr: "يرجى تحديد المدة التقديرية المتوقعة للمشروع.",
+          };
+        }
+      }
+      if (deadlineType === "specific_date") {
+        const targetDate = data.timeline?.targetDate?.trim() || "";
+        if (!targetDate) {
+          return {
+            isValid: false,
+            errorEn: "Please select your specific target delivery date.",
+            errorAr: "يرجى تحديد التاريخ المستهدف لتسليم المشروع.",
+          };
+        }
+      }
+      return { isValid: true };
     }
 
     case 10: {

@@ -149,6 +149,7 @@ export interface AuthorizedRepresentative {
   relationship?: string;
   authorizationScope?: string;
   valentiaManagedDirectly: boolean;
+  representationType?: "client_in_person" | "valentia_direct" | "authorized_representative";
 }
 
 export interface ProjectScope {

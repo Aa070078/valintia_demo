@@ -47,7 +47,7 @@ export function EngineerDashboard() {
 
   // Punch list state
   const [punchList, setPunchList] = React.useState([
-    { id: 1, task: "فحص مناسيب علب الكهرباء والشرب المعماري", taskEn: "Laser level check for MEP electrical back-boxes", done: true },
+    { id: 1, task: "فحص مناسيب علب الكهرباء والشرب المعماري", taskEn: "Precision level check for MEP electrical back-boxes", done: true },
     { id: 2, task: "اختبار ضغط شبكة تغذية المياه والمحابس", taskEn: "Plumbing pressure bar test for water network", done: true },
     { id: 3, task: "مراجعة زوايا تربيع وترخيم اللياسة والجبس بورد", taskEn: "Right-angle squaring check for plastering and gypsum board", done: false },
     { id: 4, task: "مطابقة فتحات أبواب وشبابيك الألوميتال مع المقاسات المعتمدة", taskEn: "Verify aluminium window & door openings against certified drawings", done: false },
@@ -125,8 +125,8 @@ export function EngineerDashboard() {
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
             {isRTL
-              ? "إجراء الرفع المساحي بالليزر في الموقع، مطابقة مقاسات الأوتوكاد والذكاء الاصطناعي، واعتماد المقاسات الإنشائية."
-              : "Execute laser scans on location, audit drawing dimensions, and enforce engineer verification over AI extractions."}
+              ? "إجراء الرفع المساحي الميداني في الموقع، مطابقة مقاسات الأوتوكاد والذكاء الاصطناعي، واعتماد المقاسات الإنشائية."
+              : "Execute site surveys on location, audit drawing dimensions, and enforce engineer verification over AI extractions."}
           </p>
         </div>
 
@@ -268,7 +268,7 @@ export function EngineerDashboard() {
             <p className="text-xs text-muted-foreground mt-0.5">
               {isRTL
                 ? "القاعدة الهندسية §١٧: المقاس المعتمد من المهندس > استخراج الأوتوكاد CAD > تقدير الذكاء الاصطناعي AI. مقاس المهندس ملزم للمقايسة."
-                : "Rule §17: Engineer Verified > CAD Extracted > AI Inferred. Certified laser dimensions override all previous estimates."}
+                : "Rule §17: Engineer Verified > CAD Extracted > AI Inferred. Certified architectural dimensions override all previous estimates."}
             </p>
           </div>
 
@@ -320,7 +320,7 @@ export function EngineerDashboard() {
                 </div>
 
                 <div className="pt-2 border-t border-border/60">
-                  <div className="text-[11px] text-muted-foreground mb-1.5">{isRTL ? "المقاس المعتمد بالليزر (النهائي):" : "Laser Verified Dimension:"}</div>
+                  <div className="text-[11px] text-muted-foreground mb-1.5">{isRTL ? "المقاس المعتمد (النهائي):" : "Certified Dimension:"}</div>
                   {editingItemId === item.id ? (
                     <div className="flex items-center gap-2">
                       <input
@@ -375,7 +375,7 @@ export function EngineerDashboard() {
                         className="h-9 px-4 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium flex-1 flex items-center justify-center gap-1 cursor-pointer"
                       >
                         <SealCheck size={15} />
-                        <span>{isRTL ? "اعتماد مقاس الليزر" : "Certify Laser"}</span>
+                        <span>{isRTL ? "اعتماد المقاس" : "Certify Dimension"}</span>
                       </button>
                     </div>
                   )}
@@ -393,7 +393,7 @@ export function EngineerDashboard() {
                   <th className="py-3 px-4">{isRTL ? "إدخال العميل" : "Customer Entered"}</th>
                   <th className="py-3 px-4">{isRTL ? "استخراج CAD" : "CAD Extracted"}</th>
                   <th className="py-3 px-4">{isRTL ? "تقدير الذكاء الاصطناعي" : "AI Inferred"}</th>
-                  <th className="py-3 px-4">{isRTL ? "المعتمد بالليزر (النهائي)" : "Engineer Certified"}</th>
+                  <th className="py-3 px-4">{isRTL ? "المعتمد هندسياً (النهائي)" : "Engineer Certified"}</th>
                   <th className="py-3 px-4 text-center">{isRTL ? "مرجعية البيانات" : "Data Authority"}</th>
                   <th className="py-3 px-4 text-end">{isRTL ? "إجراء المهندس" : "Action"}</th>
                 </tr>
@@ -443,7 +443,7 @@ export function EngineerDashboard() {
                         </span>
                       ) : (
                         <span className="text-muted-foreground italic">
-                          {isRTL ? "بانتظار مسح الليزر" : "Pending Laser Verification"}
+                          {isRTL ? "بانتظار الرفع المساحي" : "Pending Survey Verification"}
                         </span>
                       )}
                     </td>
@@ -487,7 +487,7 @@ export function EngineerDashboard() {
                             }
                             className="h-7 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
                           >
-                            {isRTL ? "اعتماد بالليزر" : "Certify Laser Scan"}
+                            {isRTL ? "اعتماد المقاس" : "Certify Dimension"}
                           </button>
                         </div>
                       ) : (

@@ -42,7 +42,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
           >
             {isRTL
               ? "المهندسين المعماريين اللي هيتابعوا معاك كل تفصيلة في التصميم، ورفع المقاسات، واستلام الشغل على أعلى مستوى."
-              : "Dedicated architectural leads coordinating your spatial vision, lidar scans, and execution quality."}
+              : "Dedicated architectural leads coordinating your spatial vision, architectural surveys, and execution quality."}
           </p>
         </div>
 
@@ -175,7 +175,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                     isRTL ? "text-sm font-bold" : "text-xs font-semibold"
                   )}
                 >
-                  {isRTL ? "رفع المقاسات بالليزر ثلاثي الأبعاد" : "3D Lidar Site Survey"}
+                  {isRTL ? "رفع المقاسات الهندسي المعتمد" : "Architectural Site Survey"}
                 </div>
                 <div
                   className={cn(
@@ -183,7 +183,7 @@ export function ProjectTeamTab({}: ProjectTeamTabProps) {
                     isRTL ? "text-xs font-medium text-[#503C2C]" : "text-[11px]"
                   )}
                 >
-                  {isRTL ? "معاينة ميدانية في موقع البيت بدقة متناهية" : "Point-cloud precision spatial scan"}
+                  {isRTL ? "معاينة ميدانية في موقع البيت بدقة هندسية شاملة" : "Comprehensive site verification and spatial survey"}
                 </div>
               </div>
             </div>

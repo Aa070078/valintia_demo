@@ -124,22 +124,20 @@ function CreateProjectContent() {
     ]
   );
 
-  const maxAllowedStep = React.useMemo(() => getMaxUnlockedStep(formData), [formData]);
-
   const stepQuery = Number(searchParams.get("step"));
+  const returnToQuery = Number(searchParams.get("returnTo")) || null;
   const [internalStep, setInternalStep] = React.useState<number>(1);
 
-  // Clamp step if URL parameter attempts to skip ahead past incomplete steps
-  React.useEffect(() => {
-    if (stepQuery > maxAllowedStep) {
-      router.replace(`/projects/new?step=${maxAllowedStep}`);
-    }
-  }, [stepQuery, maxAllowedStep, router]);
+  // Track highest step reached so far to avoid retroactively locking steps or kicking user backwards while editing
+  const [highestReachedStep, setHighestReachedStep] = React.useState<number>(() => {
+    const fromUrl = stepQuery >= 1 && stepQuery <= 11 ? stepQuery : 1;
+    const fromReturn = returnToQuery && returnToQuery >= 1 && returnToQuery <= 11 ? returnToQuery : 1;
+    return Math.max(fromUrl, fromReturn, 1);
+  });
 
-  const currentStep = Math.min(
-    stepQuery >= 1 && stepQuery <= 11 ? stepQuery : internalStep,
-    maxAllowedStep
-  );
+  const rawMax = getMaxUnlockedStep(formData);
+  const currentStep = stepQuery >= 1 && stepQuery <= 11 ? stepQuery : internalStep;
+  const maxAllowedStep = Math.max(highestReachedStep, currentStep, rawMax);
 
   const activeStepRef = React.useRef<HTMLButtonElement | null>(null);
 
@@ -155,7 +153,7 @@ function CreateProjectContent() {
 
   const createMutation = useCreateProject();
 
-  const goToStep = (stepNumber: number) => {
+  const goToStep = (stepNumber: number, returnToStep?: number | null) => {
     if (stepNumber > maxAllowedStep) {
       const stepRes = validateStep(currentStep, formData);
       setValidationError(isRTL ? stepRes.errorAr || null : stepRes.errorEn || null);
@@ -164,7 +162,20 @@ function CreateProjectContent() {
     setValidationError(null);
     const clamped = Math.max(1, Math.min(11, stepNumber));
     setInternalStep(clamped);
-    router.replace(`/projects/new?step=${clamped}`);
+    setHighestReachedStep((prev) => Math.max(prev, clamped));
+
+    const targetReturn =
+      returnToStep !== undefined
+        ? returnToStep
+        : returnToQuery && returnToQuery !== clamped
+        ? returnToQuery
+        : null;
+
+    const url = targetReturn
+      ? `/projects/new?step=${clamped}&returnTo=${targetReturn}`
+      : `/projects/new?step=${clamped}`;
+
+    router.replace(url);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -176,6 +187,13 @@ function CreateProjectContent() {
       return;
     }
     setValidationError(null);
+
+    // If editing from review, direct save and return
+    if (returnToQuery && returnToQuery !== currentStep) {
+      goToStep(returnToQuery, null);
+      return;
+    }
+
     if (currentStep < 11) {
       goToStep(currentStep + 1);
     } else {
@@ -185,6 +203,10 @@ function CreateProjectContent() {
 
   const handleBack = () => {
     setValidationError(null);
+    if (returnToQuery && returnToQuery !== currentStep) {
+      goToStep(returnToQuery, null);
+      return;
+    }
     if (currentStep > 1) {
       goToStep(currentStep - 1);
     } else {
@@ -438,6 +460,27 @@ function CreateProjectContent() {
         {/* Main Stage Content */}
         <main className="flex-1 min-w-0 flex flex-col justify-between p-5 sm:p-8 lg:p-12">
           <div className="mx-auto w-full max-w-4xl flex-1 flex flex-col">
+            {/* Edit Mode Alert when navigated from Review */}
+            {returnToQuery && (
+              <div className="mb-5 p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#D8C8B4] text-[#503C2C] text-xs font-medium flex items-center justify-between gap-3 shadow-2xs animate-in fade-in duration-200">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#B88460] shrink-0" />
+                  <span>
+                    {isRTL
+                      ? `أنت الآن في وضع التعديل (الخطوة ${currentStep}) • عند الانتهاء اضغط "حفظ والرجوع للمراجعة" لحفظ التعديل والعودة فوراً.`
+                      : `Edit Mode (Step ${currentStep}) • Click "Save & Return to Review" when finished to apply your changes directly.`}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => goToStep(returnToQuery, null)}
+                  className="text-xs font-bold text-[#503C2C] hover:underline cursor-pointer shrink-0"
+                >
+                  {isRTL ? "رجوع للمراجعة" : "Return to Review"}
+                </button>
+              </div>
+            )}
+
             {/* Validation Alert Banner */}
             {validationError && (
               <div
@@ -559,7 +602,7 @@ function CreateProjectContent() {
                 budget={budget}
                 timeline={timeline}
                 documents={documents}
-                onJumpToStep={goToStep}
+                onJumpToStep={(stepNumber, returnTo) => goToStep(stepNumber, returnTo ?? 11)}
                 onSubmit={handleFinalSubmit}
                 isSubmitting={isSubmitting}
               />
@@ -568,30 +611,77 @@ function CreateProjectContent() {
 
           {/* Sticky / Fixed Navigation Footer for Steps 1 - 10 */}
           {currentStep < 11 && (
-            <div className="sticky bottom-0 z-30 -mx-5 -mb-5 sm:mx-0 sm:mb-0 sm:static bg-[#FAF7F2]/95 backdrop-blur-md border-t border-border p-4 sm:p-0 sm:mt-12 sm:pt-6 sm:bg-transparent pb-safe flex items-center justify-between shadow-md sm:shadow-none transition-all">
-              <button
-                type="button"
-                onClick={handleBack}
-                className={cn(
-                  "flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full border border-border bg-card text-xs font-bold text-foreground hover:bg-secondary transition-all cursor-pointer shadow-2xs touch-manipulation active:scale-95",
-                  isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
-                )}
-              >
-                {isRTL ? <ArrowRight size={13} /> : <ArrowLeft size={13} />}
-                <span>{t("wizard.back") || "Back"}</span>
-              </button>
+            <div className="sticky bottom-0 z-30 -mx-5 -mb-5 sm:mx-0 sm:mb-0 sm:static bg-[#FAF7F2]/95 backdrop-blur-md border-t border-border p-4 sm:p-0 sm:mt-12 sm:pt-6 sm:bg-transparent pb-safe flex flex-col gap-3 shadow-md sm:shadow-none transition-all">
+              {validationError && (
+                <div
+                  role="alert"
+                  className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs sm:text-sm font-medium flex items-center justify-between gap-3 animate-in fade-in duration-200 shadow-xs"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-amber-600 animate-pulse shrink-0" />
+                    <span>{validationError}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setValidationError(null)}
+                    className="text-amber-800 dark:text-amber-300 hover:opacity-75 p-1 cursor-pointer shrink-0"
+                    aria-label="Dismiss alert"
+                  >
+                    <X size={14} weight="bold" />
+                  </button>
+                </div>
+              )}
 
-              <button
-                type="button"
-                onClick={handleNext}
-                className={cn(
-                  "flex items-center gap-2 px-6 sm:px-7 py-2.5 rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer touch-manipulation",
-                  isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
-                )}
-              >
-                <span>{t("wizard.next") || "Next Step"}</span>
-                {isRTL ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
-              </button>
+              <div className="flex items-center justify-between w-full">
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className={cn(
+                    "flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-full border border-border bg-card text-xs font-bold text-foreground hover:bg-secondary transition-all cursor-pointer shadow-2xs touch-manipulation active:scale-95",
+                    isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
+                  )}
+                >
+                  {isRTL ? <ArrowRight size={13} /> : <ArrowLeft size={13} />}
+                  <span>{t("wizard.back") || "Back"}</span>
+                </button>
+
+                <div className="flex items-center gap-2.5">
+                  {returnToQuery && returnToQuery !== currentStep && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const stepRes = validateStep(currentStep, formData);
+                        if (!stepRes.isValid) {
+                          setValidationError(isRTL ? stepRes.errorAr || null : stepRes.errorEn || null);
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                          return;
+                        }
+                        setValidationError(null);
+                        goToStep(returnToQuery, null);
+                      }}
+                      className={cn(
+                        "flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full bg-[#503C2C] text-xs font-bold text-[#FAF7F2] shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer touch-manipulation",
+                        isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
+                      )}
+                    >
+                      <CheckCircle size={14} weight="bold" />
+                      <span>{isRTL ? "حفظ والرجوع للمراجعة" : "Save & Return to Review"}</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className={cn(
+                      "flex items-center gap-2 px-6 sm:px-7 py-2.5 rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer touch-manipulation",
+                      isRTL ? "tracking-normal font-sans" : "uppercase tracking-wider font-semibold"
+                    )}
+                  >
+                    <span>{returnToQuery ? (isRTL ? "الخطوة التالية" : "Next Step") : (t("wizard.next") || "Next Step")}</span>
+                    {isRTL ? <ArrowLeft size={13} /> : <ArrowRight size={13} />}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </main>

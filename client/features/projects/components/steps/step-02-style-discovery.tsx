@@ -8,6 +8,7 @@ import {
   Heart,
   Eye,
   Compass,
+  WarningCircle,
 } from "@phosphor-icons/react";
 import { AESTHETIC_DIRECTIONS, StyleDirection } from "../aesthetic-direction";
 import type { SpaceEntity, PendingStyleSelection } from "../../types";
@@ -59,8 +60,41 @@ export function StepStyleDiscovery({
     return found?.notes || "";
   });
 
-  // Filter only included spaces for assignment
-  const activeSpaces = spaces.filter((s) => s.included !== false);
+  // Filter only included spaces for assignment (checking count/quantity > 0 as well)
+  const activeSpaces = spaces.filter(
+    (s) => s.included !== false && (Number(s.quantity ?? s.count ?? 0) > 0 || s.included === true)
+  );
+
+  // Real-time space coverage analysis for per_space mode
+  const assignedPerSpaceCount = activeSpaces.filter((space) =>
+    pendingStyles.some(
+      (p) =>
+        p.targetSpaceKey === space.id &&
+        p.targetSpaceKey !== "general" &&
+        p.targetSpaceKey !== "designer_curated" &&
+        Boolean(p.styleId && p.styleId.trim().length > 0)
+    )
+  ).length;
+
+  const unassignedSpaces = activeSpaces.filter(
+    (space) =>
+      !pendingStyles.some(
+        (p) =>
+          p.targetSpaceKey === space.id &&
+          p.targetSpaceKey !== "general" &&
+          p.targetSpaceKey !== "designer_curated" &&
+          Boolean(p.styleId && p.styleId.trim().length > 0)
+      )
+  );
+
+  const unassignedSpaceIds = unassignedSpaces.map((s) => s.id);
+
+  const coveragePercent =
+    activeSpaces.length > 0
+      ? Math.min(100, Math.round((assignedPerSpaceCount / activeSpaces.length) * 100))
+      : 0;
+
+  const isPerSpaceFullyCovered = activeSpaces.length > 0 && unassignedSpaces.length === 0;
 
   // Open modal and pre-populate selected spaces for this style
   const handleOpenGallery = (direction: StyleDirection) => {
@@ -70,7 +104,12 @@ export function StepStyleDiscovery({
     if (strategy === "per_space") {
       // Find all spaces currently assigned to this style
       const currentlyAssigned = pendingStyles
-        .filter((s) => s.styleId === direction.id && s.targetSpaceKey !== "general")
+        .filter(
+          (s) =>
+            s.styleId === direction.id &&
+            s.targetSpaceKey !== "general" &&
+            s.targetSpaceKey !== "designer_curated"
+        )
         .map((s) => s.targetSpaceKey);
       setTempAssignedSpaceIds(currentlyAssigned);
     }
@@ -83,12 +122,39 @@ export function StepStyleDiscovery({
       {
         targetSpaceKey: "general",
         styleId: direction.id,
-        styleName: direction.name,
+        styleName: isRTL ? direction.nameAr : direction.name,
         referenceImages: direction.galleryImages || [direction.heroImage],
         notes: "",
       },
     ]);
     setActiveGalleryDirection(null);
+  };
+
+  // Strategy switcher helper
+  const handleSelectStrategy = (newStrategy: StyleStrategy) => {
+    setStrategy(newStrategy);
+    if (newStrategy === "unified") {
+      const selectedDir =
+        AESTHETIC_DIRECTIONS.find((d) => d.id === primaryStyleId) || AESTHETIC_DIRECTIONS[0];
+      onChangePrimaryStyleId(selectedDir.id);
+      onChangePendingStyles([
+        {
+          targetSpaceKey: "general",
+          styleId: selectedDir.id,
+          styleName: isRTL ? selectedDir.nameAr : selectedDir.name,
+          referenceImages: selectedDir.galleryImages || [selectedDir.heroImage],
+          notes: "",
+        },
+      ]);
+    } else if (newStrategy === "per_space") {
+      // Remove 'general' or 'designer_curated' so per-space mode enforces real per-space coverage
+      const existingPerSpace = pendingStyles.filter(
+        (s) => s.targetSpaceKey !== "general" && s.targetSpaceKey !== "designer_curated"
+      );
+      onChangePendingStyles(existingPerSpace);
+    } else if (newStrategy === "designer") {
+      handleSaveDesignerMode(designerNotes);
+    }
   };
 
   // Toggle space in per-space modal
@@ -100,25 +166,35 @@ export function StepStyleDiscovery({
 
   // Confirm Per-Space Assignment
   const handleConfirmPerSpace = (direction: StyleDirection) => {
-    // Remove previous assignments for the selected spaces
-    const otherStyles = pendingStyles.filter(
-      (s) => !tempAssignedSpaceIds.includes(s.targetSpaceKey) && s.targetSpaceKey !== "general"
+    // Keep pending styles that:
+    // 1) are not general or designer_curated
+    // 2) do NOT target any space in tempAssignedSpaceIds (as those are being assigned to this style)
+    // 3) were NOT previously assigned to this direction.id (if they are unchecked in tempAssignedSpaceIds now, they should be cleared!)
+    const remainingStyles = pendingStyles.filter(
+      (s) =>
+        s.targetSpaceKey !== "general" &&
+        s.targetSpaceKey !== "designer_curated" &&
+        !tempAssignedSpaceIds.includes(s.targetSpaceKey) &&
+        s.styleId !== direction.id
     );
 
     // Create new assignments for this style
     const newAssignments: PendingStyleSelection[] = tempAssignedSpaceIds.map((spaceId) => {
       const spaceObj = spaces.find((s) => s.id === spaceId);
+      const spaceName = isRTL
+        ? (spaceObj?.spaceType ? t(spaceObj.spaceType) : spaceObj?.customName) || spaceObj?.customName || spaceId
+        : spaceObj?.customName || spaceId;
       return {
         targetSpaceKey: spaceId,
         styleId: direction.id,
         styleName: isRTL ? direction.nameAr : direction.name,
         referenceImages: direction.galleryImages || [direction.heroImage],
-        notes: spaceObj?.customName || "",
+        notes: spaceName,
       };
     });
 
     onChangePrimaryStyleId(direction.id);
-    onChangePendingStyles([...otherStyles, ...newAssignments]);
+    onChangePendingStyles([...remainingStyles, ...newAssignments]);
     setActiveGalleryDirection(null);
   };
 
@@ -183,21 +259,7 @@ export function StepStyleDiscovery({
         {/* Option 1: Unified */}
         <button
           type="button"
-          onClick={() => {
-            setStrategy("unified");
-            // If switching to unified and primary style exists, set it
-            if (primaryStyleId) {
-              const dir = AESTHETIC_DIRECTIONS.find((d) => d.id === primaryStyleId) || AESTHETIC_DIRECTIONS[0];
-              onChangePendingStyles([
-                {
-                  targetSpaceKey: "general",
-                  styleId: dir.id,
-                  styleName: dir.name,
-                  referenceImages: dir.galleryImages || [dir.heroImage],
-                },
-              ]);
-            }
-          }}
+          onClick={() => handleSelectStrategy("unified")}
           className={cn(
             "p-4 rounded-2xl border text-start transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 select-none",
             strategy === "unified"
@@ -236,7 +298,7 @@ export function StepStyleDiscovery({
         {/* Option 2: Per Space */}
         <button
           type="button"
-          onClick={() => setStrategy("per_space")}
+          onClick={() => handleSelectStrategy("per_space")}
           className={cn(
             "p-4 rounded-2xl border text-start transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 select-none",
             strategy === "per_space"
@@ -275,10 +337,7 @@ export function StepStyleDiscovery({
         {/* Option 3: Designer Choice */}
         <button
           type="button"
-          onClick={() => {
-            setStrategy("designer");
-            handleSaveDesignerMode(designerNotes);
-          }}
+          onClick={() => handleSelectStrategy("designer")}
           className={cn(
             "p-4 rounded-2xl border text-start transition-all duration-200 cursor-pointer flex flex-col justify-between gap-3 select-none",
             strategy === "designer"
@@ -314,6 +373,123 @@ export function StepStyleDiscovery({
           </p>
         </button>
       </div>
+
+      {/* Real-time Spaces Coverage & Allocation Tracker (When Per-Space Mode is Active) */}
+      {strategy === "per_space" && (
+        <div className="p-5 sm:p-6 rounded-3xl border border-border bg-card shadow-xs flex flex-col gap-4 text-start">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-primary" />
+                <h3 className="text-base sm:text-lg font-serif font-medium text-[#1C1917]">
+                  {isRTL ? "مؤشر تغطية ستايل الغرف والمساحات" : "Spaces Style Allocation Progress"}
+                </h3>
+              </div>
+              <p className="text-xs text-[#78716C] mt-0.5 font-normal">
+                {isRTL
+                  ? "يجب اختيار ستايل لكل غرفة من الغرف المحددة قبل الانتقال للخطوة التالية."
+                  : "Every active space must have an assigned aesthetic direction before moving forward."}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 self-start sm:self-center">
+              <span
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold",
+                  isPerSpaceFullyCovered
+                    ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300 border border-emerald-500/30"
+                    : "bg-amber-500/15 text-amber-900 dark:text-amber-200 border border-amber-500/30"
+                )}
+              >
+                {assignedPerSpaceCount} / {activeSpaces.length} {isRTL ? "غرف مكتملة" : "spaces styled"} ({coveragePercent}%)
+              </span>
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+            <div
+              className={cn(
+                "h-full transition-all duration-500 rounded-full",
+                isPerSpaceFullyCovered ? "bg-emerald-600" : "bg-primary"
+              )}
+              style={{ width: `${coveragePercent}%` }}
+            />
+          </div>
+
+          {/* Spaces Pill Grid showing each space and its current allocation */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            {activeSpaces.map((space) => {
+              const spaceName = isRTL
+                ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "غرفة"
+                : space.customName || "Space";
+              const assignedStyle = pendingStyles.find(
+                (p) =>
+                  p.targetSpaceKey === space.id &&
+                  p.targetSpaceKey !== "general" &&
+                  p.targetSpaceKey !== "designer_curated" &&
+                  Boolean(p.styleId && p.styleId.trim().length > 0)
+              );
+              const styleDir = assignedStyle
+                ? AESTHETIC_DIRECTIONS.find((d) => d.id === assignedStyle.styleId)
+                : undefined;
+              const styleDisplayName = styleDir
+                ? isRTL
+                  ? styleDir.nameAr
+                  : styleDir.name
+                : assignedStyle?.styleName;
+
+              return (
+                <div
+                  key={space.id}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs transition-all",
+                    assignedStyle
+                      ? "bg-[#F7F2EB] dark:bg-stone-900 border-[#D8C8B4] text-[#503C2C] dark:text-stone-200 font-medium"
+                      : "bg-amber-500/10 border-amber-400/50 text-amber-900 dark:text-amber-200"
+                  )}
+                >
+                  <span className="font-medium">{spaceName}:</span>
+                  {assignedStyle ? (
+                    <span className="font-semibold text-primary underline decoration-primary/30">
+                      {styleDisplayName}
+                    </span>
+                  ) : (
+                    <span className="font-normal text-amber-800 dark:text-amber-300 italic flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                      {isRTL ? "يحتاج ستايل" : "Needs style"}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Alert if incomplete */}
+          {!isPerSpaceFullyCovered && (
+            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 dark:text-amber-200 flex items-center gap-2">
+              <WarningCircle size={17} weight="bold" className="shrink-0 text-amber-700 dark:text-amber-400" />
+              <span>
+                {isRTL
+                  ? `متبقي (${unassignedSpaces.length}) غرف بدون ستايل. افتح أي ستايل بالأسفل وخصصه للغرف المتبقية لتتمكن من المتابعة.`
+                  : `There are ${unassignedSpaces.length} unassigned spaces remaining. Open any style card below to assign them before proceeding.`}
+              </span>
+            </div>
+          )}
+
+          {/* Success if 100% complete */}
+          {isPerSpaceFullyCovered && (
+            <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
+              <Check size={16} weight="bold" className="text-emerald-700 dark:text-emerald-400 shrink-0" />
+              <span className="font-medium">
+                {isRTL
+                  ? "تم تحديد الستايل لجميع الغرف بنجاح (جاهز للمتابعة للخطوة التالية)!"
+                  : "All spaces have an assigned style direction (Ready to proceed to next step)!"}
+              </span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* STRATEGY 1 & 2: Style Cards Grid */}
       {(strategy === "unified" || strategy === "per_space") && (
@@ -561,86 +737,257 @@ export function StepStyleDiscovery({
               {strategy === "per_space" && (
                 <div className="w-full flex flex-col gap-4">
                   {/* Spaces Dropdown Trigger & Popover */}
-                  <div className="relative">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs font-medium text-[#1C1917]">
-                        {t("style_gallery.select_spaces_label") ||
-                          (isRTL ? "اختار الغرف اللي تحب تطبق عليها الستايل ده:" : "Assign this style to spaces:")}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setTempAssignedSpaceIds(activeSpaces.map((s) => s.id))}
-                          className="text-[11px] font-medium text-[#B88460] hover:underline cursor-pointer"
-                        >
-                          {t("style_gallery.select_all") || (isRTL ? "تحديد كل الغرف" : "Select All")}
-                        </button>
-                        <span className="text-border">|</span>
-                        <button
-                          type="button"
-                          onClick={() => setTempAssignedSpaceIds([])}
-                          className="text-[11px] font-medium text-[#78716C] hover:underline cursor-pointer"
-                        >
-                          {t("style_gallery.clear_all") || (isRTL ? "إلغاء التحديد" : "Clear")}
-                        </button>
-                      </div>
-                    </div>
+                  <div className="w-full flex flex-col gap-3">
+                    {(() => {
+                      const selectableSpaces = activeSpaces.filter((space) => {
+                        const isSelectedForThis = tempAssignedSpaceIds.includes(space.id);
+                        const isAssignedToOther = pendingStyles.some(
+                          (p) =>
+                            p.targetSpaceKey === space.id &&
+                            p.styleId !== activeGalleryDirection.id &&
+                            p.targetSpaceKey !== "general" &&
+                            p.targetSpaceKey !== "designer_curated"
+                        );
+                        return isSelectedForThis || !isAssignedToOther;
+                      });
 
-                    {/* Interactive Spaces Checkbox Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 p-3 rounded-2xl border border-border bg-background max-h-48 overflow-y-auto">
-                      {activeSpaces.length === 0 ? (
-                        <span className="col-span-full text-xs text-[#78716C] py-2 text-center font-normal">
-                          {isRTL ? "لسه مفيش غرف محددة في الخطوة اللي فاتت." : "No active spaces found."}
-                        </span>
-                      ) : (
-                        activeSpaces.map((space) => {
-                          const spaceName = isRTL
-                            ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "Space"
-                            : space.customName || "Space";
+                      const alreadyAssignedToOtherSpaces = activeSpaces.filter((space) => {
+                        const isSelectedForThis = tempAssignedSpaceIds.includes(space.id);
+                        const isAssignedToOther = pendingStyles.some(
+                          (p) =>
+                            p.targetSpaceKey === space.id &&
+                            p.styleId !== activeGalleryDirection.id &&
+                            p.targetSpaceKey !== "general" &&
+                            p.targetSpaceKey !== "designer_curated"
+                        );
+                        return !isSelectedForThis && isAssignedToOther;
+                      });
 
-                          const isAssigned = tempAssignedSpaceIds.includes(space.id);
-                          return (
-                            <button
-                              key={space.id}
-                              type="button"
-                              onClick={() => handleToggleSpaceAssignment(space.id)}
-                              className={cn(
-                                "flex items-center justify-between p-2.5 rounded-xl border text-xs text-start transition-all cursor-pointer",
-                                isAssigned
-                                  ? "border-primary bg-primary/10 text-primary font-medium shadow-2xs"
-                                  : "border-border/80 bg-card text-[#78716C] hover:border-foreground/30 font-normal"
+                      return (
+                        <>
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                              <span className="text-xs font-semibold text-[#1C1917]">
+                                {isRTL
+                                  ? "الغرف المتاحة للتطبيق على هذا الستايل:"
+                                  : "Available Spaces for this Style:"}
+                              </span>
+                              <p className="text-[11px] text-[#78716C] mt-0.5">
+                                {isRTL
+                                  ? "حدد الغرف التي ترغب في تطبيق هذا الستايل عليها."
+                                  : "Select which spaces you want to apply this aesthetic direction to."}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 self-start sm:self-center shrink-0">
+                              {unassignedSpaceIds.length > 0 && (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setTempAssignedSpaceIds((prev) =>
+                                        Array.from(new Set([...prev, ...unassignedSpaceIds]))
+                                      );
+                                    }}
+                                    className="text-[11px] font-semibold text-primary hover:underline cursor-pointer bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20"
+                                  >
+                                    {isRTL
+                                      ? `تحديد المتبقي فقط (${unassignedSpaceIds.length})`
+                                      : `Select Remaining (${unassignedSpaceIds.length})`}
+                                  </button>
+                                  <span className="text-border">|</span>
+                                </>
                               )}
-                            >
-                              <span className="truncate">{spaceName}</span>
-                              <div
-                                className={cn(
-                                  "h-4 w-4 rounded-md border flex items-center justify-center shrink-0 ml-1.5",
-                                  isAssigned
-                                    ? "border-primary bg-primary text-primary-foreground"
-                                    : "border-border"
-                                )}
+                              <button
+                                type="button"
+                                onClick={() => setTempAssignedSpaceIds(selectableSpaces.map((s) => s.id))}
+                                className="text-[11px] font-medium text-[#B88460] hover:underline cursor-pointer"
                               >
-                                {isAssigned && <Check size={11} weight="bold" />}
+                                {isRTL ? "تحديد كل المتاح" : "Select Available"}
+                              </button>
+                              <span className="text-border">|</span>
+                              <button
+                                type="button"
+                                onClick={() => setTempAssignedSpaceIds([])}
+                                className="text-[11px] font-medium text-[#78716C] hover:underline cursor-pointer"
+                              >
+                                {t("style_gallery.clear_all") || (isRTL ? "إلغاء التحديد" : "Clear")}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Primary: Selectable Spaces (Unassigned + Selected for this) */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 p-3 rounded-2xl border border-border bg-background max-h-56 overflow-y-auto">
+                            {selectableSpaces.length === 0 ? (
+                              <div className="col-span-full py-4 text-center flex flex-col items-center justify-center gap-1.5">
+                                <span className="text-xs font-medium text-emerald-800 dark:text-emerald-300">
+                                  {isRTL
+                                    ? "جميع الغرف محددة لستايلات أخرى بالفعل (انظر بالأسفل)."
+                                    : "All spaces are already assigned to other styles (see below)."}
+                                </span>
+                                <span className="text-[11px] text-[#78716C]">
+                                  {isRTL
+                                    ? "إذا أردت تطبيق هذا الستايل على أي غرفة، يمكنك نقلها من القائمة بالأسفل."
+                                    : "You can transfer any space to this style from the list below."}
+                                </span>
                               </div>
-                            </button>
-                          );
-                        })
-                      )}
-                    </div>
+                            ) : (
+                              selectableSpaces.map((space) => {
+                                const spaceName = isRTL
+                                  ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "غرفة"
+                                  : space.customName || "Space";
+                                const spaceQty = space.quantity ?? space.count ?? 1;
+                                const isSelectedForThis = tempAssignedSpaceIds.includes(space.id);
+
+                                return (
+                                  <button
+                                    key={space.id}
+                                    type="button"
+                                    onClick={() => handleToggleSpaceAssignment(space.id)}
+                                    className={cn(
+                                      "flex flex-col gap-1.5 p-3 rounded-2xl border text-start transition-all cursor-pointer select-none text-xs relative",
+                                      isSelectedForThis
+                                        ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary/30 shadow-2xs"
+                                        : "border-amber-400/50 bg-amber-500/5 text-foreground hover:border-amber-500 hover:bg-amber-500/10"
+                                    )}
+                                  >
+                                    <div className="flex items-center justify-between w-full gap-2">
+                                      <span className="font-medium truncate text-foreground">
+                                        {spaceName} {spaceQty > 1 && <span className="text-[10px] text-[#78716C]">({spaceQty}×)</span>}
+                                      </span>
+                                      <div
+                                        className={cn(
+                                          "h-4 w-4 rounded-md border flex items-center justify-center shrink-0 transition-colors",
+                                          isSelectedForThis
+                                            ? "border-primary bg-primary text-primary-foreground"
+                                            : "border-border bg-background"
+                                        )}
+                                      >
+                                        {isSelectedForThis && <Check size={11} weight="bold" />}
+                                      </div>
+                                    </div>
+
+                                    {/* Status Badges */}
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      {isSelectedForThis ? (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-semibold text-primary">
+                                          <Check size={9} weight="bold" />
+                                          <span>{isRTL ? "محدد لهذا الستايل" : "Selected for this style"}</span>
+                                        </span>
+                                      ) : (
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[9px] font-medium text-amber-800 dark:text-amber-300">
+                                          <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                          <span>{isRTL ? "متبقي (يحتاج ستايل)" : "Needs style"}</span>
+                                        </span>
+                                      )}
+                                    </div>
+                                  </button>
+                                );
+                              })
+                            )}
+                          </div>
+
+                          {/* Secondary: Already assigned to other styles (Clean completed display) */}
+                          {alreadyAssignedToOtherSpaces.length > 0 && (
+                            <div className="pt-2 border-t border-border/60 flex flex-col gap-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[11px] font-semibold text-[#503C2C]">
+                                  {isRTL
+                                    ? `غرف تم اختيار ستايل لها بالفعل (${alreadyAssignedToOtherSpaces.length} غرف مكتملة):`
+                                    : `Spaces Already Styled (${alreadyAssignedToOtherSpaces.length} completed):`}
+                                </span>
+                                <span className="text-[10px] text-[#78716C]">
+                                  {isRTL ? "محجوزة لستايلات أخرى" : "Assigned elsewhere"}
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 p-2.5 rounded-2xl bg-secondary/50 border border-border/70 max-h-36 overflow-y-auto">
+                                {alreadyAssignedToOtherSpaces.map((space) => {
+                                  const spaceName = isRTL
+                                    ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "غرفة"
+                                    : space.customName || "Space";
+                                  const spaceQty = space.quantity ?? space.count ?? 1;
+
+                                  const otherAssignment = pendingStyles.find(
+                                    (p) =>
+                                      p.targetSpaceKey === space.id &&
+                                      p.styleId !== activeGalleryDirection.id &&
+                                      p.targetSpaceKey !== "general" &&
+                                      p.targetSpaceKey !== "designer_curated"
+                                  );
+                                  const otherStyleDir = otherAssignment
+                                    ? AESTHETIC_DIRECTIONS.find((d) => d.id === otherAssignment.styleId)
+                                    : undefined;
+                                  const otherStyleName = otherStyleDir
+                                    ? isRTL
+                                      ? otherStyleDir.nameAr
+                                      : otherStyleDir.name
+                                    : otherAssignment?.styleName;
+
+                                  return (
+                                    <div
+                                      key={space.id}
+                                      className="flex items-center justify-between gap-2 p-2 rounded-xl bg-background border border-border text-xs"
+                                    >
+                                      <div className="min-w-0">
+                                        <div className="font-medium text-[#1C1917] truncate">
+                                          {spaceName} {spaceQty > 1 && <span className="text-[10px] text-[#78716C]">({spaceQty}×)</span>}
+                                        </div>
+                                        <div className="text-[10px] text-emerald-800 dark:text-emerald-300 font-medium truncate flex items-center gap-1 mt-0.5">
+                                          <Check size={9} weight="bold" />
+                                          <span>{otherStyleName}</span>
+                                        </div>
+                                      </div>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleToggleSpaceAssignment(space.id)}
+                                        className="text-[10px] font-semibold text-primary hover:underline shrink-0 bg-primary/10 px-2 py-1 rounded-md"
+                                      >
+                                        {isRTL ? "نقل لهنا" : "Transfer"}
+                                      </button>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
 
-                  {/* Confirm Button */}
-                  <div className="flex items-center justify-between pt-2">
-                    <span className="text-xs text-[#78716C] font-mono">
-                      {tempAssignedSpaceIds.length} {isRTL ? "غرف مختارة" : "spaces selected"}
-                    </span>
+                  {/* Confirm Button & Reassignment Notice */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-[#1C1917] font-semibold">
+                        {tempAssignedSpaceIds.length} {isRTL ? "غرف محددة لهذا الستايل" : "spaces assigned to this style"}
+                      </span>
+                      {tempAssignedSpaceIds.some((id) =>
+                        pendingStyles.some(
+                          (p) =>
+                            p.targetSpaceKey === id &&
+                            p.styleId !== activeGalleryDirection.id &&
+                            p.targetSpaceKey !== "general" &&
+                            p.targetSpaceKey !== "designer_curated"
+                        )
+                      ) && (
+                        <span className="text-[10px] text-amber-800 dark:text-amber-400 font-normal mt-0.5">
+                          {isRTL
+                            ? "تنبيه: سيتم نقل الغرف التي كانت مخصصة لستايلات أخرى إلى هذا الستايل عند التأكيد."
+                            : "Note: Reassigned spaces will be transferred to this style upon confirming."}
+                        </span>
+                      )}
+                    </div>
                     <button
                       type="button"
                       onClick={() => handleConfirmPerSpace(activeGalleryDirection)}
-                      className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer"
+                      className="px-7 py-3 rounded-full bg-primary text-primary-foreground font-medium text-xs shadow-sm hover:opacity-90 active:scale-95 transition-all cursor-pointer whitespace-nowrap self-end sm:self-auto"
                     >
                       {t("style_gallery.confirm_per_space") ||
-                        (isRTL ? "تطبيق الستايل على الغرف المختارة" : "Apply to Selected Spaces")}
+                        (isRTL
+                          ? `تطبيق الستايل على الغرف المختارة (${tempAssignedSpaceIds.length})`
+                          : `Apply to Selected Spaces (${tempAssignedSpaceIds.length})`)}
                     </button>
                   </div>
                 </div>

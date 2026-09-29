@@ -219,12 +219,12 @@ const TYPOLOGIES = [
 const METHODOLOGY = [
   {
     step: "01",
-    titleEn: "Laser Survey & Structural Audit",
-    titleAr: "رفع مساحي ليزر وفحص إنشائي",
-    descEn: "Millimeter-precise 3D LiDAR point cloud scan of your property with acoustic calibration and MEP conduit tracing.",
-    descAr: "مسح 3D بالليزر للوحدة بدقة المليمتر لفحص الحوائط والخرسانات وشبكات التغذية.",
-    badgeEn: "0.02mm Precision",
-    badgeAr: "دقة ليزر 0.02 مم",
+    titleEn: "Architectural Survey & Structural Audit",
+    titleAr: "رفع مساحي هندسي وفحص إنشائي",
+    descEn: "Millimeter-precise 3D point cloud architectural scan of your property with acoustic calibration and MEP conduit tracing.",
+    descAr: "مسح مساحي ثلاثي الأبعاد معتمد للوحدة لفحص الحوائط والخرسانات وشبكات التغذية.",
+    badgeEn: "Millimeter Precision",
+    badgeAr: "دقة هندسية عالية",
   },
   {
     step: "02",
@@ -279,8 +279,8 @@ const COMPARISON_ROWS = [
     featureAr: "دقة مقاسات الموقع",
     traditionalEn: "Manual tape measures prone to human error & misfits",
     traditionalAr: "شريط قياس يدوي بيعمل أخطاء في المقاسات وتفاوت في التركيبات",
-    valentiaEn: "3D LiDAR Point Cloud Laser Scan accurate to 0.02 mm",
-    valentiaAr: "رفع مساحي ليزر 3D دقيق جداً لكل سنتيمتر في الشقة",
+    valentiaEn: "Certified 3D Architectural Spatial Survey accurate to millimeters",
+    valentiaAr: "رفع مساحي هندسي 3D معتمد ودقيق لكل سنتيمتر في الشقة",
   },
   {
     featureEn: "Project Oversight",
@@ -642,8 +642,8 @@ export default function LandingPage() {
 
             <p className="text-sm sm:text-base text-[#6B635B] leading-relaxed max-w-xl">
               {isRTL
-                ? "بنصمم ونشطب بيتك في مصر بأعلى معايير الجودة الفندقية. بنجمع بين الدقة الهندسية بالليزر وأرقى الخامات، مع شفافية كاملة في المقايسة وتقدر تتابع موقعك لحظة بلحظة وأنت في مكانك."
-                : "We engineer and execute bespoke residential estates and sky penthouses across Egypt and the GCC. Combining millimeter laser precision with Italian artisanal finishes, absolute BOQ transparency, and live telemetry from anywhere in the world."}
+                ? "بنصمم ونشطب بيتك في مصر بأعلى معايير الجودة الفندقية. بنجمع بين الدقة الهندسية المعمارية وأرقى الخامات، مع شفافية كاملة في المقايسة وتقدر تتابع موقعك لحظة بلحظة وأنت في مكانك."
+                : "We engineer and execute bespoke residential estates and sky penthouses across Egypt and the GCC. Combining millimeter architectural precision with Italian artisanal finishes, absolute BOQ transparency, and live telemetry from anywhere in the world."}
             </p>
 
             {/* CTAs */}
@@ -688,7 +688,7 @@ export default function LandingPage() {
                   0.02 mm
                 </span>
                 <span className="block text-[11px] text-[#6B635B] uppercase tracking-wider font-mono">
-                  {isRTL ? "دقة الرفع بالليزر" : "Laser Accuracy"}
+                  {isRTL ? "دقة الرفع المساحي الهندسي" : "Survey Precision"}
                 </span>
               </div>
               <div>
@@ -862,7 +862,7 @@ export default function LandingPage() {
                 <Ruler className="w-6 h-6 mx-auto mb-2 text-[#503C2C]" />
                 <h4 className="font-serif text-2xl font-normal text-[#1C1917]">0.02 mm</h4>
                 <p className="text-xs text-[#6B635B] mt-1">
-                  {isRTL ? "دقة الرفع المساحي بالليزر 3D" : "Laser Point Cloud Precision"}
+                  {isRTL ? "دقة الرفع المساحي الهندسي 3D" : "Architectural Survey Precision"}
                 </p>
               </div>
             </RevealOnScroll>
