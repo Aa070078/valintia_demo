@@ -23,7 +23,7 @@ export interface User {
   id: number | string;
   username: string;
   email?: string;
-  name: string;
+  name?: string;
   role: UserRole;
   /**
    * Directly maps to Prisma model User.mustChangePassword

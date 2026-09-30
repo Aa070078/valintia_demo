@@ -152,15 +152,30 @@ function saveLocalUser(user: User | null, persistent: boolean = true) {
 const IS_MOCK_FALLBACK_ALLOWED =
   process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true";
 
+interface BackendUser {
+  id: number | string;
+  username: string;
+  role: UserRole;
+  mustChangePassword?: boolean;
+}
+
 interface BackendAuthResponse {
   accessToken: string;
-  user: {
-    id: number | string;
-    username: string;
-    role: UserRole;
-    mustChangePassword?: boolean;
+  user: BackendUser;
+}
+
+function mapBackendUser(backendUser: BackendUser): User {
+  return {
+    id: backendUser.id,
+    username: backendUser.username,
+    name: backendUser.username.split("@")[0],
+    role: backendUser.role,
+    mustChangePassword: Boolean(backendUser.mustChangePassword),
+    requiresPasswordChange: Boolean(backendUser.mustChangePassword),
   };
 }
+
+
 
 export const authApi = {
   /**
@@ -176,14 +191,7 @@ export const authApi = {
     try {
       const response = await apiClient.post<BackendAuthResponse>("/auth/login", loginPayload);
       const backendUser = response.data.user;
-      const user: User = {
-        id: backendUser.id,
-        username: backendUser.username,
-        name: backendUser.username.split("@")[0],
-        role: backendUser.role,
-        mustChangePassword: Boolean(backendUser.mustChangePassword),
-        requiresPasswordChange: Boolean(backendUser.mustChangePassword),
-      };
+      const user = mapBackendUser(backendUser);
       tokenStorage.setToken(response.data.accessToken);
       saveLocalUser(user, dto.rememberMe !== false);
       return {
@@ -313,22 +321,27 @@ export const authApi = {
    * Endpoint: GET /auth/me
    */
   async getCurrentUser(): Promise<User | null> {
-    const token = tokenStorage.getToken();
-    if (!token) return null;
+  const token = tokenStorage.getToken();
+  if (!token) return null;
 
-    try {
-      const response = await apiClient.get<User>("/auth/me");
-      saveLocalUser(response.data);
-      return response.data;
-    } catch {
-      if (!IS_MOCK_FALLBACK_ALLOWED) {
-        tokenStorage.removeToken();
-        saveLocalUser(null);
-        return null;
-      }
-      return getLocalUser();
+  try {
+    const response = await apiClient.get<BackendUser>("/auth/me");
+
+    const user = mapBackendUser(response.data);
+
+    saveLocalUser(user);
+
+    return user;
+  } catch {
+    if (!IS_MOCK_FALLBACK_ALLOWED) {
+      tokenStorage.removeToken();
+      saveLocalUser(null);
+      return null;
     }
-  },
+
+    return getLocalUser();
+  }
+},
 
   /**
    * Endpoint: POST /auth/change-password
