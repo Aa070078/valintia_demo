@@ -1,4 +1,4 @@
-import { PrismaClient, Role, ProjectStatus, SpaceType } from "../src/generated/prisma/client.js";
+import { PrismaClient, Role, ProjectStatus, PropertyType, SpaceType, ActivityType } from "../src/generated/prisma/client.js";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import bcrypt from "bcrypt";
@@ -88,6 +88,7 @@ async function main() {
   const customer2Id = createdUsers.get("customer2@test.com")!;
   const engineer1Id = createdUsers.get("engineer1@test.com")!;
   const engineer2Id = createdUsers.get("engineer2@test.com")!;
+  const pmId = createdUsers.get("pm@test.com")!;
 
   // -------------------------
   // 2. Seed projects
@@ -118,7 +119,7 @@ async function main() {
   await prisma.property.create({
     data: {
       projectId: project1.id,
-      propertyType: "Apartment",
+      propertyType: PropertyType.APARTMENT,
       areaSqm: 150,
       city: "Cairo",
       compound: "Test Compound 1",
@@ -128,7 +129,7 @@ async function main() {
   await prisma.property.create({
     data: {
       projectId: project2.id,
-      propertyType: "Villa",
+      propertyType: PropertyType.VILLA,
       areaSqm: 300,
       city: "Cairo",
       compound: "Test Compound 2",
@@ -143,7 +144,7 @@ async function main() {
     data: [
       {
         projectId: project1.id,
-        type: SpaceType.LIVING_ROOM,
+        type: SpaceType.LIVING,
       },
       {
         projectId: project1.id,
@@ -155,7 +156,7 @@ async function main() {
       },
       {
         projectId: project2.id,
-        type: SpaceType.LIVING_ROOM,
+        type: SpaceType.LIVING,
       },
       {
         projectId: project2.id,
@@ -182,12 +183,51 @@ async function main() {
     },
   });
 
+  // -------------------------
+  // 6. Seed project activities
+  // -------------------------
+
+  await prisma.projectActivity.createMany({
+    data: [
+      {
+        projectId: project1.id,
+        actorId: customer1Id,
+        type: ActivityType.PROJECT_CREATED,
+        metadata: { title: project1.title },
+      },
+      {
+        projectId: project2.id,
+        actorId: customer2Id,
+        type: ActivityType.PROJECT_CREATED,
+        metadata: { title: project2.title },
+      },
+      {
+        projectId: project2.id,
+        actorId: customer2Id,
+        type: ActivityType.PROJECT_SUBMITTED,
+      },
+      {
+        projectId: project1.id,
+        actorId: pmId,
+        type: ActivityType.ENGINEER_ASSIGNED,
+        metadata: { engineerId: engineer1Id },
+      },
+      {
+        projectId: project2.id,
+        actorId: pmId,
+        type: ActivityType.ENGINEER_ASSIGNED,
+        metadata: { engineerId: engineer2Id },
+      },
+    ],
+  });
+
   console.log("Development database seeded successfully.");
   console.log("Users: 7");
   console.log("Projects: 2");
   console.log("Properties: 2");
   console.log("Spaces: 5");
   console.log("Assignments: 2");
+  console.log("Activities: 5");
 }
 
 main()

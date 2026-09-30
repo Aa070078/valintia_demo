@@ -21,13 +21,66 @@ enum ProjectStatus {
   SUBMITTED
 }
 
+enum PropertyType {
+  VILLA
+  APARTMENT
+  DUPLEX
+  PENTHOUSE
+  COMMERCIAL
+  OTHER
+}
+
+enum PropertyCondition {
+  RED_BRICK
+  SEMI_FINISHED
+  UNDER_CONSTRUCTION
+  OCCUPIED
+}
+
 enum SpaceType {
-  LIVING_ROOM
+  LIVING
+  DINING
   KITCHEN
   MASTER_BEDROOM
   BEDROOM
   BATHROOM
-  BALCONY
+  TERRACE
+  OFFICE
+  DRESSING
+  CUSTOM
+}
+
+enum ScopeType {
+  FULL_FITOUT
+  RENOVATION
+  INTERIOR_DESIGN
+  OTHER
+}
+
+enum BudgetType {
+  EXACT
+  RANGE
+  UNDECIDED
+}
+
+enum DeadlineType {
+  SPECIFIC_DATE
+  DURATION
+  NO_DEADLINE
+}
+
+enum DocumentCategory {
+  ARCHITECTURAL
+  ENGINEERING
+  MEP
+  BOQ
+  OTHER
+}
+
+enum ActivityType {
+  PROJECT_CREATED
+  PROJECT_SUBMITTED
+  ENGINEER_ASSIGNED
 }
 
 model User {
@@ -40,51 +93,164 @@ model User {
   updatedAt           DateTime            @updatedAt
   projectsAsClient    Project[]           @relation("ClientProjects")
   engineerAssignments ProjectAssignment[] @relation("EngineerAssignments")
+  activities          ProjectActivity[]   @relation("UserActivities")
 
   @@map("users")
 }
 
 model Project {
-  id         Int                @id @default(autoincrement())
-  title      String
-  status     ProjectStatus      @default(DRAFT)
-  notes      String?
-  clientId   Int
-  client     User               @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Restrict)
-  property   Property?
-  spaces     Space[]
-  assignment ProjectAssignment?
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
+  id             Int                    @id @default(autoincrement())
+  title          String
+  status         ProjectStatus          @default(DRAFT)
+  notes          String?
+  coverImage     String?
+  primaryStyleId String?
+  clientId       Int
+  client         User                   @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Restrict)
+  property       Property?
+  spaces         Space[]
+  location       CustomerLocation?
+  representative ProjectRepresentative?
+  scope          ProjectScope?
+  budget         ProjectBudget?
+  timeline       TargetCompletion?
+  documents      ProjectDocument[]
+  assignment     ProjectAssignment?
+  activities     ProjectActivity[]
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
 
   @@index([clientId])
   @@map("projects")
 }
 
 model Property {
-  id           Int      @id @default(autoincrement())
-  projectId    Int      @unique
-  project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  propertyType String
-  areaSqm      Decimal  @db.Decimal(10, 2)
-  city         String
-  compound     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                 Int                @id @default(autoincrement())
+  projectId          Int                @unique
+  project            Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  propertyType       PropertyType
+  compound           String?
+  governorate        String?
+  city               String
+  areaSqm            Decimal            @db.Decimal(10, 2)
+  floors             Int?
+  condition          PropertyCondition?
+  accessibilityNotes String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   @@map("properties")
 }
 
 model Space {
-  id        Int       @id @default(autoincrement())
-  projectId Int
-  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  type      SpaceType
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id              Int       @id @default(autoincrement())
+  projectId       Int
+  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  type            SpaceType
+  customName      String?
+  quantity        Int       @default(1)
+  included        Boolean   @default(true)
+  styleId         String?
+  styleName       String?
+  styleNotes      String?
+  referenceImages String[]
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([projectId])
   @@map("spaces")
+}
+
+model CustomerLocation {
+  id               Int      @id @default(autoincrement())
+  projectId        Int      @unique
+  project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  country          String
+  countryCode      String?
+  city             String
+  timezone         String
+  phone            String?
+  phoneCountryCode String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("customer_locations")
+}
+
+model ProjectRepresentative {
+  id                      Int      @id @default(autoincrement())
+  projectId               Int      @unique
+  project                 Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  hasRepresentative       Boolean  @default(false)
+  valentiaManagedDirectly Boolean  @default(true)
+  name                    String?
+  phone                   String?
+  phoneCountryCode        String?
+  email                   String?
+  relationship            String?
+  authorizationScope      String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@map("project_representatives")
+}
+
+model ProjectScope {
+  id            Int       @id @default(autoincrement())
+  projectId     Int       @unique
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scopeType     ScopeType
+  customDetails String?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@map("project_scopes")
+}
+
+model ProjectBudget {
+  id          Int        @id @default(autoincrement())
+  projectId   Int        @unique
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  budgetType  BudgetType
+  exactAmount Decimal?   @db.Decimal(12, 2)
+  minAmount   Decimal?   @db.Decimal(12, 2)
+  maxAmount   Decimal?   @db.Decimal(12, 2)
+  currency    String     @default("EGP")
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@map("project_budgets")
+}
+
+model TargetCompletion {
+  id                  Int          @id @default(autoincrement())
+  projectId           Int          @unique
+  project             Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  deadlineType        DeadlineType
+  targetDate          DateTime?
+  durationDescription String?
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  @@map("target_completions")
+}
+
+model ProjectDocument {
+  id         Int              @id @default(autoincrement())
+  projectId  Int
+  project    Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name       String
+  category   DocumentCategory
+  url        String
+  sizeBytes  BigInt?
+  uploadedAt DateTime         @default(now())
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@index([projectId])
+  @@map("project_documents")
 }
 
 model ProjectAssignment {
@@ -98,4 +264,19 @@ model ProjectAssignment {
 
   @@index([engineerId])
   @@map("project_assignments")
+}
+
+model ProjectActivity {
+  id        Int          @id @default(autoincrement())
+  projectId Int
+  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  actorId   Int
+  actor     User         @relation("UserActivities", fields: [actorId], references: [id], onDelete: Restrict)
+  type      ActivityType
+  metadata  Json?
+  createdAt DateTime     @default(now())
+
+  @@index([projectId])
+  @@index([actorId])
+  @@map("project_activities")
 }
