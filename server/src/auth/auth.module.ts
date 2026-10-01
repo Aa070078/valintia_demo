@@ -17,7 +17,9 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
           configService.get<string>('jwt.secret') ||
           configService.get<string>('JWT_SECRET');
         if (!secret || secret.trim().length === 0) {
-          throw new Error('JWT_SECRET environment variable is missing or empty');
+          throw new Error(
+            'JWT_SECRET environment variable is missing or empty',
+          );
         }
         return {
           secret,

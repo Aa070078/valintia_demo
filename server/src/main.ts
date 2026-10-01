@@ -42,9 +42,7 @@ async function bootstrap() {
   logger.log(
     `Swagger UI at ${base}/docs${nodeEnv === 'production' ? ' (Basic Auth)' : ''}`,
   );
-  logger.log(
-    `OpenAPI YAML at ${base}/yaml and ${base}/${apiPrefix}/yaml`,
-  );
+  logger.log(`OpenAPI YAML at ${base}/yaml and ${base}/${apiPrefix}/yaml`);
 }
 
 void bootstrap();

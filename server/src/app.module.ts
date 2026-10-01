@@ -5,7 +5,9 @@ import { AuthModule } from './auth/auth.module.js';
 import { HealthModule } from './health/health.module.js';
 import { AppConfigModule } from './infrastructure/config/config.module.js';
 import { PrismaModule } from './infrastructure/database/prisma.module.js';
+import { MailModule } from './infrastructure/mail/mail.module.js';
 import { RedisModule } from './infrastructure/redis/redis.module.js';
+import { OtpModule } from './otp/otp.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { UsersModule } from './users/users.module.js';
 
@@ -14,10 +16,12 @@ import { UsersModule } from './users/users.module.js';
     AppConfigModule,
     PrismaModule,
     RedisModule,
+    MailModule,
     HealthModule,
     AuthModule,
     UsersModule,
     ProjectsModule,
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [AppService],

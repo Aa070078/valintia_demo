@@ -44,6 +44,24 @@ export const r2Config = registerAs('r2', () => ({
   publicBaseUrl: process.env.CLOUDFLARE_R2_PUBLIC_BASE_URL ?? '',
 }));
 
+export const otpConfig = registerAs('otp', () => ({
+  ttlSeconds: parseInt(process.env.OTP_TTL_SECONDS ?? '300', 10),
+  cooldownSeconds: parseInt(process.env.OTP_COOLDOWN_SECONDS ?? '60', 10),
+  maxAttempts: parseInt(process.env.OTP_MAX_ATTEMPTS ?? '5', 10),
+}));
+
+export const mailConfig = registerAs('mail', () => ({
+  from: process.env.MAIL_FROM ?? 'Valentia <no-reply@valentia.com>',
+  provider: process.env.MAIL_PROVIDER ?? 'console',
+  smtp: {
+    host: process.env.SMTP_HOST ?? 'localhost',
+    port: parseInt(process.env.SMTP_PORT ?? '587', 10),
+    user: process.env.SMTP_USER ?? '',
+    pass: process.env.SMTP_PASSWORD ?? '',
+    secure: process.env.SMTP_SECURE === 'true',
+  },
+}));
+
 /** Used for HTTP Basic Auth on /docs (+ OpenAPI YAML) when NODE_ENV=production. */
 export const swaggerConfig = registerAs('swagger', () => ({
   user: process.env.SWAGGER_USER ?? 'admin',

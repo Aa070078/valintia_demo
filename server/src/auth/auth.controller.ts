@@ -8,7 +8,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import type { RequestUser } from '../common/decorators/current-user.decorator.js';
@@ -21,9 +26,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject(AuthService) private readonly authService: AuthService,
-  ) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -47,7 +50,7 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('access-token')    
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get current authenticated user identity and role' })
   @ApiResponse({ status: 200, description: 'Current user retrieved' })
   @ApiResponse({ status: 401, description: 'Unauthorized / invalid token' })

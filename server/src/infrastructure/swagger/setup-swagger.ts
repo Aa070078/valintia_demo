@@ -42,10 +42,7 @@ function applySwaggerBasicAuth(
   );
 }
 
-function mountYamlEndpoints(
-  app: INestApplication,
-  openApiYaml: string,
-): void {
+function mountYamlEndpoints(app: INestApplication, openApiYaml: string): void {
   const expressApp = app.getHttpAdapter().getInstance() as Express;
 
   const sendYaml = (_req: Request, res: Response) => {
