@@ -12,4 +12,12 @@ export class RegisterDto {
   @IsNotEmpty()
   @MinLength(6)
   password!: string;
+
+  @ApiProperty({
+    description:
+      'Token returned by /api/otp/verify for EMAIL_VERIFICATION of this username/email',
+  })
+  @IsString()
+  @IsNotEmpty()
+  verificationToken!: string;
 }

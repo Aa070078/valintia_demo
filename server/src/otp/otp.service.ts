@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomInt } from 'node:crypto';
+import { EmailVerificationService } from '../auth/email-verification/email-verification.service.js';
 import { MailService } from '../infrastructure/mail/mail.service.js';
 import { RedisService } from '../infrastructure/redis/redis.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
@@ -28,6 +29,8 @@ export class OtpService {
     @Inject(RedisService) private readonly redisService: RedisService,
     @Inject(MailService) private readonly mailService: MailService,
     @Inject(ConfigService) private readonly configService: ConfigService,
+    @Inject(EmailVerificationService)
+    private readonly emailVerification: EmailVerificationService,
   ) {}
 
   private getOtpKey(purpose: string, email: string): string {
@@ -176,6 +179,9 @@ export class OtpService {
       success: true,
       message: 'Verification code verified successfully',
       verified: true,
+      ...(purpose === OtpPurpose.EMAIL_VERIFICATION
+        ? { verificationToken: await this.emailVerification.issue(email) }
+        : {}),
     };
   }
 }

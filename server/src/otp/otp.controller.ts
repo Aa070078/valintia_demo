@@ -40,7 +40,25 @@ export class OtpController {
   @ApiOperation({ summary: 'Verify submitted OTP' })
   @ApiResponse({
     status: 200,
-    description: 'OTP verified successfully (single-use enforced)',
+    description:
+      'OTP verified successfully (single-use enforced). EMAIL_VERIFICATION returns a short-lived verificationToken for registration.',
+    schema: {
+      type: 'object',
+      required: ['success', 'message', 'verified'],
+      properties: {
+        success: { type: 'boolean', example: true },
+        message: {
+          type: 'string',
+          example: 'Verification code verified successfully',
+        },
+        verified: { type: 'boolean', example: true },
+        verificationToken: {
+          type: 'string',
+          description:
+            'Returned only for EMAIL_VERIFICATION; submit in the registration body.',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 400,

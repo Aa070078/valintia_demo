@@ -41,7 +41,11 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Customer self-registration' })
   @ApiResponse({ status: 201, description: 'Customer account created' })
-  @ApiResponse({ status: 400, description: 'Validation failure' })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Validation failure or invalid/expired email verification token',
+  })
   @ApiResponse({ status: 409, description: 'Duplicate username' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import {
   appConfig,
   databaseConfig,
+  emailVerificationTokenConfig,
   jwtConfig,
   mailConfig,
   otpConfig,
@@ -22,6 +23,7 @@ import {
         databaseConfig,
         redisConfig,
         jwtConfig,
+        emailVerificationTokenConfig,
         throttleConfig,
         r2Config,
         swaggerConfig,

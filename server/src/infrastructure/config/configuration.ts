@@ -28,6 +28,14 @@ export const jwtConfig = registerAs('jwt', () => ({
   refreshSecret: process.env.JWT_REFRESH_SECRET ?? '',
 }));
 
+export const emailVerificationTokenConfig = registerAs(
+  'emailVerificationToken',
+  () => ({
+    secret: process.env.EMAIL_VERIFICATION_TOKEN_SECRET ?? '',
+    expiresIn: process.env.EMAIL_VERIFICATION_TOKEN_EXPIRES_IN ?? '15m',
+  }),
+);
+
 export const throttleConfig = registerAs('throttle', () => ({
   defaultTtlMs: parseInt(process.env.THROTTLE_DEFAULT_TTL_MS ?? '60000', 10),
   defaultLimit: parseInt(process.env.THROTTLE_DEFAULT_LIMIT ?? '120', 10),

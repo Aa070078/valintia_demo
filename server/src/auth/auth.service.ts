@@ -13,12 +13,15 @@ import { PrismaService } from '../infrastructure/database/prisma.service.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
+import { EmailVerificationService } from './email-verification/email-verification.service.js';
 
 @Injectable()
 export class AuthService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(JwtService) private readonly jwtService: JwtService,
+    @Inject(EmailVerificationService)
+    private readonly emailVerification: EmailVerificationService,
   ) {}
 
   async login(loginDto: LoginDto) {
@@ -57,7 +60,10 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
-    const { username, password } = registerDto;
+    const { password, verificationToken } = registerDto;
+    const username = registerDto.username.trim().toLowerCase();
+
+    await this.emailVerification.verify(verificationToken, username);
 
     const existingUser = await this.prisma.user.findUnique({
       where: { username },

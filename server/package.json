@@ -18,6 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:email-verification": "npm run build && node --import tsx --test test/email-verification.test.ts",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "prisma:generate": "prisma generate",
