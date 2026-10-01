@@ -14,6 +14,7 @@ import { AESTHETIC_DIRECTIONS, StyleDirection } from "../aesthetic-direction";
 import type { SpaceEntity, PendingStyleSelection } from "../../types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
+import { getSpaceDisplayName } from "../../lib/space-names";
 
 interface StepStyleDiscoveryProps {
   pendingStyles: PendingStyleSelection[];
@@ -181,9 +182,7 @@ export function StepStyleDiscovery({
     // Create new assignments for this style
     const newAssignments: PendingStyleSelection[] = tempAssignedSpaceIds.map((spaceId) => {
       const spaceObj = spaces.find((s) => s.id === spaceId);
-      const spaceName = isRTL
-        ? (spaceObj?.spaceType ? t(spaceObj.spaceType) : spaceObj?.customName) || spaceObj?.customName || spaceId
-        : spaceObj?.customName || spaceId;
+      const spaceName = getSpaceDisplayName(spaceObj || spaceId, isRTL);
       return {
         targetSpaceKey: spaceId,
         styleId: direction.id,
@@ -218,12 +217,7 @@ export function StepStyleDiscovery({
       .filter((s) => s.styleId === styleId && s.targetSpaceKey !== "general")
       .map((s) => {
         const space = spaces.find((sp) => sp.id === s.targetSpaceKey);
-        const name = space
-          ? (isRTL
-              ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName
-              : space.customName)
-          : s.targetSpaceKey;
-        return name || s.targetSpaceKey;
+        return getSpaceDisplayName(space || s.targetSpaceKey, isRTL);
       });
   };
 
@@ -420,9 +414,7 @@ export function StepStyleDiscovery({
           {/* Spaces Pill Grid showing each space and its current allocation */}
           <div className="flex flex-wrap gap-2 pt-1">
             {activeSpaces.map((space) => {
-              const spaceName = isRTL
-                ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "غرفة"
-                : space.customName || "Space";
+              const spaceName = getSpaceDisplayName(space, isRTL);
               const assignedStyle = pendingStyles.find(
                 (p) =>
                   p.targetSpaceKey === space.id &&
@@ -833,9 +825,7 @@ export function StepStyleDiscovery({
                               </div>
                             ) : (
                               selectableSpaces.map((space) => {
-                                const spaceName = isRTL
-                                  ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "غرفة"
-                                  : space.customName || "Space";
+                                const spaceName = getSpaceDisplayName(space, isRTL);
                                 const spaceQty = space.quantity ?? space.count ?? 1;
                                 const isSelectedForThis = tempAssignedSpaceIds.includes(space.id);
 
@@ -903,9 +893,7 @@ export function StepStyleDiscovery({
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 p-2.5 rounded-2xl bg-secondary/50 border border-border/70 max-h-36 overflow-y-auto">
                                 {alreadyAssignedToOtherSpaces.map((space) => {
-                                  const spaceName = isRTL
-                                    ? (space.spaceType ? t(space.spaceType) : space.customName) || space.customName || "غرفة"
-                                    : space.customName || "Space";
+                                  const spaceName = getSpaceDisplayName(space, isRTL);
                                   const spaceQty = space.quantity ?? space.count ?? 1;
 
                                   const otherAssignment = pendingStyles.find(

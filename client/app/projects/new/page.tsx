@@ -237,11 +237,12 @@ function CreateProjectContent() {
 
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
+    const projectTitle = property.compound
+      ? `${property.compound} Residence`
+      : `${property.city} Architectural Fit-Out`;
+
     try {
       const reconciledSpaces = reconcileSpacesWithStyles();
-      const projectTitle = property.compound
-        ? `${property.compound} Residence`
-        : `${property.city} Architectural Fit-Out`;
 
       const created = await createMutation.mutateAsync({
         title: projectTitle,
@@ -261,11 +262,13 @@ function CreateProjectContent() {
 
       // Confirm transition to 'submitted' lifecycle status
       await projectsApi.submitProject(created.id);
-      router.push(`/projects/${created.id}`);
+      router.push(
+        `/projects/confirmation?id=${created.id}&title=${encodeURIComponent(projectTitle)}`
+      );
     } catch (err) {
       console.error("Failed to commission project", err);
       // Fallback local ID redirect to preserve smooth flow
-      router.push(`/projects`);
+      router.push(`/projects/confirmation?id=0101&title=${encodeURIComponent(projectTitle)}`);
     } finally {
       setIsSubmitting(false);
     }

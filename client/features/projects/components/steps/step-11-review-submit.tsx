@@ -33,6 +33,7 @@ import { AESTHETIC_DIRECTIONS } from "../aesthetic-direction";
 import { CURATED_SPACES } from "../spaces-architecture";
 import { Spinner } from "@/components/ui/spinner";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { getSpaceDisplayName, getStyleDisplayName } from "../../lib/space-names";
 import { cn } from "@/lib/utils";
 
 interface StepReviewSubmitProps {
@@ -435,13 +436,13 @@ export function StepReviewSubmit({
 
                 {/* Space Title */}
                 <span className="mt-2.5 text-xs text-[#1C1917] truncate max-w-full font-medium">
-                  {space.customName || space.spaceType}
+                  {getSpaceDisplayName(space, isRTL)}
                 </span>
 
                 {/* Subtitle / Style tag */}
                 {customStyle ? (
                   <span className="text-[9px] text-[#B88460] font-medium truncate max-w-full mt-0.5">
-                    {customStyle}
+                    {getStyleDisplayName(customStyle, isRTL)}
                   </span>
                 ) : (
                   <span className="text-[10px] text-[#78716C] font-mono mt-0.5">

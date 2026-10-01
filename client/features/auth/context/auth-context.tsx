@@ -19,6 +19,10 @@ interface AuthContextValue {
   isLoading: boolean;
   login: (dto: ProposedLoginDto) => Promise<{ redirectUrl?: string }>;
   signup: (dto: ProposedSignupDto) => Promise<{ redirectUrl?: string }>;
+  initiateSignup: (dto: ProposedSignupDto) => Promise<{ success: boolean; email: string; otp: string }>;
+  confirmOtpAndLogin: (code: string, fallbackEmail?: string) => Promise<{ redirectUrl?: string }>;
+  resendOtp: (email?: string) => Promise<{ success: boolean; otp: string }>;
+  getPendingOtp: () => import("../types").PendingOtpData | null;
   logout: () => Promise<void>;
   changePassword: (dto: ProposedChangePasswordDto) => Promise<boolean>;
   devSwitchRole: (role: UserRole) => Promise<{ redirectUrl?: string }>;
@@ -82,6 +86,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const initiateSignup = async (dto: ProposedSignupDto): Promise<{ success: boolean; email: string; otp: string }> => {
+    setIsLoading(true);
+    try {
+      return await authApi.initiateSignup(dto);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const confirmOtpAndLogin = async (code: string, fallbackEmail?: string): Promise<{ redirectUrl?: string }> => {
+    setIsLoading(true);
+    try {
+      const session = await authApi.confirmOtpAndLogin(code, fallbackEmail);
+      setUser(session.user);
+      return handleRoleRedirection(session.user.role);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendOtp = async (email?: string): Promise<{ success: boolean; otp: string }> => {
+    return authApi.resendOtp(email);
+  };
+
+  const getPendingOtp = () => {
+    return authApi.getPendingOtp();
+  };
+
   const logout = async () => {
     await authApi.logout();
     setUser(null);
@@ -125,6 +157,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading,
     login,
     signup,
+    initiateSignup,
+    confirmOtpAndLogin,
+    resendOtp,
+    getPendingOtp,
     logout,
     changePassword,
     devSwitchRole,

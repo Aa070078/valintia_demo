@@ -1,440 +1,356 @@
 "use client";
 
 import * as React from "react";
-import {
-  MOCK_USERS,
-  MOCK_PROJECTS,
-  MOCK_CATALOG_PACKAGES,
-  MOCK_AUDIT_LOGS,
-} from "../mock-data";
-import { User, Role, CatalogPackage, AuditLogEntry } from "../types";
+import { MOCK_USERS, MOCK_AUDIT_LOGS } from "../mock-data";
+import { User, Role, AuditLogEntry } from "../types";
 import {
   ShieldCheck,
-  Copy,
-  Check,
   UserPlus,
-  Key,
+  Users,
+  CheckCircle,
+  X,
+  Check,
+  Funnel,
+  ClockCounterClockwise,
 } from "@phosphor-icons/react";
-import { CreateStaffModal } from "./create-staff-modal";
-import { authApi } from "@/features/auth/api/auth.api";
-import type { User as AuthUser } from "@/features/auth/types";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 
 export function AdminDashboard() {
   const { isRTL } = useLanguage();
-  const [users, setUsers] = React.useState<User[]>(() => {
-    const staffList = authApi.getAllStaffUsers();
-    const merged = [...MOCK_USERS];
-    for (const s of staffList) {
-      const idx = merged.findIndex((u) => u.id === s.id || u.username === s.username);
-      const transformed: User = {
-        id: s.id,
-        username: s.username,
-        name: s.name,
-        email: s.username,
-        phone: s.phone,
-        role: s.role as Role,
-        activeProjectsCount: s.activeProjectsCount || 0,
-        mustChangePassword: Boolean(s.mustChangePassword || s.requiresPasswordChange),
-      };
-      if (idx >= 0) {
-        merged[idx] = transformed;
-      } else {
-        merged.unshift(transformed);
-      }
-    }
-    return merged;
-  });
-  const [packages] = React.useState<CatalogPackage[]>(MOCK_CATALOG_PACKAGES);
+  const [users, setUsers] = React.useState<User[]>(MOCK_USERS);
   const [auditLogs, setAuditLogs] = React.useState<AuditLogEntry[]>(MOCK_AUDIT_LOGS);
-  const [activeTab, setActiveTab] = React.useState<"OVERVIEW" | "USERS" | "CATALOG" | "AUDIT">("OVERVIEW");
-  const [showCreateStaffModal, setShowCreateStaffModal] = React.useState(false);
-  const [copiedUserId, setCopiedUserId] = React.useState<string | number | null>(null);
+  const [activeTab, setActiveTab] = React.useState<"STAFF" | "AUDIT">("STAFF");
+  const [roleFilter, setRoleFilter] = React.useState<string>("ALL");
 
-  const handleUserCreated = (newUser: AuthUser) => {
-    setUsers((prev) => [
-      {
-        id: newUser.id,
-        username: newUser.username,
-        name: newUser.name,
-        email: newUser.username,
-        phone: newUser.phone,
-        role: newUser.role as Role,
-        activeProjectsCount: 0,
-        mustChangePassword: true,
-      },
-      ...prev.filter((u) => u.id !== newUser.id),
-    ]);
+  // Role edit modal state
+  const [editingUser, setEditingUser] = React.useState<User | null>(null);
+  const [selectedRole, setSelectedRole] = React.useState<Role>("ENGINEER");
 
-    setAuditLogs((prev) => [
-      {
-        id: `log-${Date.now()}`,
-        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
-        actorName: "System Administrator",
-        actorRole: "ADMINISTRATOR",
-        action: "PROVISION_STAFF_ACCOUNT",
-        targetEntity: `${newUser.name} (@${newUser.username})`,
-        details: `Assigned role ${newUser.role} with temporary password enforcement on initial login`,
-      },
-      ...prev,
-    ]);
-  };
+  // Add staff modal state
+  const [isAddingStaff, setIsAddingStaff] = React.useState(false);
+  const [newStaffName, setNewStaffName] = React.useState("");
+  const [newStaffEmail, setNewStaffEmail] = React.useState("");
+  const [newStaffPhone, setNewStaffPhone] = React.useState("");
+  const [newStaffRole, setNewStaffRole] = React.useState<Role>("ENGINEER");
+  const [actionNotice, setActionNotice] = React.useState<string | null>(null);
+
+  // Filtered users
+  const filteredUsers = React.useMemo(() => {
+    if (roleFilter === "ALL") return users;
+    return users.filter((u) => u.role === roleFilter);
+  }, [users, roleFilter]);
 
   // Handle changing user role
-  const handleRoleChange = (userId: number | string, newRole: Role) => {
+  const handleConfirmRoleChange = () => {
+    if (!editingUser) return;
+
     setUsers((prev) =>
-      prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+      prev.map((u) => (u.id === editingUser.id ? { ...u, role: selectedRole } : u))
     );
 
-    setAuditLogs((prev) => [
-      {
-        id: `log-${Date.now()}`,
-        timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
-        actorName: "System Administrator",
-        actorRole: "ADMINISTRATOR",
-        action: "ELEVATE_USER_ROLE",
-        targetEntity: `User #${userId}`,
-        details: `Role updated to ${newRole}`,
-      },
-      ...prev,
-    ]);
+    const logEntry: AuditLogEntry = {
+      id: `log-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      actorName: "System Administrator",
+      actorRole: "ADMINISTRATOR",
+      action: "ELEVATE_USER_ROLE",
+      targetEntity: `User #${editingUser.id} (${editingUser.name})`,
+      details: `Role updated from ${editingUser.role} to ${selectedRole}`,
+    };
+
+    setAuditLogs((prev) => [logEntry, ...prev]);
+    setActionNotice(
+      isRTL
+        ? `تم تحديث صلاحية ${editingUser.name} بنجاح إلى ${selectedRole}`
+        : `Updated ${editingUser.name}'s role to ${selectedRole.replace(/_/g, " ")}`
+    );
+    setEditingUser(null);
+    setTimeout(() => setActionNotice(null), 4000);
   };
 
-  const handleCopyCredentials = (u: User) => {
-    const text = isRTL
-      ? `بيانات الدخول إلى منصة فالنتيا:\nاسم المستخدم: ${u.username}\nالصلاحية: ${u.role}\nالحالة: ${u.mustChangePassword ? "يلزم تغيير كلمة المرور فور أول دخول" : "مفعل"}\nرابط الدخول: https://client-phi-seven-43.vercel.app/login`
-      : `Valentia Staff Credentials:\nUsername: ${u.username}\nRole: ${u.role}\nStatus: ${u.mustChangePassword ? "Mandatory Password Change On First Login" : "Verified"}\nLogin URL: https://client-phi-seven-43.vercel.app/login`;
+  // Handle adding new staff member
+  const handleAddStaff = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newStaffName.trim() || !newStaffEmail.trim()) return;
 
-    navigator.clipboard.writeText(text);
-    setCopiedUserId(u.id);
-    setTimeout(() => setCopiedUserId(null), 2000);
+    const newUser: User = {
+      id: Date.now(),
+      username: newStaffEmail,
+      name: newStaffName,
+      email: newStaffEmail,
+      phone: newStaffPhone || undefined,
+      role: newStaffRole,
+      mustChangePassword: true,
+      activeProjectsCount: 0,
+    };
+
+    setUsers((prev) => [newUser, ...prev]);
+
+    const logEntry: AuditLogEntry = {
+      id: `log-${Date.now()}`,
+      timestamp: new Date().toISOString().replace("T", " ").substring(0, 19),
+      actorName: "System Administrator",
+      actorRole: "ADMINISTRATOR",
+      action: "CREATE_STAFF_ACCOUNT",
+      targetEntity: `User #${newUser.id} (${newUser.name})`,
+      details: `Created new staff account with role ${newUser.role}`,
+    };
+
+    setAuditLogs((prev) => [logEntry, ...prev]);
+    setActionNotice(
+      isRTL
+        ? `تم إنشاء حساب للموظف الجديد ${newStaffName} بنجاح`
+        : `Staff account created for ${newStaffName}`
+    );
+    setIsAddingStaff(false);
+    setNewStaffName("");
+    setNewStaffEmail("");
+    setNewStaffPhone("");
+    setTimeout(() => setActionNotice(null), 4000);
   };
 
-  const totalPipeline = MOCK_PROJECTS.reduce((acc, p) => acc + p.budgetEgp, 0);
+  const getRoleBadge = (role: Role) => {
+    switch (role) {
+      case "ENGINEER":
+        return {
+          label: isRTL ? "مهندس موقع" : "Site Architect",
+          className: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/50 dark:text-amber-300",
+        };
+      case "PROJECT_MANAGER":
+        return {
+          label: isRTL ? "مدير مشروع" : "Project Manager",
+          className: "bg-blue-50 text-blue-800 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300",
+        };
+      case "ADMINISTRATOR":
+        return {
+          label: isRTL ? "مسؤول نظام" : "Administrator",
+          className: "bg-purple-50 text-purple-800 border-purple-200 dark:bg-purple-950/50 dark:text-purple-300",
+        };
+      case "COMPANY_OWNER":
+        return {
+          label: isRTL ? "مالك الشركة" : "Company Owner",
+          className: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300",
+        };
+      default:
+        return {
+          label: role,
+          className: "bg-muted text-muted-foreground border-border",
+        };
+    }
+  };
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
-      {/* Top Banner */}
+      {/* Top Banner & Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono uppercase tracking-wider mb-2">
             <ShieldCheck className="w-3.5 h-3.5" />
-            <span>{isRTL ? "إدارة النظام والتحكم الشامل" : "EXECUTIVE & ATELIER GOVERNANCE"}</span>
+            <span>{isRTL ? "الإدارة العليا وحوكمة الفريق" : "EXECUTIVE & ATELIER GOVERNANCE"}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-foreground">
-            {isRTL ? "لوحة الإدارة والتحكم في الصلاحيات" : "Company Leadership & Administration"}
+            {isRTL ? "حوكمة فريق العمل والصلاحيات (RBAC)" : "Staff Governance & Operations"}
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
             {isRTL
-              ? "متابعة مؤشرات الأداء، إدارة كوادر العمل والصلاحيات (RBAC)، تكويد باقات التشطيب، وسجلات الأمان."
-              : "Monitor firm-wide financials, manage RBAC staff roles, configure turnkey pricing packages, and inspect security audit trails."}
+              ? "إدارة صلاحيات فريق العمل، متابعة توزيع المشاريع على المهندسين، ومراقبة سجل العمليات الإدارية."
+              : "Manage RBAC staff permissions, audit commission allocations, track team member credentials, and inspect security access logs."}
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border bg-card shadow-xs flex-wrap">
-          {(
-            [
-              { key: "OVERVIEW", label: "Executive BI", labelAr: "المؤشرات العامة" },
-              { key: "USERS", label: "Staff & RBAC", labelAr: "المستخدمين والصلاحيات" },
-              { key: "CATALOG", label: "Package Catalog", labelAr: "دليل الباقات" },
-              { key: "AUDIT", label: "Audit Logs", labelAr: "سجل العمليات" },
-            ] as const
-          ).map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setActiveTab(t.key)}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer",
-                activeTab === t.key
-                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-              )}
-            >
-              {isRTL ? t.labelAr : t.label}
-            </button>
-          ))}
+        <div className="flex items-center gap-1.5 p-1 rounded-xl border border-border bg-card shadow-xs self-start md:self-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTab("STAFF")}
+            className={cn(
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium font-mono uppercase transition-colors cursor-pointer flex items-center gap-1.5",
+              activeTab === "STAFF"
+                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>{isRTL ? `فريق العمل (${users.length})` : `Staff & RBAC (${users.length})`}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab("AUDIT")}
+            className={cn(
+              "px-3.5 py-1.5 rounded-lg text-xs font-medium font-mono uppercase transition-colors cursor-pointer flex items-center gap-1.5",
+              activeTab === "AUDIT"
+                ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <ClockCounterClockwise className="w-3.5 h-3.5" />
+            <span>{isRTL ? `سجل النشاط (${auditLogs.length})` : `Audit Trail (${auditLogs.length})`}</span>
+          </button>
         </div>
       </div>
 
-      {/* TAB 1: EXECUTIVE OVERVIEW */}
-      {activeTab === "OVERVIEW" && (
-        <div className="space-y-8">
-          {/* Executive Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-              <div className="text-xs text-muted-foreground font-mono uppercase mb-2">
-                {isRTL ? "قيمة المشاريع النشطة" : "Active Construction Pipeline"}
-              </div>
-              <div className="text-2xl font-semibold font-mono text-foreground">
-                EGP {(totalPipeline / 1_000_000).toFixed(1)}M
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                {isRTL ? "٦ عقود تشطيب سكني فاخر" : "6 contracted residential estates"}
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-              <div className="text-xs text-muted-foreground font-mono uppercase mb-2">
-                {isRTL ? "متوسط هامش الربح" : "Average Gross Margin"}
-              </div>
-              <div className="text-2xl font-semibold font-mono text-emerald-600">
-                31.8%
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                {isRTL ? "+٢.٤٪ أعلى من توقعات السنة" : "+2.4% above FY2026 forecast"}
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-              <div className="text-xs text-muted-foreground font-mono uppercase mb-2">
-                {isRTL ? "الالتزام بجدول التسليم" : "Turnkey Completion SLA"}
-              </div>
-              <div className="text-2xl font-semibold font-mono text-foreground">
-                94.2%
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                {isRTL ? "تسليم المفتاح في الميعاد المحدد" : "On-time handover adherence"}
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-              <div className="text-xs text-muted-foreground font-mono uppercase mb-2">
-                {isRTL ? "إجمالي المستخلصات المحصلة" : "Invoiced & Collected"}
-              </div>
-              <div className="text-2xl font-semibold font-mono text-foreground">
-                EGP 38.6M
-              </div>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                {isRTL ? "٥٢٪ من المستخلصات تم تحصيلها" : "52% milestone cashflow collected"}
-              </p>
-            </div>
+      {/* Action Notification */}
+      {actionNotice && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <span>{actionNotice}</span>
           </div>
-
-          {/* Typology Breakdown */}
-          <div className="p-6 rounded-2xl border border-border bg-card shadow-xs">
-            <h3 className="font-serif text-lg font-medium text-foreground mb-4">
-              {isRTL ? "توزيع الإيرادات وهوامش الربح حسب نوع العقار" : "Revenue & Margin Breakdown by Architectural Typology"}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl border border-border bg-muted/20">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-foreground">{isRTL ? "فلل خاصة (Private Villas)" : "Private Villas"}</span>
-                  <span className="font-mono text-emerald-600 font-medium">34.2% Margin</span>
-                </div>
-                <div className="text-xl font-mono font-medium text-foreground">EGP 37.2M</div>
-                <div className="w-full h-1.5 bg-border rounded-full mt-3 overflow-hidden">
-                  <div className="bg-primary h-full w-[65%]" />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border border-border bg-muted/20">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-foreground">{isRTL ? "بنتهاوس معلق (Sky Penthouses)" : "Sky Penthouses"}</span>
-                  <span className="font-mono text-emerald-600 font-medium">30.8% Margin</span>
-                </div>
-                <div className="text-xl font-mono font-medium text-foreground">EGP 20.7M</div>
-                <div className="w-full h-1.5 bg-border rounded-full mt-3 overflow-hidden">
-                  <div className="bg-primary h-full w-[45%]" />
-                </div>
-              </div>
-
-              <div className="p-4 rounded-xl border border-border bg-muted/20">
-                <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="font-semibold text-foreground">{isRTL ? "دوبلكس عصري (Urban Duplexes)" : "Urban Duplexes"}</span>
-                  <span className="font-mono text-emerald-600 font-medium">27.5% Margin</span>
-                </div>
-                <div className="text-xl font-mono font-medium text-foreground">EGP 16.7M</div>
-                <div className="w-full h-1.5 bg-border rounded-full mt-3 overflow-hidden">
-                  <div className="bg-primary h-full w-[35%]" />
-                </div>
-              </div>
-            </div>
-          </div>
+          <button
+            onClick={() => setActionNotice(null)}
+            className="text-emerald-600 hover:text-emerald-900"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
-      {/* TAB 2: STAFF & RBAC MANAGEMENT */}
-      {activeTab === "USERS" && (
-        <div className="p-6 rounded-2xl border border-border bg-card shadow-xs space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-4">
-            <div>
-              <h3 className="font-serif text-lg font-medium text-foreground">
-                {isRTL ? "دليل حسابات فريق العمل والصلاحيات (RBAC)" : "Staff Directory & Role-Based Access Control (RBAC)"}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {isRTL
-                  ? "إنشاء حسابات المهندسين والمديرين، تعيين كلمة المرور المؤقتة، وإلزامهم بتغييرها عند أول تسجيل دخول."
-                  : "Provision staff accounts for Engineers, Project Managers, and Admins. First-time login password change is strictly enforced."}
-              </p>
+      {/* TAB 1: STAFF & RBAC GOVERNANCE */}
+      {activeTab === "STAFF" && (
+        <div className="space-y-6">
+          {/* Staff Metrics Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+              <div className="text-[11px] font-mono text-muted-foreground uppercase mb-1">
+                {isRTL ? "إجمالي أعضاء الفريق" : "Total Team Staff"}
+              </div>
+              <div className="text-xl font-semibold font-mono text-foreground">
+                {users.length}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+              <div className="text-[11px] font-mono text-muted-foreground uppercase mb-1">
+                {isRTL ? "مهندسو الموقع" : "Site Engineers"}
+              </div>
+              <div className="text-xl font-semibold font-mono text-amber-700 dark:text-amber-300">
+                {users.filter((u) => u.role === "ENGINEER").length}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+              <div className="text-[11px] font-mono text-muted-foreground uppercase mb-1">
+                {isRTL ? "مديرو المشاريع" : "Project Managers"}
+              </div>
+              <div className="text-xl font-semibold font-mono text-blue-700 dark:text-blue-300">
+                {users.filter((u) => u.role === "PROJECT_MANAGER").length}
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl border border-border bg-card shadow-xs">
+              <div className="text-[11px] font-mono text-muted-foreground uppercase mb-1">
+                {isRTL ? "مسؤولو النظام / الملاك" : "System Admins / Owners"}
+              </div>
+              <div className="text-xl font-semibold font-mono text-purple-700 dark:text-purple-300">
+                {users.filter((u) => u.role === "ADMINISTRATOR" || u.role === "COMPANY_OWNER").length}
+              </div>
+            </div>
+          </div>
+
+          {/* Controls Bar: Role Filters & Add Staff Button */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-xl border border-border bg-card shadow-xs">
+            <div className="flex items-center gap-1.5 overflow-x-auto">
+              <span className="text-[10px] font-mono text-muted-foreground uppercase flex items-center gap-1 mr-1">
+                <Funnel className="w-3 h-3" />
+                <span>{isRTL ? "الدور:" : "ROLE:"}</span>
+              </span>
+              {(["ALL", "ENGINEER", "PROJECT_MANAGER", "ADMINISTRATOR", "COMPANY_OWNER"] as const).map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRoleFilter(r)}
+                  className={cn(
+                    "px-2.5 py-1 rounded-md text-[10px] font-mono uppercase transition-colors cursor-pointer",
+                    roleFilter === r
+                      ? "bg-primary text-primary-foreground font-semibold"
+                      : "bg-muted text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {r === "ALL" ? (isRTL ? "الكل" : "All Roles") : r.replace(/_/g, " ")}
+                </button>
+              ))}
             </div>
 
             <button
               type="button"
-              onClick={() => setShowCreateStaffModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium uppercase tracking-wider shadow-2xs transition-all cursor-pointer active:scale-98 shrink-0"
+              onClick={() => setIsAddingStaff(true)}
+              className="h-8 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
             >
-              <UserPlus size={15} />
-              <span>{isRTL ? "إنشاء حساب موظف جديد" : "Add Staff Account"}</span>
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>{isRTL ? "إضافة عضو جديد" : "Add Staff Member"}</span>
             </button>
           </div>
 
-          {/* Users List: Responsive Mobile Cards + Desktop Table */}
-          <div>
-            {/* Mobile Cards (Viewports < md) */}
-            <div className="md:hidden divide-y divide-border">
-              {users.map((u) => {
-                const isCopied = copiedUserId === u.id;
-                const needsPasswordChange = Boolean(u.mustChangePassword);
-
-                return (
-                  <div key={u.id} className="p-4 space-y-3 hover:bg-muted/20 transition-colors">
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <div className="font-semibold text-foreground text-sm">{u.name}</div>
-                        <div className="text-[11px] font-mono text-muted-foreground mt-0.5">ID: #{u.id}</div>
-                      </div>
-
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <select
-                          value={u.role}
-                          onChange={(e) => handleRoleChange(u.id, e.target.value as Role)}
-                          className="h-8 px-2 rounded-lg border border-border bg-background text-[11px] font-mono uppercase focus:ring-1 focus:ring-primary outline-none cursor-pointer"
-                        >
-                          <option value="CUSTOMER">CUSTOMER</option>
-                          <option value="ENGINEER">ENGINEER</option>
-                          <option value="PROJECT_MANAGER">PROJECT_MANAGER</option>
-                          <option value="COMPANY_OWNER">COMPANY_OWNER</option>
-                          <option value="ADMINISTRATOR">ADMINISTRATOR</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-1 text-xs text-muted-foreground pt-1 border-t border-border/60">
-                      <div className="font-mono text-[11px] text-foreground">{u.email || u.username}</div>
-                      {u.phone && <div className="text-[10px] font-mono text-muted-foreground">{u.phone}</div>}
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/60">
-                      <div>
-                        {needsPasswordChange ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
-                            <Key className="w-3 h-3 text-amber-600" />
-                            <span>{isRTL ? "أول دخول • كلمة سر مؤقتة" : "TEMP PASSWORD"}</span>
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
-                            <Check className="w-3 h-3 text-emerald-600" />
-                            <span>{isRTL ? "مفعل ومؤكد" : "VERIFIED"}</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() => handleCopyCredentials(u)}
-                        className="h-8 px-3 rounded-lg border border-border bg-card hover:bg-muted text-xs font-mono text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
-                      >
-                        {isCopied ? (
-                          <>
-                            <Check size={14} className="text-emerald-500" />
-                            <span className="text-emerald-600 font-semibold">{isRTL ? "تم النسخ" : "Copied"}</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy size={14} />
-                            <span>{isRTL ? "نسخ البيانات" : "Copy Info"}</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Desktop Table (Viewports >= md) */}
-            <div className="hidden md:block overflow-x-auto">
+          {/* Staff Members Table */}
+          <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-muted/40 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
+                <thead className="bg-muted/50 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
                   <tr>
-                    <th className="py-3 px-4">{isRTL ? "المستخدم" : "User"}</th>
-                    <th className="py-3 px-4">{isRTL ? "الإيميل والهاتف" : "Email & Phone"}</th>
-                    <th className="py-3 px-4">{isRTL ? "الصلاحية" : "Active Role"}</th>
-                    <th className="py-3 px-4">{isRTL ? "المشاريع المسندة" : "Active Workload"}</th>
-                    <th className="py-3 px-4">{isRTL ? "حالة أول دخول" : "Security & Status"}</th>
-                    <th className="py-3 px-4 text-end">{isRTL ? "إجراءات" : "Action"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الاسم والبريد الإلكتروني" : "Member Name & Email"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الدور الوظيفي" : "RBAC Role"}</th>
+                    <th className="py-3 px-4">{isRTL ? "رقم الهاتف" : "Phone Contact"}</th>
+                    <th className="py-3 px-4">{isRTL ? "المشاريع المسندة" : "Assigned Commissions"}</th>
+                    <th className="py-3 px-4 text-right">{isRTL ? "الإجراءات" : "Actions"}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {users.map((u) => {
-                    const isCopied = copiedUserId === u.id;
-                    const needsPasswordChange = Boolean(u.mustChangePassword);
+                  {filteredUsers.map((user) => {
+                    const roleBadge = getRoleBadge(user.role);
 
                     return (
-                      <tr key={u.id} className="hover:bg-muted/20 transition-colors">
+                      <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                         <td className="py-3.5 px-4">
-                          <div className="font-semibold text-foreground">{u.name}</div>
-                          <div className="text-[10px] font-mono text-muted-foreground">ID: #{u.id}</div>
+                          <div className="font-semibold text-foreground flex items-center gap-2">
+                            <span>{user.name}</span>
+                            {user.mustChangePassword && (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                                {isRTL ? "تغيير باسورد إجباري" : "1st Login Reset"}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] font-mono text-muted-foreground">
+                            {user.email || user.username}
+                          </div>
                         </td>
 
-                        <td className="py-3.5 px-4 text-muted-foreground">
-                          <div className="font-mono text-[11px] text-foreground">{u.email || u.username}</div>
-                          <div className="text-[10px] font-mono">{u.phone || "—"}</div>
-                        </td>
-
                         <td className="py-3.5 px-4">
-                          <select
-                            value={u.role}
-                            onChange={(e) => handleRoleChange(u.id, e.target.value as Role)}
-                            className="h-7 px-2 rounded-lg border border-border bg-background text-[11px] font-mono uppercase focus:ring-1 focus:ring-primary outline-none cursor-pointer"
+                          <span
+                            className={cn(
+                              "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border",
+                              roleBadge.className
+                            )}
                           >
-                            <option value="CUSTOMER">CUSTOMER</option>
-                            <option value="ENGINEER">ENGINEER</option>
-                            <option value="PROJECT_MANAGER">PROJECT_MANAGER</option>
-                            <option value="COMPANY_OWNER">COMPANY_OWNER</option>
-                            <option value="ADMINISTRATOR">ADMINISTRATOR</option>
-                          </select>
+                            {roleBadge.label}
+                          </span>
                         </td>
 
                         <td className="py-3.5 px-4 font-mono text-muted-foreground">
-                          {u.activeProjectsCount ? `${u.activeProjectsCount} ${isRTL ? "مشاريع" : "Projects"}` : "—"}
+                          {user.phone || "—"}
                         </td>
 
-                        <td className="py-3.5 px-4">
-                          {needsPasswordChange ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-amber-100 text-amber-800 border border-amber-300 animate-pulse">
-                              <Key className="w-3 h-3 text-amber-600" />
-                              <span>{isRTL ? "أول دخول - كلمة سر مؤقتة" : "TEMPORARY PASSWORD"}</span>
+                        <td className="py-3.5 px-4 font-mono">
+                          {user.role === "ENGINEER" || user.role === "PROJECT_MANAGER" ? (
+                            <span className="font-medium text-foreground">
+                              {user.activeProjectsCount || 0} {isRTL ? "مشاريع نشطة" : "Active"}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-mono bg-emerald-100 text-emerald-800 border border-emerald-300">
-                              <Check className="w-3 h-3 text-emerald-600" />
-                              <span>{isRTL ? "مفعل ومؤكد" : "VERIFIED"}</span>
-                            </span>
+                            <span className="text-muted-foreground">{isRTL ? "عام للشركة" : "Firm Wide"}</span>
                           )}
                         </td>
 
-                        <td className="py-3.5 px-4 text-end">
+                        <td className="py-3.5 px-4 text-right">
                           <button
                             type="button"
-                            onClick={() => handleCopyCredentials(u)}
-                            className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-border bg-card hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
-                            title={isRTL ? "نسخ بيانات الدخول" : "Copy credentials"}
+                            onClick={() => {
+                              setEditingUser(user);
+                              setSelectedRole(user.role);
+                            }}
+                            className="h-7 px-2.5 rounded-lg border border-border bg-card hover:bg-muted text-xs text-foreground cursor-pointer transition-colors"
                           >
-                            {isCopied ? (
-                              <>
-                                <Check size={12} className="text-emerald-500" />
-                                <span className="text-emerald-600 font-semibold">{isRTL ? "تم" : "Done"}</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={12} />
-                                <span>{isRTL ? "نسخ" : "Copy"}</span>
-                              </>
-                            )}
+                            {isRTL ? "تعديل الصلاحية" : "Change Role"}
                           </button>
                         </td>
                       </tr>
@@ -447,110 +363,240 @@ export function AdminDashboard() {
         </div>
       )}
 
-      {/* TAB 3: CATALOG & PRICING */}
-      {activeTab === "CATALOG" && (
-        <div className="p-6 rounded-2xl border border-border bg-card shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-4">
-            <div>
-              <h3 className="font-serif text-lg font-medium text-foreground">
-                {isRTL ? "باقات التشطيب وقوائم الأسعار المعيارية" : "Service Packages & Base Rate Catalog"}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {isRTL
-                  ? "تسعير المتر المربع، عدد جولات التعديل، ومواعيد التسليم المعتمدة لكل باقة."
-                  : "Standardized client offerings, revision allowances, and construction square-meter baselines."}
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {packages.map((pkg) => (
-              <div key={pkg.id} className="p-5 rounded-xl border border-border bg-muted/20 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[10px] uppercase px-2 py-0.5 rounded bg-primary/10 text-primary font-semibold">
-                    {pkg.type.replace("_", " ")}
-                  </span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                </div>
-
-                <h4 className="font-medium text-foreground text-sm">{pkg.name}</h4>
-
-                <div className="space-y-1.5 border-t border-border pt-3 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{isRTL ? "سعر الباقة الأساسي:" : "Base Package Price:"}</span>
-                    <span className="font-mono font-medium text-foreground">
-                      EGP {pkg.basePriceEgp.toLocaleString()}
-                    </span>
-                  </div>
-                  {pkg.ratePerMeterEgp && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{isRTL ? "سعر المتر المربع:" : "Rate Per M²:"}</span>
-                      <span className="font-mono font-medium text-foreground">
-                        EGP {pkg.ratePerMeterEgp.toLocaleString()} / m²
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{isRTL ? "مدة التنفيذ:" : "Turnaround Time:"}</span>
-                    <span className="font-mono text-foreground">{pkg.turnaroundDays} {isRTL ? "يوم" : "Days"}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">{isRTL ? "التعديلات المتاحة:" : "Included Revisions:"}</span>
-                    <span className="font-mono text-foreground">{pkg.includedRevisions} {isRTL ? "تعديلات" : "Revisions"}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 4: IMMUTABLE AUDIT LOG */}
+      {/* TAB 2: AUDIT TRAIL */}
       {activeTab === "AUDIT" && (
-        <div className="p-6 rounded-2xl border border-border bg-card shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-border pb-4">
-            <div>
-              <h3 className="font-serif text-lg font-medium text-foreground">
-                {isRTL ? "سجل العمليات والأمان الموثق" : "Immutable System Audit Log"}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {isRTL
-                  ? "سجل غير قابل للتعديل يوثق جميع التكليفات والاعتمادات الهندسية والمالية."
-                  : "Cryptographically tracked record of assignments, dimensional certifications, and financial approvals."}
-              </p>
-            </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-serif font-medium text-foreground">
+              {isRTL ? "سجل الأحداث الأمنية والعمليات الإدارية" : "Security & Administrative Event Log"}
+            </h2>
+            <span className="text-xs font-mono text-muted-foreground">
+              {isRTL ? "سجل إداري غير قابل للتعديل" : "Immutable administrative history"}
+            </span>
           </div>
 
-          <div className="space-y-2">
-            {auditLogs.map((log) => (
-              <div
-                key={log.id}
-                className="p-3.5 rounded-lg border border-border bg-muted/20 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-semibold text-foreground">{log.action}</span>
-                    <span className="text-muted-foreground">· {log.targetEntity}</span>
-                  </div>
-                  <p className="text-muted-foreground text-[11px] mt-0.5">{log.details}</p>
-                </div>
+          <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-muted/50 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
+                  <tr>
+                    <th className="py-3 px-4">{isRTL ? "الوقت والتاريخ" : "Timestamp"}</th>
+                    <th className="py-3 px-4">{isRTL ? "المنفذ" : "Actor"}</th>
+                    <th className="py-3 px-4">{isRTL ? "العملية" : "Action"}</th>
+                    <th className="py-3 px-4">{isRTL ? "الهدف" : "Target Entity"}</th>
+                    <th className="py-3 px-4">{isRTL ? "التفاصيل" : "Event Details"}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {auditLogs.map((log) => (
+                    <tr key={log.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-3.5 px-4 font-mono text-[11px] text-muted-foreground whitespace-nowrap">
+                        {log.timestamp}
+                      </td>
 
-                <div className="text-end shrink-0 text-[10px] font-mono text-muted-foreground">
-                  <div>{log.actorName} ({log.actorRole})</div>
-                  <div>{log.timestamp}</div>
-                </div>
-              </div>
-            ))}
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <div className="font-medium text-foreground">{log.actorName}</div>
+                        <div className="text-[10px] font-mono text-muted-foreground">
+                          {log.actorRole}
+                        </div>
+                      </td>
+
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-muted text-foreground border border-border">
+                          {log.action}
+                        </span>
+                      </td>
+
+                      <td className="py-3.5 px-4 font-mono text-foreground whitespace-nowrap">
+                        {log.targetEntity}
+                      </td>
+
+                      <td className="py-3.5 px-4 text-muted-foreground leading-relaxed">
+                        {log.details}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Create Staff Modal */}
-      <CreateStaffModal
-        open={showCreateStaffModal}
-        onClose={() => setShowCreateStaffModal(false)}
-        onUserCreated={handleUserCreated}
-      />
+      {/* Edit Role Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-border pb-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase text-muted-foreground">
+                  {isRTL ? "تعديل الصلاحيات الإدارية" : "RBAC Role Update"}
+                </span>
+                <h3 className="font-serif text-lg font-normal text-foreground">
+                  {editingUser.name}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditingUser(null)}
+                className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-xs font-mono uppercase text-muted-foreground">
+                {isRTL ? "اختر الدور الوظيفي:" : "Select Authorized Role:"}
+              </label>
+
+              {(["ENGINEER", "PROJECT_MANAGER", "ADMINISTRATOR", "COMPANY_OWNER"] as Role[]).map((r) => (
+                <label
+                  key={r}
+                  className={cn(
+                    "flex items-center justify-between p-3 rounded-xl border text-xs cursor-pointer transition-colors",
+                    selectedRole === r
+                      ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                      : "border-border hover:bg-muted/40"
+                  )}
+                >
+                  <span className="font-medium text-foreground">{r.replace(/_/g, " ")}</span>
+                  <input
+                    type="radio"
+                    name="role"
+                    value={r}
+                    checked={selectedRole === r}
+                    onChange={() => setSelectedRole(r)}
+                    className="accent-primary"
+                  />
+                </label>
+              ))}
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setEditingUser(null)}
+                className="px-4 py-2 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                {isRTL ? "إلغاء" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmRoleChange}
+                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>{isRTL ? "تحديث الصلاحية" : "Update Role"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Staff Modal */}
+      {isAddingStaff && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <form
+            onSubmit={handleAddStaff}
+            className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+          >
+            <div className="flex items-start justify-between border-b border-border pb-3">
+              <div>
+                <span className="text-[10px] font-mono uppercase text-muted-foreground">
+                  {isRTL ? "إضافة عضو فريق جديد" : "Staff Registration"}
+                </span>
+                <h3 className="font-serif text-lg font-normal text-foreground">
+                  {isRTL ? "بيانات الموظف الجديد" : "Add New Team Member"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddingStaff(false)}
+                className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[11px] text-muted-foreground mb-1">
+                  {isRTL ? "الاسم بالكامل:" : "Full Name:"}
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newStaffName}
+                  onChange={(e) => setNewStaffName(e.target.value)}
+                  placeholder={isRTL ? "م. زياد منصور" : "e.g. Eng. Ziad Mansour"}
+                  className="w-full h-8 px-3 rounded-lg border border-border bg-background text-xs text-foreground outline-none focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] text-muted-foreground mb-1">
+                  {isRTL ? "البريد الإلكتروني / اسم المستخدم:" : "Email / Username:"}
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={newStaffEmail}
+                  onChange={(e) => setNewStaffEmail(e.target.value)}
+                  placeholder="ziad.mansour@valentia.com"
+                  className="w-full h-8 px-3 rounded-lg border border-border bg-background text-xs text-foreground outline-none focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] text-muted-foreground mb-1">
+                  {isRTL ? "رقم الهاتف (اختياري):" : "Phone (Optional):"}
+                </label>
+                <input
+                  type="tel"
+                  value={newStaffPhone}
+                  onChange={(e) => setNewStaffPhone(e.target.value)}
+                  placeholder="+20 100 000 0000"
+                  className="w-full h-8 px-3 rounded-lg border border-border bg-background text-xs text-foreground outline-none focus:border-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] text-muted-foreground mb-1">
+                  {isRTL ? "الدور الوظيفي:" : "Assigned Role:"}
+                </label>
+                <select
+                  value={newStaffRole}
+                  onChange={(e) => setNewStaffRole(e.target.value as Role)}
+                  className="w-full h-8 px-3 rounded-lg border border-border bg-background text-xs text-foreground outline-none focus:border-primary cursor-pointer font-mono"
+                >
+                  <option value="ENGINEER">{isRTL ? "مهندس موقع (ENGINEER)" : "Site Architect (ENGINEER)"}</option>
+                  <option value="PROJECT_MANAGER">{isRTL ? "مدير مشروع (PROJECT_MANAGER)" : "Project Manager (PROJECT_MANAGER)"}</option>
+                  <option value="ADMINISTRATOR">{isRTL ? "مسؤول نظام (ADMINISTRATOR)" : "Administrator (ADMINISTRATOR)"}</option>
+                  <option value="COMPANY_OWNER">{isRTL ? "مالك شركة (COMPANY_OWNER)" : "Company Owner (COMPANY_OWNER)"}</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setIsAddingStaff(false)}
+                className="px-4 py-2 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                {isRTL ? "إلغاء" : "Cancel"}
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>{isRTL ? "إنشاء الحساب" : "Create Account"}</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

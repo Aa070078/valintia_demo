@@ -18,8 +18,8 @@ export type Role =
 export type ProjectStatus =
   | "DRAFT"
   | "SUBMITTED"
+  | "ASSIGNED"
   | "ENGINEER_REVIEW"
-  | "CONSULTATION_SCHEDULED"
   | "SITE_VISIT_SCHEDULED"
   | "SITE_VISIT_COMPLETED"
   | "DESIGN_IN_PROGRESS"
@@ -39,7 +39,9 @@ export type SpaceType =
   | "MASTER_BEDROOM"
   | "BEDROOM"
   | "BATHROOM"
-  | "BALCONY";
+  | "BALCONY"
+  | "TERRACE"
+  | "DINING";
 
 export type DataSourceType =
   | "CUSTOMER_ENTERED"
@@ -75,6 +77,15 @@ export interface ProjectAssignment {
   assignedAt: string;
 }
 
+export interface ProjectSpaceSummary {
+  id: string;
+  name: string;
+  type: string;
+  quantity: number;
+  styleName?: string;
+  notes?: string;
+}
+
 export interface ProjectMilestone {
   id: string;
   title: string;
@@ -98,7 +109,7 @@ export interface SiteVisit {
   assignedEngineerId: number;
   assignedEngineerName: string;
   status: SiteVisitStatus;
-  laserScanCompleted?: boolean;
+  siteSurveyCompleted?: boolean;
   notes?: string;
 }
 
@@ -155,16 +166,33 @@ export interface ProjectOverview {
   title: string;
   clientName: string;
   clientPhone: string;
-  typology: "VILLA" | "PENTHOUSE" | "DUPLEX" | "TOWNHOUSE";
+  clientEmail?: string;
+  customerLocation?: {
+    country: string;
+    city: string;
+    timezone?: string;
+  };
+  representative?: {
+    representationType: "client_in_person" | "valentia_direct" | "authorized_representative";
+    name?: string;
+    relationship?: string;
+    phone?: string;
+    email?: string;
+  };
+  typology: "VILLA" | "PENTHOUSE" | "DUPLEX" | "TOWNHOUSE" | "APARTMENT" | string;
   areaM2: number;
   location: string;
   compound: string;
   budgetEgp: number;
   status: ProjectStatus;
   health: ScheduleHealth;
-  leadEngineerId?: number;
-  leadEngineerName?: string;
+  leadEngineerId?: number | null;
+  leadEngineerName?: string | null;
   completionPercent: number;
+  spaces?: ProjectSpaceSummary[];
+  scopeType?: string;
+  targetTimeline?: string;
+  notes?: string;
   nextMilestone: string;
   nextMilestoneDate: string;
   createdAt: string;

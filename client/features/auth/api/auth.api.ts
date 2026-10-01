@@ -9,6 +9,7 @@ import type {
   ProposedChangePasswordDto,
   ChangePasswordResponse,
   CreateStaffDto,
+  PendingOtpData,
 } from "../types";
 
 /**
@@ -97,6 +98,7 @@ export const DEMO_FIRST_LOGIN_STAFF: User = {
 
 const USER_SESSION_KEY = "valentia_current_user";
 const CUSTOM_STAFF_STORAGE_KEY = "valentia_custom_staff_users";
+const PENDING_OTP_KEY = "valentia_pending_otp";
 
 export interface StoredStaffAccount {
   user: User;
@@ -307,6 +309,164 @@ export const authApi = {
         token: mockToken,
       };
     }
+  },
+
+  /**
+   * Retrieves pending OTP registration data from sessionStorage.
+   */
+  getPendingOtp(): PendingOtpData | null {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = sessionStorage.getItem(PENDING_OTP_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Step 1 of Customer Registration:
+   * Registers account on backend (or verifies availability in mock fallback),
+   * generates 6-digit OTP (demo code '123456'), and saves pending verification data.
+   */
+  async initiateSignup(dto: ProposedSignupDto): Promise<{ success: boolean; email: string; otp: string }> {
+    try {
+      // Register on real backend
+      await apiClient.post("/auth/register", {
+        username: dto.username,
+        password: dto.password,
+      });
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        throw error;
+      }
+      // Mock Fallback: Ensure not duplicate in demo personas
+      const exists = Object.values(DEMO_PERSONAS).some(
+        (p) => p.username.toLowerCase() === dto.username.toLowerCase()
+      );
+      if (exists) {
+        throw new Error("This email or username is already registered.");
+      }
+    }
+
+    const demoOtp = "123456";
+    const pendingData: PendingOtpData = {
+      username: dto.username,
+      password: dto.password,
+      name: dto.name,
+      phone: dto.phone,
+      role: dto.role || "CUSTOMER",
+      otp: demoOtp,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 10 * 60 * 1000,
+    };
+
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(PENDING_OTP_KEY, JSON.stringify(pendingData));
+    }
+
+    return {
+      success: true,
+      email: dto.username,
+      otp: demoOtp,
+    };
+  },
+
+  /**
+   * Resend OTP verification code for customer registration.
+   */
+  async resendOtp(email?: string): Promise<{ success: boolean; otp: string }> {
+    const pending = this.getPendingOtp();
+    const demoOtp = "123456";
+    const targetEmail = email || pending?.username || "";
+
+    const updatedData: PendingOtpData = {
+      username: targetEmail,
+      password: pending?.password,
+      name: pending?.name,
+      phone: pending?.phone,
+      role: pending?.role || "CUSTOMER",
+      otp: demoOtp,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 10 * 60 * 1000,
+    };
+
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(PENDING_OTP_KEY, JSON.stringify(updatedData));
+    }
+
+    return {
+      success: true,
+      otp: demoOtp,
+    };
+  },
+
+  /**
+   * Step 2 of Customer Registration:
+   * Validates the 6-digit OTP and authenticates the user into the atelier session.
+   */
+  async confirmOtpAndLogin(code: string, fallbackEmail?: string): Promise<AuthSession> {
+    const pending = this.getPendingOtp();
+    const targetEmail = pending?.username || fallbackEmail;
+
+    if (!targetEmail) {
+      throw new Error("No pending verification session found. Please register first.");
+    }
+
+    const cleanCode = code.trim();
+    const expectedOtp = pending?.otp || "123456";
+
+    // Validate OTP against demo code 123456 or expected OTP
+    if (cleanCode !== expectedOtp && cleanCode !== "123456") {
+      throw new Error("Invalid verification code. Please make sure you entered the correct 6-digit code.");
+    }
+
+    // Authenticate via login
+    if (pending?.password) {
+      try {
+        const session = await this.login({
+          username: pending.username,
+          password: pending.password,
+          rememberMe: true,
+        });
+
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem(PENDING_OTP_KEY);
+        }
+
+        return session;
+      } catch (err) {
+        if (!IS_MOCK_FALLBACK_ALLOWED) {
+          throw err;
+        }
+      }
+    }
+
+    // Fallback/Mock session creation
+    const user: User = {
+      id: Math.floor(Math.random() * 10000) + 100,
+      username: targetEmail,
+      email: targetEmail.includes("@") ? targetEmail : undefined,
+      name: pending?.name || targetEmail.split("@")[0],
+      role: pending?.role || "CUSTOMER",
+      phone: pending?.phone,
+      mustChangePassword: false,
+      requiresPasswordChange: false,
+    };
+
+    const mockToken = `mock-jwt-customer-${Date.now()}`;
+    tokenStorage.setToken(mockToken);
+    saveLocalUser(user, true);
+
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem(PENDING_OTP_KEY);
+    }
+
+    return {
+      user,
+      token: mockToken,
+    };
   },
 
   /**

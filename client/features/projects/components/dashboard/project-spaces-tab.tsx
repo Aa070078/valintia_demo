@@ -7,13 +7,14 @@ import type { SpaceEntity } from "../../types";
 import { CURATED_SPACES } from "../spaces-architecture";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
+import { getSpaceDisplayName, getStyleDisplayName } from "../../lib/space-names";
 
 interface ProjectSpacesTabProps {
   spaces: SpaceEntity[];
 }
 
 export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
-  const { t, isRTL } = useLanguage();
+  const { isRTL } = useLanguage();
 
   const activeSpaces = spaces.filter((s) => s.included !== false);
 
@@ -31,11 +32,8 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-in fade-in duration-300">
       {activeSpaces.map((space) => {
-        const curated = CURATED_SPACES.find((c) => c.id === space.id);
-        const title =
-          space.customName ||
-          (curated ? t(curated.nameKey) || curated.defaultName : space.spaceType) ||
-          "Space";
+        const curated = CURATED_SPACES.find((c) => c.id === space.id || c.id === space.spaceType);
+        const title = getSpaceDisplayName(space, isRTL);
         const image = curated?.imageSrc || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=400&q=80";
 
         return (
@@ -81,7 +79,7 @@ export function ProjectSpacesTab({ spaces }: ProjectSpacesTabProps) {
                   )}
                 >
                   <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-                  <span>{space.stylePreference.styleName}</span>
+                  <span>{getStyleDisplayName(space.stylePreference.styleName, isRTL)}</span>
                 </div>
               ) : (
                 <div className={cn("text-[11px] text-[#78716C]", isRTL && "font-medium text-[#503C2C]")}>

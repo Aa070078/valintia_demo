@@ -30,11 +30,12 @@ function SignupForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get("redirect");
-  const { signup, isLoading } = useAuth();
+  const emailParam = searchParams.get("email") || "";
+  const { initiateSignup, isLoading } = useAuth();
   const { language, toggleLanguage, isRTL } = useLanguage();
 
   const [name, setName] = React.useState("");
-  const [username, setUsername] = React.useState("");
+  const [username, setUsername] = React.useState(emailParam);
   const [phone, setPhone] = React.useState("");
   const [countryCode, setCountryCode] = React.useState("+20");
   const [password, setPassword] = React.useState("");
@@ -125,7 +126,7 @@ function SignupForm() {
 
     try {
       const fullPhone = phone ? `${countryCode} ${phone}` : undefined;
-      const res = await signup({
+      await initiateSignup({
         username: username.trim(),
         password,
         name: name.trim() || undefined,
@@ -133,15 +134,14 @@ function SignupForm() {
         role: "CUSTOMER",
       });
 
-      if (res?.redirectUrl) {
-        window.location.href = res.redirectUrl;
-      } else {
-        const destination =
-          redirectParam && redirectParam.startsWith("/")
-            ? redirectParam
-            : "/projects/new";
-        router.push(destination);
-      }
+      const destination =
+        redirectParam && redirectParam.startsWith("/")
+          ? redirectParam
+          : "/projects/new";
+      
+      router.push(
+        `/verify-otp?email=${encodeURIComponent(username.trim())}&redirect=${encodeURIComponent(destination)}`
+      );
     } catch (err: unknown) {
       console.error("Signup failed:", err);
       const apiMsg = getErrorMessage(err);
@@ -519,14 +519,14 @@ function SignupForm() {
               {isSubmitting || isLoading ? (
                 <>
                   <CircleNotch className="w-4 h-4 animate-spin" />
-                  <span>{isRTL ? "ثواني بنسجل حسابك..." : "Creating Account..."}</span>
+                  <span>{isRTL ? "ثواني بنجهز رمز التحقق..." : "Preparing Verification..."}</span>
                 </>
               ) : (
                 <>
                   <span>
                     {isRTL
-                      ? "إنشاء الحساب وبدء تشطيب بيتي ←"
-                      : "Create Account & Start Commission"}
+                      ? "المتابعة لتأكيد رمز التحقق ←"
+                      : "Proceed to Email Verification →"}
                   </span>
                   {isRTL ? (
                     <ArrowLeft className="w-4 h-4" />

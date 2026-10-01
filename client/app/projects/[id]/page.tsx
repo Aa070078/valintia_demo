@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 type ActiveTab = "overview" | "spaces" | "team" | "documents";
 
 export default function ProjectDetailsPage() {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params?.id as string;
   const { isRTL } = useLanguage();
@@ -86,6 +87,7 @@ export default function ProjectDetailsPage() {
   const handleSubmit = async () => {
     try {
       await submitMutation.mutateAsync();
+      router.push(`/projects/confirmation?id=${id}&title=${encodeURIComponent(displayTitle)}`);
     } catch (err) {
       console.error("Failed to submit project", err);
     }

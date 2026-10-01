@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { Project } from "../types";
 import { getProjectDisplayTitle } from "../types";
 import { StatusChip } from "./status-chip";
+import { getProjectStatusInfo } from "../lib/project-status-resolver";
 import { useLanguage } from "@/lib/i18n/language-context";
 
 interface ProjectCardProps {
@@ -23,6 +24,7 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
   const compound = project.property?.compound || project.compound;
   const city = project.property?.city || project.city || "Cairo";
   const displayTitle = getProjectDisplayTitle(project);
+  const statusInfo = getProjectStatusInfo(project.status, isRTL);
 
   return (
     <div
@@ -85,6 +87,36 @@ export function ProjectCard({ project, className }: ProjectCardProps) {
               {compound ? `${compound}, ` : ""}
               {city}
             </span>
+          </div>
+
+          {/* Progress Bar & Architectural Telemetry */}
+          <div className="mt-4 pt-3.5 border-t border-border/60 flex flex-col gap-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[11px] font-medium text-[#78716C] truncate max-w-[70%]">
+                {statusInfo.stageLabel}
+              </span>
+              <span className="font-mono text-xs font-bold text-[#503C2C]">
+                {statusInfo.percentage}%
+              </span>
+            </div>
+
+            {/* Progress Track */}
+            <div className="h-1.5 w-full bg-[#EAE2D7] rounded-full overflow-hidden">
+              <div
+                className={cn("h-full transition-all duration-500 rounded-full", statusInfo.progressColorClass)}
+                style={{ width: `${statusInfo.percentage}%` }}
+              />
+            </div>
+
+            {/* Next Step / Action Required */}
+            <div className="flex items-start gap-1.5 text-[11px] mt-0.5">
+              <span className="text-[10px] text-[#B88460] font-bold shrink-0 mt-0.5">
+                {isRTL ? "الخطوة القادمة:" : "Next:"}
+              </span>
+              <span className="text-[#6B635B] truncate font-normal">
+                {statusInfo.nextStepLabel}
+              </span>
+            </div>
           </div>
         </div>
 

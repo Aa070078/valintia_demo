@@ -56,6 +56,17 @@ export interface ProposedSignupDto {
   role?: UserRole;
 }
 
+export interface PendingOtpData {
+  username: string;
+  password?: string;
+  name?: string;
+  phone?: string;
+  role?: UserRole;
+  otp: string;
+  createdAt: number;
+  expiresAt: number;
+}
+
 export interface CreateStaffDto {
   name: string;
   username: string;
