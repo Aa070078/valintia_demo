@@ -51,7 +51,7 @@ export const otpConfig = registerAs('otp', () => ({
 }));
 
 export const mailConfig = registerAs('mail', () => ({
-  from: process.env.MAIL_FROM ?? 'Valentia <no-reply@valentia.com>',
+  from: process.env.MAIL_FROM ?? 'onboarding@resend.dev',
   provider: process.env.MAIL_PROVIDER ?? 'console',
   smtp: {
     host: process.env.SMTP_HOST ?? 'localhost',
