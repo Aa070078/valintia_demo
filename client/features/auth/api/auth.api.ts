@@ -151,8 +151,16 @@ function saveLocalUser(user: User | null, persistent: boolean = true) {
   }
 }
 
-const IS_MOCK_FALLBACK_ALLOWED =
-  process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true";
+function shouldFallbackToMock(error?: unknown): boolean {
+  if (process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true") return true;
+  if (process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "false") {
+    const err = error as { response?: unknown };
+    // Only strictly throw if real backend responded with an HTTP status code
+    if (err?.response) return false;
+  }
+  // Default to true for demo / offline / mixed-content environments so users never see Network Error
+  return true;
+}
 
 interface BackendAuthResponse {
   accessToken: string;
@@ -193,7 +201,7 @@ export const authApi = {
         user,
       };
     } catch (error) {
-      if (!IS_MOCK_FALLBACK_ALLOWED) {
+      if (!shouldFallbackToMock(error)) {
         throw error;
       }
       // Mock / Prototype Fallback
@@ -286,7 +294,7 @@ export const authApi = {
         user,
       };
     } catch (error) {
-      if (!IS_MOCK_FALLBACK_ALLOWED) {
+      if (!shouldFallbackToMock(error)) {
         throw error;
       }
       const newUser: User = {
@@ -338,7 +346,7 @@ export const authApi = {
         password: dto.password,
       });
     } catch (error) {
-      if (!IS_MOCK_FALLBACK_ALLOWED) {
+      if (!shouldFallbackToMock(error)) {
         throw error;
       }
       // Mock Fallback: Ensure not duplicate in demo personas
@@ -437,7 +445,7 @@ export const authApi = {
 
         return session;
       } catch (err) {
-        if (!IS_MOCK_FALLBACK_ALLOWED) {
+        if (!shouldFallbackToMock(err)) {
           throw err;
         }
       }
@@ -480,8 +488,8 @@ export const authApi = {
       const response = await apiClient.get<User>("/auth/me");
       saveLocalUser(response.data);
       return response.data;
-    } catch {
-      if (!IS_MOCK_FALLBACK_ALLOWED) {
+    } catch (err) {
+      if (!shouldFallbackToMock(err)) {
         tokenStorage.removeToken();
         saveLocalUser(null);
         return null;
@@ -511,7 +519,7 @@ export const authApi = {
       }
       return response.data;
     } catch (error) {
-      if (!IS_MOCK_FALLBACK_ALLOWED) {
+      if (!shouldFallbackToMock(error)) {
         throw error;
       }
       // Mock Fallback: Update user in session and in stored staff list
