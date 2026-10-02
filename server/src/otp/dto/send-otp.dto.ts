@@ -25,7 +25,7 @@ export class SendOtpDto {
   @IsOptional()
   @IsEnum(OtpPurpose, {
     message:
-      'Purpose must be one of: EMAIL_VERIFICATION, PASSWORD_RESET, LOGIN, GENERAL',
+      'Purpose must be one of: EMAIL_VERIFICATION, PASSWORD_RESET, LOGIN',
   })
   purpose?: OtpPurpose = OtpPurpose.EMAIL_VERIFICATION;
 }

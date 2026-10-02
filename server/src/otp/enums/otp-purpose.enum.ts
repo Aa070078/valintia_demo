@@ -1,11 +1,9 @@
 /**
- * Purpose namespaces isolate OTP challenges. Only EMAIL_VERIFICATION currently
- * connects to registration; PASSWORD_RESET/LOGIN/GENERAL values alone do not
- * implement those business flows (password reset needs its own secure next stage).
+ * Purpose namespaces isolate temporary challenges. Registration and reset consume
+ * distinct signed proofs; only the dedicated LOGIN endpoint issues access JWTs.
  */
 export enum OtpPurpose {
   EMAIL_VERIFICATION = 'EMAIL_VERIFICATION',
   PASSWORD_RESET = 'PASSWORD_RESET',
   LOGIN = 'LOGIN',
-  GENERAL = 'GENERAL',
 }

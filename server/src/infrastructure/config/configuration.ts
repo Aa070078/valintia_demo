@@ -40,6 +40,15 @@ export const emailVerificationTokenConfig = registerAs(
   }),
 );
 
+// Reset proof has its own cryptographic purpose, separate from registration/login.
+export const passwordResetTokenConfig = registerAs(
+  'passwordResetToken',
+  () => ({
+    secret: process.env.PASSWORD_RESET_TOKEN_SECRET ?? '',
+    expiresIn: process.env.PASSWORD_RESET_TOKEN_EXPIRES_IN ?? '15m',
+  }),
+);
+
 export const throttleConfig = registerAs('throttle', () => ({
   defaultTtlMs: parseInt(process.env.THROTTLE_DEFAULT_TTL_MS ?? '60000', 10),
   defaultLimit: parseInt(process.env.THROTTLE_DEFAULT_LIMIT ?? '120', 10),
