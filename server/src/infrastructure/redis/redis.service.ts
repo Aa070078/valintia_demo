@@ -54,6 +54,15 @@ export class RedisService implements OnModuleDestroy {
     return this.client.get(key);
   }
 
+  /** Reserve a temporary marker once, including concurrent callers. */
+  async setIfAbsent(
+    key: string,
+    value: string,
+    ttlSeconds: number,
+  ): Promise<boolean> {
+    return (await this.client.set(key, value, 'EX', ttlSeconds, 'NX')) === 'OK';
+  }
+
   async del(key: string): Promise<number> {
     return this.client.del(key);
   }
@@ -80,6 +89,30 @@ export class RedisService implements OnModuleDestroy {
     } catch {
       return null;
     }
+  }
+
+  /** Atomically replace/delete an unchanged JSON record without extending its TTL. */
+  async compareAndSwapJSON<T>(
+    key: string,
+    expected: T,
+    replacement?: T,
+  ): Promise<boolean> {
+    const result = await this.client.eval(
+      `if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
+       if ARGV[2] == '' then
+         redis.call('DEL', KEYS[1])
+       else
+         local ttl = redis.call('PTTL', KEYS[1])
+         if ttl <= 0 then return 0 end
+         redis.call('SET', KEYS[1], ARGV[2], 'PX', ttl)
+       end
+       return 1`,
+      1,
+      key,
+      JSON.stringify(expected),
+      replacement === undefined ? '' : JSON.stringify(replacement),
+    );
+    return result === 1;
   }
 
   async increment(key: string): Promise<number> {

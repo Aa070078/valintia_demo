@@ -8,13 +8,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomInt } from 'node:crypto';
-import { EmailVerificationService } from '../auth/email-verification/email-verification.service.js';
 import { MailService } from '../infrastructure/mail/mail.service.js';
 import { RedisService } from '../infrastructure/redis/redis.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { OtpPurpose } from './enums/otp-purpose.enum.js';
 
+/** Server-owned challenge state stored at otp:code:<purpose>:<normalized-email>. */
 interface StoredOtpRecord {
   code: string;
   attempts: number;
@@ -29,26 +29,31 @@ export class OtpService {
     @Inject(RedisService) private readonly redisService: RedisService,
     @Inject(MailService) private readonly mailService: MailService,
     @Inject(ConfigService) private readonly configService: ConfigService,
-    @Inject(EmailVerificationService)
-    private readonly emailVerification: EmailVerificationService,
   ) {}
 
   private getOtpKey(purpose: string, email: string): string {
+    // Purpose isolates challenges: a LOGIN OTP cannot satisfy EMAIL_VERIFICATION.
     return `otp:code:${purpose}:${email}`;
   }
 
   private getCooldownKey(purpose: string, email: string): string {
+    // A separate temporary marker limits requests, not the challenge's validity.
     return `otp:cooldown:${purpose}:${email}`;
   }
 
   /**
-   * Generates a cryptographically secure 6-digit OTP, records it in Redis with expiry,
-   * sets resend cooldown, and triggers delivery via the isolated MailService.
+   * Creates an email-access challenge for the supplied email and OTP purpose.
+   * Normalized email keeps Redis keys consistent with verification and registration.
+   * Purpose isolates challenges; auth endpoints decide what a success authorizes.
+   * Stores { code, attempts, createdAt } server-side, emails the OTP, and returns
+   * delivery/timing metadata only: the HTTP response never contains the OTP.
    */
   async generateAndSendOtp(dto: SendOtpDto) {
     const email = dto.email.toLowerCase().trim();
     const purpose = dto.purpose ?? OtpPurpose.EMAIL_VERIFICATION;
 
+    // TTL controls OTP validity (e.g. 300s); cooldown controls resends (e.g. 60s).
+    // The OTP can remain valid after the initial resend block has ended.
     const ttlSeconds = this.configService.get<number>('otp.ttlSeconds') ?? 300; // 5 minutes
     const cooldownSeconds =
       this.configService.get<number>('otp.cooldownSeconds') ?? 60; // 60 seconds
@@ -56,8 +61,12 @@ export class OtpService {
     const otpKey = this.getOtpKey(purpose, email);
     const cooldownKey = this.getCooldownKey(purpose, email);
 
-    // 1. Resend / Cooldown Protection
-    const isCooldownActive = await this.redisService.exists(cooldownKey);
+    // otp:cooldown:<purpose>:<email> exists only while another request is blocked.
+    const isCooldownActive = !(await this.redisService.setIfAbsent(
+      cooldownKey,
+      '1',
+      cooldownSeconds,
+    ));
     if (isCooldownActive) {
       const remainingCooldown = await this.redisService.raw.ttl(cooldownKey);
       const retryAfter =
@@ -78,10 +87,10 @@ export class OtpService {
       );
     }
 
-    // 2. Generate cryptographically secure 6-digit numeric OTP
+    // Cryptographically secure six-digit number; 1000000 is an exclusive upper bound.
     const otpCode = randomInt(100000, 1000000).toString();
 
-    // 3. Store server-owned state in Redis with TTL
+    // Redis expiration bounds the lifetime of the server-owned challenge record.
     const record: StoredOtpRecord = {
       code: otpCode,
       attempts: 0,
@@ -89,13 +98,12 @@ export class OtpService {
     };
 
     await this.redisService.setJSON(otpKey, record, ttlSeconds);
-    await this.redisService.set(cooldownKey, '1', cooldownSeconds);
 
     this.logger.log(
       `OTP generated for ${email} [Purpose: ${purpose}, TTL: ${ttlSeconds}s, Cooldown: ${cooldownSeconds}s]`,
     );
 
-    // 4. Send email through isolated MailService provider layer
+    // MailService hides provider details (such as Resend) from the OTP mechanism.
     const purposeLabel = purpose.replace(/_/g, ' ').toLowerCase();
     await this.mailService.sendOtpEmail(
       email,
@@ -104,7 +112,7 @@ export class OtpService {
       Math.ceil(ttlSeconds / 60),
     );
 
-    // 5. Return success payload — NEVER expose the OTP code to the client
+    // Return delivery metadata; the challenge must be obtained through the inbox.
     return {
       success: true,
       message: `Verification code sent to ${email}`,
@@ -114,10 +122,10 @@ export class OtpService {
   }
 
   /**
-   * Server-side verification of submitted OTP:
-   * - Validates existence & expiry
-   * - Protects against brute-force attempts
-   * - Deletes OTP upon success to prevent replay/reuse
+   * FIRST verification stage: did the submitted OTP match the backend's challenge
+   * for this email and purpose? Normalization reconstructs the same Redis key.
+   * Limits guessing attempts and consumes a successful challenge. Returns success
+   * metadata to the caller; auth/proof services perform purpose-specific actions.
    */
   async verifyOtp(dto: VerifyOtpDto) {
     const email = dto.email.toLowerCase().trim();
@@ -127,61 +135,72 @@ export class OtpService {
     const maxAttempts = this.configService.get<number>('otp.maxAttempts') ?? 5;
     const otpKey = this.getOtpKey(purpose, email);
 
-    // 1. Fetch server-owned OTP record
-    const record = await this.redisService.getJSON<StoredOtpRecord>(otpKey);
+    // Retry stale reads so concurrent guesses count and only one caller consumes OTP.
+    while (true) {
+      // An absent record may be expired, already consumed, or otherwise invalid.
+      const record = await this.redisService.getJSON<StoredOtpRecord>(otpKey);
 
-    if (!record) {
-      throw new BadRequestException(
-        'Verification code has expired or is invalid. Please request a new code.',
-      );
-    }
-
-    // 2. Brute-force attempt protection
-    record.attempts += 1;
-
-    if (record.attempts > maxAttempts) {
-      // Invalidate the OTP completely on too many failed attempts
-      await this.redisService.del(otpKey);
-      this.logger.warn(
-        `OTP for ${email} (${purpose}) revoked due to exceeding max attempts (${maxAttempts}).`,
-      );
-      throw new BadRequestException(
-        'Maximum verification attempts exceeded. Please request a new verification code.',
-      );
-    }
-
-    // 3. Verify submitted code
-    if (record.code !== submittedOtp) {
-      // Preserve remaining TTL when updating failed attempt count
-      const remainingTtl = await this.redisService.raw.ttl(otpKey);
-      if (remainingTtl > 0) {
-        await this.redisService.setJSON(otpKey, record, remainingTtl);
+      if (!record) {
+        throw new BadRequestException(
+          'Verification code has expired or is invalid. Please request a new code.',
+        );
       }
 
-      const attemptsLeft = maxAttempts - record.attempts;
-      this.logger.warn(
-        `Invalid OTP attempt for ${email} (${purpose}). Attempts left: ${attemptsLeft}`,
+      const originalRecord = { ...record };
+      // Preserve current semantics: the sixth request revokes when maxAttempts=5.
+      record.attempts += 1;
+
+      if (record.attempts > maxAttempts) {
+        // Once the attempt budget is exceeded, a fresh challenge is required.
+        if (
+          !(await this.redisService.compareAndSwapJSON(otpKey, originalRecord))
+        )
+          continue;
+        this.logger.warn(
+          `OTP for ${email} (${purpose}) revoked due to exceeding max attempts (${maxAttempts}).`,
+        );
+        throw new BadRequestException(
+          'Maximum verification attempts exceeded. Please request a new verification code.',
+        );
+      }
+
+      // The server-owned code is the authority, not a frontend verification flag.
+      if (record.code !== submittedOtp) {
+        // Updating attempts must not restart the OTP's lifetime on each failed guess.
+        if (
+          !(await this.redisService.compareAndSwapJSON(
+            otpKey,
+            originalRecord,
+            record,
+          ))
+        )
+          continue;
+
+        const attemptsLeft = maxAttempts - record.attempts;
+        this.logger.warn(
+          `Invalid OTP attempt for ${email} (${purpose}). Attempts left: ${attemptsLeft}`,
+        );
+
+        throw new BadRequestException(
+          `Invalid verification code.${attemptsLeft > 0 ? ` ${attemptsLeft} attempt(s) remaining.` : ''}`,
+        );
+      }
+
+      // Consume the OTP before issuing proof: later replay cannot reuse this record.
+      if (!(await this.redisService.compareAndSwapJSON(otpKey, originalRecord)))
+        continue;
+
+      this.logger.log(
+        `OTP successfully verified and invalidated for ${email} (${purpose}).`,
       );
 
-      throw new BadRequestException(
-        `Invalid verification code.${attemptsLeft > 0 ? ` ${attemptsLeft} attempt(s) remaining.` : ''}`,
-      );
+      // Completing the temporary challenge grants no session or proof by itself.
+      // The consuming endpoint selects the appropriate auth/domain action.
+      return {
+        success: true,
+        message: 'Verification code verified successfully',
+        verified: true,
+      };
     }
-
-    // 4. Single-use guarantee: Invalidate the OTP immediately
-    await this.redisService.del(otpKey);
-
-    this.logger.log(
-      `OTP successfully verified and invalidated for ${email} (${purpose}).`,
-    );
-
-    return {
-      success: true,
-      message: 'Verification code verified successfully',
-      verified: true,
-      ...(purpose === OtpPurpose.EMAIL_VERIFICATION
-        ? { verificationToken: await this.emailVerification.issue(email) }
-        : {}),
-    };
   }
 }

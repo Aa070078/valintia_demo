@@ -9,16 +9,21 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
-import { OtpService } from './otp.service.js';
+import { OtpProofService } from './otp-proof.service.js';
 
 @ApiTags('otp')
 @Controller('otp')
 export class OtpController {
-  constructor(@Inject(OtpService) private readonly otpService: OtpService) {}
+  constructor(
+    @Inject(OtpProofService) private readonly otpProof: OtpProofService,
+  ) {}
 
   @Post('send')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Send email verification / authentication OTP' })
+  @ApiOperation({
+    summary:
+      'Send registration OTP; use auth request endpoints for reset/login',
+  })
   @ApiResponse({
     status: 200,
     description: 'OTP generated and sent to email successfully',
@@ -32,7 +37,7 @@ export class OtpController {
     description: 'Too Many Requests: Resend cooldown active',
   })
   async sendOtp(@Body() sendOtpDto: SendOtpDto) {
-    return this.otpService.generateAndSendOtp(sendOtpDto);
+    return this.otpProof.sendRegistrationOtp(sendOtpDto);
   }
 
   @Post('verify')
@@ -41,7 +46,7 @@ export class OtpController {
   @ApiResponse({
     status: 200,
     description:
-      'OTP verified successfully (single-use enforced). EMAIL_VERIFICATION returns a short-lived verificationToken for registration.',
+      'EMAIL_VERIFICATION returns verificationToken; PASSWORD_RESET returns passwordResetToken. Use /api/auth/login/otp/verify for LOGIN.',
     schema: {
       type: 'object',
       required: ['success', 'message', 'verified'],
@@ -57,6 +62,11 @@ export class OtpController {
           description:
             'Returned only for EMAIL_VERIFICATION; submit in the registration body.',
         },
+        passwordResetToken: {
+          type: 'string',
+          description:
+            'Returned only for PASSWORD_RESET; accepted only by reset-password.',
+        },
       },
     },
   })
@@ -66,6 +76,6 @@ export class OtpController {
       'Bad Request: Invalid code, expired code, or maximum attempts exceeded',
   })
   async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto) {
-    return this.otpService.verifyOtp(verifyOtpDto);
+    return this.otpProof.verifyAndIssueProof(verifyOtpDto);
   }
 }

@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { OtpPurpose } from '../enums/otp-purpose.enum.js';
 
+/** First-stage challenge submission; registration later consumes the returned proof. */
 export class VerifyOtpDto {
   @ApiProperty({
     example: 'customer@example.com',
@@ -40,7 +41,7 @@ export class VerifyOtpDto {
   @IsOptional()
   @IsEnum(OtpPurpose, {
     message:
-      'Purpose must be one of: EMAIL_VERIFICATION, PASSWORD_RESET, LOGIN, GENERAL',
+      'Purpose must be one of: EMAIL_VERIFICATION, PASSWORD_RESET, LOGIN',
   })
   purpose?: OtpPurpose = OtpPurpose.EMAIL_VERIFICATION;
 }
