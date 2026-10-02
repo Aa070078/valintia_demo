@@ -91,8 +91,7 @@ export class ProjectsController {
   })
   @ApiResponse({
     status: 400,
-    description:
-      'Bad Request: Validation error or project is not in DRAFT status',
+    description: 'Bad Request: Validation error or project is not in DRAFT status',
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({
@@ -128,3 +127,4 @@ export class ProjectsController {
     return this.projectsService.assignEngineer(id, assignDto, currentUser);
   }
 }
+

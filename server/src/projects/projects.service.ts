@@ -14,7 +14,9 @@ import { UpdateProjectDto } from './dto/update-project.dto.js';
 
 @Injectable()
 export class ProjectsService {
-  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+  ) {}
 
   async create(dto: CreateProjectDto, user: RequestUser) {
     return this.prisma.project.create({
@@ -218,7 +220,9 @@ export class ProjectsService {
     });
 
     if (!engineer) {
-      throw new NotFoundException(`User with ID ${dto.engineerId} not found`);
+      throw new NotFoundException(
+        `User with ID ${dto.engineerId} not found`,
+      );
     }
 
     if (engineer.role !== Role.ENGINEER) {
@@ -236,3 +240,4 @@ export class ProjectsService {
     return assignment;
   }
 }
+
