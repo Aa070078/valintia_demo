@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { randomBytes } from 'node:crypto';
 import { Role } from '../generated/prisma/client.js';
@@ -11,9 +7,7 @@ import { CreateInternalUserDto } from './dto/create-internal-user.dto.js';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @Inject(PrismaService) private readonly prisma: PrismaService,
-  ) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async createInternalUser(dto: CreateInternalUserDto) {
     const { firstName, lastName, birthYear, role, username } = dto;

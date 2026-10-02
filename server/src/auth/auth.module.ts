@@ -5,11 +5,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { PrismaModule } from '../infrastructure/database/prisma.module.js';
 import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
+import { EmailVerificationModule } from './email-verification/email-verification.module.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 
 @Module({
   imports: [
     PrismaModule,
+    EmailVerificationModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
@@ -17,7 +19,9 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
           configService.get<string>('jwt.secret') ||
           configService.get<string>('JWT_SECRET');
         if (!secret || secret.trim().length === 0) {
-          throw new Error('JWT_SECRET environment variable is missing or empty');
+          throw new Error(
+            'JWT_SECRET environment variable is missing or empty',
+          );
         }
         return {
           secret,

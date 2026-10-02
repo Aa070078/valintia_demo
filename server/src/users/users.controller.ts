@@ -1,5 +1,18 @@
-import { Body, Controller, HttpCode, HttpStatus, Inject, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
 import { RolesGuard } from '../common/guards/roles.guard.js';
@@ -22,7 +35,10 @@ export class UsersController {
   @ApiOperation({ summary: 'Create internal persona account (Admin only)' })
   @ApiResponse({ status: 201, description: 'Internal user account created' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden: Requires ADMINISTRATOR role' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden: Requires ADMINISTRATOR role',
+  })
   @ApiResponse({ status: 400, description: 'Validation failure' })
   async createInternalUser(@Body() createDto: CreateInternalUserDto) {
     return this.usersService.createInternalUser(createDto);
