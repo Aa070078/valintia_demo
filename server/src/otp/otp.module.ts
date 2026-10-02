@@ -5,6 +5,8 @@ import { RedisModule } from '../infrastructure/redis/redis.module.js';
 import { OtpController } from './otp.controller.js';
 import { OtpService } from './otp.service.js';
 
+// Imports the shared proof service so OTP can issue the registration bridge,
+// while Redis state and provider-specific email delivery remain separate concerns.
 @Module({
   imports: [RedisModule, MailModule, EmailVerificationModule],
   controllers: [OtpController],

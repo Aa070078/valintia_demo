@@ -12,6 +12,8 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
   imports: [
     PrismaModule,
     EmailVerificationModule,
+    // Login/access JwtService: user identity and role, normal JWT secret, 1h expiry.
+    // EmailVerificationModule privately configures its own JwtService for proofs.
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {

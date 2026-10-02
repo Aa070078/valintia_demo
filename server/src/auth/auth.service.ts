@@ -46,6 +46,8 @@ export class AuthService {
       role: user.role,
     };
 
+    // Login's access JWT represents authenticated identity (sub/role), using
+    // AuthModule's normal secret; email verification proof cannot log a user in.
     const accessToken = await this.jwtService.signAsync(payload);
 
     return {
@@ -59,10 +61,20 @@ export class AuthService {
     };
   }
 
+  /**
+   * Consumes recent email-verification proof from a separate OTP HTTP request.
+   * Input is the existing username/password contract plus verificationToken;
+   * output is the created CUSTOMER identity, not an access JWT or login session.
+   * Once proof passes, retain duplicate rejection, bcrypt hashing, CUSTOMER-only
+   * creation, mustChangePassword=false, and the response without a password hash.
+   */
   async register(registerDto: RegisterDto) {
     const { password, verificationToken } = registerDto;
+    // Match the representation used by the OTP Redis keys and signed email claim.
     const username = registerDto.username.trim().toLowerCase();
 
+    // Security gate BEFORE any database access: this exact normalized email must
+    // have passed EMAIL_VERIFICATION. Client verification booleans are not proof.
     await this.emailVerification.verify(verificationToken, username);
 
     const existingUser = await this.prisma.user.findUnique({

@@ -10,6 +10,7 @@ import {
 } from 'class-validator';
 import { OtpPurpose } from '../enums/otp-purpose.enum.js';
 
+/** First-stage challenge submission; registration later consumes the returned proof. */
 export class VerifyOtpDto {
   @ApiProperty({
     example: 'customer@example.com',

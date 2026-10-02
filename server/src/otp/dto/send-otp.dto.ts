@@ -3,6 +3,7 @@ import { Transform } from 'class-transformer';
 import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 import { OtpPurpose } from '../enums/otp-purpose.enum.js';
 
+/** Selects the normalized inbox and purpose for a challenge, not account creation. */
 export class SendOtpDto {
   @ApiProperty({
     example: 'customer@example.com',

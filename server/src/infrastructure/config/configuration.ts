@@ -22,12 +22,16 @@ export const redisConfig = registerAs('redis', () => ({
   ttlDefault: parseInt(process.env.REDIS_TTL_DEFAULT ?? '3600', 10),
 }));
 
+// Access JWTs represent login identity (sub/role); email proofs use separate config.
 export const jwtConfig = registerAs('jwt', () => ({
   secret: process.env.JWT_SECRET ?? process.env.JWT_ACCESS_SECRET ?? '',
   accessSecret: process.env.JWT_ACCESS_SECRET ?? '',
   refreshSecret: process.env.JWT_REFRESH_SECRET ?? '',
 }));
 
+// Short-lived registration proof settings, loaded through ConfigService.
+// SECRET is private signing material, never a token or frontend response field.
+// EXPIRES_IN is a duration (15m by default); JwtService derives iat/exp timestamps.
 export const emailVerificationTokenConfig = registerAs(
   'emailVerificationToken',
   () => ({
@@ -52,6 +56,8 @@ export const r2Config = registerAs('r2', () => ({
   publicBaseUrl: process.env.CLOUDFLARE_R2_PUBLIC_BASE_URL ?? '',
 }));
 
+// Independent Redis lifetimes: 300s challenge validity vs 60s resend blocking.
+// maxAttempts bounds guessing; neither retrying nor cooldown extends OTP validity.
 export const otpConfig = registerAs('otp', () => ({
   ttlSeconds: parseInt(process.env.OTP_TTL_SECONDS ?? '300', 10),
   cooldownSeconds: parseInt(process.env.OTP_COOLDOWN_SECONDS ?? '60', 10),
