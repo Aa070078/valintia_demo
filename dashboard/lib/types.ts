@@ -15,21 +15,12 @@ export type Role =
   | "COMPANY_OWNER"
   | "ADMINISTRATOR";
 
-export type ProjectStatus =
-  | "DRAFT"
-  | "SUBMITTED"
-  | "ENGINEER_REVIEW"
-  | "CONSULTATION_SCHEDULED"
-  | "SITE_VISIT_SCHEDULED"
-  | "SITE_VISIT_COMPLETED"
-  | "DESIGN_IN_PROGRESS"
-  | "DESIGN_DELIVERED"
-  | "BOQ_PREPARATION"
-  | "QUOTATION_CONFIRMED"
-  | "EXECUTION"
-  | "FINAL_INSPECTION"
-  | "HANDOVER"
-  | "COMPLETED";
+/**
+ * ProjectStatus strictly matches Prisma backend enum:
+ * enum ProjectStatus { DRAFT, SUBMITTED }
+ * Assignment is derived from leadEngineerId / assignment != null.
+ */
+export type ProjectStatus = "DRAFT" | "SUBMITTED";
 
 export type ScheduleHealth = "ON_SCHEDULE" | "AT_RISK" | "DELAYED";
 
@@ -39,20 +30,15 @@ export type SpaceType =
   | "MASTER_BEDROOM"
   | "BEDROOM"
   | "BATHROOM"
-  | "BALCONY";
+  | "BALCONY"
+  | "TERRACE"
+  | "DINING";
 
 export type DataSourceType =
   | "CUSTOMER_ENTERED"
   | "CAD_EXTRACTED"
   | "AI_INFERRED"
   | "ENGINEER_VERIFIED";
-
-export type SiteVisitStatus =
-  | "ASSIGNED"
-  | "ON_THE_WAY"
-  | "ARRIVED"
-  | "IN_PROGRESS"
-  | "COMPLETED";
 
 export interface User {
   id: number;
@@ -75,6 +61,15 @@ export interface ProjectAssignment {
   assignedAt: string;
 }
 
+export interface ProjectSpaceSummary {
+  id: string;
+  name: string;
+  type: string;
+  quantity: number;
+  styleName?: string;
+  notes?: string;
+}
+
 export interface ProjectMilestone {
   id: string;
   title: string;
@@ -83,60 +78,6 @@ export interface ProjectMilestone {
   completedDate?: string;
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "BLOCKED";
   progressPercent: number;
-}
-
-export interface SiteVisit {
-  id: string;
-  projectId: string;
-  projectName: string;
-  clientName: string;
-  clientPhone: string;
-  location: string;
-  compound: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  assignedEngineerId: number;
-  assignedEngineerName: string;
-  status: SiteVisitStatus;
-  laserScanCompleted?: boolean;
-  notes?: string;
-}
-
-export interface ChangeOrder {
-  id: string;
-  projectId: string;
-  projectName: string;
-  clientName: string;
-  title: string;
-  description: string;
-  requestedAt: string;
-  costImpactEgp: number;
-  timeImpactDays: number;
-  status: "PENDING_REVIEW" | "APPROVED" | "REJECTED";
-}
-
-export interface EngineeringDimensionItem {
-  id: string;
-  spaceName: string;
-  parameter: string;
-  customerEntered: string;
-  cadExtracted?: string;
-  aiInferred?: string;
-  engineerVerified?: string;
-  status: DataSourceType;
-  verifiedBy?: string;
-  verifiedAt?: string;
-}
-
-export interface CatalogPackage {
-  id: string;
-  name: string;
-  type: "2D_BLUEPRINT" | "3D_PHOTOREALISTIC" | "TURNKEY_FITOUT";
-  basePriceEgp: number;
-  ratePerMeterEgp?: number;
-  turnaroundDays: number;
-  includedRevisions: number;
-  isActive: boolean;
 }
 
 export interface AuditLogEntry {
@@ -155,16 +96,33 @@ export interface ProjectOverview {
   title: string;
   clientName: string;
   clientPhone: string;
-  typology: "VILLA" | "PENTHOUSE" | "DUPLEX" | "TOWNHOUSE";
+  clientEmail?: string;
+  customerLocation?: {
+    country: string;
+    city: string;
+    timezone?: string;
+  };
+  representative?: {
+    representationType: "client_in_person" | "valentia_direct" | "authorized_representative";
+    name?: string;
+    relationship?: string;
+    phone?: string;
+    email?: string;
+  };
+  typology: "VILLA" | "PENTHOUSE" | "DUPLEX" | "TOWNHOUSE" | "APARTMENT" | string;
   areaM2: number;
   location: string;
   compound: string;
   budgetEgp: number;
   status: ProjectStatus;
   health: ScheduleHealth;
-  leadEngineerId?: number;
-  leadEngineerName?: string;
+  leadEngineerId?: number | null;
+  leadEngineerName?: string | null;
   completionPercent: number;
+  spaces?: ProjectSpaceSummary[];
+  scopeType?: string;
+  targetTimeline?: string;
+  notes?: string;
   nextMilestone: string;
   nextMilestoneDate: string;
   createdAt: string;

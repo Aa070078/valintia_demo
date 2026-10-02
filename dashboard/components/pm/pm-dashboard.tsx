@@ -1,82 +1,134 @@
 "use client";
 
 import * as React from "react";
+import { MOCK_PROJECTS, MOCK_USERS } from "@/lib/mock-data";
+import { ProjectOverview } from "@/lib/types";
 import {
-  MOCK_PROJECTS,
-  MOCK_USERS,
-  MOCK_CHANGE_ORDERS,
-} from "@/lib/mock-data";
-import { ProjectOverview, ChangeOrder } from "@/lib/types";
-import {
-  CheckCircle,
-  Clock,
   UserGear,
-  MagnifyingGlass,
-  CurrencyDollar,
+  Buildings,
   HardHat,
-  Check,
+  Clock,
+  CheckCircle,
+  MagnifyingGlass,
+  User,
+  Phone,
+  ArrowsOutCardinal,
   X,
+  Check,
+  CaretRight,
+  UserPlus,
+  GlobeHemisphereWest,
 } from "@phosphor-icons/react";
 import { cn } from "@/lib/utils";
 
+// Format IANA timezone dynamically using Intl.DateTimeFormat (no hardcoded offsets)
+function formatCustomerTimezone(tz?: string): string {
+  if (!tz) return "UTC";
+  try {
+    const now = new Date();
+    const timeStr = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    }).format(now);
+    return `${tz} (Local: ${timeStr})`;
+  } catch {
+    return tz;
+  }
+}
+
 export function PmDashboard() {
   const [projects, setProjects] = React.useState<ProjectOverview[]>(MOCK_PROJECTS);
+  const [activeTab, setActiveTab] = React.useState<"INTAKE" | "ACTIVE" | "ALL">("INTAKE");
   const [search, setSearch] = React.useState("");
-  const [healthFilter, setHealthFilter] = React.useState<string>("ALL");
-  const [changeOrders, setChangeOrders] = React.useState<ChangeOrder[]>(MOCK_CHANGE_ORDERS);
   const [selectedProject, setSelectedProject] = React.useState<ProjectOverview | null>(null);
+  const [assigningProjectId, setAssigningProjectId] = React.useState<string | null>(null);
+  const [selectedEngineerId, setSelectedEngineerId] = React.useState<number | "">("");
+  const [successToast, setSuccessToast] = React.useState<string | null>(null);
 
-  // Engineers list
   const engineers = MOCK_USERS.filter((u) => u.role === "ENGINEER");
 
-  // Reassign engineer handler
-  const handleAssignEngineer = (projectId: string, engineerId: number) => {
+  // Filter queues: Intake = unassigned; Active = assigned
+  const intakeQueue = React.useMemo(() => {
+    return projects.filter(
+      (p) => p.status === "SUBMITTED" && (!p.leadEngineerId || p.leadEngineerId === null)
+    );
+  }, [projects]);
+
+  const activeQueue = React.useMemo(() => {
+    return projects.filter(
+      (p) => p.status === "SUBMITTED" && p.leadEngineerId != null
+    );
+  }, [projects]);
+
+  // Current tab items with search
+  const displayedProjects = React.useMemo(() => {
+    let source = projects;
+    if (activeTab === "INTAKE") source = intakeQueue;
+    else if (activeTab === "ACTIVE") source = activeQueue;
+
+    if (!search.trim()) return source;
+    const q = search.toLowerCase();
+    return source.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.clientName.toLowerCase().includes(q) ||
+        p.code.toLowerCase().includes(q) ||
+        p.compound.toLowerCase().includes(q) ||
+        p.location.toLowerCase().includes(q)
+    );
+  }, [projects, activeTab, intakeQueue, activeQueue, search]);
+
+  // Handle Engineer Assignment (Status strictly remains SUBMITTED; assigned state is derived from leadEngineerId)
+  const handleConfirmAssignment = (projectId: string, engineerId: number) => {
     const engineer = engineers.find((e) => e.id === engineerId);
     if (!engineer) return;
 
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === projectId
-          ? {
-              ...p,
-              leadEngineerId: engineer.id,
-              leadEngineerName: engineer.name,
-            }
-          : p
-      )
-    );
-  };
-
-  // Change order action
-  const handleCOAction = (coId: string, status: "APPROVED" | "REJECTED") => {
-    setChangeOrders((prev) =>
-      prev.map((co) => (co.id === coId ? { ...co, status } : co))
-    );
-  };
-
-  // Filtered projects
-  const filteredProjects = React.useMemo(() => {
-    return projects.filter((p) => {
-      const matchesSearch =
-        p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.clientName.toLowerCase().includes(search.toLowerCase()) ||
-        p.code.toLowerCase().includes(search.toLowerCase()) ||
-        p.compound.toLowerCase().includes(search.toLowerCase());
-
-      const matchesHealth =
-        healthFilter === "ALL" || p.health === healthFilter;
-
-      return matchesSearch && matchesHealth;
+    const updated = projects.map((p) => {
+      if (p.id !== projectId) return p;
+      return {
+        ...p,
+        leadEngineerId: engineer.id,
+        leadEngineerName: engineer.name,
+        // Status remains SUBMITTED (aligned with Prisma schema)
+        nextMilestone: "Architectural Specification & Feasibility Review",
+        nextMilestoneDate: new Date(Date.now() + 4 * 86400000).toISOString().slice(0, 10),
+      };
     });
-  }, [projects, search, healthFilter]);
 
-  const totalValue = projects.reduce((acc, p) => acc + p.budgetEgp, 0);
-  const onScheduleCount = projects.filter((p) => p.health === "ON_SCHEDULE").length;
-  const atRiskCount = projects.filter((p) => p.health !== "ON_SCHEDULE").length;
+    setProjects(updated);
+
+    // If modal is open for this project, update selected dossier
+    if (selectedProject?.id === projectId) {
+      const match = updated.find((p) => p.id === projectId);
+      if (match) setSelectedProject(match);
+    }
+
+    setAssigningProjectId(null);
+    setSelectedEngineerId("");
+    setSuccessToast(`Successfully assigned ${engineer.name} to ${updated.find((p) => p.id === projectId)?.title}`);
+    setTimeout(() => setSuccessToast(null), 4000);
+  };
+
+  const getWorkflowBadge = (project: ProjectOverview) => {
+    if (project.leadEngineerId != null) {
+      return {
+        label: `Assigned · ${project.leadEngineerName || "Site Architect"}`,
+        className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/50 dark:text-blue-300",
+      };
+    }
+    return {
+      label: "Needs Engineer Assignment",
+      className: "bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/60 dark:text-amber-200",
+    };
+  };
+
+  const targetAssignProject = projects.find((p) => p.id === assigningProjectId);
 
   return (
-    <div className="space-y-8 p-6 lg:p-8">
-      {/* Top Banner & Header */}
+    <div className="space-y-8 p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
+      {/* Top Banner & PM Desk Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono uppercase tracking-wider mb-2">
@@ -84,391 +136,585 @@ export function PmDashboard() {
             <span>PROJECT MANAGEMENT OPS DESK</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-normal tracking-tight text-foreground">
-            Portfolio Command & Delivery Matrix
+            Project Intake &amp; Delivery Matrix
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            Supervise fit-out progress, assign site engineers, monitor milestone SLA, and resolve client change requests.
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+            Review incoming customer submissions, assign certified site engineers, track spatial scopes, and advance fit-out milestones.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3.5 py-1.5 rounded-lg border border-border bg-card text-xs flex items-center gap-2">
+          <div className="px-3.5 py-1.5 rounded-lg border border-border bg-card text-xs flex items-center gap-2 font-mono">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-muted-foreground font-mono">LIVE SYNC:</span>
-            <span className="font-semibold text-foreground">6 ACTIVE FIT-OUTS</span>
+            <span className="text-muted-foreground">LEAD PM:</span>
+            <span className="font-semibold text-foreground">Nouran Hassan</span>
           </div>
         </div>
       </div>
 
       {/* KPI Metric Strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Total Portfolio Value</span>
-            <CurrencyDollar className="w-4 h-4 text-primary" />
+            <span className="font-mono uppercase">Intake Queue (Needs Assignment)</span>
+            <Clock className="w-4 h-4 text-amber-500" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
-            EGP {(totalValue / 1_000_000).toFixed(1)}M
+            {intakeQueue.length}
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Across 6 contracted residences
+            New submissions awaiting PM triage
           </p>
         </div>
 
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Schedule Adherence</span>
+            <span className="font-mono uppercase">Assigned Fit-Outs</span>
             <CheckCircle className="w-4 h-4 text-emerald-500" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
-            {Math.round((onScheduleCount / projects.length) * 100)}%
+            {activeQueue.length}
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            {onScheduleCount} on track · {atRiskCount} flagged for review
+            Active under architectural engineering review
           </p>
         </div>
 
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Lead Engineers Active</span>
-            <HardHat className="w-4 h-4 text-amber-500" />
+            <span className="font-mono uppercase">Engineers on Duty</span>
+            <HardHat className="w-4 h-4 text-primary" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
             {engineers.length} Architects
           </div>
           <p className="text-[11px] text-muted-foreground mt-1">
-            Average workload 2.8 projects/eng
-          </p>
-        </div>
-
-        <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-          <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
-            <span className="font-mono uppercase">Pending Change Orders</span>
-            <Clock className="w-4 h-4 text-blue-500" />
-          </div>
-          <div className="text-2xl font-semibold text-foreground font-mono">
-            {changeOrders.filter((c) => c.status === "PENDING_REVIEW").length}
-          </div>
-          <p className="text-[11px] text-muted-foreground mt-1">
-            Requires cost/schedule approval
+            Available for commission assignment
           </p>
         </div>
       </div>
 
-      {/* Main Grid: Projects Table + Engineer Capacity */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Projects Matrix */}
-        <div className="xl:col-span-8 space-y-4">
-          {/* Search & Health Filter Bar */}
-          <div className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-            <div className="relative w-full sm:w-72">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by code, villa, client..."
-                className="w-full h-9 px-3 ps-8 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
-              />
-              <MagnifyingGlass className="w-3.5 h-3.5 absolute left-2.5 top-3 text-muted-foreground" />
-            </div>
+      {/* Success Notification */}
+      {successToast && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between animate-in fade-in">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <span>{successToast}</span>
+          </div>
+          <button
+            onClick={() => setSuccessToast(null)}
+            className="text-emerald-600 hover:text-emerald-900"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
 
-            <div className="flex items-center gap-1.5 w-full sm:w-auto">
-              <span className="text-[11px] font-mono text-muted-foreground mr-1">HEALTH:</span>
-              {(["ALL", "ON_SCHEDULE", "AT_RISK", "DELAYED"] as const).map((h) => (
-                <button
-                  key={h}
-                  onClick={() => setHealthFilter(h)}
+      {/* Main Work Area: Queue Tabs & Projects Table */}
+      <div className="space-y-4">
+        {/* Navigation Tabs & Search */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-2 rounded-xl border border-border bg-card shadow-xs">
+          {/* Queue Filter Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto">
+            <button
+              type="button"
+              onClick={() => setActiveTab("INTAKE")}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium font-mono uppercase transition-colors cursor-pointer flex items-center gap-2",
+                activeTab === "INTAKE"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span>Intake Queue</span>
+              {intakeQueue.length > 0 && (
+                <span
                   className={cn(
-                    "px-2.5 py-1 rounded text-[10px] font-medium font-mono uppercase transition-colors cursor-pointer",
-                    healthFilter === h
-                      ? "bg-primary text-primary-foreground font-semibold"
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    "px-1.5 py-0.2 rounded-full text-[10px] font-bold",
+                    activeTab === "INTAKE" ? "bg-primary-foreground text-primary" : "bg-amber-100 text-amber-900"
                   )}
                 >
-                  {h.replace("_", " ")}
-                </button>
-              ))}
-            </div>
+                  {intakeQueue.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("ACTIVE")}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium font-mono uppercase transition-colors cursor-pointer flex items-center gap-2",
+                activeTab === "ACTIVE"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span>Assigned Portfolio</span>
+              <span className="text-[10px] opacity-75">({activeQueue.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("ALL")}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-medium font-mono uppercase transition-colors cursor-pointer",
+                activeTab === "ALL"
+                  ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <span>All Projects ({projects.length})</span>
+            </button>
           </div>
 
-          {/* Projects Table */}
-          <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+          {/* Search Box */}
+          <div className="relative w-full sm:w-64">
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search code, title, client, compound..."
+              className="w-full h-8 px-3 ps-8 rounded-lg border border-border bg-background text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary"
+            />
+            <MagnifyingGlass className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-muted-foreground" />
+          </div>
+        </div>
+
+        {/* Project Queue Table */}
+        <div className="rounded-xl border border-border bg-card overflow-hidden shadow-xs">
+          {displayedProjects.length === 0 ? (
+            <div className="p-12 text-center space-y-2">
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mx-auto text-muted-foreground">
+                <Buildings className="w-5 h-5" />
+              </div>
+              <div className="text-sm font-medium text-foreground">
+                {activeTab === "INTAKE"
+                  ? "Intake Queue is Clear"
+                  : "No Projects Found"}
+              </div>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                {activeTab === "INTAKE"
+                  ? "All incoming customer submissions have been assigned to site engineers."
+                  : "No projects match the current search criteria or queue filter."}
+              </p>
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
                 <thead className="bg-muted/50 text-[10px] uppercase font-mono text-muted-foreground border-b border-border">
                   <tr>
-                    <th className="py-3 px-4">Code & Project</th>
-                    <th className="py-3 px-4">Client & Compound</th>
-                    <th className="py-3 px-4">Budget</th>
-                    <th className="py-3 px-4">Health</th>
-                    <th className="py-3 px-4">Lead Engineer</th>
-                    <th className="py-3 px-4">Next Milestone</th>
+                    <th className="py-3 px-4">Code &amp; Project</th>
+                    <th className="py-3 px-4">Client &amp; Location</th>
+                    <th className="py-3 px-4">Typology / Scope</th>
+                    <th className="py-3 px-4">Workflow State</th>
+                    <th className="py-3 px-4">Assigned Engineer</th>
+                    <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredProjects.map((p) => (
-                    <tr
-                      key={p.id}
-                      className="hover:bg-muted/30 transition-colors cursor-pointer"
-                      onClick={() => setSelectedProject(p)}
-                    >
-                      <td className="py-3.5 px-4">
-                        <div className="font-semibold text-foreground">{p.title}</div>
-                        <div className="text-[10px] font-mono text-muted-foreground">
-                          {p.code} · {p.typology} ({p.areaM2}m²)
-                        </div>
-                      </td>
+                  {displayedProjects.map((p) => {
+                    const statusBadge = getWorkflowBadge(p);
 
-                      <td className="py-3.5 px-4">
-                        <div className="text-foreground font-medium">{p.clientName}</div>
-                        <div className="text-[10px] text-muted-foreground">{p.compound}</div>
-                      </td>
+                    return (
+                      <tr
+                        key={p.id}
+                        className="hover:bg-muted/30 transition-colors"
+                      >
+                        <td className="py-3.5 px-4">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedProject(p)}
+                            className="text-start group cursor-pointer"
+                          >
+                            <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                              {p.title}
+                            </div>
+                            <div className="text-[10px] font-mono text-muted-foreground">
+                              {p.code} · Created {p.createdAt}
+                            </div>
+                          </button>
+                        </td>
 
-                      <td className="py-3.5 px-4 font-mono font-medium text-foreground">
-                        EGP {(p.budgetEgp / 1_000_000).toFixed(2)}M
-                      </td>
+                        <td className="py-3.5 px-4">
+                          <div className="text-foreground font-medium">{p.clientName}</div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {p.compound ? `${p.compound}, ` : ""}{p.location}
+                          </div>
+                        </td>
 
-                      <td className="py-3.5 px-4">
-                        <span
-                          className={cn(
-                            "inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono font-medium",
-                            p.health === "ON_SCHEDULE"
-                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
-                              : p.health === "AT_RISK"
-                              ? "bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
-                              : "bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-300"
-                          )}
-                        >
+                        <td className="py-3.5 px-4">
+                          <div className="font-mono font-medium text-foreground">
+                            {p.typology} · {p.areaM2} m²
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {p.spaces?.length || 0} Spaces Defined
+                          </div>
+                        </td>
+
+                        <td className="py-3.5 px-4">
                           <span
                             className={cn(
-                              "w-1.5 h-1.5 rounded-full",
-                              p.health === "ON_SCHEDULE"
-                                ? "bg-emerald-500"
-                                : p.health === "AT_RISK"
-                                ? "bg-amber-500"
-                                : "bg-red-500"
+                              "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border",
+                              statusBadge.className
                             )}
-                          />
-                          {p.health.replace("_", " ")}
-                        </span>
-                      </td>
+                          >
+                            {statusBadge.label}
+                          </span>
+                        </td>
 
-                      <td className="py-3.5 px-4" onClick={(e) => e.stopPropagation()}>
-                        <select
-                          value={p.leadEngineerId || ""}
-                          onChange={(e) =>
-                            handleAssignEngineer(p.id, Number(e.target.value))
-                          }
-                          className="h-7 px-2 rounded border border-border bg-background text-[11px] text-foreground focus:ring-1 focus:ring-primary outline-none cursor-pointer"
-                        >
-                          {engineers.map((eng) => (
-                            <option key={eng.id} value={eng.id}>
-                              {eng.name}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
+                        <td className="py-3.5 px-4">
+                          {p.leadEngineerName ? (
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span className="font-medium text-foreground">{p.leadEngineerName}</span>
+                            </div>
+                          ) : (
+                            <span className="text-[11px] font-mono text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-200">
+                              Unassigned
+                            </span>
+                          )}
+                        </td>
 
-                      <td className="py-3.5 px-4">
-                        <div className="text-foreground truncate max-w-[140px]" title={p.nextMilestone}>
-                          {p.nextMilestone}
-                        </div>
-                        <div className="text-[10px] font-mono text-muted-foreground">
-                          Due: {p.nextMilestoneDate}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="inline-flex items-center gap-2">
+                            {!p.leadEngineerId ? (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAssigningProjectId(p.id);
+                                  setSelectedEngineerId("");
+                                }}
+                                className="h-7 px-3 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+                              >
+                                <UserPlus className="w-3.5 h-3.5" />
+                                <span>Assign Engineer</span>
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAssigningProjectId(p.id);
+                                  setSelectedEngineerId(Number(p.leadEngineerId));
+                                }}
+                                className="h-7 px-2.5 rounded-lg border border-border bg-card hover:bg-muted text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                              >
+                                Reassign
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => setSelectedProject(p)}
+                              className="h-7 px-2.5 rounded-lg border border-border bg-card hover:bg-muted text-xs text-foreground cursor-pointer transition-colors flex items-center gap-1"
+                            >
+                              <span>Dossier</span>
+                              <CaretRight className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-
-        {/* Right Column: Engineer Capacity & Change Orders */}
-        <div className="xl:col-span-4 space-y-6">
-          {/* Engineer Workload Matrix */}
-          <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-xs font-mono uppercase text-foreground">
-                <HardHat className="w-4 h-4 text-primary" />
-                <span className="font-semibold">Engineer Allocation Matrix</span>
-              </div>
-              <span className="text-[10px] text-muted-foreground font-mono">MAX 4 / ENG</span>
-            </div>
-
-            <div className="space-y-3.5">
-              {engineers.map((eng) => {
-                const count = projects.filter((p) => p.leadEngineerId === eng.id).length;
-                const percent = Math.min((count / 4) * 100, 100);
-
-                return (
-                  <div key={eng.id} className="p-3 rounded-lg border border-border bg-muted/20">
-                    <div className="flex items-center justify-between text-xs mb-1.5">
-                      <span className="font-medium text-foreground">{eng.name}</span>
-                      <span className="font-mono text-[11px] text-muted-foreground">
-                        {count} / 4 Projects
-                      </span>
-                    </div>
-
-                    <div className="w-full h-2 rounded-full bg-border overflow-hidden">
-                      <div
-                        className={cn(
-                          "h-full rounded-full transition-all duration-300",
-                          count >= 4
-                            ? "bg-red-500"
-                            : count >= 3
-                            ? "bg-amber-500"
-                            : "bg-primary"
-                        )}
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Change Orders Triage Card */}
-          <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2 text-xs font-mono uppercase text-foreground">
-                <Clock className="w-4 h-4 text-primary" />
-                <span className="font-semibold">Change Orders Pending PM Review</span>
-              </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-                {changeOrders.filter((c) => c.status === "PENDING_REVIEW").length} PENDING
-              </span>
-            </div>
-
-            <div className="space-y-3">
-              {changeOrders.map((co) => (
-                <div key={co.id} className="p-3.5 rounded-lg border border-border bg-muted/20 text-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-[10px] text-muted-foreground">{co.projectName}</span>
-                    <span
-                      className={cn(
-                        "text-[10px] font-mono uppercase px-1.5 py-0.2 rounded",
-                        co.status === "APPROVED"
-                          ? "bg-emerald-100 text-emerald-800"
-                          : co.status === "REJECTED"
-                          ? "bg-red-100 text-red-800"
-                          : "bg-amber-100 text-amber-800"
-                      )}
-                    >
-                      {co.status.replace("_", " ")}
-                    </span>
-                  </div>
-
-                  <h4 className="font-medium text-foreground text-xs leading-snug mb-1.5">
-                    {co.title}
-                  </h4>
-
-                  <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-                    {co.description}
-                  </p>
-
-                  <div className="flex items-center justify-between border-t border-border pt-2 text-[11px]">
-                    <span className="font-mono font-medium text-foreground">
-                      +EGP {co.costImpactEgp.toLocaleString()} · +{co.timeImpactDays} Days
-                    </span>
-
-                    {co.status === "PENDING_REVIEW" && (
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleCOAction(co.id, "APPROVED")}
-                          className="h-6 px-2.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <Check className="w-3 h-3" />
-                          <span>Approve</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleCOAction(co.id, "REJECTED")}
-                          className="h-6 px-2 rounded bg-muted hover:bg-red-100 text-red-600 text-[10px] font-medium flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <X className="w-3 h-3" />
-                          <span>Reject</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Selected Project Quick Inspection Modal */}
-      {selectedProject && (
+      {/* Assign Engineer Dialog / Modal */}
+      {assigningProjectId && targetAssignProject && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b border-border pb-3">
+          <div className="bg-card border border-border rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-start justify-between border-b border-border pb-3">
               <div>
                 <span className="text-[10px] font-mono uppercase text-muted-foreground">
-                  {selectedProject.code} · {selectedProject.typology}
+                  {targetAssignProject.code} · Commission Assignment
                 </span>
-                <h3 className="font-serif text-xl font-normal text-foreground">
-                  {selectedProject.title}
+                <h3 className="font-serif text-lg font-normal text-foreground">
+                  Assign Lead Architect / Site Engineer
                 </h3>
               </div>
               <button
                 type="button"
-                onClick={() => setSelectedProject(null)}
+                onClick={() => setAssigningProjectId(null)}
                 className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Client Name:</span>
-                <span className="font-medium text-foreground">{selectedProject.clientName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Client Phone:</span>
-                <span className="font-mono text-foreground">{selectedProject.clientPhone}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Location & Compound:</span>
-                <span className="text-foreground">{selectedProject.compound}, {selectedProject.location}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Contracted Area:</span>
-                <span className="font-mono text-foreground">{selectedProject.areaM2} m²</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Total Budget:</span>
-                <span className="font-mono font-medium text-foreground">
-                  EGP {selectedProject.budgetEgp.toLocaleString()}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Lead Architect:</span>
-                <span className="font-medium text-foreground">{selectedProject.leadEngineerName || "Unassigned"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Current Phase:</span>
-                <span className="font-mono uppercase font-semibold text-primary">{selectedProject.status}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Next Milestone:</span>
-                <span className="text-foreground font-medium">{selectedProject.nextMilestone} ({selectedProject.nextMilestoneDate})</span>
+            <div className="p-3 rounded-lg bg-muted/40 border border-border/80 text-xs space-y-1">
+              <div><strong>Project:</strong> {targetAssignProject.title}</div>
+              <div><strong>Client:</strong> {targetAssignProject.clientName} ({targetAssignProject.location})</div>
+              <div><strong>Typology:</strong> {targetAssignProject.typology} · {targetAssignProject.areaM2} m²</div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="block text-xs font-mono uppercase text-muted-foreground">
+                Select Certified Site Engineer:
+              </label>
+
+              <div className="space-y-2">
+                {engineers.map((eng) => {
+                  const currentCount = projects.filter((p) => p.leadEngineerId === eng.id).length;
+                  const isSelected = selectedEngineerId === eng.id;
+
+                  return (
+                    <div
+                      key={eng.id}
+                      onClick={() => setSelectedEngineerId(eng.id)}
+                      className={cn(
+                        "p-3 rounded-xl border flex items-center justify-between text-xs cursor-pointer transition-all",
+                        isSelected
+                          ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                          : "border-border bg-card hover:bg-muted/40"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold font-mono">
+                          {eng.name.split(" ").map((n) => n[0]).slice(0, 2).join("")}
+                        </div>
+                        <div>
+                          <div className="font-medium text-foreground">{eng.name}</div>
+                          <div className="text-[11px] text-muted-foreground font-mono">
+                            {eng.phone || eng.email}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-[10px] font-mono text-muted-foreground block">
+                          Current Load
+                        </span>
+                        <span className="font-mono text-xs font-semibold text-foreground">
+                          {currentCount} {currentCount === 1 ? "Project" : "Projects"}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="pt-2 border-t border-border flex justify-end gap-2">
+            <div className="flex justify-end gap-2 pt-2 border-t border-border">
+              <button
+                type="button"
+                onClick={() => setAssigningProjectId(null)}
+                className="px-4 py-2 rounded-lg border border-border text-xs text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={!selectedEngineerId}
+                onClick={() => handleConfirmAssignment(targetAssignProject.id, Number(selectedEngineerId))}
+                className={cn(
+                  "px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer",
+                  selectedEngineerId
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                )}
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Confirm Assignment</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Full Project Inspection Dossier Modal */}
+      {selectedProject && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+          <div className="bg-card border border-border rounded-2xl max-w-2xl w-full p-6 space-y-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between border-b border-border pb-4">
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                    {selectedProject.code} · PM COMMISSION DOSSIER
+                  </span>
+                  <span
+                    className={cn(
+                      "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border",
+                      getWorkflowBadge(selectedProject).className
+                    )}
+                  >
+                    {getWorkflowBadge(selectedProject).label}
+                  </span>
+                </div>
+                <h3 className="font-serif text-2xl font-normal text-foreground">
+                  {selectedProject.title}
+                </h3>
+              </div>
+
               <button
                 type="button"
                 onClick={() => setSelectedProject(null)}
-                className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors"
+                className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
               >
-                Close Dossier
+                <X className="w-4 h-4" />
               </button>
+            </div>
+
+            {/* Client & Representative Information */}
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/80 space-y-3">
+              <div className="flex items-center justify-between text-xs font-mono uppercase text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <User className="w-3.5 h-3.5 text-primary" />
+                  <span>Customer &amp; Representation Information</span>
+                </span>
+                <span className="text-[10px] text-foreground font-mono">
+                  Budget: EGP {selectedProject.budgetEgp.toLocaleString()}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Primary Client:</span>
+                  <span className="font-medium text-foreground">{selectedProject.clientName}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Phone Contact:</span>
+                  <a
+                    href={`tel:${selectedProject.clientPhone}`}
+                    className="font-mono text-primary hover:underline flex items-center gap-1.5"
+                  >
+                    <Phone className="w-3 h-3" />
+                    <span>{selectedProject.clientPhone}</span>
+                  </a>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Customer Location &amp; Timezone:</span>
+                  <span className="text-foreground flex items-center gap-1.5 font-mono text-[11px]">
+                    <GlobeHemisphereWest className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>
+                      {selectedProject.customerLocation?.city
+                        ? `${selectedProject.customerLocation.city}, ${selectedProject.customerLocation.country} · `
+                        : ""}
+                      {formatCustomerTimezone(selectedProject.customerLocation?.timezone)}
+                    </span>
+                  </span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Representation in Egypt:</span>
+                  <span className="font-medium text-foreground">
+                    {selectedProject.representative?.representationType === "client_in_person"
+                      ? "Client in Egypt in person"
+                      : selectedProject.representative?.representationType === "valentia_direct"
+                      ? "Direct Valentia Management"
+                      : selectedProject.representative?.name
+                      ? `${selectedProject.representative.name} (${selectedProject.representative.relationship || "Rep"}) · ${selectedProject.representative.phone || ""}`
+                      : "Authorized Representative"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Specifications */}
+            <div className="p-4 rounded-xl bg-muted/30 border border-border/80 space-y-3">
+              <div className="flex items-center gap-2 text-xs font-mono uppercase text-muted-foreground">
+                <Buildings className="w-3.5 h-3.5 text-primary" />
+                <span>Property Details &amp; Scope</span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Typology:</span>
+                  <span className="font-mono font-medium text-foreground">{selectedProject.typology}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Contracted Area:</span>
+                  <span className="font-mono font-medium text-foreground">{selectedProject.areaM2} m²</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Compound:</span>
+                  <span className="font-medium text-foreground">{selectedProject.compound || "Stand-alone"}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground block text-[11px]">Target Timeline:</span>
+                  <span className="font-medium text-foreground">{selectedProject.targetTimeline || "Standard"}</span>
+                </div>
+              </div>
+
+              {selectedProject.notes && (
+                <div className="border-t border-border/60 pt-2 text-xs">
+                  <span className="text-muted-foreground block text-[11px]">Customer Directives:</span>
+                  <p className="text-foreground leading-relaxed mt-0.5 bg-background/50 p-2 rounded-lg border border-border/40 font-mono text-[11px] whitespace-pre-wrap">
+                    {selectedProject.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Spaces Breakdown */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-mono uppercase text-muted-foreground">
+                  <ArrowsOutCardinal className="w-3.5 h-3.5 text-primary" />
+                  <span>Configured Spaces Scope ({selectedProject.spaces?.length || 0})</span>
+                </div>
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  {selectedProject.scopeType || "Turnkey Fit-Out"}
+                </span>
+              </div>
+
+              {selectedProject.spaces && selectedProject.spaces.length > 0 ? (
+                <div className="border border-border rounded-xl divide-y divide-border overflow-hidden">
+                  {selectedProject.spaces.map((sp) => (
+                    <div key={sp.id} className="p-3 bg-card flex items-center justify-between text-xs">
+                      <div>
+                        <div className="font-medium text-foreground">{sp.name}</div>
+                        <div className="text-[10px] text-muted-foreground font-mono">
+                          Type: {sp.type.replace(/_/g, " ")} · Qty: {sp.quantity}
+                        </div>
+                      </div>
+                      {sp.styleName && (
+                        <div className="px-2.5 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-mono font-medium">
+                          {sp.styleName}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl border border-dashed border-border text-center text-xs text-muted-foreground">
+                  No spaces configured in intake.
+                </div>
+              )}
+            </div>
+
+            {/* Assignment & Actions */}
+            <div className="border-t border-border pt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="text-xs">
+                <span className="text-muted-foreground">Assigned Engineer: </span>
+                <span className="font-medium text-foreground">
+                  {selectedProject.leadEngineerName || "Unassigned"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAssigningProjectId(selectedProject.id);
+                    setSelectedEngineerId(selectedProject.leadEngineerId ? Number(selectedProject.leadEngineerId) : "");
+                  }}
+                  className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-medium cursor-pointer hover:bg-primary/90 transition-colors flex items-center gap-1.5 shadow-xs"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>{selectedProject.leadEngineerId ? "Reassign Engineer" : "Assign Engineer"}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedProject(null)}
+                  className="px-4 py-2 rounded-lg border border-border bg-card hover:bg-muted text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                >
+                  Close Dossier
+                </button>
+              </div>
             </div>
           </div>
         </div>
