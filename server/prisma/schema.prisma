@@ -50,6 +50,12 @@ enum SpaceType {
   CUSTOM
 }
 
+enum StylePreferenceMode {
+  WHOLE_PROJECT
+  PER_SPACE
+  ENGINEER_DECIDES
+}
+
 enum ScopeType {
   FULL_FITOUT
   RENOVATION
@@ -99,26 +105,27 @@ model User {
 }
 
 model Project {
-  id             Int                    @id @default(autoincrement())
-  title          String
-  status         ProjectStatus          @default(DRAFT)
-  notes          String?
-  coverImage     String?
-  primaryStyleId String?
-  clientId       Int
-  client         User                   @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Restrict)
-  property       Property?
-  spaces         Space[]
-  location       CustomerLocation?
-  representative ProjectRepresentative?
-  scope          ProjectScope?
-  budget         ProjectBudget?
-  timeline       TargetCompletion?
-  documents      ProjectDocument[]
-  assignment     ProjectAssignment?
-  activities     ProjectActivity[]
-  createdAt      DateTime               @default(now())
-  updatedAt      DateTime               @updatedAt
+  id         Int           @id @default(autoincrement())
+  title      String
+  status     ProjectStatus @default(DRAFT)
+  coverImage String?
+  clientId   Int
+
+  client          User                    @relation("ClientProjects", fields: [clientId], references: [id], onDelete: Restrict)
+  property        Property?
+  spaces          Space[]
+  stylePreference ProjectStylePreference?
+  location        CustomerLocation?
+  representative  ProjectRepresentative?
+  scope           ProjectScope?
+  budget          ProjectBudget?
+  timeline        TargetCompletion?
+  documents       ProjectDocument[]
+  assignments     ProjectAssignment[]
+  activities      ProjectActivity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([clientId])
   @@map("projects")
@@ -143,23 +150,60 @@ model Property {
 }
 
 model Space {
-  id              Int       @id @default(autoincrement())
-  projectId       Int
-  project         Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  type            SpaceType
-  customName      String?
-  quantity        Int       @default(1)
-  included        Boolean   @default(true)
-  styleId         String?
-  styleName       String?
-  styleNotes      String?
-  referenceImages String[]
-  notes           String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  type       SpaceType
+  customName String?
+
+  stylePreference SpaceStylePreference?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId])
   @@map("spaces")
+}
+
+model ProjectStylePreference {
+  id        Int     @id @default(autoincrement())
+  projectId Int     @unique
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  mode StylePreferenceMode
+
+  // Used when mode = WHOLE_PROJECT
+  styleId   String?
+  styleName String?
+
+  // Used when mode = ENGINEER_DECIDES
+  // Can also contain general style-related notes.
+  notes String?
+
+  spacePreferences SpaceStylePreference[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("project_style_preferences")
+}
+
+model SpaceStylePreference {
+  id                       Int                    @id @default(autoincrement())
+  projectStylePreferenceId Int
+  spaceId                  Int                    @unique
+  styleId                  String
+  styleName                String?
+  notes                    String?
+  projectStylePreference   ProjectStylePreference @relation(fields: [projectStylePreferenceId], references: [id], onDelete: Cascade)
+  space                    Space                  @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectStylePreferenceId])
+  @@map("space_style_preferences")
 }
 
 model CustomerLocation {
@@ -197,14 +241,13 @@ model ProjectRepresentative {
 }
 
 model ProjectScope {
-  id            Int       @id @default(autoincrement())
-  projectId     Int       @unique
-  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  scopeType     ScopeType
-  customDetails String?
-  notes         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  projectId Int       @unique
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scopeType ScopeType
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@map("project_scopes")
 }
@@ -244,7 +287,7 @@ model ProjectDocument {
   name       String
   category   DocumentCategory
   url        String
-  sizeBytes  BigInt?
+  sizeBytes  Int?
   uploadedAt DateTime         @default(now())
   createdAt  DateTime         @default(now())
   updatedAt  DateTime         @updatedAt
@@ -254,14 +297,18 @@ model ProjectDocument {
 }
 
 model ProjectAssignment {
-  id         Int      @id @default(autoincrement())
-  projectId  Int      @unique
-  project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  engineerId Int
-  engineer   User     @relation("EngineerAssignments", fields: [engineerId], references: [id], onDelete: Restrict)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
+  engineerId Int
+  engineer   User @relation("EngineerAssignments", fields: [engineerId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, engineerId])
+  @@index([projectId])
   @@index([engineerId])
   @@map("project_assignments")
 }

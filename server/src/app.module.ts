@@ -8,9 +8,16 @@ import { PrismaModule } from './infrastructure/database/prisma.module.js';
 import { RedisModule } from './infrastructure/redis/redis.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { UsersModule } from './users/users.module.js';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
+    }),
+    
     AppConfigModule,
     PrismaModule,
     RedisModule,
@@ -22,4 +29,4 @@ import { UsersModule } from './users/users.module.js';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

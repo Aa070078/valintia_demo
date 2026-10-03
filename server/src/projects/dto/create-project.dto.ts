@@ -1,48 +1,142 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+
+/**
+ * --------------------------------------------------------------------------
+ * Create Project DTO
+ * --------------------------------------------------------------------------
+ *
+ * IMPORTANT:
+ *
+ * This DTO intentionally supports partial draft creation.
+ *
+ * The wizard can call:
+ *
+ * Step 1:
+ * {
+ *   "property": {
+ *     "propertyType": "villa"
+ *   }
+ * }
+ *
+ * Step 2:
+ * {
+ *   "property": {
+ *     "city": "New Cairo",
+ *     "areaSqm": 250
+ *   }
+ * }
+ *
+  * Step 3:
+ * {
+ *   "spaces": [
+ *     {
+ *       "type": "bedroom",
+ *       "customName": "Master Bedroom"
+ *     },
+ *     {
+ *       "type": "bedroom",
+ *       "customName": "Kids Bedroom"
+ *     },
+ *     {
+ *       "type": "bathroom",
+ *       "customName": "Master Bathroom"
+ *     }
+ *   ]
+ * }
+ * And so on.
+ *
+ * The project remains DRAFT until the submit endpoint performs the
+ * complete business validation.
+ */
+
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
-  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { CreatePropertyDto } from './create-property.dto.js';
-import { CreateSpaceDto } from './create-space.dto.js';
+
+
+import { PropertyDto } from './property.dto.js';
+import { SpaceDto } from './space.dto.js';
+import { ProjectStylePreferenceDto } from './style-preference.dto.js';
+import { CustomerLocationDto } from './customer-location.dto.js';
+import { RepresentativeDto } from './representative.dto.js';
+import { ProjectScopeDto } from './project-scope.dto.js';
+import { ProjectBudgetDto } from './project-budget.dto.js';
+import { TargetCompletionDto } from './target-completion.dto.js';
 
 export class CreateProjectDto {
-  @ApiProperty({
-    example: 'Palm Hills Modern Villa',
-    description: 'Project title',
-  })
-  @IsString()
-  @IsNotEmpty()
-  title!: string;
-
   @ApiPropertyOptional({
-    example: 'Client requested modern minimalist interior',
-    description: 'Additional notes or requirements',
+    example: 'New Villa Interior Design',
   })
   @IsOptional()
   @IsString()
-  notes?: string;
+  @IsNotEmpty()
+  title?: string;
 
   @ApiPropertyOptional({
-    type: () => CreatePropertyDto,
-    description: 'Property details',
+    type: PropertyDto,
   })
   @IsOptional()
   @ValidateNested()
-  @Type(() => CreatePropertyDto)
-  property?: CreatePropertyDto;
+  @Type(() => PropertyDto)
+  property?: PropertyDto;
 
   @ApiPropertyOptional({
-    type: () => [CreateSpaceDto],
-    description: 'List of spaces in the project',
+    type: [SpaceDto],
   })
   @IsOptional()
-  @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => CreateSpaceDto)
-  spaces?: CreateSpaceDto[];
+  @Type(() => SpaceDto)
+  spaces?: SpaceDto[];
+
+  @ApiPropertyOptional({
+    type: ProjectStylePreferenceDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ProjectStylePreferenceDto)
+  stylePreference?: ProjectStylePreferenceDto;
+
+  @ApiPropertyOptional({
+    type: CustomerLocationDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => CustomerLocationDto)
+  customerLocation?: CustomerLocationDto;
+
+  @ApiPropertyOptional({
+    type: RepresentativeDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RepresentativeDto)
+  representative?: RepresentativeDto;
+
+  @ApiPropertyOptional({
+    type: ProjectScopeDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ProjectScopeDto)
+  scope?: ProjectScopeDto;
+
+  @ApiPropertyOptional({
+    type: ProjectBudgetDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ProjectBudgetDto)
+  budget?: ProjectBudgetDto;
+
+  @ApiPropertyOptional({
+    type: TargetCompletionDto,
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => TargetCompletionDto)
+  timeline?: TargetCompletionDto;
 }
