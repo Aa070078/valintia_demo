@@ -7,6 +7,8 @@ export type RequestUser = {
   sub: number;
   role: Role;
   username?: string;
+  onboardingSession?: boolean;
+  onboardingVersion?: string;
 };
 
 type RequestWithUser = Request & { user?: RequestUser };

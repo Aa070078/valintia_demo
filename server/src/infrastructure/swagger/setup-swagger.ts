@@ -86,6 +86,8 @@ export function setupSwagger(
         scheme: 'bearer',
         bearerFormat: 'JWT',
         in: 'header',
+        description:
+          'Use accessToken for business endpoints. onboardingToken works only on me, onboarding email request/verify and change-password; replace it with a fresh accessToken after onboarding.',
       },
       'access-token',
     )

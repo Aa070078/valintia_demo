@@ -1,8 +1,15 @@
-import { PrismaClient, Role, ProjectStatus, SpaceType } from "../src/generated/prisma/client.js";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
-import bcrypt from "bcrypt";
-import "dotenv/config";
+import {
+  PrismaClient,
+  Role,
+  ProjectStatus,
+  SpaceType,
+} from '../src/generated/prisma/client.js';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
+import bcrypt from 'bcrypt';
+import { randomBytes } from 'node:crypto';
+import 'dotenv/config';
+import { isInternalRole } from '../src/auth/identity-policy.js';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -16,38 +23,41 @@ const prisma = new PrismaClient({
 
 const users = [
   {
-    username: "customer1@test.com",
-    password: "Customer123!",
+    username: 'customer1@test.com',
+    email: 'customer1@test.com',
+    password: 'Customer123!',
     role: Role.CUSTOMER,
   },
   {
-    username: "customer2@test.com",
-    password: "Customer123!",
+    username: 'customer2@test.com',
+    email: 'customer2@test.com',
+    password: 'Customer123!',
     role: Role.CUSTOMER,
   },
   {
-    username: "engineer1@test.com",
-    password: "Engineer123!",
+    username: 'engineer1@test.com',
+    password: 'Engineer123!',
     role: Role.ENGINEER,
   },
   {
-    username: "engineer2@test.com",
-    password: "Engineer123!",
+    username: 'engineer2@test.com',
+    password: 'Engineer123!',
     role: Role.ENGINEER,
   },
   {
-    username: "pm@test.com",
-    password: "ProjectManager123!",
+    username: 'pm@test.com',
+    password: 'ProjectManager123!',
     role: Role.PROJECT_MANAGER,
   },
   {
-    username: "owner@test.com",
-    password: "Owner123!",
+    username: 'owner@test.com',
+    password: 'Owner123!',
     role: Role.COMPANY_OWNER,
   },
   {
-    username: "admin@test.com",
-    password: "Admin123!",
+    username: 'admin@test.com',
+    email: 'admin@test.com',
+    password: 'Admin123!',
     role: Role.ADMINISTRATOR,
   },
 ];
@@ -68,26 +78,35 @@ async function main() {
       where: {
         username: user.username,
       },
-      update: {
-        passwordHash,
-        role: user.role,
-        mustChangePassword,
-      },
+      // Do not overwrite an existing user's completed onboarding or chosen password.
+      update: {},
       create: {
         username: user.username,
         passwordHash,
         role: user.role,
         mustChangePassword,
+        email: 'email' in user ? user.email : null,
+        emailVerified: false, // Development seeds are not evidence of inbox verification.
+        ...(isInternalRole(user.role)
+          ? {
+              temporaryLogin: `seed-${user.username.split('@')[0]}@internal.local`,
+              temporaryCredentialsExpiresAt: new Date(
+                Date.now() + 48 * 3600000,
+              ),
+              onboardingVersion: randomBytes(24).toString('hex'),
+              accessTokensValidAfter: new Date(),
+            }
+          : {}),
       },
     });
 
     createdUsers.set(user.username, createdUser.id);
   }
 
-  const customer1Id = createdUsers.get("customer1@test.com")!;
-  const customer2Id = createdUsers.get("customer2@test.com")!;
-  const engineer1Id = createdUsers.get("engineer1@test.com")!;
-  const engineer2Id = createdUsers.get("engineer2@test.com")!;
+  const customer1Id = createdUsers.get('customer1@test.com')!;
+  const customer2Id = createdUsers.get('customer2@test.com')!;
+  const engineer1Id = createdUsers.get('engineer1@test.com')!;
+  const engineer2Id = createdUsers.get('engineer2@test.com')!;
 
   // -------------------------
   // 2. Seed projects
@@ -95,18 +114,18 @@ async function main() {
 
   const project1 = await prisma.project.create({
     data: {
-      title: "Customer 1 Living Space",
+      title: 'Customer 1 Living Space',
       status: ProjectStatus.DRAFT,
-      notes: "Development test project owned by Customer 1.",
+      notes: 'Development test project owned by Customer 1.',
       clientId: customer1Id,
     },
   });
 
   const project2 = await prisma.project.create({
     data: {
-      title: "Customer 2 Villa",
+      title: 'Customer 2 Villa',
       status: ProjectStatus.SUBMITTED,
-      notes: "Development test project owned by Customer 2.",
+      notes: 'Development test project owned by Customer 2.',
       clientId: customer2Id,
     },
   });
@@ -118,20 +137,20 @@ async function main() {
   await prisma.property.create({
     data: {
       projectId: project1.id,
-      propertyType: "Apartment",
+      propertyType: 'Apartment',
       areaSqm: 150,
-      city: "Cairo",
-      compound: "Test Compound 1",
+      city: 'Cairo',
+      compound: 'Test Compound 1',
     },
   });
 
   await prisma.property.create({
     data: {
       projectId: project2.id,
-      propertyType: "Villa",
+      propertyType: 'Villa',
       areaSqm: 300,
-      city: "Cairo",
-      compound: "Test Compound 2",
+      city: 'Cairo',
+      compound: 'Test Compound 2',
     },
   });
 
@@ -182,12 +201,12 @@ async function main() {
     },
   });
 
-  console.log("Development database seeded successfully.");
-  console.log("Users: 7");
-  console.log("Projects: 2");
-  console.log("Properties: 2");
-  console.log("Spaces: 5");
-  console.log("Assignments: 2");
+  console.log('Development database seeded successfully.');
+  console.log('Users: 7');
+  console.log('Projects: 2');
+  console.log('Properties: 2');
+  console.log('Spaces: 5');
+  console.log('Assignments: 2');
 }
 
 main()

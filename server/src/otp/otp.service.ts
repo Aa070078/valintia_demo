@@ -13,6 +13,7 @@ import { RedisService } from '../infrastructure/redis/redis.service.js';
 import { SendOtpDto } from './dto/send-otp.dto.js';
 import { VerifyOtpDto } from './dto/verify-otp.dto.js';
 import { OtpPurpose } from './enums/otp-purpose.enum.js';
+import { isRealEmail } from '../auth/identity-policy.js';
 
 /** Server-owned challenge state stored at otp:code:<purpose>:<normalized-email>. */
 interface StoredOtpRecord {
@@ -48,9 +49,11 @@ export class OtpService {
    * Stores { code, attempts, createdAt } server-side, emails the OTP, and returns
    * delivery/timing metadata only: the HTTP response never contains the OTP.
    */
-  async generateAndSendOtp(dto: SendOtpDto) {
+  async generateAndSendOtp(dto: SendOtpDto, accountBinding?: string) {
     const email = dto.email.toLowerCase().trim();
     const purpose = dto.purpose ?? OtpPurpose.EMAIL_VERIFICATION;
+    if (!isRealEmail(email))
+      throw new BadRequestException('A real email address is required');
 
     // TTL controls OTP validity (e.g. 300s); cooldown controls resends (e.g. 60s).
     // The OTP can remain valid after the initial resend block has ended.
@@ -58,8 +61,12 @@ export class OtpService {
     const cooldownSeconds =
       this.configService.get<number>('otp.cooldownSeconds') ?? 60; // 60 seconds
 
-    const otpKey = this.getOtpKey(purpose, email);
-    const cooldownKey = this.getCooldownKey(purpose, email);
+    // Binding is supplied only by the authenticated service, never an HTTP DTO.
+    const keyEmail = accountBinding
+      ? `account:${accountBinding}:${email}`
+      : email;
+    const otpKey = this.getOtpKey(purpose, keyEmail);
+    const cooldownKey = this.getCooldownKey(purpose, keyEmail);
 
     // otp:cooldown:<purpose>:<email> exists only while another request is blocked.
     const isCooldownActive = !(await this.redisService.setIfAbsent(
@@ -103,7 +110,7 @@ export class OtpService {
       `OTP generated for ${email} [Purpose: ${purpose}, TTL: ${ttlSeconds}s, Cooldown: ${cooldownSeconds}s]`,
     );
 
-    // MailService hides provider details (such as Resend) from the OTP mechanism.
+    // MailService hides delivery-provider details from the OTP mechanism.
     const purposeLabel = purpose.replace(/_/g, ' ').toLowerCase();
     await this.mailService.sendOtpEmail(
       email,
@@ -127,13 +134,16 @@ export class OtpService {
    * Limits guessing attempts and consumes a successful challenge. Returns success
    * metadata to the caller; auth/proof services perform purpose-specific actions.
    */
-  async verifyOtp(dto: VerifyOtpDto) {
+  async verifyOtp(dto: VerifyOtpDto, accountBinding?: string) {
     const email = dto.email.toLowerCase().trim();
     const purpose = dto.purpose ?? OtpPurpose.EMAIL_VERIFICATION;
     const submittedOtp = dto.otp.trim();
 
     const maxAttempts = this.configService.get<number>('otp.maxAttempts') ?? 5;
-    const otpKey = this.getOtpKey(purpose, email);
+    const otpKey = this.getOtpKey(
+      purpose,
+      accountBinding ? `account:${accountBinding}:${email}` : email,
+    );
 
     // Retry stale reads so concurrent guesses count and only one caller consumes OTP.
     while (true) {

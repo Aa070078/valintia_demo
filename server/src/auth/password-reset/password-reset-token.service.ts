@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'node:crypto';
 import { PrismaService } from '../../infrastructure/database/prisma.service.js';
 import { OtpPurpose } from '../../otp/enums/otp-purpose.enum.js';
+import { isRealEmail, requiresOnboarding } from '../identity-policy.js';
 
 interface PasswordResetClaims {
   sub: number;
@@ -26,9 +27,14 @@ export class PasswordResetTokenService {
   async issue(email: string): Promise<string> {
     const normalizedEmail = email.trim().toLowerCase();
     const user = await this.prisma.user.findUnique({
-      where: { username: normalizedEmail },
+      where: { email: normalizedEmail },
     });
-    if (!user) throw this.invalidToken();
+    if (
+      !user?.emailVerified ||
+      requiresOnboarding(user) ||
+      !isRealEmail(normalizedEmail)
+    )
+      throw this.invalidToken();
     return this.jwt.signAsync({
       sub: user.id,
       email: normalizedEmail,

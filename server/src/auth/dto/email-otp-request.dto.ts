@@ -6,7 +6,8 @@ import { IsEmail, IsNotEmpty } from 'class-validator';
 export class EmailOtpRequestDto {
   @ApiProperty({
     example: 'customer@example.com',
-    description: 'Registered account email',
+    description:
+      'Real email address; temporaryLogin is never an email destination',
   })
   @Transform(({ value }) =>
     typeof value === 'string' ? value.trim().toLowerCase() : value,

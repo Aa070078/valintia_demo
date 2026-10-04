@@ -34,7 +34,7 @@ export class OtpController {
   })
   @ApiResponse({
     status: 429,
-    description: 'Too Many Requests: Resend cooldown active',
+    description: 'Too Many Requests: Code request cooldown active',
   })
   async sendOtp(@Body() sendOtpDto: SendOtpDto) {
     return this.otpProof.sendRegistrationOtp(sendOtpDto);
