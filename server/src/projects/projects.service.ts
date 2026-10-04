@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -14,9 +15,7 @@ import { UpdateProjectDto } from './dto/update-project.dto.js';
 
 @Injectable()
 export class ProjectsService {
-  constructor(
-    @Inject(PrismaService) private readonly prisma: PrismaService,
-  ) {}
+  constructor(@Inject(PrismaService) private readonly prisma: PrismaService) {}
 
   async create(dto: CreateProjectDto, user: RequestUser) {
     return this.prisma.project.create({
@@ -207,37 +206,47 @@ export class ProjectsService {
       );
     }
 
-    const project = await this.prisma.project.findUnique({
-      where: { id: projectId },
+    return this.prisma.$transaction(async (tx) => {
+      // Review actions use the same Project lock before checking assignment/state.
+      await tx.$queryRaw`SELECT "id" FROM "projects" WHERE "id" = ${projectId} FOR UPDATE`;
+      const project = await tx.project.findUnique({
+        where: { id: projectId },
+      });
+
+      if (!project) {
+        throw new NotFoundException(`Project with ID ${projectId} not found`);
+      }
+
+      if (
+        project.status !== ProjectStatus.DRAFT &&
+        project.status !== ProjectStatus.SUBMITTED
+      ) {
+        throw new ConflictException(
+          'Engineer assignment is locked once review has started',
+        );
+      }
+
+      const engineer = await tx.user.findUnique({
+        where: { id: dto.engineerId },
+      });
+
+      if (!engineer) {
+        throw new NotFoundException(`User with ID ${dto.engineerId} not found`);
+      }
+
+      if (engineer.role !== Role.ENGINEER) {
+        throw new BadRequestException(
+          `Selected user ${dto.engineerId} does not have the ENGINEER role`,
+        );
+      }
+
+      const assignment = await tx.projectAssignment.upsert({
+        where: { projectId },
+        update: { engineerId: dto.engineerId },
+        create: { projectId, engineerId: dto.engineerId },
+      });
+
+      return assignment;
     });
-
-    if (!project) {
-      throw new NotFoundException(`Project with ID ${projectId} not found`);
-    }
-
-    const engineer = await this.prisma.user.findUnique({
-      where: { id: dto.engineerId },
-    });
-
-    if (!engineer) {
-      throw new NotFoundException(
-        `User with ID ${dto.engineerId} not found`,
-      );
-    }
-
-    if (engineer.role !== Role.ENGINEER) {
-      throw new BadRequestException(
-        `Selected user ${dto.engineerId} does not have the ENGINEER role`,
-      );
-    }
-
-    const assignment = await this.prisma.projectAssignment.upsert({
-      where: { projectId },
-      update: { engineerId: dto.engineerId },
-      create: { projectId, engineerId: dto.engineerId },
-    });
-
-    return assignment;
   }
 }
-

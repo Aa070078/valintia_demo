@@ -9,10 +9,14 @@ import { AuthController } from './auth.controller.js';
 import { AuthService } from './auth.service.js';
 import { EmailVerificationModule } from './email-verification/email-verification.module.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
+import { OnboardingService } from './onboarding.service.js';
+import { TemporaryLoginLimiter } from './temporary-login-limiter.service.js';
+import { RedisModule } from '../infrastructure/redis/redis.module.js';
 
 @Module({
   imports: [
     PrismaModule,
+    RedisModule,
     EmailVerificationModule,
     OtpModule,
     PasswordResetTokenModule,
@@ -39,7 +43,12 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard],
+  providers: [
+    AuthService,
+    JwtAuthGuard,
+    OnboardingService,
+    TemporaryLoginLimiter,
+  ],
   exports: [AuthService, JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}

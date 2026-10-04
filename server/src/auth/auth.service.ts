@@ -5,6 +5,7 @@ import {
   Logger,
   NotFoundException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
@@ -22,6 +23,10 @@ import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
 import { EmailVerificationService } from './email-verification/email-verification.service.js';
+import { isRealEmail, requiresOnboarding } from './identity-policy.js';
+import { TemporaryLoginLimiter } from './temporary-login-limiter.service.js';
+import { OnboardingService } from './onboarding.service.js';
+import type { RequestUser } from '../common/decorators/current-user.decorator.js';
 
 @Injectable()
 export class AuthService {
@@ -34,6 +39,9 @@ export class AuthService {
     @Inject(OtpService) private readonly otpService: OtpService,
     @Inject(PasswordResetTokenService)
     private readonly passwordResetTokens: PasswordResetTokenService,
+    @Inject(TemporaryLoginLimiter)
+    private readonly temporaryLimiter: TemporaryLoginLimiter,
+    @Inject(OnboardingService) private readonly onboarding: OnboardingService,
   ) {}
 
   /** Respond independently of account lookup/mail latency; no account-existence signal. */
@@ -56,10 +64,11 @@ export class AuthService {
     normalizedEmail: string,
     purpose: OtpPurpose,
   ): Promise<void> {
+    if (!isRealEmail(normalizedEmail)) return;
     const user = await this.prisma.user.findUnique({
-      where: { username: normalizedEmail },
+      where: { email: normalizedEmail },
     });
-    if (user) {
+    if (user?.emailVerified && !requiresOnboarding(user)) {
       await this.otpService.generateAndSendOtp({
         email: normalizedEmail,
         purpose,
@@ -85,8 +94,13 @@ export class AuthService {
         otp: dto.otp,
         purpose: OtpPurpose.LOGIN,
       });
-      user = await this.prisma.user.findUnique({ where: { username: email } });
-      if (!user) throw new Error('No matching account');
+      user = await this.prisma.user.findUnique({ where: { email } });
+      if (
+        !user?.emailVerified ||
+        requiresOnboarding(user) ||
+        !isRealEmail(email)
+      )
+        throw new Error('No matching account');
     } catch {
       // Invalid codes and absent accounts produce the same authentication failure.
       throw new UnauthorizedException('Invalid or expired login code');
@@ -104,7 +118,9 @@ export class AuthService {
     });
     if (
       !user ||
-      user.username !== claims.email ||
+      user.email !== claims.email ||
+      !user.emailVerified ||
+      requiresOnboarding(user) ||
       this.passwordResetTokens.passwordVersion(user.passwordHash) !==
         claims.passwordVersion
     ) {
@@ -116,7 +132,8 @@ export class AuthService {
     const updated = await this.prisma.user.updateMany({
       where: {
         id: user.id,
-        username: claims.email,
+        email: claims.email,
+        emailVerified: true,
         passwordHash: user.passwordHash,
       },
       data: { passwordHash, mustChangePassword: false },
@@ -127,27 +144,94 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const { username, password } = loginDto;
-
+    const identifier = loginDto.email.trim().toLowerCase();
+    const temporary = identifier.endsWith('@internal.local');
+    if (!temporary && !isRealEmail(identifier)) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    if (temporary) await this.temporaryLimiter.consume(identifier);
     const user = await this.prisma.user.findUnique({
-      where: { username },
+      where: temporary ? { temporaryLogin: identifier } : { email: identifier },
     });
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    if (
+      temporary &&
+      (!requiresOnboarding(user) ||
+        !user.onboardingVersion ||
+        !user.temporaryCredentialsExpiresAt ||
+        user.temporaryCredentialsExpiresAt.getTime() <= Date.now())
+    ) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    // The same account budget applies if an email-first user logs in via real email.
+    if (!temporary && requiresOnboarding(user) && user.temporaryLogin) {
+      await this.temporaryLimiter.consume(user.temporaryLogin);
+    }
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.passwordHash,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (requiresOnboarding(user)) {
+      if (
+        !user.onboardingVersion ||
+        !user.temporaryCredentialsExpiresAt ||
+        user.temporaryCredentialsExpiresAt.getTime() <= Date.now()
+      ) {
+        throw new UnauthorizedException(
+          'Provisioning credentials expired. Contact an administrator.',
+        );
+      }
+      const onboardingToken = await this.jwtService.signAsync(
+        {
+          sub: user.id,
+          role: user.role,
+          scope: 'onboarding',
+          version: user.onboardingVersion,
+        },
+        { expiresIn: '15m' },
+      );
+      return {
+        onboardingToken,
+        onboardingRequired: true,
+        user: this.identity(user),
+      };
+    }
     return this.issueAccessToken(user);
+  }
+
+  private identity(user: User) {
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      emailVerified: user.emailVerified,
+      role: user.role,
+      mustChangePassword: user.mustChangePassword,
+      onboardingRequired: requiresOnboarding(user),
+    };
   }
 
   /** Authentication credential shared by password login and OTP login. */
   private async issueAccessToken(user: User) {
+    if (requiresOnboarding(user))
+      throw new UnauthorizedException('Onboarding is incomplete');
+    // JWT timestamps have second precision. Wait at most one second so newly
+    // issued tokens clear the cutoff without accepting older tokens from that second.
+    if (user.accessTokensValidAfter) {
+      const boundary =
+        Math.ceil(user.accessTokensValidAfter.getTime() / 1000) * 1000;
+      if (boundary > Date.now())
+        await new Promise((done) => setTimeout(done, boundary - Date.now()));
+    }
     const payload = {
       sub: user.id,
       role: user.role,
@@ -159,12 +243,7 @@ export class AuthService {
 
     return {
       accessToken,
-      user: {
-        id: user.id,
-        username: user.username,
-        role: user.role,
-        mustChangePassword: user.mustChangePassword,
-      },
+      user: this.identity(user),
     };
   }
 
@@ -179,6 +258,8 @@ export class AuthService {
     const { password, verificationToken } = registerDto;
     // Match the representation used by the OTP Redis keys and signed email claim.
     const username = registerDto.username.trim().toLowerCase();
+    if (!isRealEmail(username))
+      throw new BadRequestException('A real email address is required');
 
     // Security gate BEFORE any database access: this exact normalized email must
     // have passed EMAIL_VERIFICATION. Client verification booleans are not proof.
@@ -191,21 +272,34 @@ export class AuthService {
     if (existingUser) {
       throw new ConflictException('Username is already taken');
     }
+    if (await this.prisma.user.findUnique({ where: { email: username } }))
+      throw new ConflictException('Email is already assigned');
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const newUser = await this.prisma.user.create({
-      data: {
-        username,
-        passwordHash,
-        role: Role.CUSTOMER,
-        mustChangePassword: false,
-      },
-    });
+    let newUser: User;
+    try {
+      newUser = await this.prisma.user.create({
+        data: {
+          username,
+          email: username,
+          emailVerified: true,
+          passwordHash,
+          role: Role.CUSTOMER,
+          mustChangePassword: false,
+        },
+      });
+    } catch (error) {
+      if ((error as { code?: string }).code === 'P2002')
+        throw new ConflictException('Email or username is already assigned');
+      throw error;
+    }
 
     return {
       id: newUser.id,
       username: newUser.username,
+      email: newUser.email,
+      emailVerified: newUser.emailVerified,
       role: newUser.role,
       mustChangePassword: newUser.mustChangePassword,
       createdAt: newUser.createdAt,
@@ -221,38 +315,13 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    return {
-      id: user.id,
-      username: user.username,
-      role: user.role,
-      mustChangePassword: user.mustChangePassword,
-    };
+    return this.identity(user);
   }
 
-  async changePassword(userId: number, changePasswordDto: ChangePasswordDto) {
-    const { newPassword } = changePasswordDto;
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const passwordHash = await bcrypt.hash(newPassword, 10);
-
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: {
-        passwordHash,
-        mustChangePassword: false,
-      },
-    });
-
-    return {
-      message: 'Password changed successfully',
-      mustChangePassword: false,
-    };
+  async changePassword(
+    actor: RequestUser,
+    changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.onboarding.changePassword(actor, changePasswordDto.newPassword);
   }
 }

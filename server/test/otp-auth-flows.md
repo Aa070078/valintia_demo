@@ -1,8 +1,12 @@
 # OTP authentication flows
 
-Work stays on local `feat/s2-email-otp`. These flows use the existing Redis,
-MailService/Resend, bcrypt and Nest JWT infrastructure. No frontend change or
-database migration is needed.
+These flows use the existing Redis, MailService/SMTP, bcrypt and Nest JWT
+infrastructure. The identity update on `feat/s2-engineer-review-workflow` requires
+the user-email-identity migration. LOGIN and PASSWORD_RESET now resolve verified
+real `email`, rather than `username`, and reject incomplete internal accounts.
+Historical customers retain password login but must verify their backfilled email
+before using email OTP/recovery. Temporary identifiers are never mail destinations.
+See [account lifecycle and Swagger steps](../../.claude/docs/ai/account-provisioning/api-handoff.md).
 
 ## Configuration
 
@@ -137,9 +141,9 @@ Remaining limitations:
   existing behavior. Reset proof becomes unusable after any password change.
 - There is no new global/IP request limiter. Existing per-email/purpose cooldown
   and challenge attempt limits remain; these alone are not comprehensive abuse control.
-- OTP login requires a registered username that is a normalized email. Existing
-  non-email staff usernames retain password login; they cannot receive email OTPs.
-- Live Resend delivery and real PostgreSQL password changes were not tested here.
+- OTP login requires the actual verified real email field and completed internal
+  onboarding. Profile usernames and temporary identifiers never receive login OTPs.
+- Live SMTP delivery and real PostgreSQL password changes were not tested here.
 
 ## Automated checks
 

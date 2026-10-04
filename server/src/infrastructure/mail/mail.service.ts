@@ -1,99 +1,63 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import type { MailProvider, SendMailOptions } from './mail.interfaces.js';
 
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
   private provider: MailProvider;
+  private readonly from: string;
 
   constructor(
     @Inject(ConfigService)
     private readonly configService: ConfigService,
   ) {
+    this.from = this.required('mail.from', 'SMTP_FROM');
     this.provider = this.createProvider();
   }
 
-  /**
-   * Creates the configured mail provider.
-   *
-   * Supported providers:
-   * - console: local development/testing
-   * - resend: real email delivery using Resend
-   */
-  private createProvider(): MailProvider {
-    const providerName =
-      this.configService.get<string>('mail.provider') ?? 'console';
-
-    /**
-     * Resend provider
-     */
-    if (providerName === 'resend') {
-      const apiKey = this.configService.get<string>('RESEND_API_KEY');
-
-      if (!apiKey) {
-        throw new Error(
-          'RESEND_API_KEY is required when MAIL_PROVIDER=resend',
-        );
-      }
-
-      const resend = new Resend(apiKey);
-
-      return {
-        sendMail: async (options: SendMailOptions): Promise<void> => {
-          /*
-           * For our current OTP emails, HTML content is always generated.
-           * This check also allows TypeScript to know that options.html
-           * is definitely a string before passing it to Resend.
-           */
-          if (!options.html) {
-            throw new Error('Email HTML content is required');
-          }
-
-          const { data, error } = await resend.emails.send({
-            from:
-              options.from ??
-              'Valentia <onboarding@resend.dev>',
-            to: options.to,
-            subject: options.subject,
-            html: options.html,
-          });
-
-          if (error) {
-            this.logger.error(
-              `Resend failed to send email to ${options.to}: ${error.message}`,
-            );
-
-            throw new Error(
-              `Failed to send email: ${error.message}`,
-            );
-          }
-
-          this.logger.log(
-            `Email sent successfully to ${options.to} via Resend. ID: ${data?.id}`,
-          );
-        },
-      };
+  private required(key: string, name: string): string {
+    const value = this.configService.get<string>(key);
+    if (typeof value !== 'string' || !value.trim()) {
+      throw new Error(`${name} is required for SMTP email delivery`);
     }
+    return value;
+  }
 
-    /**
-     * Console provider
-     *
-     * Used when MAIL_PROVIDER is not "resend".
-     * No real email is sent.
-     */
+  /** Validate locally at initialization; no inbox/network request during startup. */
+  private createProvider(): MailProvider {
+    const host = this.required('mail.smtp.host', 'SMTP_HOST');
+    const user = this.required('mail.smtp.user', 'SMTP_USER');
+    const pass = this.required('mail.smtp.pass', 'SMTP_PASS');
+    const port = this.configService.get<number>('mail.smtp.port');
+    const secure = this.configService.get<string>('mail.smtp.secure');
+    if (!Number.isInteger(port) || !port || port < 1 || port > 65535) {
+      throw new Error('SMTP_PORT must be an integer between 1 and 65535');
+    }
+    if (secure !== 'true' && secure !== 'false') {
+      throw new Error('SMTP_SECURE must be true or false');
+    }
+    const transport = nodemailer.createTransport({
+      host,
+      port,
+      secure: secure === 'true',
+      auth: { user, pass },
+      requireTLS: secure === 'false',
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 30000,
+      logger: false,
+      debug: false,
+    });
     return {
       sendMail: async (options: SendMailOptions): Promise<void> => {
-        this.logger.log(
-          `[Mail Delivery - CONSOLE] To: ${options.to} | Subject: "${options.subject}"`,
-        );
-
-        if (options.text) {
-          this.logger.debug(
-            `[Mail Text Body]:\n${options.text}`,
-          );
-        }
+        await transport.sendMail(options);
       },
     };
   }
@@ -110,14 +74,47 @@ export class MailService {
    * General mail sending method.
    */
   async sendMail(options: SendMailOptions): Promise<void> {
-    const defaultFrom =
-      this.configService.get<string>('mail.from') ??
-      'Valentia <onboarding@resend.dev>';
-
-    await this.provider.sendMail({
-      ...options,
-      from: options.from ?? defaultFrom,
-    });
+    try {
+      await this.provider.sendMail({
+        ...options,
+        from: options.from ?? this.from,
+      });
+      // Subject/body include OTPs; SMTP debug/error messages can contain secrets.
+      this.logger.log('Email delivered via SMTP');
+    } catch (error) {
+      const details =
+        error && typeof error === 'object'
+          ? (error as { code?: unknown; responseCode?: unknown })
+          : {};
+      const codes = [
+        'EAUTH',
+        'ECONNECTION',
+        'ESOCKET',
+        'ETIMEDOUT',
+        'EDNS',
+        'EENVELOPE',
+        'EMESSAGE',
+        'ESTREAM',
+        'ETLS',
+      ];
+      const code =
+        typeof details.code === 'string' && codes.includes(details.code)
+          ? details.code
+          : 'UNKNOWN';
+      const responseCode =
+        typeof details.responseCode === 'number' &&
+        Number.isInteger(details.responseCode) &&
+        details.responseCode >= 100 &&
+        details.responseCode <= 599
+          ? details.responseCode
+          : 'unknown';
+      this.logger.error(
+        `SMTP delivery failed (code=${code}, responseCode=${responseCode})`,
+      );
+      throw new ServiceUnavailableException(
+        'Email delivery is temporarily unavailable. Please try again later.',
+      );
+    }
   }
 
   /**
@@ -131,15 +128,10 @@ export class MailService {
   ): Promise<void> {
     const formattedPurpose = purpose
       .split(/[\s_]+/)
-      .map(
-        (word) =>
-          word.charAt(0).toUpperCase() +
-          word.slice(1).toLowerCase(),
-      )
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ');
 
-    const subject =
-      `Your Valentia ${formattedPurpose} Code: ${otp}`;
+    const subject = `Your Valentia ${formattedPurpose} Code: ${otp}`;
 
     const text = `
 Hello,
@@ -236,6 +228,7 @@ Valentia Team
     `;
 
     await this.sendMail({
+      from: this.from,
       to,
       subject,
       text,

@@ -15,6 +15,16 @@ export const databaseConfig = registerAs('database', () => ({
   url: process.env.DATABASE_URL ?? '',
 }));
 
+export const provisioningConfig = registerAs('provisioning', () => {
+  const ttlHours = Number(process.env.INTERNAL_PROVISIONING_TTL_HOURS ?? '48');
+  if (!Number.isInteger(ttlHours) || ttlHours < 24 || ttlHours > 72) {
+    throw new Error(
+      'INTERNAL_PROVISIONING_TTL_HOURS must be an integer between 24 and 72',
+    );
+  }
+  return { ttlHours };
+});
+
 export const redisConfig = registerAs('redis', () => ({
   host: process.env.REDIS_HOST ?? 'localhost',
   port: parseInt(process.env.REDIS_PORT ?? '6379', 10),
@@ -74,14 +84,13 @@ export const otpConfig = registerAs('otp', () => ({
 }));
 
 export const mailConfig = registerAs('mail', () => ({
-  from: process.env.MAIL_FROM ?? 'onboarding@resend.dev',
-  provider: process.env.MAIL_PROVIDER ?? 'console',
+  from: process.env.SMTP_FROM,
   smtp: {
-    host: process.env.SMTP_HOST ?? 'localhost',
-    port: parseInt(process.env.SMTP_PORT ?? '587', 10),
-    user: process.env.SMTP_USER ?? '',
-    pass: process.env.SMTP_PASSWORD ?? '',
-    secure: process.env.SMTP_SECURE === 'true',
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    secure: process.env.SMTP_SECURE,
   },
 }));
 

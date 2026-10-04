@@ -82,7 +82,9 @@ const prisma = {
       databaseReads++;
       const user = where.id
         ? users.get(where.id)
-        : [...users.values()].find((user) => user.username === where.username);
+        : [...users.values()].find((user) =>
+            Object.entries(where).every(([key, value]) => user[key] === value),
+          );
       return user ? { ...user } : null;
     },
     create: async ({ data }: any) => {
@@ -94,7 +96,7 @@ const prisma = {
       const user = users.get(where.id);
       if (
         !user ||
-        user.username !== where.username ||
+        user.email !== where.email ||
         user.passwordHash !== where.passwordHash
       )
         return { count: 0 };
@@ -165,6 +167,8 @@ beforeEach(async () => {
   users.set(1, {
     id: 1,
     username: email,
+    email,
+    emailVerified: true,
     passwordHash: await bcrypt.hash('Password123!', 10),
     role: 'CUSTOMER',
     mustChangePassword: false,
@@ -172,9 +176,11 @@ beforeEach(async () => {
   users.set(2, {
     id: 2,
     username: 'other@example.com',
+    email: 'other@example.com',
+    emailVerified: true,
     passwordHash: await bcrypt.hash('OtherPassword!', 10),
     role: 'ENGINEER',
-    mustChangePassword: true,
+    mustChangePassword: false,
   });
 });
 after(async () => {
@@ -348,7 +354,7 @@ test('PASSWORD_RESET OTP produces only reset proof; wrong/expired/mismatched-pur
 
 test('reset changes password, rejects replay and cannot register or authenticate; stateless sessions persist', async () => {
   const login = await post('auth/login', {
-    username: email,
+    email: email,
     password: 'Password123!',
   }).expect(200);
   const token = await getResetProof();
@@ -364,11 +370,11 @@ test('reset changes password, rejects replay and cannot register or authenticate
   assert.equal(users.get(1).mustChangePassword, false);
   await reset(token, 'AnotherPassword!').expect(400);
   await post('auth/login', {
-    username: email,
+    email: email,
     password: 'Password123!',
   }).expect(401);
   await post('auth/login', {
-    username: email,
+    email: email,
     password: 'ChangedPassword!',
   }).expect(200);
   await request(app.getHttpServer())
@@ -443,7 +449,7 @@ test('parallel reset consumers allow one password update only', async () => {
 
 test('LOGIN OTP authenticates with existing access JWT and preserves password login', async () => {
   const normal = await post('auth/login', {
-    username: email,
+    email: email,
     password: 'Password123!',
   }).expect(200);
   const known = await post('auth/login/otp/request', {
@@ -522,7 +528,7 @@ test('LOGIN rejects wrong, expired, wrong-purpose and unknown-account codes with
   await post('otp/send', { email, purpose: 'LOGIN' }).expect(400);
 });
 
-test('LOGIN preserves staff role and mustChangePassword flag', async () => {
+test('LOGIN preserves active staff role and completed password state', async () => {
   await post('auth/login/otp/request', { email: 'other@example.com' }).expect(
     200,
   );
@@ -531,7 +537,7 @@ test('LOGIN preserves staff role and mustChangePassword flag', async () => {
     otp: messages.at(-1)!.code,
   }).expect(200);
   assert.equal(response.body.user.role, 'ENGINEER');
-  assert.equal(response.body.user.mustChangePassword, true);
+  assert.equal(response.body.user.mustChangePassword, false);
 });
 
 test('concurrent successful OTP submissions authenticate once; concurrent guesses consume the attempt budget', async () => {
