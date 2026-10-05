@@ -17,10 +17,13 @@ export type Role =
 
 /**
  * ProjectStatus strictly matches Prisma backend enum:
- * enum ProjectStatus { DRAFT, SUBMITTED }
- * Assignment is derived from leadEngineerId / assignment != null.
+ * enum ProjectStatus { DRAFT, SUBMITTED, UNDER_ENGINEER_REVIEW, ENGINEER_READY }
  */
-export type ProjectStatus = "DRAFT" | "SUBMITTED";
+export type ProjectStatus =
+  | "DRAFT"
+  | "SUBMITTED"
+  | "UNDER_ENGINEER_REVIEW"
+  | "ENGINEER_READY";
 
 export type ScheduleHealth = "ON_SCHEDULE" | "AT_RISK" | "DELAYED";
 
