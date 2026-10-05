@@ -1,6 +1,6 @@
-
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -12,7 +12,8 @@ import { validateProjectForSubmission } from '../validators/project-submission.v
 import { ProjectStyleService } from './project-style.service.js';
 import { ProjectDocumentsService } from './project-documents.service.js';
 import {
-  ActivityType,
+  Prisma,
+  ProjectActivityAction,
   ProjectStatus,
   Role,
   StylePreferenceMode,
@@ -30,7 +31,6 @@ import {
   mapProjectToFrontend,
   toPrismaBudgetType,
   toPrismaDeadlineType,
-  toPrismaDocumentCategory,
   toPrismaPropertyCondition,
   toPrismaPropertyType,
   toPrismaScopeType,
@@ -45,7 +45,7 @@ export class ProjectsService {
     private readonly filesService: FilesService,
     private readonly projectStyleService: ProjectStyleService,
     private readonly projectDocumentsService: ProjectDocumentsService,
-  ) { }
+  ) {}
 
   /**
    * --------------------------------------------------------------------------
@@ -78,9 +78,9 @@ export class ProjectsService {
     documents: true,
 
     /**
-     * A project can have multiple engineers.
+     * A project has exactly one responsible engineer.
      */
-    assignments: {
+    assignment: {
       include: {
         engineer: {
           select: {
@@ -90,15 +90,22 @@ export class ProjectsService {
           },
         },
       },
-      orderBy: {
-        id: 'asc' as const,
-      },
     },
 
     activities: {
-      orderBy: {
-        createdAt: 'desc' as const,
+      include: {
+        actor: {
+          select: {
+            id: true,
+            username: true,
+            role: true,
+          },
+        },
       },
+      orderBy: [
+        { createdAt: 'desc' as const },
+        { id: 'desc' as const },
+      ],
     },
   };
 
@@ -113,9 +120,7 @@ export class ProjectsService {
    */
   async create(dto: CreateProjectDto, user: RequestUser) {
     if (user.role !== Role.CUSTOMER) {
-      throw new ForbiddenException(
-        'Only customers can create projects',
-      );
+      throw new ForbiddenException('Only customers can create projects');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -130,14 +135,11 @@ export class ProjectsService {
        */
       const hasProperty = dto.property !== undefined;
 
-      const propertyTypeInput =
-        dto.property?.propertyType ?? 'other';
+      const propertyTypeInput = dto.property?.propertyType ?? 'other';
 
-      const cityInput =
-        dto.property?.city ?? '';
+      const cityInput = dto.property?.city ?? '';
 
-      const areaInput =
-        dto.property?.areaSqm ?? 0;
+      const areaInput = dto.property?.areaSqm ?? 0;
 
       const titleInput =
         dto.title?.trim() ||
@@ -164,8 +166,7 @@ export class ProjectsService {
           data: {
             projectId: createdProject.id,
 
-            propertyType:
-              toPrismaPropertyType(propertyTypeInput),
+            propertyType: toPrismaPropertyType(propertyTypeInput),
 
             city: cityInput,
 
@@ -177,13 +178,10 @@ export class ProjectsService {
 
             condition:
               dto.property?.condition !== undefined
-                ? toPrismaPropertyCondition(
-                  dto.property.condition,
-                )
+                ? toPrismaPropertyCondition(dto.property.condition)
                 : undefined,
 
-            accessibilityNotes:
-              dto.property?.accessibilityNotes,
+            accessibilityNotes: dto.property?.accessibilityNotes,
           },
         });
       }
@@ -198,11 +196,7 @@ export class ProjectsService {
        * for every incoming space.
        */
       if (dto.spaces !== undefined) {
-        await this.createSpaces(
-          tx,
-          createdProject.id,
-          dto.spaces,
-        );
+        await this.createSpaces(tx, createdProject.id, dto.spaces);
       }
 
       /**
@@ -215,23 +209,17 @@ export class ProjectsService {
           data: {
             projectId: createdProject.id,
 
-            country:
-              dto.customerLocation.country ?? '',
+            country: dto.customerLocation.country ?? '',
 
-            countryCode:
-              dto.customerLocation.countryCode,
+            countryCode: dto.customerLocation.countryCode,
 
-            city:
-              dto.customerLocation.city ?? '',
+            city: dto.customerLocation.city ?? '',
 
-            timezone:
-              dto.customerLocation.timezone ?? 'UTC',
+            timezone: dto.customerLocation.timezone ?? 'UTC',
 
-            phone:
-              dto.customerLocation.phone,
+            phone: dto.customerLocation.phone,
 
-            phoneCountryCode:
-              dto.customerLocation.phoneCountryCode,
+            phoneCountryCode: dto.customerLocation.phoneCountryCode,
           },
         });
       }
@@ -244,29 +232,22 @@ export class ProjectsService {
           data: {
             projectId: createdProject.id,
 
-            hasRepresentative:
-              dto.representative.hasRepresentative ?? false,
+            hasRepresentative: dto.representative.hasRepresentative ?? false,
 
             valentiaManagedDirectly:
               dto.representative.valentiaManagedDirectly ?? true,
 
-            name:
-              dto.representative.name,
+            name: dto.representative.name,
 
-            phone:
-              dto.representative.phone,
+            phone: dto.representative.phone,
 
-            phoneCountryCode:
-              dto.representative.phoneCountryCode,
+            phoneCountryCode: dto.representative.phoneCountryCode,
 
-            email:
-              dto.representative.email,
+            email: dto.representative.email,
 
-            relationship:
-              dto.representative.relationship,
+            relationship: dto.representative.relationship,
 
-            authorizationScope:
-              dto.representative.authorizationScope,
+            authorizationScope: dto.representative.authorizationScope,
           },
         });
       }
@@ -279,13 +260,9 @@ export class ProjectsService {
           data: {
             projectId: createdProject.id,
 
-            scopeType:
-              toPrismaScopeType(
-                dto.scope.scopeType ?? 'other',
-              ),
+            scopeType: toPrismaScopeType(dto.scope.scopeType ?? 'other'),
 
-            notes:
-              dto.scope.notes,
+            notes: dto.scope.notes,
           },
         });
       }
@@ -298,22 +275,17 @@ export class ProjectsService {
           data: {
             projectId: createdProject.id,
 
-            budgetType:
-              toPrismaBudgetType(
-                dto.budget.budgetType ?? 'undecided',
-              ),
+            budgetType: toPrismaBudgetType(
+              dto.budget.budgetType ?? 'undecided',
+            ),
 
-            exactAmount:
-              dto.budget.exactAmount,
+            exactAmount: dto.budget.exactAmount,
 
-            minAmount:
-              dto.budget.minAmount,
+            minAmount: dto.budget.minAmount,
 
-            maxAmount:
-              dto.budget.maxAmount,
+            maxAmount: dto.budget.maxAmount,
 
-            currency:
-              dto.budget.currency ?? 'EGP',
+            currency: dto.budget.currency ?? 'EGP',
           },
         });
       }
@@ -326,23 +298,18 @@ export class ProjectsService {
           data: {
             projectId: createdProject.id,
 
-            deadlineType:
-              toPrismaDeadlineType(
-                dto.timeline.deadlineType ?? 'no_deadline',
-              ),
+            deadlineType: toPrismaDeadlineType(
+              dto.timeline.deadlineType ?? 'no_deadline',
+            ),
 
-            targetDate:
-              dto.timeline.targetDate
-                ? new Date(dto.timeline.targetDate)
-                : undefined,
+            targetDate: dto.timeline.targetDate
+              ? new Date(dto.timeline.targetDate)
+              : undefined,
 
-            durationDescription:
-              dto.timeline.durationDescription,
+            durationDescription: dto.timeline.durationDescription,
           },
         });
       }
-
-
 
       /**
        * 9. Style preference
@@ -361,32 +328,34 @@ export class ProjectsService {
       /**
        * 10. Activity
        */
-      await tx.projectActivity.create({
-        data: {
-          projectId: createdProject.id,
-          actorId: user.id,
-          type: ActivityType.PROJECT_CREATED,
+      await this.logActivity(tx, {
+        projectId: createdProject.id,
+        actor: user,
+        action: ProjectActivityAction.PROJECT_CREATED,
+        fromStatus: null,
+        toStatus: ProjectStatus.DRAFT,
+        note: 'Draft project created',
+        metadata: {
+          title: titleInput,
+          propertyType: hasProperty ? propertyTypeInput : null,
+          spacesCount: dto.spaces?.length ?? 0,
+          sectionsProvided: {
+            property: hasProperty,
+            spaces: dto.spaces !== undefined,
+            customerLocation: dto.customerLocation !== undefined,
+            representative: dto.representative !== undefined,
+            scope: dto.scope !== undefined,
+            budget: dto.budget !== undefined,
+            timeline: dto.timeline !== undefined,
+            stylePreference: dto.stylePreference !== undefined,
+          },
         },
       });
 
       /**
        * 11. Return complete project
        */
-      const finalProject =
-        await tx.project.findUnique({
-          where: {
-            id: createdProject.id,
-          },
-          include: this.projectInclude,
-        });
-
-      if (!finalProject) {
-        throw new NotFoundException(
-          `Project with ID ${createdProject.id} not found after creation`,
-        );
-      }
-
-      return mapProjectToFrontend(finalProject);
+      return this.loadMappedProject(tx, createdProject.id);
     });
   }
 
@@ -414,8 +383,8 @@ export class ProjectsService {
        */
       projects = await this.prisma.project.findMany({
         where: {
-          assignments: {
-            some: {
+          assignment: {
+            is: {
               engineerId: user.id,
             },
           },
@@ -434,9 +403,7 @@ export class ProjectsService {
       });
     }
 
-    return projects.map((project) =>
-      mapProjectToFrontend(project),
-    );
+    return projects.map((project) => mapProjectToFrontend(project));
   }
 
   /**
@@ -444,22 +411,16 @@ export class ProjectsService {
    * GET ONE
    * --------------------------------------------------------------------------
    */
-  async findOneForUser(
-    id: number,
-    user: RequestUser,
-  ) {
-    const project =
-      await this.prisma.project.findUnique({
-        where: {
-          id,
-        },
-        include: this.projectInclude,
-      });
+  async findOneForUser(id: number, user: RequestUser) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id,
+      },
+      include: this.projectInclude,
+    });
 
     if (!project) {
-      throw new NotFoundException(
-        `Project with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
     /**
@@ -474,16 +435,10 @@ export class ProjectsService {
     }
 
     /**
-     * Engineer must have an assignment.
+     * Engineer must be the assigned engineer.
      */
     if (user.role === Role.ENGINEER) {
-      const isAssigned =
-        project.assignments.some(
-          (assignment) =>
-            assignment.engineerId === user.id,
-        );
-
-      if (!isAssigned) {
+      if (project.assignment?.engineerId !== user.id) {
         throw new ForbiddenException(
           'Access denied: You are not assigned to this project',
         );
@@ -498,23 +453,16 @@ export class ProjectsService {
    * UPDATE DRAFT
    * --------------------------------------------------------------------------
    */
-  async updateDraft(
-    id: number,
-    dto: UpdateProjectDto,
-    user: RequestUser,
-  ) {
-    const project =
-      await this.prisma.project.findUnique({
-        where: {
-          id,
-        },
-        include: this.projectInclude,
-      });
+  async updateDraft(id: number, dto: UpdateProjectDto, user: RequestUser) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id,
+      },
+      include: this.projectInclude,
+    });
 
     if (!project) {
-      throw new NotFoundException(
-        `Project with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
     if (user.role !== Role.CUSTOMER) {
@@ -530,9 +478,7 @@ export class ProjectsService {
     }
 
     if (project.status !== ProjectStatus.DRAFT) {
-      throw new BadRequestException(
-        'Only DRAFT projects can be modified',
-      );
+      throw new BadRequestException('Only DRAFT projects can be modified');
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -542,19 +488,15 @@ export class ProjectsService {
        * ----------------------------------------------------------------------
        */
       if (dto.property !== undefined) {
-        const existingProperty =
-          await tx.property.findUnique({
-            where: {
-              projectId: id,
-            },
-          });
+        const existingProperty = await tx.property.findUnique({
+          where: {
+            projectId: id,
+          },
+        });
 
         const propertyData = {
           ...(dto.property.propertyType !== undefined && {
-            propertyType:
-              toPrismaPropertyType(
-                dto.property.propertyType,
-              ),
+            propertyType: toPrismaPropertyType(dto.property.propertyType),
           }),
 
           ...(dto.property.city !== undefined && {
@@ -570,8 +512,7 @@ export class ProjectsService {
           }),
 
           ...(dto.property.governorate !== undefined && {
-            governorate:
-              dto.property.governorate,
+            governorate: dto.property.governorate,
           }),
 
           ...(dto.property.floors !== undefined && {
@@ -579,15 +520,11 @@ export class ProjectsService {
           }),
 
           ...(dto.property.condition !== undefined && {
-            condition:
-              toPrismaPropertyCondition(
-                dto.property.condition,
-              ),
+            condition: toPrismaPropertyCondition(dto.property.condition),
           }),
 
           ...(dto.property.accessibilityNotes !== undefined && {
-            accessibilityNotes:
-              dto.property.accessibilityNotes,
+            accessibilityNotes: dto.property.accessibilityNotes,
           }),
         };
 
@@ -603,36 +540,26 @@ export class ProjectsService {
             data: {
               projectId: id,
 
-              propertyType:
-                toPrismaPropertyType(
-                  dto.property.propertyType ??
-                  'other',
-                ),
+              propertyType: toPrismaPropertyType(
+                dto.property.propertyType ?? 'other',
+              ),
 
-              city:
-                dto.property.city ?? '',
+              city: dto.property.city ?? '',
 
-              areaSqm:
-                dto.property.areaSqm ?? 0,
+              areaSqm: dto.property.areaSqm ?? 0,
 
-              compound:
-                dto.property.compound,
+              compound: dto.property.compound,
 
-              governorate:
-                dto.property.governorate,
+              governorate: dto.property.governorate,
 
-              floors:
-                dto.property.floors,
+              floors: dto.property.floors,
 
               condition:
                 dto.property.condition !== undefined
-                  ? toPrismaPropertyCondition(
-                    dto.property.condition,
-                  )
+                  ? toPrismaPropertyCondition(dto.property.condition)
                   : undefined,
 
-              accessibilityNotes:
-                dto.property.accessibilityNotes,
+              accessibilityNotes: dto.property.accessibilityNotes,
             },
           });
         }
@@ -657,11 +584,7 @@ export class ProjectsService {
         });
 
         if (dto.spaces.length > 0) {
-          await this.createSpaces(
-            tx,
-            id,
-            dto.spaces,
-          );
+          await this.createSpaces(tx, id, dto.spaces);
         }
 
         /**
@@ -678,13 +601,11 @@ export class ProjectsService {
 
         if (
           existingStylePreference &&
-          existingStylePreference.mode ===
-          StylePreferenceMode.PER_SPACE
+          existingStylePreference.mode === StylePreferenceMode.PER_SPACE
         ) {
           await tx.spaceStylePreference.deleteMany({
             where: {
-              projectStylePreferenceId:
-                existingStylePreference.id,
+              projectStylePreferenceId: existingStylePreference.id,
             },
           });
         }
@@ -709,8 +630,7 @@ export class ProjectsService {
        * ----------------------------------------------------------------------
        */
       if (dto.customerLocation !== undefined) {
-        const location =
-          dto.customerLocation;
+        const location = dto.customerLocation;
 
         await tx.customerLocation.upsert({
           where: {
@@ -723,8 +643,7 @@ export class ProjectsService {
             }),
 
             ...(location.countryCode !== undefined && {
-              countryCode:
-                location.countryCode,
+              countryCode: location.countryCode,
             }),
 
             ...(location.city !== undefined && {
@@ -732,8 +651,7 @@ export class ProjectsService {
             }),
 
             ...(location.timezone !== undefined && {
-              timezone:
-                location.timezone,
+              timezone: location.timezone,
             }),
 
             ...(location.phone !== undefined && {
@@ -741,31 +659,24 @@ export class ProjectsService {
             }),
 
             ...(location.phoneCountryCode !== undefined && {
-              phoneCountryCode:
-                location.phoneCountryCode,
+              phoneCountryCode: location.phoneCountryCode,
             }),
           },
 
           create: {
             projectId: id,
 
-            country:
-              location.country ?? '',
+            country: location.country ?? '',
 
-            countryCode:
-              location.countryCode,
+            countryCode: location.countryCode,
 
-            city:
-              location.city ?? '',
+            city: location.city ?? '',
 
-            timezone:
-              location.timezone ?? 'UTC',
+            timezone: location.timezone ?? 'UTC',
 
-            phone:
-              location.phone,
+            phone: location.phone,
 
-            phoneCountryCode:
-              location.phoneCountryCode,
+            phoneCountryCode: location.phoneCountryCode,
           },
         });
       }
@@ -776,8 +687,7 @@ export class ProjectsService {
        * ----------------------------------------------------------------------
        */
       if (dto.representative !== undefined) {
-        const representative =
-          dto.representative;
+        const representative = dto.representative;
 
         await tx.projectRepresentative.upsert({
           where: {
@@ -786,13 +696,11 @@ export class ProjectsService {
 
           update: {
             ...(representative.hasRepresentative !== undefined && {
-              hasRepresentative:
-                representative.hasRepresentative,
+              hasRepresentative: representative.hasRepresentative,
             }),
 
             ...(representative.valentiaManagedDirectly !== undefined && {
-              valentiaManagedDirectly:
-                representative.valentiaManagedDirectly,
+              valentiaManagedDirectly: representative.valentiaManagedDirectly,
             }),
 
             ...(representative.name !== undefined && {
@@ -804,8 +712,7 @@ export class ProjectsService {
             }),
 
             ...(representative.phoneCountryCode !== undefined && {
-              phoneCountryCode:
-                representative.phoneCountryCode,
+              phoneCountryCode: representative.phoneCountryCode,
             }),
 
             ...(representative.email !== undefined && {
@@ -813,44 +720,33 @@ export class ProjectsService {
             }),
 
             ...(representative.relationship !== undefined && {
-              relationship:
-                representative.relationship,
+              relationship: representative.relationship,
             }),
 
             ...(representative.authorizationScope !== undefined && {
-              authorizationScope:
-                representative.authorizationScope,
+              authorizationScope: representative.authorizationScope,
             }),
           },
 
           create: {
             projectId: id,
 
-            hasRepresentative:
-              representative.hasRepresentative ??
-              false,
+            hasRepresentative: representative.hasRepresentative ?? false,
 
             valentiaManagedDirectly:
-              representative.valentiaManagedDirectly ??
-              true,
+              representative.valentiaManagedDirectly ?? true,
 
-            name:
-              representative.name,
+            name: representative.name,
 
-            phone:
-              representative.phone,
+            phone: representative.phone,
 
-            phoneCountryCode:
-              representative.phoneCountryCode,
+            phoneCountryCode: representative.phoneCountryCode,
 
-            email:
-              representative.email,
+            email: representative.email,
 
-            relationship:
-              representative.relationship,
+            relationship: representative.relationship,
 
-            authorizationScope:
-              representative.authorizationScope,
+            authorizationScope: representative.authorizationScope,
           },
         });
       }
@@ -870,10 +766,7 @@ export class ProjectsService {
 
           update: {
             ...(scope.scopeType !== undefined && {
-              scopeType:
-                toPrismaScopeType(
-                  scope.scopeType,
-                ),
+              scopeType: toPrismaScopeType(scope.scopeType),
             }),
 
             ...(scope.notes !== undefined && {
@@ -884,13 +777,9 @@ export class ProjectsService {
           create: {
             projectId: id,
 
-            scopeType:
-              toPrismaScopeType(
-                scope.scopeType ?? 'other',
-              ),
+            scopeType: toPrismaScopeType(scope.scopeType ?? 'other'),
 
-            notes:
-              scope.notes,
+            notes: scope.notes,
           },
         });
       }
@@ -910,53 +799,38 @@ export class ProjectsService {
 
           update: {
             ...(budget.budgetType !== undefined && {
-              budgetType:
-                toPrismaBudgetType(
-                  budget.budgetType,
-                ),
+              budgetType: toPrismaBudgetType(budget.budgetType),
             }),
 
             ...(budget.exactAmount !== undefined && {
-              exactAmount:
-                budget.exactAmount,
+              exactAmount: budget.exactAmount,
             }),
 
             ...(budget.minAmount !== undefined && {
-              minAmount:
-                budget.minAmount,
+              minAmount: budget.minAmount,
             }),
 
             ...(budget.maxAmount !== undefined && {
-              maxAmount:
-                budget.maxAmount,
+              maxAmount: budget.maxAmount,
             }),
 
             ...(budget.currency !== undefined && {
-              currency:
-                budget.currency,
+              currency: budget.currency,
             }),
           },
 
           create: {
             projectId: id,
 
-            budgetType:
-              toPrismaBudgetType(
-                budget.budgetType ??
-                'undecided',
-              ),
+            budgetType: toPrismaBudgetType(budget.budgetType ?? 'undecided'),
 
-            exactAmount:
-              budget.exactAmount,
+            exactAmount: budget.exactAmount,
 
-            minAmount:
-              budget.minAmount,
+            minAmount: budget.minAmount,
 
-            maxAmount:
-              budget.maxAmount,
+            maxAmount: budget.maxAmount,
 
-            currency:
-              budget.currency ?? 'EGP',
+            currency: budget.currency ?? 'EGP',
           },
         });
       }
@@ -967,8 +841,7 @@ export class ProjectsService {
        * ----------------------------------------------------------------------
        */
       if (dto.timeline !== undefined) {
-        const timeline =
-          dto.timeline;
+        const timeline = dto.timeline;
 
         await tx.targetCompletion.upsert({
           where: {
@@ -977,47 +850,33 @@ export class ProjectsService {
 
           update: {
             ...(timeline.deadlineType !== undefined && {
-              deadlineType:
-                toPrismaDeadlineType(
-                  timeline.deadlineType,
-                ),
+              deadlineType: toPrismaDeadlineType(timeline.deadlineType),
             }),
 
             ...(timeline.targetDate !== undefined && {
-              targetDate:
-                new Date(
-                  timeline.targetDate,
-                ),
+              targetDate: new Date(timeline.targetDate),
             }),
 
             ...(timeline.durationDescription !== undefined && {
-              durationDescription:
-                timeline.durationDescription,
+              durationDescription: timeline.durationDescription,
             }),
           },
 
           create: {
             projectId: id,
 
-            deadlineType:
-              toPrismaDeadlineType(
-                timeline.deadlineType ??
-                'no_deadline',
-              ),
+            deadlineType: toPrismaDeadlineType(
+              timeline.deadlineType ?? 'no_deadline',
+            ),
 
-            targetDate:
-              timeline.targetDate
-                ? new Date(
-                  timeline.targetDate,
-                )
-                : undefined,
+            targetDate: timeline.targetDate
+              ? new Date(timeline.targetDate)
+              : undefined,
 
-            durationDescription:
-              timeline.durationDescription,
+            durationDescription: timeline.durationDescription,
           },
         });
       }
-
 
       /**
        * ----------------------------------------------------------------------
@@ -1044,21 +903,7 @@ export class ProjectsService {
        * 10. Return updated project
        * ----------------------------------------------------------------------
        */
-      const updated =
-        await tx.project.findUnique({
-          where: {
-            id,
-          },
-          include: this.projectInclude,
-        });
-
-      if (!updated) {
-        throw new NotFoundException(
-          `Project with ID ${id} not found after update`,
-        );
-      }
-
-      return mapProjectToFrontend(updated);
+      return this.loadMappedProject(tx, id);
     });
   }
 
@@ -1067,83 +912,69 @@ export class ProjectsService {
    * SUBMIT PROJECT
    * --------------------------------------------------------------------------
    */
-  async submitProject(
-    id: number,
-    user: RequestUser,
-  ) {
-    const project =
-      await this.prisma.project.findUnique({
-        where: {
-          id,
-        },
-        include: this.projectInclude,
-      });
+  async submitProject(id: number, user: RequestUser) {
+    const project = await this.prisma.project.findUnique({
+      where: {
+        id,
+      },
+      include: this.projectInclude,
+    });
 
     if (!project) {
-      throw new NotFoundException(
-        `Project with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Project with ID ${id} not found`);
     }
 
-    if (
-      user.role !== Role.CUSTOMER ||
-      project.clientId !== user.id
-    ) {
+    if (user.role !== Role.CUSTOMER || project.clientId !== user.id) {
       throw new ForbiddenException(
         'Access denied: Only the project owner customer can submit their draft project',
       );
     }
 
-    if (
-      project.status !== ProjectStatus.DRAFT
-    ) {
+    if (project.status !== ProjectStatus.DRAFT) {
       throw new BadRequestException(
         `Cannot submit project. Current status is ${project.status}`,
       );
     }
 
-    const missingFields =
-      validateProjectForSubmission(project);
+    const missingFields = validateProjectForSubmission(project);
 
     if (missingFields.length > 0) {
       throw new BadRequestException({
-        message:
-          'Project is incomplete and cannot be submitted',
+        message: 'Project is incomplete and cannot be submitted',
         missingFields,
       });
     }
 
-    return this.prisma.$transaction(
-      async (tx) => {
-        const updatedProject =
-          await tx.project.update({
-            where: {
-              id,
-            },
+    return this.prisma.$transaction(async (tx) => {
+      await tx.project.update({
+        where: {
+          id,
+        },
 
-            data: {
-              status:
-                ProjectStatus.SUBMITTED,
-            },
+        data: {
+          status: ProjectStatus.SUBMITTED,
+        },
+      });
 
-            include:
-              this.projectInclude,
-          });
+      await this.logActivity(tx, {
+        projectId: id,
+        actor: user,
+        action: ProjectActivityAction.PROJECT_SUBMITTED,
+        fromStatus: ProjectStatus.DRAFT,
+        toStatus: ProjectStatus.SUBMITTED,
+        note: 'Project submitted for engineer review',
+        metadata: {
+          title: project.title,
+          spacesCount: project.spaces.length,
+          documentsCount: project.documents.length,
+          stylePreferenceMode: project.stylePreference?.mode ?? null,
+          budgetType: project.budget?.budgetType ?? null,
+          hasAssignedEngineer: project.assignment !== null,
+        },
+      });
 
-        await tx.projectActivity.create({
-          data: {
-            projectId: id,
-            actorId: user.id,
-            type:
-              ActivityType.PROJECT_SUBMITTED,
-          },
-        });
-
-        return mapProjectToFrontend(
-          updatedProject,
-        );
-      },
-    );
+      return this.loadMappedProject(tx, id);
+    });
   }
 
   /**
@@ -1151,20 +982,18 @@ export class ProjectsService {
    * ASSIGN ENGINEER
    * --------------------------------------------------------------------------
    *
-   * A project can have multiple engineers.
+   * A project has exactly one responsible engineer.
+   * Assigning a different engineer re-assigns the project
+   * (allowed only before review has started).
    *
-   * The schema guarantees uniqueness using:
-   * @@unique([projectId, engineerId])
+   * Returns the ProjectAssignment record (same as master).
    */
   async assignEngineer(
     projectId: number,
     dto: AssignEngineerDto,
     user: RequestUser,
   ) {
-    const allowedRoles: Role[] = [
-      Role.PROJECT_MANAGER,
-      Role.ADMINISTRATOR,
-    ];
+    const allowedRoles: Role[] = [Role.PROJECT_MANAGER, Role.ADMINISTRATOR];
 
     if (!allowedRoles.includes(user.role)) {
       throw new ForbiddenException(
@@ -1172,96 +1001,93 @@ export class ProjectsService {
       );
     }
 
-    const project =
-      await this.prisma.project.findUnique({
-        where: {
-          id: projectId,
+    return this.prisma.$transaction(async (tx) => {
+      // Review actions use the same Project lock before checking assignment/state.
+      await tx.$queryRaw`SELECT "id" FROM "projects" WHERE "id" = ${projectId} FOR UPDATE`;
+
+      const project = await tx.project.findUnique({
+        where: { id: projectId },
+        include: {
+          assignment: {
+            include: {
+              engineer: {
+                select: { id: true, username: true },
+              },
+            },
+          },
         },
       });
 
-    if (!project) {
-      throw new NotFoundException(
-        `Project with ID ${projectId} not found`,
-      );
-    }
+      if (!project) {
+        throw new NotFoundException(`Project with ID ${projectId} not found`);
+      }
 
-    const engineer =
-      await this.prisma.user.findUnique({
-        where: {
-          id: dto.engineerId,
-        },
-      });
-
-    if (!engineer) {
-      throw new NotFoundException(
-        `User with ID ${dto.engineerId} not found`,
-      );
-    }
-
-    if (engineer.role !== Role.ENGINEER) {
-      throw new BadRequestException(
-        `Selected user ${dto.engineerId} does not have the ENGINEER role`,
-      );
-    }
-
-    return this.prisma.$transaction(
-      async (tx) => {
-        /**
-         * Do not replace another engineer.
-         *
-         * If this exact engineer is already assigned,
-         * Prisma's unique constraint prevents duplicates.
-         */
-        await tx.projectAssignment.upsert({
-          where: {
-            projectId_engineerId: {
-              projectId,
-              engineerId: dto.engineerId,
-            },
-          },
-
-          update: {},
-
-          create: {
-            projectId,
-            engineerId: dto.engineerId,
-          },
-        });
-
-        await tx.projectActivity.create({
-          data: {
-            projectId,
-            actorId: user.id,
-            type:
-              ActivityType.ENGINEER_ASSIGNED,
-
-            metadata: {
-              assignedEngineerId:
-                dto.engineerId,
-            },
-          },
-        });
-
-        const updatedProject =
-          await tx.project.findUnique({
-            where: {
-              id: projectId,
-            },
-            include:
-              this.projectInclude,
-          });
-
-        if (!updatedProject) {
-          throw new NotFoundException(
-            `Project with ID ${projectId} not found after assignment`,
-          );
-        }
-
-        return mapProjectToFrontend(
-          updatedProject,
+      if (
+        project.status !== ProjectStatus.DRAFT &&
+        project.status !== ProjectStatus.SUBMITTED
+      ) {
+        throw new ConflictException(
+          'Engineer assignment is locked once review has started',
         );
-      },
-    );
+      }
+
+      const engineer = await tx.user.findUnique({
+        where: { id: dto.engineerId },
+        select: { id: true, username: true, role: true },
+      });
+
+      if (!engineer) {
+        throw new NotFoundException(`User with ID ${dto.engineerId} not found`);
+      }
+
+      if (engineer.role !== Role.ENGINEER) {
+        throw new BadRequestException(
+          `Selected user ${dto.engineerId} does not have the ENGINEER role`,
+        );
+      }
+
+      const previous = project.assignment;
+
+      // Same engineer already assigned: idempotent, no duplicate activity.
+      if (previous && previous.engineerId === engineer.id) {
+        return tx.projectAssignment.findUniqueOrThrow({
+          where: { projectId },
+        });
+      }
+
+      const assignment = await tx.projectAssignment.upsert({
+        where: { projectId },
+        update: { engineerId: engineer.id },
+        create: { projectId, engineerId: engineer.id },
+      });
+
+      const isReassignment = previous !== null;
+
+      await this.logActivity(tx, {
+        projectId,
+        actor: user,
+        action: isReassignment
+          ? ProjectActivityAction.ENGINEER_REASSIGNED
+          : ProjectActivityAction.ENGINEER_ASSIGNED,
+        fromStatus: project.status,
+        toStatus: project.status,
+        note: isReassignment
+          ? `Engineer changed from ${previous.engineer.username} to ${engineer.username}`
+          : `Engineer ${engineer.username} assigned to the project`,
+        metadata: {
+          projectTitle: project.title,
+          newEngineer: { id: engineer.id, username: engineer.username },
+          previousEngineer: previous
+            ? {
+                id: previous.engineer.id,
+                username: previous.engineer.username,
+              }
+            : null,
+        },
+      });
+
+      return assignment;
+    });
   }
 
   /**
@@ -1287,7 +1113,6 @@ export class ProjectsService {
       },
     });
   }
-
 
   /**
    * --------------------------------------------------------------------------
@@ -1343,10 +1168,63 @@ export class ProjectsService {
   }
 
   /**
-   * ========================================================================== 
+   * ==========================================================================
    * PRIVATE HELPERS
-   * ========================================================================== 
+   * ==========================================================================
    */
+
+  /**
+   * --------------------------------------------------------------------------
+   * Log project activity
+   * --------------------------------------------------------------------------
+   *
+   * Single entry point for writing timeline events, so every event
+   * carries the actor, the actor role, the status transition and
+   * structured metadata.
+   */
+  private async logActivity(
+    tx: Prisma.TransactionClient,
+    params: {
+      projectId: number;
+      actor: RequestUser;
+      action: ProjectActivityAction;
+      fromStatus: ProjectStatus | null;
+      toStatus: ProjectStatus;
+      note?: string;
+      metadata?: Prisma.InputJsonValue;
+    },
+  ) {
+    await tx.projectActivity.create({
+      data: {
+        projectId: params.projectId,
+        actorId: params.actor.id,
+        actorRole: params.actor.role,
+        action: params.action,
+        fromStatus: params.fromStatus,
+        toStatus: params.toStatus,
+        note: params.note,
+        metadata: params.metadata,
+      },
+    });
+  }
+
+  /**
+   * --------------------------------------------------------------------------
+   * Load a project with everything and map it for the frontend
+   * --------------------------------------------------------------------------
+   */
+  private async loadMappedProject(tx: Prisma.TransactionClient, id: number) {
+    const project = await tx.project.findUnique({
+      where: { id },
+      include: this.projectInclude,
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+
+    return mapProjectToFrontend(project);
+  }
 
   /**
    * --------------------------------------------------------------------------
@@ -1366,7 +1244,7 @@ export class ProjectsService {
    * becomes exactly three Space records.
    */
   private async createSpaces(
-    tx: any,
+    tx: Prisma.TransactionClient,
     projectId: number,
     spaces: CreateProjectDto['spaces'],
   ) {
@@ -1374,25 +1252,16 @@ export class ProjectsService {
       return;
     }
 
-    const rows = spaces.map(
-      (space) => ({
-        projectId,
+    const rows = spaces.map((space) => ({
+      projectId,
 
-        type:
-          toPrismaSpaceType(
-            space.type,
-          ),
+      type: toPrismaSpaceType(space.type),
 
-        customName:
-          space.customName,
-      }),
-    );
+      customName: space.customName,
+    }));
 
     await tx.space.createMany({
       data: rows,
     });
   }
-
-
 }
-

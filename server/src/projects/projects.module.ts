@@ -6,6 +6,7 @@ import { ProjectsService } from './projects.service.js';
 import { FilesModule } from '../files/files.module.js';
 import { ProjectStyleService } from './project-style.service.js';
 import { ProjectDocumentsService } from './project-documents.service.js';
+import { ProjectReviewService } from './project-review.service.js';
 
 @Module({
   imports: [PrismaModule, AuthModule, FilesModule],
@@ -14,6 +15,7 @@ import { ProjectDocumentsService } from './project-documents.service.js';
     ProjectsService,
     ProjectStyleService,
     ProjectDocumentsService,
+    ProjectReviewService,
   ],
   exports: [ProjectsService],
 })

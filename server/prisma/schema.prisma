@@ -19,6 +19,17 @@ enum Role {
 enum ProjectStatus {
   DRAFT
   SUBMITTED
+  UNDER_ENGINEER_REVIEW
+  ENGINEER_READY
+}
+
+enum ProjectActivityAction {
+  PROJECT_CREATED
+  PROJECT_SUBMITTED
+  ENGINEER_ASSIGNED
+  ENGINEER_REASSIGNED
+  REVIEW_STARTED
+  CONSULTATION_READY
 }
 
 enum PropertyType {
@@ -83,25 +94,42 @@ enum DocumentCategory {
   OTHER
 }
 
-enum ActivityType {
-  PROJECT_CREATED
-  PROJECT_SUBMITTED
-  ENGINEER_ASSIGNED
-}
-
 model User {
-  id                  Int                 @id @default(autoincrement())
-  username            String              @unique
-  passwordHash        String
-  role                Role
-  mustChangePassword  Boolean             @default(true)
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  projectsAsClient    Project[]           @relation("ClientProjects")
-  engineerAssignments ProjectAssignment[] @relation("EngineerAssignments")
-  activities          ProjectActivity[]   @relation("UserActivities")
+  id                            Int                           @id @default(autoincrement())
+  username                      String                        @unique
+  email                         String?                       @unique
+  temporaryLogin                String?                       @unique
+  emailVerified                 Boolean                       @default(false)
+  temporaryCredentialsExpiresAt DateTime?
+  onboardingVersion             String?
+  accessTokensValidAfter        DateTime?
+  passwordHash                  String
+  role                          Role
+  mustChangePassword            Boolean                       @default(true)
+  createdAt                     DateTime                      @default(now())
+  updatedAt                     DateTime                      @updatedAt
+  projectsAsClient              Project[]                     @relation("ClientProjects")
+  engineerAssignments           ProjectAssignment[]           @relation("EngineerAssignments")
+  projectActivities             ProjectActivity[]             @relation("ProjectActivityActor")
+  provisioningActions           AccountProvisioningActivity[] @relation("ProvisioningActor")
+  provisioningHistory           AccountProvisioningActivity[] @relation("ProvisioningTarget")
 
   @@map("users")
+}
+
+// Account audit metadata only; credentials and generation secrets are never recorded.
+model AccountProvisioningActivity {
+  id        Int      @id @default(autoincrement())
+  actorId   Int
+  actor     User     @relation("ProvisioningActor", fields: [actorId], references: [id], onDelete: Restrict)
+  userId    Int
+  user      User     @relation("ProvisioningTarget", fields: [userId], references: [id], onDelete: Restrict)
+  action    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([actorId])
+  @@map("account_provisioning_activities")
 }
 
 model Project {
@@ -121,7 +149,7 @@ model Project {
   budget          ProjectBudget?
   timeline        TargetCompletion?
   documents       ProjectDocument[]
-  assignments     ProjectAssignment[]
+  assignment      ProjectAssignment? // exactly one responsible engineer
   activities      ProjectActivity[]
 
   createdAt DateTime @default(now())
@@ -296,9 +324,10 @@ model ProjectDocument {
   @@map("project_documents")
 }
 
+// One responsible engineer per project (projectId is unique).
 model ProjectAssignment {
   id        Int     @id @default(autoincrement())
-  projectId Int
+  projectId Int     @unique
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   engineerId Int
@@ -307,23 +336,26 @@ model ProjectAssignment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([projectId, engineerId])
-  @@index([projectId])
   @@index([engineerId])
   @@map("project_assignments")
 }
 
+// Project timeline events; not a replacement for the platform-wide audit log.
 model ProjectActivity {
-  id        Int          @id @default(autoincrement())
-  projectId Int
-  project   Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  actorId   Int
-  actor     User         @relation("UserActivities", fields: [actorId], references: [id], onDelete: Restrict)
-  type      ActivityType
-  metadata  Json?
-  createdAt DateTime     @default(now())
+  id         Int                   @id @default(autoincrement())
+  projectId  Int
+  project    Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  actorId    Int
+  actor      User                  @relation("ProjectActivityActor", fields: [actorId], references: [id], onDelete: Restrict)
+  actorRole  Role
+  action     ProjectActivityAction
+  fromStatus ProjectStatus? // null for the very first event (project creation)
+  toStatus   ProjectStatus
+  note       String?               @db.VarChar(2000)
+  metadata   Json? // structured details of the event
+  createdAt  DateTime              @default(now())
 
-  @@index([projectId])
+  @@index([projectId, createdAt, id])
   @@index([actorId])
   @@map("project_activities")
 }

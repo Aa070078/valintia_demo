@@ -42,10 +42,7 @@ function applySwaggerBasicAuth(
   );
 }
 
-function mountYamlEndpoints(
-  app: INestApplication,
-  openApiYaml: string,
-): void {
+function mountYamlEndpoints(app: INestApplication, openApiYaml: string): void {
   const expressApp = app.getHttpAdapter().getInstance() as Express;
 
   const sendYaml = (_req: Request, res: Response) => {
@@ -89,6 +86,8 @@ export function setupSwagger(
         scheme: 'bearer',
         bearerFormat: 'JWT',
         in: 'header',
+        description:
+          'Use accessToken for business endpoints. onboardingToken works only on me, onboarding email request/verify and change-password; replace it with a fresh accessToken after onboarding.',
       },
       'access-token',
     )

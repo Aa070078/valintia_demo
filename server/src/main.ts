@@ -1,8 +1,8 @@
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { setupSwagger } from './infrastructure/swagger/setup-swagger';
+import { AppModule } from './app.module.js';
+import { setupSwagger } from './infrastructure/swagger/setup-swagger.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -42,9 +42,7 @@ async function bootstrap() {
   logger.log(
     `Swagger UI at ${base}/docs${nodeEnv === 'production' ? ' (Basic Auth)' : ''}`,
   );
-  logger.log(
-    `OpenAPI YAML at ${base}/yaml and ${base}/${apiPrefix}/yaml`,
-  );
+  logger.log(`OpenAPI YAML at ${base}/yaml and ${base}/${apiPrefix}/yaml`);
 }
 
 void bootstrap();
