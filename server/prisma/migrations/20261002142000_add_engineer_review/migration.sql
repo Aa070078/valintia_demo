@@ -1,5 +1,3 @@
--- CreateEnum
-CREATE TYPE "ProjectActivityAction" AS ENUM ('REVIEW_STARTED', 'CONSULTATION_READY');
 
 -- AlterEnum
 -- This migration adds more than one value to an enum.
@@ -8,33 +6,65 @@ CREATE TYPE "ProjectActivityAction" AS ENUM ('REVIEW_STARTED', 'CONSULTATION_REA
 -- multiple migrations, each migration adding only one value to
 -- the enum.
 
+-- CreateEnum
+CREATE TYPE "ProjectActivityAction" AS ENUM (
+    'PROJECT_CREATED',
+    'PROJECT_SUBMITTED',
+    'ENGINEER_ASSIGNED',
+    'ENGINEER_REASSIGNED',
+    'REVIEW_STARTED',
+    'CONSULTATION_READY'
+);
 
+-- AlterEnum
 ALTER TYPE "ProjectStatus" ADD VALUE 'UNDER_ENGINEER_REVIEW';
 ALTER TYPE "ProjectStatus" ADD VALUE 'ENGINEER_READY';
 
--- CreateTable
-CREATE TABLE "project_activities" (
-    "id" SERIAL NOT NULL,
-    "projectId" INTEGER NOT NULL,
-    "actorId" INTEGER NOT NULL,
-    "actorRole" "Role" NOT NULL,
-    "action" "ProjectActivityAction" NOT NULL,
-    "fromStatus" "ProjectStatus" NOT NULL,
-    "toStatus" "ProjectStatus" NOT NULL,
-    "note" VARCHAR(2000),
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+-- The project_activities table was already created by
+-- 20260930022618_expand_project_domain.
+-- Upgrade that existing table to the current schema.
 
-    CONSTRAINT "project_activities_pkey" PRIMARY KEY ("id")
-);
+ALTER TABLE "project_activities"
+ADD COLUMN "actorRole" "Role",
+ADD COLUMN "action" "ProjectActivityAction",
+ADD COLUMN "fromStatus" "ProjectStatus",
+ADD COLUMN "toStatus" "ProjectStatus",
+ADD COLUMN "note" VARCHAR(2000);
 
--- CreateIndex
-CREATE INDEX "project_activities_projectId_createdAt_id_idx" ON "project_activities"("projectId", "createdAt", "id");
+-- Convert existing activity types to the new action field.
+UPDATE "project_activities"
+SET "action" = CASE "type"::text
+    WHEN 'PROJECT_CREATED' THEN 'PROJECT_CREATED'::"ProjectActivityAction"
+    WHEN 'PROJECT_SUBMITTED' THEN 'PROJECT_SUBMITTED'::"ProjectActivityAction"
+    WHEN 'ENGINEER_ASSIGNED' THEN 'ENGINEER_ASSIGNED'::"ProjectActivityAction"
+END;
 
--- CreateIndex
-CREATE INDEX "project_activities_actorId_idx" ON "project_activities"("actorId");
+-- Get the actor role from users.
+UPDATE "project_activities" pa
+SET "actorRole" = u."role"
+FROM "users" u
+WHERE pa."actorId" = u."id";
 
--- AddForeignKey
-ALTER TABLE "project_activities" ADD CONSTRAINT "project_activities_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- Existing activities are historical.
+-- Their previous status is unknown, so fromStatus remains nullable.
+UPDATE "project_activities"
+SET "toStatus" = CASE "action"
+    WHEN 'PROJECT_CREATED' THEN 'DRAFT'::"ProjectStatus"
+    WHEN 'PROJECT_SUBMITTED' THEN 'SUBMITTED'::"ProjectStatus"
+    WHEN 'ENGINEER_ASSIGNED' THEN 'SUBMITTED'::"ProjectStatus"
+END;
 
--- AddForeignKey
-ALTER TABLE "project_activities" ADD CONSTRAINT "project_activities_actorId_fkey" FOREIGN KEY ("actorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "project_activities"
+DROP COLUMN "type";
+
+ALTER TABLE "project_activities"
+ALTER COLUMN "actorRole" SET NOT NULL,
+ALTER COLUMN "action" SET NOT NULL,
+ALTER COLUMN "toStatus" SET NOT NULL;
+
+DROP TYPE "ActivityType";
+
+DROP INDEX "project_activities_projectId_idx";
+
+CREATE INDEX "project_activities_projectId_createdAt_id_idx"
+ON "project_activities"("projectId", "createdAt", "id");
