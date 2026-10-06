@@ -129,7 +129,15 @@ function getLocalUser(): User | null {
   const stored = sessionStorage.getItem(USER_SESSION_KEY) || localStorage.getItem(USER_SESSION_KEY);
   if (!stored) return DEMO_PERSONAS.CUSTOMER;
   try {
-    return JSON.parse(stored);
+    const parsed = JSON.parse(stored);
+    if (parsed && !parsed.name) {
+      parsed.name = parsed.username
+        ? parsed.username.split("@")[0]
+        : parsed.email
+        ? parsed.email.split("@")[0]
+        : "Client";
+    }
+    return parsed;
   } catch {
     return DEMO_PERSONAS.CUSTOMER;
   }
@@ -180,7 +188,9 @@ export const authApi = {
       const user: User = {
         id: backendUser.id,
         username: backendUser.username,
-        name: backendUser.username.split("@")[0],
+        name:
+          (backendUser as any).name ||
+          (backendUser.username ? backendUser.username.split("@")[0] : "Client"),
         role: backendUser.role,
         mustChangePassword: Boolean(backendUser.mustChangePassword),
         requiresPasswordChange: Boolean(backendUser.mustChangePassword),
@@ -319,8 +329,15 @@ export const authApi = {
 
     try {
       const response = await apiClient.get<User>("/auth/me");
-      saveLocalUser(response.data);
-      return response.data;
+      const raw = response.data;
+      const user: User = {
+        ...raw,
+        name:
+          raw.name ||
+          (raw.username ? raw.username.split("@")[0] : raw.email ? raw.email.split("@")[0] : "Client"),
+      };
+      saveLocalUser(user);
+      return user;
     } catch {
       if (!IS_MOCK_FALLBACK_ALLOWED) {
         tokenStorage.removeToken();

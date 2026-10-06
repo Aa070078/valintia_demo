@@ -2,6 +2,23 @@
 
 Append-only audit log for changes under `client/`. Newest entry at the top.
 
+## [2026-10-06 23:28] Customer Auth Session Safe Fallback & Display Name Resilience
+
+**ID:** 20261006-2328-client-user-displayname-fallback  
+**By:** @Antigravity  
+**App:** client  
+**Requested:** Fix runtime TypeError `Cannot read properties of undefined (reading 'split')` in `CustomerHeader` when logging in as a customer.  
+**Scope:** `client/components/layout/customer-header.tsx`, `client/app/projects/new/page.tsx`, `client/features/auth/api/auth.api.ts`, `client/features/auth/components/sign-in-modal.tsx`, `client/features/dashboard/components/create-staff-modal.tsx`, `dashboard/components/admin/admin-dashboard.tsx`
+
+### Summary
+Resolved a runtime TypeError where customer sessions from the backend (`GET /auth/me` and `POST /auth/login`) return a user record with `username` and `email` without an explicit `name` column, causing `user.name.split(" ")` in `CustomerHeader` to throw undefined errors. Added safe fallback resolving `user.name || user.username || user.email || "Client"` across header initials, user button titles, modal user titles, and project wizard avatar initial.
+
+### Verification
+- `npm run typecheck` in `client/`: 0 errors.
+- `npm run typecheck` in `dashboard/`: 0 errors.
+
+---
+
 ## [2026-09-24 16:55] Architectural Visual Redesign & 3D Coverflow Alignment
 
 **ID:** 20260924-1655-client-architectural-redesign  

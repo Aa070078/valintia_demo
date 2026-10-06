@@ -292,7 +292,7 @@ export function AdminDashboard() {
                       <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                         <td className="py-3.5 px-4">
                           <div className="font-semibold text-foreground flex items-center gap-2">
-                            <span>{user.name}</span>
+                            <span>{user.name || user.username}</span>
                             {user.mustChangePassword && (
                               <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200">
                                 1st Login Reset

@@ -16,9 +16,16 @@ export function CustomerHeader() {
   const [isAuthOpen, setIsAuthOpen] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
 
-  const initials = user?.name
-    ? user.name
+  const displayName =
+    user?.name ||
+    (user?.username ? user.username.split("@")[0] : "") ||
+    (user?.email ? user.email.split("@")[0] : "") ||
+    (isRTL ? "العميل" : "Client");
+
+  const initials = displayName
+    ? displayName
         .split(" ")
+        .filter(Boolean)
         .map((n) => n[0])
         .join("")
         .slice(0, 2)
@@ -154,7 +161,7 @@ export function CustomerHeader() {
             type="button"
             onClick={() => setIsAuthOpen(true)}
             aria-label="User Profile & Sign In"
-            title={isAuthenticated && user ? `${user.name} (${role})` : "Sign In"}
+            title={isAuthenticated && user ? `${displayName} (${role})` : "Sign In"}
             className="flex items-center gap-2 rounded-full border border-border bg-card p-1 text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:text-foreground hover:shadow-xs active:scale-95 cursor-pointer pr-2.5 touch-manipulation"
           >
             <div className="flex h-7 w-7 items-center justify-center rounded-full bg-foreground/5 text-foreground text-[10px] font-bold">
@@ -165,7 +172,7 @@ export function CustomerHeader() {
               )}
             </div>
             <span className="hidden xs:inline text-[10px] font-semibold tracking-wider uppercase text-foreground">
-              {isAuthenticated && user ? user.name.split(" ")[0] : t("nav.sign_in") || "Sign In"}
+              {isAuthenticated && user ? displayName.split(" ")[0] : t("nav.sign_in") || "Sign In"}
             </span>
           </button>
 

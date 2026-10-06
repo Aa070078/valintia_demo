@@ -315,11 +315,11 @@ function CreateProjectContent() {
               type="button"
               onClick={() => setIsSignInOpen(true)}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xs hover:opacity-90 transition-opacity"
-              title={user ? user.name : "Sign In"}
+              title={user ? (user.name || user.username || "Client") : "Sign In"}
             >
               {user ? (
                 <span className="text-xs font-bold font-mono">
-                  {user.name.charAt(0).toUpperCase()}
+                  {(user.name || user.username || "C").charAt(0).toUpperCase()}
                 </span>
               ) : (
                 <User size={14} weight="bold" />

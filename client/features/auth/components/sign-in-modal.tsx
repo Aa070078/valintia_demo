@@ -234,7 +234,7 @@ export function SignInModal({ open, onClose }: SignInModalProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-semibold text-sm text-[#1C1917] dark:text-[#FAF7F2]">
-                        {user.name}
+                        {user.name || user.username || user.email || "Client"}
                       </h4>
                       <p className="text-[#78716C] dark:text-[#989692]">{user.email}</p>
                     </div>

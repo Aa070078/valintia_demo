@@ -165,7 +165,7 @@ function CreateStaffModalDialog({
             <div className="p-5 rounded-2xl bg-[#F4EDE2] border border-[#D8C8B4] space-y-3 text-xs">
               <div className="flex items-center justify-between pb-2 border-b border-[#D8C8B4]/60">
                 <span className="text-[#6B635B]">{isRTL ? "الاسم الكامل:" : "Full Name:"}</span>
-                <span className="font-medium text-[#1C1917]">{createdResult.user.name}</span>
+                <span className="font-medium text-[#1C1917]">{createdResult.user.name || createdResult.user.username}</span>
               </div>
               <div className="flex items-center justify-between pb-2 border-b border-[#D8C8B4]/60">
                 <span className="text-[#6B635B]">{isRTL ? "اسم المستخدم / الإيميل:" : "Username / Email:"}</span>
