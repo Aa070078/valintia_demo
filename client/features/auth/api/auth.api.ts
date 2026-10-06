@@ -160,13 +160,35 @@ function saveLocalUser(user: User | null, persistent: boolean = true) {
 const IS_MOCK_FALLBACK_ALLOWED =
   process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true";
 
+interface BackendUser {
+  id: number | string;
+  username: string;
+  role: UserRole;
+  mustChangePassword?: boolean;
+}
+
 interface BackendAuthResponse {
-  accessToken: string;
-  user: {
-    id: number | string;
-    username: string;
-    role: UserRole;
-    mustChangePassword?: boolean;
+  accessToken?: string;
+  onboardingToken?: string;
+  onboardingRequired?: boolean;
+  user: BackendUser;
+}
+
+function mapBackendUser(backendUser: BackendUser): User {
+  const emailCandidate = (backendUser as any).email || "";
+  const nameCandidate =
+    (backendUser as any).name ||
+    (backendUser.username ? backendUser.username.split("@")[0] : emailCandidate ? emailCandidate.split("@")[0] : "Client");
+
+  return {
+    id: backendUser.id,
+    username: backendUser.username,
+    name: nameCandidate,
+    email: emailCandidate || undefined,
+    role: backendUser.role,
+    mustChangePassword: Boolean(backendUser.mustChangePassword),
+    requiresPasswordChange: Boolean(backendUser.mustChangePassword),
+    onboardingRequired: Boolean((backendUser as any).onboardingRequired),
   };
 }
 
@@ -185,21 +207,17 @@ export const authApi = {
     try {
       const response = await apiClient.post<BackendAuthResponse>("/auth/login", loginPayload);
       const backendUser = response.data.user;
-      const user: User = {
-        id: backendUser.id,
-        username: backendUser.username,
-        name:
-          (backendUser as any).name ||
-          (backendUser.username ? backendUser.username.split("@")[0] : "Client"),
-        role: backendUser.role,
-        mustChangePassword: Boolean(backendUser.mustChangePassword),
-        requiresPasswordChange: Boolean(backendUser.mustChangePassword),
-      };
-      tokenStorage.setToken(response.data.accessToken);
+      const user = mapBackendUser(backendUser);
+      const token = response.data.accessToken || response.data.onboardingToken || "";
+      if (token) {
+        tokenStorage.setToken(token);
+      }
       saveLocalUser(user, dto.rememberMe !== false);
       return {
-        token: response.data.accessToken,
+        token,
         user,
+        onboardingToken: response.data.onboardingToken,
+        onboardingRequired: response.data.onboardingRequired,
       };
     } catch (error) {
       if (!IS_MOCK_FALLBACK_ALLOWED) {
@@ -324,18 +342,12 @@ export const authApi = {
    * Endpoint: GET /auth/me
    */
   async getCurrentUser(): Promise<User | null> {
-    const token = tokenStorage.getToken();
-    if (!token) return null;
+  const token = tokenStorage.getToken();
+  if (!token) return null;
 
     try {
-      const response = await apiClient.get<User>("/auth/me");
-      const raw = response.data;
-      const user: User = {
-        ...raw,
-        name:
-          raw.name ||
-          (raw.username ? raw.username.split("@")[0] : raw.email ? raw.email.split("@")[0] : "Client"),
-      };
+      const response = await apiClient.get<BackendUser>("/auth/me");
+      const user = mapBackendUser(response.data);
       saveLocalUser(user);
       return user;
     } catch {
