@@ -17,6 +17,7 @@ import {
   getProjectActivity,
   getConsultations,
 } from "../api/engineer.api";
+import { useLanguage } from "@/lib/i18n/language-context";
 
 // Fallback seed projects for offline / demo view matching Sprint 2 review statuses
 const FALLBACK_ASSIGNED_PROJECTS: ProjectListItem[] = [
@@ -114,28 +115,10 @@ export function useEngineerWorkspace() {
   const [reviewContext, setReviewContext] = React.useState<ProjectReviewContext | null>(null);
   const [activities, setActivities] = React.useState<ProjectActivity[]>([]);
   const [activeFilter, setActiveFilter] = React.useState<EngineerWorkQueueFilter>("ALL");
-  const [language, setLanguage] = React.useState<"ar" | "en">(() => {
-    if (typeof window !== "undefined") {
-      return (localStorage.getItem("valentia_lang") as "ar" | "en") || "ar";
-    }
-    return "ar";
-  });
+  const { language, isRTL, toggleLanguage } = useLanguage();
   const [isLoading, setIsLoading] = React.useState(true);
   const [isTransitioning, setIsTransitioning] = React.useState(false);
   const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
-
-  // Sync document language & direction when language changes
-  React.useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-      document.documentElement.lang = language;
-      localStorage.setItem("valentia_lang", language);
-    }
-  }, [language]);
-
-  const toggleLanguage = React.useCallback(() => {
-    setLanguage((prev) => (prev === "ar" ? "en" : "ar"));
-  }, []);
 
   // Fetch initial assigned projects & consultations
   React.useEffect(() => {
@@ -409,7 +392,7 @@ export function useEngineerWorkspace() {
     activities,
     activeFilter,
     language,
-    isRTL: language === "ar",
+    isRTL,
     isLoading,
     isTransitioning,
     feedback,
