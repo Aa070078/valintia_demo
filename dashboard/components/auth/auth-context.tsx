@@ -51,6 +51,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function loadInitialSession() {
       try {
+        if (typeof window !== "undefined") {
+          const urlParams = new URLSearchParams(window.location.search);
+          const tokenParam = urlParams.get("token");
+          if (tokenParam) {
+            setAccessToken(tokenParam);
+            const cleanUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+          }
+        }
+
         const token = getAccessToken();
         if (!token) {
           if (isMounted) setUser(null);

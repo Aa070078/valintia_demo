@@ -41,6 +41,12 @@ function LoginFormContent() {
         else if (user.role === "PROJECT_MANAGER") router.replace("/pm");
         else router.replace("/admin");
       }
+    } else if (!authLoading && !isAuthenticated) {
+      // Forward to the unified client login page
+      const targetRedirect = redirectParam
+        ? (redirectParam.startsWith("http") ? redirectParam : `http://localhost:3001${redirectParam}`)
+        : "http://localhost:3001/engineer";
+      window.location.href = `http://localhost:3000/login?redirect=${encodeURIComponent(targetRedirect)}`;
     }
   }, [authLoading, isAuthenticated, user, router, redirectParam]);
 

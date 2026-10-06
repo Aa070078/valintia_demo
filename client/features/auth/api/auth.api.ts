@@ -168,8 +168,9 @@ export const authApi = {
    * Returns JWT token and authenticated user payload.
    */
   async login(dto: ProposedLoginDto): Promise<AuthSession> {
+    const emailCandidate = (dto.email || dto.username || "").trim();
     const loginPayload = {
-      username: dto.username || dto.email || "",
+      email: emailCandidate,
       password: dto.password,
     };
 

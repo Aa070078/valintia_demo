@@ -20,8 +20,11 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
 
   React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      const redirectQuery = pathname ? `?redirect=${encodeURIComponent(pathname)}` : "";
-      router.replace(`/login${redirectQuery}`);
+      const currentFullUrl = typeof window !== "undefined" ? window.location.href : "";
+      const target = currentFullUrl
+        ? `http://localhost:3000/login?redirect=${encodeURIComponent(currentFullUrl)}`
+        : "http://localhost:3000/login";
+      window.location.href = target;
     }
   }, [isLoading, isAuthenticated, router, pathname]);
 

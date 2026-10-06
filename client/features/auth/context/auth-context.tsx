@@ -44,18 +44,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  const handleRoleRedirection = (role: UserRole): { redirectUrl?: string } => {
+  const handleRoleRedirection = (role: UserRole, token?: string): { redirectUrl?: string } => {
+    const tokenQuery = token ? `?token=${encodeURIComponent(token)}` : "";
+    const dashboardBase =
+      typeof window !== "undefined" && window.location.hostname === "localhost"
+        ? "http://localhost:3001"
+        : "";
+
     if (role === "PROJECT_MANAGER") {
-      return { redirectUrl: "/dashboard/pm" };
+      return { redirectUrl: `${dashboardBase}/pm${tokenQuery}` };
     }
     if (role === "ENGINEER") {
-      return { redirectUrl: "/dashboard/engineer" };
+      return { redirectUrl: `${dashboardBase}/engineer${tokenQuery}` };
     }
-    if (role === "COMPANY_OWNER") {
-      return { redirectUrl: "/dashboard/owner" };
-    }
-    if (role === "ADMINISTRATOR" || role === "ADMIN") {
-      return { redirectUrl: "/dashboard/admin" };
+    if (role === "COMPANY_OWNER" || role === "ADMINISTRATOR" || role === "ADMIN") {
+      return { redirectUrl: `${dashboardBase}/admin${tokenQuery}` };
     }
     return { redirectUrl: "/projects" };
   };
@@ -65,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const session = await authApi.login(dto);
       setUser(session.user);
-      return handleRoleRedirection(session.user.role);
+      return handleRoleRedirection(session.user.role, session.token);
     } finally {
       setIsLoading(false);
     }
