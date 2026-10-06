@@ -21,7 +21,10 @@ import { ProjectOverviewTab } from "@/features/projects/components/dashboard/pro
 import { ProjectSpacesTab } from "@/features/projects/components/dashboard/project-spaces-tab";
 import { ProjectTeamTab } from "@/features/projects/components/dashboard/project-team-tab";
 import { ProjectDocumentsTab } from "@/features/projects/components/dashboard/project-documents-tab";
-import { ConsultationScheduler } from "@/features/projects/components/consultation-scheduler";
+import {
+  ConsultationScheduler,
+  type BookedAppointment,
+} from "@/features/projects/components/consultation-scheduler";
 import {
   useProject,
   useSubmitProject,
@@ -40,9 +43,20 @@ export default function ProjectDetailsPage() {
   const { isRTL } = useLanguage();
 
   const [activeTab, setActiveTab] = React.useState<ActiveTab>("overview");
+  const [appointment, setAppointment] = React.useState<BookedAppointment | null>(null);
 
   const { data: project, isLoading, error } = useProject(id);
   const submitMutation = useSubmitProject(id);
+
+  React.useEffect(() => {
+    if (!id) return;
+    try {
+      const saved = localStorage.getItem(`valentia_appointment_proj_${id}`);
+      if (saved) {
+        setAppointment(JSON.parse(saved));
+      }
+    } catch {}
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -188,7 +202,10 @@ export default function ProjectDetailsPage() {
         </div>
 
         {/* Dynamic Project Roadmap Timeline */}
-        <ProjectJourney projectStatus={project.status} />
+        <ProjectJourney
+          projectStatus={project.status}
+          consultationAppointment={appointment}
+        />
 
         {/* Just Submitted Success Alert Banner */}
         {searchParams.get("submitted") === "true" && (
@@ -203,19 +220,21 @@ export default function ProjectDetailsPage() {
                 </h4>
                 <p className="text-xs text-emerald-800 mt-0.5 leading-relaxed">
                   {isRTL
-                    ? "طلبك الآن قيد المراجعة الهندسية الفورية لدى مهندسي فالنتيا. يمكنك حجز موعد المعاينة أو الاستشارة أدناه."
-                    : "Your specifications are now under priority architectural review. Reserve your consultation slot below."}
+                    ? "طلبك الآن قيد المراجعة الهندسية الفورية لدى مهندسي فالنتيا. يمكنك حجز موعد ميتينج الاستشارة أدناه."
+                    : "Your specifications are now under priority architectural review. Reserve your consultation meeting slot below."}
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Consultation & Site Survey Scheduling Desk */}
+        {/* Consultation Scheduling Desk (Locked to Stage 02) */}
         <ConsultationScheduler
           projectId={project.id}
           projectTitle={displayTitle}
           projectLocation={project.property?.city || project.city}
+          initialAppointment={appointment}
+          onAppointmentBooked={(newApt) => setAppointment(newApt)}
         />
 
         {/* Tab Navigation */}

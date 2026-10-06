@@ -21,9 +21,10 @@ export interface JourneyStage {
 interface ProjectJourneyProps {
   projectStatus: ProposedProjectLifecycleStatus;
   stages?: JourneyStage[];
+  consultationAppointment?: { date: string; timeSlot: string } | null;
 }
 
-export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
+export function ProjectJourney({ projectStatus, stages, consultationAppointment }: ProjectJourneyProps) {
   const { isRTL } = useLanguage();
 
   const isSubmitted = projectStatus === "submitted" || projectStatus === "initial_review";
@@ -47,7 +48,11 @@ export function ProjectJourney({ projectStatus, stages }: ProjectJourneyProps) {
       descEn: "Video sync with lead architect to align vision and materials.",
       descAr: "ميتينج فيديو مع رئيس المهندسين عشان نفهم ذوقك ونظبط تفاصيل التصميم والخامات.",
       status: isSubmitted ? "in_progress" : "upcoming",
-      scheduledDate: isSubmitted ? "Estimated: Within 48 Hours" : undefined,
+      scheduledDate: consultationAppointment
+        ? (isRTL
+            ? `الميعاد: ${consultationAppointment.date} (${consultationAppointment.timeSlot})`
+            : `Booked: ${consultationAppointment.date} @ ${consultationAppointment.timeSlot}`)
+        : (isSubmitted ? (isRTL ? "متاح لحجز الموعد الآن" : "Ready to schedule") : undefined),
       icon: CalendarCheck,
     },
     {

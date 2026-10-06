@@ -5,33 +5,27 @@ import {
   CalendarBlank,
   Clock,
   VideoCamera,
-  Buildings,
   CheckCircle,
-  MapPin,
   Sparkle,
-  Phone,
-  ChatText,
   CalendarPlus,
   ArrowRight,
   ArrowLeft,
   X,
-  Compass,
+  LockKey,
 } from "@phosphor-icons/react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 
-export type ConsultationType = "ATELIER_CONSULTATION" | "SITE_VISIT" | "VIRTUAL_CALL";
-
 export interface BookedAppointment {
   id: string;
   projectId: string | number;
-  type: ConsultationType;
+  type: "CONSULTATION_MEETING";
   date: string; // ISO date string (YYYY-MM-DD)
   timeSlot: string; // e.g. "11:30 AM"
   notes?: string;
   status: "CONFIRMED" | "RESCHEDULED" | "COMPLETED";
   createdAt: string;
-  meetingLocation?: string;
+  meetingChannel?: string;
 }
 
 interface ConsultationSchedulerProps {
@@ -39,7 +33,7 @@ interface ConsultationSchedulerProps {
   projectTitle: string;
   projectLocation?: string;
   initialAppointment?: BookedAppointment | null;
-  onAppointmentBooked?: (appointment: BookedAppointment) => void;
+  onAppointmentBooked?: (appointment: BookedAppointment | null) => void;
 }
 
 const TIME_SLOTS = [
@@ -68,7 +62,6 @@ const MONTH_NAMES_AR = [
 export function ConsultationScheduler({
   projectId,
   projectTitle,
-  projectLocation,
   initialAppointment,
   onAppointmentBooked,
 }: ConsultationSchedulerProps) {
@@ -88,8 +81,7 @@ export function ConsultationScheduler({
   });
 
   const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(false);
-  const [selectedType, setSelectedType] = React.useState<ConsultationType>("ATELIER_CONSULTATION");
-  
+
   // Calendar month state
   const today = new Date();
   const [currentMonth, setCurrentMonth] = React.useState(today.getMonth());
@@ -154,18 +146,15 @@ export function ConsultationScheduler({
     const newAppointment: BookedAppointment = {
       id: `apt-${Date.now()}`,
       projectId,
-      type: selectedType,
+      type: "CONSULTATION_MEETING",
       date: selectedDateStr,
       timeSlot: selectedTimeSlot,
       notes: notes.trim() || undefined,
       status: "CONFIRMED",
       createdAt: new Date().toISOString(),
-      meetingLocation:
-        selectedType === "ATELIER_CONSULTATION"
-          ? "Valentia Design Atelier — New Cairo Flagship Studio"
-          : selectedType === "SITE_VISIT"
-          ? projectLocation || "Project Site Inspection"
-          : "Valentia Virtual Atelier (Google Meet Link)",
+      meetingChannel: isRTL
+        ? "مكالمة فيديو مباشرة (Google Meet) مع رئيس المهندسين"
+        : "Live Video Meeting (Google Meet) with Lead Architect",
     };
 
     setAppointment(newAppointment);
@@ -180,7 +169,7 @@ export function ConsultationScheduler({
       setIsSuccessFeedback(false);
       setIsBookingModalOpen(false);
       if (onAppointmentBooked) onAppointmentBooked(newAppointment);
-    }, 1200);
+    }, 1000);
   };
 
   const handleCancelAppointment = () => {
@@ -188,6 +177,7 @@ export function ConsultationScheduler({
     try {
       localStorage.removeItem(storageKey);
     } catch {}
+    if (onAppointmentBooked) onAppointmentBooked(null);
   };
 
   const formattedDate = appointment
@@ -217,14 +207,10 @@ export function ConsultationScheduler({
               <div>
                 <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[10px] font-mono uppercase tracking-wider mb-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>{isRTL ? "تم تأكيد الميعاد بنجاح" : "APPOINTMENT CONFIRMED"}</span>
+                  <span>{isRTL ? "تم تأكيد موعد ميتينج الاستشارة · مرحلة 02" : "CONSULTATION MEETING CONFIRMED · STAGE 02"}</span>
                 </div>
                 <h4 className="text-base sm:text-lg font-serif font-bold text-[#1C1917]">
-                  {appointment.type === "ATELIER_CONSULTATION"
-                    ? isRTL ? "استشارة معمارية في أتيليه فالنتيا" : "Atelier Design Consultation"
-                    : appointment.type === "SITE_VISIT"
-                    ? isRTL ? "زيارة ميدانية ومعاينة رفع مساحي بالليزر" : "On-Site Laser Survey & Inspection"
-                    : isRTL ? "جلسة استشارة افتراضية (فيديو)" : "Virtual Design Session"}
+                  {isRTL ? "مكالمة الاستشارة المعمارية مع رئيس المهندسين" : "Consultation Meeting with Lead Architect"}
                 </h4>
               </div>
             </div>
@@ -242,7 +228,7 @@ export function ConsultationScheduler({
                 onClick={handleCancelAppointment}
                 className="px-3 py-2 text-xs text-red-600 hover:text-red-700 transition-colors cursor-pointer"
               >
-                {isRTL ? "إلغاء" : "Cancel"}
+                {isRTL ? "إلغاء الميعاد" : "Cancel"}
               </button>
             </div>
           </div>
@@ -252,7 +238,7 @@ export function ConsultationScheduler({
               <CalendarBlank className="w-5 h-5 text-[#B88460] shrink-0" />
               <div>
                 <div className="text-[10px] uppercase font-mono tracking-wider text-[#78716C]">
-                  {isRTL ? "تاريخ المقابلة" : "Scheduled Date"}
+                  {isRTL ? "تاريخ المقابلة" : "Meeting Date"}
                 </div>
                 <div className="text-xs font-semibold text-[#1C1917] mt-0.5">
                   {formattedDate}
@@ -273,13 +259,13 @@ export function ConsultationScheduler({
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-[#E8DEC8] flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-[#B88460] shrink-0" />
+              <VideoCamera className="w-5 h-5 text-[#B88460] shrink-0" />
               <div>
                 <div className="text-[10px] uppercase font-mono tracking-wider text-[#78716C]">
-                  {isRTL ? "مكان اللقاء" : "Location / Channel"}
+                  {isRTL ? "نوع اللقاء والقناة" : "Channel"}
                 </div>
                 <div className="text-xs font-semibold text-[#1C1917] mt-0.5 truncate max-w-[200px]">
-                  {appointment.meetingLocation}
+                  {appointment.meetingChannel || (isRTL ? "مكالمة فيديو مباشرة (Google Meet)" : "Video Call (Google Meet)")}
                 </div>
               </div>
             </div>
@@ -291,10 +277,20 @@ export function ConsultationScheduler({
               <span className="text-[#78716C]">{appointment.notes}</span>
             </div>
           )}
+
+          {/* Sequential Progression Note */}
+          <div className="mt-4 pt-3 border-t border-[#E8DEC8] flex items-center gap-2 text-[11px] text-[#78716C]">
+            <LockKey className="w-3.5 h-3.5 text-[#B88460] shrink-0" />
+            <span>
+              {isRTL
+                ? "ملاحظة: فور إتمام جلسة الاستشارة بالفيديو واعتماد التوجه المعماري، سيتم فتح حجز موعد المعاينة الميدانية ورفع المقاسات (المرحلة 03) تلقائياً."
+                : "Note: Upon completing this consultation meeting, the 3D Site Survey scheduling (Stage 03) will unlock automatically."}
+            </span>
+          </div>
         </div>
       ) : (
         /* ─────────────────────────────────────────────────────────────
-            2. IF NOT BOOKED: INVITATION BANNER TO SCHEDULE
+            2. IF NOT BOOKED: INVITATION BANNER TO SCHEDULE CONSULTATION
         ───────────────────────────────────────────────────────────── */
         <div className="p-6 sm:p-7 rounded-3xl bg-[#503C2C] text-[#FAF7F2] shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-[#B88460]/40">
           <div className="absolute top-0 right-0 w-72 h-72 bg-[#B88460]/20 rounded-full blur-3xl pointer-events-none" />
@@ -302,19 +298,19 @@ export function ConsultationScheduler({
           <div className="space-y-2 max-w-xl text-start">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF7F2]/10 border border-[#FAF7F2]/20 text-[10px] uppercase font-mono tracking-widest text-[#E5D7C7]">
               <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-              <span>{isRTL ? "الخطوة التالية المعتمدة" : "RECOMMENDED NEXT STEP"}</span>
+              <span>{isRTL ? "الخطوة التالية المعتمدة · مرحلة 02" : "ACTIVE STAGE 02 · CONSULTATION MEETING"}</span>
             </div>
 
             <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
               {isRTL
-                ? "احجز جلستك المعمارية أو موعد المعاينة الميدانية"
-                : "Schedule Your Atelier Consultation or Site Survey"}
+                ? "احجز ميعاد ميتينج الاستشارة مع رئيس المهندسين"
+                : "Schedule Your Lead Architect Consultation Meeting"}
             </h3>
 
             <p className="text-xs text-[#E5D7C7] leading-relaxed">
               {isRTL
-                ? "اختر الموعد المناسب لك لزيارة أتيليه فالنتيا لمناقشة التصاميم والخامات، أو لتنسيق رفع مساحي ليزري ثلاثي الأبعاد في موقع عقارك."
-                : "Pick a convenient date to meet our senior architects at the atelier, or book our 3D laser survey team for your property."}
+                ? "طلب مشروعك تم اعتماده بنجاح. الخطوة الحالية هي حجز موعد ميتينج الاستشارة الأولية بالفيديو مع رئيس المهندسين لمراجعة متطلباتك واعتماد اتجاه التصميم قبل الانتقال لمرحلة المعاينة الميدانية."
+                : "Your commission is verified. The active milestone is your initial video consultation with our lead architect to align on design direction before the on-site survey."}
             </p>
           </div>
 
@@ -327,13 +323,14 @@ export function ConsultationScheduler({
             )}
           >
             <CalendarPlus className="w-4 h-4" />
-            <span>{isRTL ? "حجز ميعاد المقابلة الآن ←" : "Book Appointment Now →"}</span>
+            <span>{isRTL ? "اختيار وقت الميتينج الآن ←" : "Pick Meeting Time →"}</span>
           </button>
         </div>
       )}
 
       {/* ─────────────────────────────────────────────────────────────
           3. INTERACTIVE 21ST CALENDAR APPOINTMENT PICKER MODAL
+             (LOCKED TO STAGE 02 CONSULTATION MEETING ONLY)
       ───────────────────────────────────────────────────────────── */}
       {isBookingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
@@ -357,82 +354,33 @@ export function ConsultationScheduler({
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2 h-2 rounded-full bg-[#B88460] animate-pulse" />
                 <span className="text-[10px] font-mono uppercase tracking-widest text-[#78716C] font-semibold">
-                  {isRTL ? "نظام حجز المواعيد والمعاينات" : "VALENTIA APPOINTMENT DESK"}
+                  {isRTL ? "المرحلة 02 من 05 · مكالمة الاستشارة" : "STAGE 02 OF 05 · CONSULTATION MEETING"}
                 </span>
               </div>
               <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#1C1917]">
-                {isRTL ? "تحديد موعد الاستشارة أو المعاينة" : "Book Consultation or Site Survey"}
+                {isRTL ? "تحديد موعد ميتينج الاستشارة مع رئيس المهندسين" : "Pick Consultation Meeting Date & Time"}
               </h2>
+              <p className="text-xs text-[#78716C] mt-1">
+                {isRTL
+                  ? "مكالمة فيديو تفاعلية لمناقشة أسلوب التصميم، متطلبات الغرف، والمواد قبل بدء المعاينات الميدانية."
+                  : "Interactive video session to align spatial needs and materials before scheduling site inspections."}
+              </p>
             </div>
 
-            {/* Meeting Type Selector */}
-            <div className="mb-6">
-              <label className="block text-xs font-semibold text-[#503C2C] mb-2 uppercase tracking-wider">
-                {isRTL ? "نوع الموعد المطلوب" : "Meeting / Survey Type"}
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setSelectedType("ATELIER_CONSULTATION")}
-                  className={cn(
-                    "p-3 rounded-2xl border text-start transition-all cursor-pointer flex flex-col justify-between gap-2",
-                    selectedType === "ATELIER_CONSULTATION"
-                      ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-sm"
-                      : "bg-white text-[#1C1917] border-[#D8C8B4] hover:bg-[#F5EFE6]"
-                  )}
-                >
-                  <Buildings className={cn("w-5 h-5", selectedType === "ATELIER_CONSULTATION" ? "text-[#B88460]" : "text-[#78716C]")} />
-                  <div>
-                    <div className="text-xs font-bold leading-tight">
-                      {isRTL ? "استشارة الأتيليه" : "Atelier Meeting"}
-                    </div>
-                    <div className={cn("text-[10px] mt-0.5", selectedType === "ATELIER_CONSULTATION" ? "text-[#E5D7C7]" : "text-[#78716C]")}>
-                      {isRTL ? "معاينة عينات الخامات" : "Physical material boards"}
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedType("SITE_VISIT")}
-                  className={cn(
-                    "p-3 rounded-2xl border text-start transition-all cursor-pointer flex flex-col justify-between gap-2",
-                    selectedType === "SITE_VISIT"
-                      ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-sm"
-                      : "bg-white text-[#1C1917] border-[#D8C8B4] hover:bg-[#F5EFE6]"
-                  )}
-                >
-                  <Compass className={cn("w-5 h-5", selectedType === "SITE_VISIT" ? "text-[#B88460]" : "text-[#78716C]")} />
-                  <div>
-                    <div className="text-xs font-bold leading-tight">
-                      {isRTL ? "معاينة ميدانية للموقع" : "On-Site Survey"}
-                    </div>
-                    <div className={cn("text-[10px] mt-0.5", selectedType === "SITE_VISIT" ? "text-[#E5D7C7]" : "text-[#78716C]")}>
-                      {isRTL ? "رفع ليزري ثلاثي الأبعاد" : "Laser 3D scanning"}
-                    </div>
-                  </div>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedType("VIRTUAL_CALL")}
-                  className={cn(
-                    "p-3 rounded-2xl border text-start transition-all cursor-pointer flex flex-col justify-between gap-2",
-                    selectedType === "VIRTUAL_CALL"
-                      ? "bg-[#503C2C] text-[#FAF7F2] border-[#503C2C] shadow-sm"
-                      : "bg-white text-[#1C1917] border-[#D8C8B4] hover:bg-[#F5EFE6]"
-                  )}
-                >
-                  <VideoCamera className={cn("w-5 h-5", selectedType === "VIRTUAL_CALL" ? "text-[#B88460]" : "text-[#78716C]")} />
-                  <div>
-                    <div className="text-xs font-bold leading-tight">
-                      {isRTL ? "جلسة فيديو اونلاين" : "Virtual Video Call"}
-                    </div>
-                    <div className={cn("text-[10px] mt-0.5", selectedType === "VIRTUAL_CALL" ? "text-[#E5D7C7]" : "text-[#78716C]")}>
-                      {isRTL ? "مناقشة عبر شاشتك" : "Interactive screen share"}
-                    </div>
-                  </div>
-                </button>
+            {/* Sequential Stage Notice Banner */}
+            <div className="mb-5 p-3.5 rounded-2xl bg-white border border-[#D8C8B4] flex items-center gap-3 text-xs text-[#503C2C]">
+              <div className="w-8 h-8 rounded-xl bg-[#503C2C] text-[#FAF7F2] flex items-center justify-center shrink-0">
+                <VideoCamera className="w-4 h-4 text-[#B88460]" />
+              </div>
+              <div className="leading-relaxed">
+                <span className="font-bold text-[#1C1917]">
+                  {isRTL ? "جلسة فيديو مباشرة (أونلاين): " : "Direct Video Meeting: "}
+                </span>
+                <span className="text-[#78716C]">
+                  {isRTL
+                    ? "اختر التاريخ والوقت الأنسب لك أدناه. مواعيد المراحل التالية (كالمعاينة الميدانية ثلاثية الأبعاد) ستفتح تلقائياً بعد إنهاء هذا الميتينج."
+                    : "Select your preferred date and slot below. Next stages (such as 3D Site Survey) will unlock after this meeting."}
+                </span>
               </div>
             </div>
 
@@ -510,7 +458,7 @@ export function ConsultationScheduler({
                 <div>
                   <div className="flex items-center gap-1.5 mb-3 text-xs font-mono font-bold text-[#503C2C] uppercase tracking-wider">
                     <Clock className="w-4 h-4 text-[#B88460]" />
-                    <span>{isRTL ? "المواعيد المتاحة" : "Available Slots"}</span>
+                    <span>{isRTL ? "المواعيد المتاحة للميتينج" : "Available Slots"}</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 max-h-[220px] overflow-y-auto pr-1">
@@ -549,7 +497,7 @@ export function ConsultationScheduler({
             {/* Optional Notes */}
             <div className="mb-6">
               <label className="block text-xs font-semibold text-[#503C2C] mb-1.5 uppercase tracking-wider">
-                {isRTL ? "ملاحظات أو استفسارات خاصة للمهندس (اختياري)" : "Notes / Questions for the Architect (Optional)"}
+                {isRTL ? "ملاحظات أو أسئلة للمهندس قبل المكالمة (اختياري)" : "Notes / Questions for the Lead Architect (Optional)"}
               </label>
               <textarea
                 rows={2}
@@ -557,8 +505,8 @@ export function ConsultationScheduler({
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder={
                   isRTL
-                    ? "مثال: محتاجين نركز على استغلال مساحة غرفة الماستر والمطبخ المفتوح..."
-                    : "e.g. Please bring travertine and light oak samples; focus on master bathroom layout..."
+                    ? "مثال: حابب نركز على استغلال مساحة غرفة الماستر والمطبخ المفتوح، وتنسيق الألوان المحايدة..."
+                    : "e.g. Focus on master suite layout and open kitchen flow, warm neutral tones..."
                 }
                 className="w-full p-3 rounded-xl bg-white border border-[#D8C8B4] text-xs text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#B88460] focus:border-transparent transition-all shadow-inner"
               />
@@ -586,12 +534,12 @@ export function ConsultationScheduler({
                 {isSuccessFeedback ? (
                   <>
                     <CheckCircle className="w-4 h-4 text-emerald-400" weight="fill" />
-                    <span>{isRTL ? "تم تأكيد الحجز بنجاح!" : "Appointment Confirmed!"}</span>
+                    <span>{isRTL ? "تم حجز موعد الميتينج بنجاح!" : "Meeting Booked Successfully!"}</span>
                   </>
                 ) : (
                   <>
                     <CalendarPlus className="w-4 h-4 text-[#B88460]" />
-                    <span>{isRTL ? "تأكيد حجز الميعاد ←" : "Confirm Booking →"}</span>
+                    <span>{isRTL ? "تأكيد حجز ميعاد الميتينج ←" : "Confirm Meeting Time →"}</span>
                   </>
                 )}
               </button>
