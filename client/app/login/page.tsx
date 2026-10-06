@@ -66,12 +66,18 @@ function LoginForm() {
         router.push(destination);
       }
     } catch (err: unknown) {
-      console.error("Login failed:", err);
       const apiMsg = getErrorMessage(err);
+      console.warn("Login attempt failed:", apiMsg || err);
+      
+      let displayError = apiMsg;
+      if (isRTL && (!displayError || displayError.toLowerCase().includes("invalid credentials"))) {
+        displayError = "بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى.";
+      }
+      
       setError(
-        apiMsg ||
+        displayError ||
         (isRTL
-          ? "بيانات الدخول مش صحيحة. اتأكد من اسم المستخدم وكلمة السر وجرب تاني."
+          ? "بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى."
           : "Invalid credentials. Please verify your username and password.")
       );
     } finally {
