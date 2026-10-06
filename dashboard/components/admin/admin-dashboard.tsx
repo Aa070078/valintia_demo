@@ -120,7 +120,7 @@ export function AdminDashboard() {
       case "COMPANY_OWNER":
         return {
           label: "Company Owner",
-          className: "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/50 dark:text-emerald-300",
+          className: "bg-[#B88460]/15 text-[#8F5A36] border-[#B88460]/30 dark:bg-[#B88460]/20 dark:text-[#E5D5C5]",
         };
       default:
         return {
@@ -181,14 +181,14 @@ export function AdminDashboard() {
 
       {/* Action Notification */}
       {actionNotice && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between animate-in fade-in">
+        <div className="p-4 rounded-xl bg-[#EFE8DE] border border-[#B88460]/30 text-[#503C2C] dark:bg-[#2C2621] dark:border-[#B88460]/40 dark:text-[#F5EFE6] text-xs font-medium flex items-center justify-between animate-in fade-in">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <CheckCircle className="w-4 h-4 text-[#B88460]" />
             <span>{actionNotice}</span>
           </div>
           <button
             onClick={() => setActionNotice(null)}
-            className="text-emerald-600 hover:text-emerald-900"
+            className="text-[#706E6B] hover:text-[#503C2C] dark:text-[#A89F95] dark:hover:text-[#F5EFE6]"
           >
             <X className="w-3.5 h-3.5" />
           </button>

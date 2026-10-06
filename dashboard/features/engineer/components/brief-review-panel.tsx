@@ -252,10 +252,10 @@ export function BriefReviewPanel({
               className={cn(
                 "px-2.5 py-0.5 rounded-full text-xs font-mono font-medium border",
                 context.status === "ENGINEER_READY"
-                  ? "bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300"
+                  ? "bg-[#B88460]/15 text-[#8F5A36] border-[#B88460]/30 dark:bg-[#B88460]/20 dark:text-[#E5D5C5] dark:border-[#B88460]/40"
                   : context.status === "UNDER_ENGINEER_REVIEW"
-                  ? "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950 dark:text-amber-300"
-                  : "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-950 dark:text-blue-300"
+                  ? "bg-[#503C2C]/10 text-[#503C2C] border-[#503C2C]/20 dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2]"
+                  : "bg-muted text-muted-foreground border-border"
               )}
             >
               {context.status}
@@ -480,9 +480,9 @@ export function BriefReviewPanel({
           {/* Workflow Status 3: ENGINEER_READY - Status Completed */}
           {context.status === "ENGINEER_READY" && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-200 text-xs space-y-2">
+              <div className="p-4 rounded-xl bg-[#EFE8DE] border border-[#B88460]/30 text-[#503C2C] dark:bg-[#2C2621] dark:border-[#B88460]/40 dark:text-[#F5EFE6] text-xs space-y-2">
                 <div className="flex items-center gap-2 font-medium">
-                  <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-[#B88460] shrink-0" />
                   <span>
                     {isRTL
                       ? "تم اعتماد الجاهزية للاستشارة الهندسية بنجاح"

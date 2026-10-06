@@ -198,7 +198,7 @@ export function HighestPriorityAction({
   return (
     <div className="rounded-2xl border border-border bg-card/50 p-5 sm:p-6 shadow-xs flex items-center justify-between gap-4">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-[#B88460]/15 text-[#B88460] flex items-center justify-center shrink-0">
           <CheckCircle className="w-5 h-5" />
         </div>
         <div>

@@ -41,7 +41,7 @@ export function ActivityLogView({
           desc: isRTL
             ? "تم انتقال المشروع من مسلّم إلى قيد المراجعة الهندسية"
             : "Project transitioned: SUBMITTED → UNDER_ENGINEER_REVIEW",
-          badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+          badgeColor: "bg-[#503C2C]/10 text-[#503C2C] border border-[#503C2C]/20 dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2]",
         };
       case "CONSULTATION_READY":
         return {
@@ -49,7 +49,7 @@ export function ActivityLogView({
           desc: isRTL
             ? "تم اعتماد المواصفات وفتح حجز الاستشارة: UNDER_ENGINEER_REVIEW → ENGINEER_READY"
             : "Specifications confirmed & consultation unlocked: UNDER_ENGINEER_REVIEW → ENGINEER_READY",
-          badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+          badgeColor: "bg-[#B88460]/15 text-[#8F5A36] border border-[#B88460]/30 dark:bg-[#B88460]/20 dark:text-[#E5D5C5]",
         };
       default:
         return {

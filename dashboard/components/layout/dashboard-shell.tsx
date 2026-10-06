@@ -37,17 +37,17 @@ export function DashboardShell({
     ENGINEER: {
       label: "Lead Architect & Field Engineer",
       icon: <Compass className="w-4 h-4" />,
-      badgeColor: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
+      badgeColor: "bg-[#503C2C]/10 text-[#503C2C] border border-[#503C2C]/20 dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2]",
     },
     ADMINISTRATOR: {
       label: "System Administrator",
       icon: <ShieldCheck className="w-4 h-4" />,
-      badgeColor: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300",
+      badgeColor: "bg-muted text-muted-foreground border border-border",
     },
     COMPANY_OWNER: {
       label: "Company Owner",
       icon: <Crown className="w-4 h-4" />,
-      badgeColor: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300",
+      badgeColor: "bg-[#B88460]/15 text-[#8F5A36] border border-[#B88460]/30 dark:bg-[#B88460]/20 dark:text-[#E5D5C5]",
     },
     CUSTOMER: {
       label: "Customer Client",

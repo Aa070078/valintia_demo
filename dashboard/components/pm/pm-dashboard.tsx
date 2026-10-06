@@ -145,7 +145,7 @@ export function PmDashboard() {
 
         <div className="flex items-center gap-3">
           <div className="px-3.5 py-1.5 rounded-lg border border-border bg-card text-xs flex items-center gap-2 font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#B88460] animate-pulse" />
             <span className="text-muted-foreground">LEAD PM:</span>
             <span className="font-semibold text-foreground">Nouran Hassan</span>
           </div>
@@ -170,7 +170,7 @@ export function PmDashboard() {
         <div className="p-5 rounded-xl border border-border bg-card shadow-xs">
           <div className="flex items-center justify-between text-muted-foreground text-xs mb-3">
             <span className="font-mono uppercase">Assigned Fit-Outs</span>
-            <CheckCircle className="w-4 h-4 text-emerald-500" />
+            <CheckCircle className="w-4 h-4 text-[#B88460]" />
           </div>
           <div className="text-2xl font-semibold text-foreground font-mono">
             {activeQueue.length}
@@ -196,14 +196,14 @@ export function PmDashboard() {
 
       {/* Success Notification */}
       {successToast && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center justify-between animate-in fade-in">
+        <div className="p-4 rounded-xl bg-[#EFE8DE] border border-[#B88460]/30 text-[#503C2C] dark:bg-[#2C2621] dark:border-[#B88460]/40 dark:text-[#F5EFE6] text-xs font-medium flex items-center justify-between animate-in fade-in">
           <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <CheckCircle className="w-4 h-4 text-[#B88460]" />
             <span>{successToast}</span>
           </div>
           <button
             onClick={() => setSuccessToast(null)}
-            className="text-emerald-600 hover:text-emerald-900"
+            className="text-[#706E6B] hover:text-[#503C2C] dark:text-[#A89F95] dark:hover:text-[#F5EFE6]"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -365,7 +365,7 @@ export function PmDashboard() {
                         <td className="py-3.5 px-4">
                           {p.leadEngineerName ? (
                             <div className="flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#B88460]" />
                               <span className="font-medium text-foreground">{p.leadEngineerName}</span>
                             </div>
                           ) : (

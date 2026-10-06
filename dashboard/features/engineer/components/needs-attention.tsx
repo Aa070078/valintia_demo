@@ -84,7 +84,7 @@ export function NeedsAttention({
 
         {pendingReviews.length === 0 ? (
           <div className="py-6 text-center text-xs text-muted-foreground flex flex-col items-center gap-2">
-            <CheckCircle className="w-6 h-6 text-emerald-500" />
+            <CheckCircle className="w-6 h-6 text-[#B88460]" />
             <span>
               {isRTL
                 ? "لا توجد مراجعات معمارية معلقة حالياً."
@@ -194,13 +194,13 @@ export function NeedsAttention({
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-amber-600">
+                      <span className="text-xs font-mono font-bold text-[#B88460]">
                         {timeDisplay}
                       </span>
                       <span className="text-[10px] text-muted-foreground font-mono">
                         ({c.durationMinutes} {isRTL ? "دقيقة" : "min"})
                       </span>
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-[#503C2C]/10 text-[#503C2C] dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2] border border-[#503C2C]/20">
                         {c.status}
                       </span>
                     </div>

@@ -208,12 +208,12 @@ export function MomComposer({
         {/* Current State Badge */}
         <div className="flex items-center gap-2">
           {momRecord?.status === "CONFIRMED_BY_CUSTOMER" ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-mono font-medium border border-emerald-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B88460]/15 text-[#8F5A36] dark:bg-[#B88460]/20 dark:text-[#E5D5C5] text-xs font-mono font-medium border border-[#B88460]/30">
               <CheckCircle className="w-3.5 h-3.5" />
               <span>{isRTL ? "معتمد رسمياً من العميل" : "Confirmed by Customer"}</span>
             </span>
           ) : momRecord?.status === "PUBLISHED_TO_CUSTOMER" ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 text-xs font-mono font-medium border border-blue-300">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#503C2C]/10 text-[#503C2C] dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2] text-xs font-mono font-medium border border-[#503C2C]/20">
               <Clock className="w-3.5 h-3.5" />
               <span>{isRTL ? "مُرسل وبانتظار اعتماد العميل" : "Published · Awaiting Customer Confirmation"}</span>
             </span>
@@ -228,8 +228,8 @@ export function MomComposer({
 
       {/* Success Notification */}
       {successToast && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2 animate-in fade-in">
-          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="p-4 rounded-xl bg-[#EFE8DE] border border-[#B88460]/30 text-[#503C2C] dark:bg-[#2C2621] dark:border-[#B88460]/40 dark:text-[#F5EFE6] text-xs font-medium flex items-center gap-2 animate-in fade-in">
+          <CheckCircle className="w-4 h-4 text-[#B88460] shrink-0" />
           <span>{successToast}</span>
         </div>
       )}
@@ -246,7 +246,7 @@ export function MomComposer({
               className={cn(
                 "text-[10px] font-mono",
                 summary.trim().length >= 20
-                  ? "text-emerald-600 dark:text-emerald-400"
+                  ? "text-[#503C2C] dark:text-[#D8B79B] font-semibold"
                   : "text-muted-foreground"
               )}
             >

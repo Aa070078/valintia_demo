@@ -122,13 +122,13 @@ export function EngineerDashboard() {
           className={cn(
             "p-4 rounded-xl text-xs font-medium flex items-center justify-between animate-in fade-in",
             feedback.type === "success"
-              ? "bg-emerald-50 border border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-300"
+              ? "bg-[#EFE8DE] border border-[#B88460]/30 text-[#503C2C] dark:bg-[#2C2621] dark:border-[#B88460]/40 dark:text-[#F5EFE6]"
               : "bg-destructive/10 border border-destructive/20 text-destructive"
           )}
         >
           <div className="flex items-center gap-2">
             {feedback.type === "success" ? (
-              <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-[#B88460] shrink-0" />
             ) : (
               <WarningCircle className="w-4 h-4 text-destructive shrink-0" />
             )}

@@ -76,7 +76,7 @@ export function ProjectWorkspace({
         return {
           label: isRTL ? "معتمد للاستشارة" : "Ready for Consultation",
           className:
-            "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-300",
+            "bg-[#B88460]/15 text-[#8F5A36] dark:bg-[#B88460]/20 dark:text-[#E5D5C5] border-[#B88460]/30",
         };
       default:
         return {
@@ -413,7 +413,7 @@ export function ProjectWorkspace({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-medium bg-[#503C2C]/10 text-[#503C2C] dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2] border border-[#503C2C]/20">
                       {projectConsultation.status}
                     </span>
                     <span className="text-xs font-mono text-muted-foreground">

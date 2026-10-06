@@ -52,19 +52,19 @@ export function AssignedProjectsQueue({
         return {
           label: isRTL ? "مُسلّم حديثاً · بانتظار المراجعة" : "Submitted · Pending Review",
           className:
-            "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-200 dark:border-blue-900",
+            "bg-muted text-muted-foreground border-border",
         };
       case "UNDER_ENGINEER_REVIEW":
         return {
           label: isRTL ? "قيد المراجعة الهندسية" : "Under Engineer Review",
           className:
-            "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-900",
+            "bg-[#503C2C]/10 text-[#503C2C] dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2] border-[#503C2C]/20 dark:border-[#FAF7F2]/20",
         };
       case "ENGINEER_READY":
         return {
           label: isRTL ? "معتمد للاستشارة" : "Ready for Consultation",
           className:
-            "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900",
+            "bg-[#B88460]/15 text-[#8F5A36] dark:bg-[#B88460]/20 dark:text-[#E5D5C5] border-[#B88460]/30 dark:border-[#B88460]/40",
         };
       default:
         return {
