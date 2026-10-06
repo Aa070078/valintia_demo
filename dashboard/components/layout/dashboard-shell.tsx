@@ -40,7 +40,7 @@ export function DashboardShell({
       labelAr: "مكتب إدارة المشروعات",
       labelEn: "Project Management Desk",
       icon: <UserGear className="w-4 h-4" />,
-      badgeColor: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
+      badgeColor: "bg-[#B88460]/15 text-[#8F5A36] border border-[#B88460]/30 dark:bg-[#B88460]/20 dark:text-[#E5D5C5]",
     },
     ENGINEER: {
       labelAr: "مكتب المهندس المعماري المعتمد",
@@ -124,7 +124,7 @@ export function DashboardShell({
                 {user?.username || (isRTL ? "عضو الفريق" : "Staff Member")}
               </span>
               <span className="block text-[10px] font-mono text-muted-foreground">
-                {user?.role || effectiveRole}
+                {isRTL ? roleInfo.labelAr : roleInfo.labelEn}
               </span>
             </div>
 
