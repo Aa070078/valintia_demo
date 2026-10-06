@@ -2,6 +2,7 @@ import {
   PrismaClient,
   Role,
   ProjectStatus,
+  PropertyType,
   SpaceType,
 } from '../src/generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -103,10 +104,11 @@ async function main() {
     createdUsers.set(user.username, createdUser.id);
   }
 
-  const customer1Id = createdUsers.get('customer1@test.com')!;
-  const customer2Id = createdUsers.get('customer2@test.com')!;
-  const engineer1Id = createdUsers.get('engineer1@test.com')!;
-  const engineer2Id = createdUsers.get('engineer2@test.com')!;
+  const customer1Id = createdUsers.get("customer1@test.com")!;
+  const customer2Id = createdUsers.get("customer2@test.com")!;
+  const engineer1Id = createdUsers.get("engineer1@test.com")!;
+  const engineer2Id = createdUsers.get("engineer2@test.com")!;
+  const pmId = createdUsers.get("pm@test.com")!;
 
   // -------------------------
   // 2. Seed projects
@@ -137,7 +139,7 @@ async function main() {
   await prisma.property.create({
     data: {
       projectId: project1.id,
-      propertyType: 'Apartment',
+      propertyType: PropertyType.APARTMENT,
       areaSqm: 150,
       city: 'Cairo',
       compound: 'Test Compound 1',
@@ -147,7 +149,7 @@ async function main() {
   await prisma.property.create({
     data: {
       projectId: project2.id,
-      propertyType: 'Villa',
+      propertyType: PropertyType.VILLA,
       areaSqm: 300,
       city: 'Cairo',
       compound: 'Test Compound 2',
@@ -162,7 +164,7 @@ async function main() {
     data: [
       {
         projectId: project1.id,
-        type: SpaceType.LIVING_ROOM,
+        type: SpaceType.LIVING,
       },
       {
         projectId: project1.id,
@@ -174,7 +176,7 @@ async function main() {
       },
       {
         projectId: project2.id,
-        type: SpaceType.LIVING_ROOM,
+        type: SpaceType.LIVING,
       },
       {
         projectId: project2.id,
