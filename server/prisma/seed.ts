@@ -118,7 +118,6 @@ async function main() {
     data: {
       title: 'Customer 1 Living Space',
       status: ProjectStatus.DRAFT,
-      notes: 'Development test project owned by Customer 1.',
       clientId: customer1Id,
     },
   });
@@ -127,7 +126,6 @@ async function main() {
     data: {
       title: 'Customer 2 Villa',
       status: ProjectStatus.SUBMITTED,
-      notes: 'Development test project owned by Customer 2.',
       clientId: customer2Id,
     },
   });

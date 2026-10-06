@@ -109,6 +109,9 @@ export class OtpService {
     this.logger.log(
       `OTP generated for ${email} [Purpose: ${purpose}, TTL: ${ttlSeconds}s, Cooldown: ${cooldownSeconds}s]`,
     );
+    if (process.env.NODE_ENV !== 'production') {
+      this.logger.log(`[DEV OTP CODE] ${email} -> ${otpCode}`);
+    }
 
     // MailService hides delivery-provider details from the OTP mechanism.
     const purposeLabel = purpose.replace(/_/g, ' ').toLowerCase();
@@ -125,6 +128,7 @@ export class OtpService {
       message: `Verification code sent to ${email}`,
       expiresInSeconds: ttlSeconds,
       cooldownSeconds: cooldownSeconds,
+      ...(process.env.NODE_ENV !== 'production' ? { devOtp: otpCode } : {}),
     };
   }
 

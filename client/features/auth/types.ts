@@ -19,6 +19,8 @@ export type UserRole =
   | "ADMINISTRATOR"
   | "ADMIN";
 
+export type Role = UserRole;
+
 export interface User {
   id: number | string;
   username: string;
@@ -34,11 +36,31 @@ export interface User {
   phone?: string;
   avatarUrl?: string;
   activeProjectsCount?: number;
+  onboardingRequired?: boolean;
 }
 
 export interface AuthSession {
   user: User;
   token: string;
+  onboardingToken?: string;
+  onboardingRequired?: boolean;
+}
+
+export interface OnboardingEmailRequestResponse {
+  success: boolean;
+  message: string;
+  expiresInSeconds?: number;
+  cooldownSeconds?: number;
+  devOtp?: string;
+}
+
+export interface OnboardingEmailVerifyResponse {
+  success: boolean;
+  email: string;
+  emailVerified: boolean;
+  mustChangePassword: boolean;
+  onboardingComplete: boolean;
+  message: string;
 }
 
 export interface ProposedLoginDto {

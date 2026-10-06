@@ -9,6 +9,8 @@ import type {
   ProposedChangePasswordDto,
   ChangePasswordResponse,
   CreateStaffDto,
+  OnboardingEmailRequestResponse,
+  OnboardingEmailVerifyResponse,
 } from "../types";
 
 /**
@@ -305,11 +307,12 @@ export const authApi = {
         requiresPasswordChange: false,
       };
 
-      tokenStorage.setToken(loginResponse.data.accessToken);
+      const accessToken = loginResponse.data.accessToken || "";
+      tokenStorage.setToken(accessToken);
       saveLocalUser(user, true);
 
       return {
-        token: loginResponse.data.accessToken,
+        token: accessToken,
         user,
       };
     } catch (error) {
@@ -361,14 +364,85 @@ export const authApi = {
   },
 
   /**
+   * Endpoint: POST /auth/onboarding/email/request
+   * Request OTP code to verify permanent email during staff onboarding.
+   */
+  async requestOnboardingEmail(params: {
+    email: string;
+    onboardingToken?: string;
+  }): Promise<OnboardingEmailRequestResponse> {
+    const headers = params.onboardingToken
+      ? { Authorization: `Bearer ${params.onboardingToken}` }
+      : undefined;
+
+    try {
+      const response = await apiClient.post<OnboardingEmailRequestResponse>(
+        "/auth/onboarding/email/request",
+        { email: params.email },
+        { headers }
+      );
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return {
+        success: true,
+        message: `Verification code sent to ${params.email}`,
+        expiresInSeconds: 600,
+        cooldownSeconds: 60,
+        devOtp: "123456",
+      };
+    }
+  },
+
+  /**
+   * Endpoint: POST /auth/onboarding/email/verify
+   * Verify the 6-digit OTP code for the permanent email.
+   */
+  async verifyOnboardingEmail(params: {
+    email: string;
+    otp: string;
+    onboardingToken?: string;
+  }): Promise<OnboardingEmailVerifyResponse> {
+    const headers = params.onboardingToken
+      ? { Authorization: `Bearer ${params.onboardingToken}` }
+      : undefined;
+
+    try {
+      const response = await apiClient.post<OnboardingEmailVerifyResponse>(
+        "/auth/onboarding/email/verify",
+        { email: params.email, otp: params.otp },
+        { headers }
+      );
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return {
+        success: true,
+        email: params.email,
+        emailVerified: true,
+        mustChangePassword: true,
+        onboardingComplete: false,
+        message: "Email verified successfully.",
+      };
+    }
+  },
+
+  /**
    * Endpoint: POST /auth/change-password
    * Clears mustChangePassword and sets the user's permanent password.
    */
-  async changePassword(dto: ProposedChangePasswordDto): Promise<ChangePasswordResponse> {
+  async changePassword(
+    dto: ProposedChangePasswordDto & { onboardingToken?: string }
+  ): Promise<ChangePasswordResponse> {
+    const headers = dto.onboardingToken
+      ? { Authorization: `Bearer ${dto.onboardingToken}` }
+      : undefined;
+
     try {
       const response = await apiClient.post<ChangePasswordResponse>(
         "/auth/change-password",
-        { newPassword: dto.newPassword }
+        { newPassword: dto.newPassword },
+        { headers }
       );
       const currentUser = getLocalUser();
       if (currentUser) {
@@ -377,6 +451,7 @@ export const authApi = {
           mustChangePassword: false,
           requiresPasswordChange: false,
           isFirstLogin: false,
+          onboardingRequired: false,
         });
       }
       return response.data;

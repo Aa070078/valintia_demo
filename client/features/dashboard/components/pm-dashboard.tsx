@@ -32,7 +32,7 @@ export function PmDashboard() {
     const allStaff = authApi.getAllStaffUsers();
     const engs = allStaff
       .filter((u) => u.role === "ENGINEER")
-      .map((u) => ({ id: u.id, name: u.name }));
+      .map((u) => ({ id: u.id, name: u.name || u.username.split("@")[0] }));
 
     if (engs.length > 0) return engs;
     return MOCK_USERS.filter((u) => u.role === "ENGINEER").map((u) => ({ id: u.id, name: u.name }));

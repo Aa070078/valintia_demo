@@ -20,6 +20,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { getErrorMessage } from "@/lib/utils";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
+import { StaffOnboardingModal } from "@/features/auth/components/staff-onboarding-modal";
 
 function LoginForm() {
   const router = useRouter();
@@ -34,6 +35,23 @@ function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [onboardingSession, setOnboardingSession] = React.useState<{
+    token: string;
+    user: any;
+  } | null>(null);
+
+  const handleOnboardingSuccess = (targetRedirectUrl?: string) => {
+    setOnboardingSession(null);
+    if (targetRedirectUrl) {
+      window.location.href = targetRedirectUrl;
+    } else {
+      const destination =
+        redirectParam && redirectParam.startsWith("/")
+          ? redirectParam
+          : "/projects";
+      router.push(destination);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +73,14 @@ function LoginForm() {
         password,
         rememberMe,
       });
+
+      if (res?.onboardingRequired && res.onboardingToken) {
+        setOnboardingSession({
+          token: res.onboardingToken,
+          user: res.user || null,
+        });
+        return;
+      }
 
       if (res?.redirectUrl) {
         window.location.href = res.redirectUrl;
@@ -428,6 +454,16 @@ function LoginForm() {
           </div>
         </RevealOnScroll>
       </div>
+
+      {onboardingSession && (
+        <StaffOnboardingModal
+          open={Boolean(onboardingSession)}
+          onboardingToken={onboardingSession.token}
+          user={onboardingSession.user}
+          onSuccess={handleOnboardingSuccess}
+          onCancel={() => setOnboardingSession(null)}
+        />
+      )}
     </div>
   );
 }
