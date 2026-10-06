@@ -15,7 +15,6 @@ import {
   Translate,
   List,
   X,
-  ArrowSquareOut,
 } from "@phosphor-icons/react";
 
 interface DashboardShellProps {
@@ -115,17 +114,6 @@ export function DashboardShell({
             <span>{language === "ar" ? "English" : "العربية"}</span>
           </button>
 
-          {/* Customer Portal Link */}
-          <a
-            href="http://localhost:3000"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background hover:bg-muted text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          >
-            <span>{isRTL ? "بوابة العملاء" : "Customer Portal"}</span>
-            <ArrowSquareOut className="w-3.5 h-3.5" />
-          </a>
-
           {/* User Profile & Sign Out */}
           <div className="flex items-center gap-3 ps-3 border-s border-border">
             <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary font-mono">
@@ -190,20 +178,10 @@ export function DashboardShell({
           </div>
 
           <div className="flex flex-col gap-2 pt-2">
-            <a
-              href="http://localhost:3000"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between p-3 rounded-xl border border-border bg-background text-xs font-medium text-foreground"
-            >
-              <span>{isRTL ? "الانتقال إلى بوابة العملاء" : "Customer Portal"}</span>
-              <ArrowSquareOut className="w-4 h-4 text-muted-foreground" />
-            </a>
-
             <button
               type="button"
               onClick={logout}
-              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl bg-destructive/10 text-destructive text-xs font-semibold hover:bg-destructive/20 transition-colors"
+              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl bg-destructive/10 text-destructive text-xs font-semibold hover:bg-destructive/20 transition-colors cursor-pointer"
             >
               <SignOut className="w-4 h-4" />
               <span>{isRTL ? "تسجيل الخروج من المنظومة" : "Sign Out of Workspace"}</span>
