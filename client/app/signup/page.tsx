@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import * as React from "react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
 import {
   ArrowLeft,
   ArrowRight,
@@ -18,42 +18,48 @@ import {
   FileText,
   Sparkle,
   Compass,
-} from "@phosphor-icons/react";
-import { useAuth } from "@/features/auth/context/auth-context";
-import { useLanguage } from "@/lib/i18n/language-context";
-import { PhoneInputWithCountry } from "@/features/projects/components/phone-input-with-country";
-import { TiltCard } from "@/components/motion/tilt-card";
-import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
-import { cn, getErrorMessage } from "@/lib/utils";
+} from "@phosphor-icons/react"
+import { useAuth } from "@/features/auth/context/auth-context"
+import { useLanguage } from "@/lib/i18n/language-context"
+import { PhoneInputWithCountry } from "@/features/projects/components/phone-input-with-country"
+import { TiltCard } from "@/components/motion/tilt-card"
+import { RevealOnScroll } from "@/components/motion/reveal-on-scroll"
+import { cn, getErrorMessage } from "@/lib/utils"
+import { authApi } from "@/features/auth/api/auth.api"
+import { RegistrationVerification } from "@/features/auth/components/registration-verification"
+import type { ProposedSignupDto } from "@/features/auth/types"
 
 function SignupForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectParam = searchParams.get("redirect");
-  const { signup, isLoading } = useAuth();
-  const { language, toggleLanguage, isRTL } = useLanguage();
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectParam = searchParams.get("redirect")
+  const { signup, isLoading } = useAuth()
+  const { language, toggleLanguage, isRTL } = useLanguage()
 
-  const [name, setName] = React.useState("");
-  const [username, setUsername] = React.useState("");
-  const [phone, setPhone] = React.useState("");
-  const [countryCode, setCountryCode] = React.useState("+20");
-  const [password, setPassword] = React.useState("");
-  const [confirmPassword, setConfirmPassword] = React.useState("");
-  const [showPassword, setShowPassword] = React.useState(false);
-  const [agreeTerms, setAgreeTerms] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [pendingSignup, setPendingSignup] = React.useState<
+    (Omit<ProposedSignupDto, "verificationToken"> & { cooldown: number }) | null
+  >(null)
+  const [name, setName] = React.useState("")
+  const [username, setUsername] = React.useState("")
+  const [phone, setPhone] = React.useState("")
+  const [countryCode, setCountryCode] = React.useState("+20")
+  const [password, setPassword] = React.useState("")
+  const [confirmPassword, setConfirmPassword] = React.useState("")
+  const [showPassword, setShowPassword] = React.useState(false)
+  const [agreeTerms, setAgreeTerms] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   // Live password strength calculation
   const passwordStrength = React.useMemo(() => {
-    if (!password) return 0;
-    let score = 0;
-    if (password.length >= 8) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
-    return score; // 0 to 4
-  }, [password]);
+    if (!password) return 0
+    let score = 0
+    if (password.length >= 8) score += 1
+    if (/[A-Z]/.test(password)) score += 1
+    if (/[0-9]/.test(password)) score += 1
+    if (/[^A-Za-z0-9]/.test(password)) score += 1
+    return score // 0 to 4
+  }, [password])
 
   const strengthLabel = React.useMemo(() => {
     switch (passwordStrength) {
@@ -62,35 +68,35 @@ function SignupForm() {
         return {
           text: isRTL ? "ضعيفة" : "Weak",
           color: "text-red-600 bg-red-100",
-        };
+        }
       case 2:
         return {
           text: isRTL ? "متوسطة" : "Fair",
           color: "text-amber-600 bg-amber-100",
-        };
+        }
       case 3:
         return {
           text: isRTL ? "كويسة" : "Good",
           color: "text-blue-600 bg-blue-100",
-        };
+        }
       case 4:
       default:
         return {
           text: isRTL ? "قوية جداً ومحمية" : "Ultra Secure",
           color: "text-emerald-700 bg-emerald-100",
-        };
+        }
     }
-  }, [passwordStrength, isRTL]);
+  }, [passwordStrength, isRTL])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!username.trim() || !password) {
       setError(
         isRTL
           ? "من فضلك املأ كل البيانات المطلوبة."
           : "Please complete all required credentials."
-      );
-      return;
+      )
+      return
     }
 
     if (password !== confirmPassword) {
@@ -98,8 +104,8 @@ function SignupForm() {
         isRTL
           ? "كلمتي السر مش متطابقتين. اتأكد من كتابتهم صح."
           : "Passwords do not match. Please re-enter."
-      );
-      return;
+      )
+      return
     }
 
     if (password.length < 8) {
@@ -107,8 +113,8 @@ function SignupForm() {
         isRTL
           ? "كلمة السر لازم تكون ٨ حروف أو أرقام على الأقل."
           : "Password must be at least 8 characters long."
-      );
-      return;
+      )
+      return
     }
 
     if (!agreeTerms) {
@@ -116,53 +122,64 @@ function SignupForm() {
         isRTL
           ? "من فضلك وافق على شروط الخدمة وسياسة الخصوصية للمتابعة."
           : "Please agree to the terms and privacy policy to continue."
-      );
-      return;
+      )
+      return
     }
 
-    setError(null);
-    setIsSubmitting(true);
+    setError(null)
+    setIsSubmitting(true)
 
     try {
-      const fullPhone = phone ? `${countryCode} ${phone}` : undefined;
-      const res = await signup({
-        username: username.trim(),
+      const email = username.trim().toLowerCase()
+      const response = await authApi.requestRegistrationCode(email)
+      setPendingSignup({
+        username: email,
         password,
-        name: name.trim() || undefined,
-        phone: fullPhone,
-        role: "CUSTOMER",
-      });
-
-      if (res?.redirectUrl) {
-        window.location.href = res.redirectUrl;
-      } else {
-        const destination =
-          redirectParam && redirectParam.startsWith("/")
-            ? redirectParam
-            : "/projects/new";
-        router.push(destination);
-      }
+        name: name.trim(),
+        phone: phone ? `${countryCode} ${phone}` : undefined,
+        cooldown: response.cooldownSeconds ?? 60,
+      })
     } catch (err: unknown) {
-      console.error("Signup failed:", err);
-      const apiMsg = getErrorMessage(err);
+      const apiMsg = getErrorMessage(err)
       setError(
         apiMsg ||
-        (isRTL
-          ? "مقدرناش ننشئ الحساب دلوقتي، اسم المستخدم أو الإيميل ده مسجل قبل كده."
-          : "Account registration could not be completed. The username may already exist.")
-      );
+          (isRTL
+            ? "مقدرناش ننشئ الحساب دلوقتي، اسم المستخدم أو الإيميل ده مسجل قبل كده."
+            : "Account registration could not be completed. The username may already exist.")
+      )
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
+
+  async function finishSignup(verificationToken: string) {
+    if (!pendingSignup) return
+    await signup({ ...pendingSignup, verificationToken })
+    setPendingSignup(null)
+    setPassword("")
+    setConfirmPassword("")
+    const destination =
+      redirectParam?.startsWith("/") && !redirectParam.startsWith("//")
+        ? redirectParam
+        : "/projects/new"
+    router.replace(destination)
+  }
 
   return (
-    <div className="min-h-screen w-full bg-[#ECE3D5] text-[#1C1917] flex flex-col md:flex-row relative overflow-hidden">
+    <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-[#ECE3D5] text-[#1C1917] md:flex-row">
+      {pendingSignup && (
+        <RegistrationVerification
+          email={pendingSignup.username}
+          initialCooldown={pendingSignup.cooldown}
+          onVerified={finishSignup}
+          onCancel={() => setPendingSignup(null)}
+        />
+      )}
       {/* Top Floating Language & Home Link */}
-      <div className="absolute top-6 left-6 right-6 z-30 flex items-center justify-between pointer-events-auto">
+      <div className="pointer-events-auto absolute top-6 right-6 left-6 z-30 flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#503C2C] hover:text-[#1C1917] font-medium transition-colors bg-white/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#D8C8B4]/60 shadow-sm"
+          className="inline-flex items-center gap-2 rounded-full border border-[#D8C8B4]/60 bg-white/70 px-3.5 py-1.5 text-xs font-medium tracking-widest text-[#503C2C] uppercase shadow-sm backdrop-blur-md transition-colors hover:text-[#1C1917]"
         >
           {isRTL ? (
             <>
@@ -180,16 +197,16 @@ function SignupForm() {
         <button
           onClick={toggleLanguage}
           type="button"
-          className="text-xs font-medium tracking-wider text-[#503C2C] hover:text-[#1C1917] transition-colors bg-white/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#D8C8B4]/60 shadow-sm"
+          className="rounded-full border border-[#D8C8B4]/60 bg-white/70 px-3.5 py-1.5 text-xs font-medium tracking-wider text-[#503C2C] shadow-sm backdrop-blur-md transition-colors hover:text-[#1C1917]"
         >
           {language === "en" ? "العربية" : "English"}
         </button>
       </div>
 
       {/* LEFT PANEL: Privileges Showcase & Editorial Story */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 xl:p-16 overflow-hidden bg-[#241F1B] text-[#FAF7F2]">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-[#241F1B] p-12 text-[#FAF7F2] lg:flex lg:w-1/2 xl:p-16">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-luminosity scale-105 transition-transform duration-1000 ease-out"
+          className="absolute inset-0 scale-105 bg-cover bg-center opacity-40 mix-blend-luminosity transition-transform duration-1000 ease-out"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85')`,
           }}
@@ -200,15 +217,17 @@ function SignupForm() {
         {/* Brand Lockup */}
         <div className="relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-[#FAF7F2]/30 flex items-center justify-center bg-white/10 backdrop-blur-md">
-              <Buildings className="w-5 h-5 text-[#FAF7F2]" weight="light" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#FAF7F2]/30 bg-white/10 backdrop-blur-md">
+              <Buildings className="h-5 w-5 text-[#FAF7F2]" weight="light" />
             </div>
             <div>
-              <span className="block text-sm tracking-[0.25em] font-light uppercase text-[#FAF7F2]">
+              <span className="block text-sm font-light tracking-[0.25em] text-[#FAF7F2] uppercase">
                 VALENTIA
               </span>
               <span className="block text-[10px] tracking-[0.2em] text-[#FAF7F2]/60 uppercase">
-                {isRTL ? "أتيليه التصميم والتشطيب المتكامل" : "Design & Build Atelier"}
+                {isRTL
+                  ? "أتيليه التصميم والتشطيب المتكامل"
+                  : "Design & Build Atelier"}
               </span>
             </div>
           </div>
@@ -218,14 +237,14 @@ function SignupForm() {
         <div className="relative z-10 my-auto py-8">
           <TiltCard
             maxRotation={6}
-            className="p-8 rounded-2xl bg-white/[0.06] backdrop-blur-xl border border-white/15 shadow-2xl text-[#FAF7F2]"
+            className="rounded-2xl border border-white/15 bg-white/[0.06] p-8 text-[#FAF7F2] shadow-2xl backdrop-blur-xl"
           >
-            <div className="flex items-center gap-2 mb-4 text-[#B88460] text-xs uppercase tracking-widest font-mono">
-              <Sparkle className="w-3.5 h-3.5" weight="fill" />
+            <div className="mb-4 flex items-center gap-2 font-mono text-xs tracking-widest text-[#B88460] uppercase">
+              <Sparkle className="h-3.5 w-3.5" weight="fill" />
               <span>{isRTL ? "مميزات حسابك معانا" : "ATELIER PRIVILEGES"}</span>
             </div>
 
-            <h3 className="font-serif text-2xl font-normal text-[#FAF7F2] mb-6">
+            <h3 className="mb-6 font-serif text-2xl font-normal text-[#FAF7F2]">
               {isRTL
                 ? "تجربة تشطيب راقية ومريحة تليق ببيتك"
                 : "A Bespoke Fit-Out Experience Crafted Around You"}
@@ -233,14 +252,16 @@ function SignupForm() {
 
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-[#B88460]/20 border border-[#B88460]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <Compass className="w-4 h-4 text-[#FAF7F2]" />
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#B88460]/40 bg-[#B88460]/20">
+                  <Compass className="h-4 w-4 text-[#FAF7F2]" />
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-[#FAF7F2]">
-                    {isRTL ? "رسومات ومخططات أيزومترية تفاعلية لكل فراغ" : "Interactive 3D Axonometrics"}
+                    {isRTL
+                      ? "رسومات ومخططات أيزومترية تفاعلية لكل فراغ"
+                      : "Interactive 3D Axonometrics"}
                   </span>
-                  <span className="text-[11px] text-[#FAF7F2]/60 leading-relaxed block">
+                  <span className="block text-[11px] leading-relaxed text-[#FAF7F2]/60">
                     {isRTL
                       ? "هتشوف كل ركن في بيتك مجسم وموضح عليه كل خامة وتشطيب بالتفصيل."
                       : "Explore room layouts with pinpoint material callouts and finish specifications."}
@@ -249,14 +270,16 @@ function SignupForm() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-[#B88460]/20 border border-[#B88460]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <FileText className="w-4 h-4 text-[#FAF7F2]" />
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#B88460]/40 bg-[#B88460]/20">
+                  <FileText className="h-4 w-4 text-[#FAF7F2]" />
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-[#FAF7F2]">
-                    {isRTL ? "شفافية كاملة في المقايسة والبنود (BOQ)" : "100% Itemized BOQ Transparency"}
+                    {isRTL
+                      ? "شفافية كاملة في المقايسة والبنود (BOQ)"
+                      : "100% Itemized BOQ Transparency"}
                   </span>
-                  <span className="text-[11px] text-[#FAF7F2]/60 leading-relaxed block">
+                  <span className="block text-[11px] leading-relaxed text-[#FAF7F2]/60">
                     {isRTL
                       ? "تسعير واضح ومفصل لكل بند ومتر في شقتك أو فيلتك من غير أي مصاريف مستخبية."
                       : "Fixed-rate pricing and itemized breakdown with zero hidden surprises."}
@@ -265,14 +288,16 @@ function SignupForm() {
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-7 h-7 rounded-lg bg-[#B88460]/20 border border-[#B88460]/40 flex items-center justify-center shrink-0 mt-0.5">
-                  <CheckCircle className="w-4 h-4 text-[#FAF7F2]" />
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-[#B88460]/40 bg-[#B88460]/20">
+                  <CheckCircle className="h-4 w-4 text-[#FAF7F2]" />
                 </div>
                 <div>
                   <span className="block text-xs font-medium text-[#FAF7F2]">
-                    {isRTL ? "متابعة أسبوعية مباشرة مع مهندس الموقع" : "Weekly Site Architect Reports"}
+                    {isRTL
+                      ? "متابعة أسبوعية مباشرة مع مهندس الموقع"
+                      : "Weekly Site Architect Reports"}
                   </span>
-                  <span className="text-[11px] text-[#FAF7F2]/60 leading-relaxed block">
+                  <span className="block text-[11px] leading-relaxed text-[#FAF7F2]/60">
                     {isRTL
                       ? "صور وتقارير حية أول بأول توضح نسبة إنجاز كل مرحلة لحد الاستلام على المفتاح."
                       : "Direct photo updates and milestone telemetry directly on your dashboard."}
@@ -284,9 +309,9 @@ function SignupForm() {
         </div>
 
         {/* Security Assurance */}
-        <div className="relative z-10 flex items-center justify-between text-xs text-[#FAF7F2]/60 border-t border-white/10 pt-6">
+        <div className="relative z-10 flex items-center justify-between border-t border-white/10 pt-6 text-xs text-[#FAF7F2]/60">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" weight="fill" />
+            <ShieldCheck className="h-4 w-4 text-emerald-400" weight="fill" />
             <span>
               {isRTL
                 ? "بياناتك وتفاصيل بيتك في أمان تام وبأعلى درجات الخصوصية."
@@ -298,18 +323,24 @@ function SignupForm() {
       </div>
 
       {/* RIGHT PANEL: Registration Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-20 sm:px-12 md:px-16 lg:px-20 xl:px-24 relative z-10 overflow-y-auto">
-        <RevealOnScroll direction="up" delayMs={100} className="w-full max-w-md mx-auto">
+      <div className="relative z-10 flex flex-1 flex-col justify-center overflow-y-auto px-6 py-20 sm:px-12 md:px-16 lg:px-20 xl:px-24">
+        <RevealOnScroll
+          direction="up"
+          delayMs={100}
+          className="mx-auto w-full max-w-md"
+        >
           {/* Header */}
           <div className="mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DFD3C1]/50 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
-              <Sparkle className="w-3 h-3 text-[#B88460]" />
-              <span>{isRTL ? "حساب عميل جديد" : "COMMISSION REGISTRATION"}</span>
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#D8C8B4] bg-[#DFD3C1]/50 px-3 py-1 font-mono text-xs tracking-widest text-[#503C2C] uppercase">
+              <Sparkle className="h-3 w-3 text-[#B88460]" />
+              <span>
+                {isRTL ? "حساب عميل جديد" : "COMMISSION REGISTRATION"}
+              </span>
             </div>
-            <h1 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal tracking-tight">
+            <h1 className="font-serif text-3xl font-normal tracking-tight text-[#1C1917] sm:text-4xl">
               {isRTL ? "اعمل حسابك في فالنتيا" : "Create Atelier Account"}
             </h1>
-            <p className="mt-2 text-sm text-[#6B635B] leading-relaxed">
+            <p className="mt-2 text-sm leading-relaxed text-[#6B635B]">
               {isRTL
                 ? "سجل بياناتك عشان تبدأ تخطط وتشطب بيتك الجديد بأرقى مستوى."
                 : "Register to begin your bespoke residential fit-out commission."}
@@ -318,8 +349,8 @@ function SignupForm() {
 
           {/* Error Banner */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-              <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />
+            <div className="mb-6 flex animate-in items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800 duration-200 fade-in slide-in-from-top-2">
+              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-red-500" />
               <span>{error}</span>
             </div>
           )}
@@ -330,7 +361,7 @@ function SignupForm() {
             <div>
               <label
                 htmlFor="fullname"
-                className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
+                className="mb-1.5 block text-xs font-medium tracking-wider text-[#503C2C] uppercase"
               >
                 {isRTL ? "الاسم بالكامل" : "Full Name"}
               </label>
@@ -342,10 +373,10 @@ function SignupForm() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={isRTL ? "طارق منصور" : "Tarek Mansour"}
-                  className="w-full h-12 px-4 ps-11 rounded-xl bg-white/90 border border-[#D8C8B4] focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] text-sm text-[#1C1917] placeholder:text-[#6B635B]/50 transition-all outline-none"
+                  className="h-12 w-full rounded-xl border border-[#D8C8B4] bg-white/90 px-4 ps-11 text-sm text-[#1C1917] transition-all outline-none placeholder:text-[#6B635B]/50 focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917]"
                 />
-                <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-[#6B635B]">
-                  <User className="w-4 h-4" />
+                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5 text-[#6B635B]">
+                  <User className="h-4 w-4" />
                 </div>
               </div>
             </div>
@@ -354,30 +385,30 @@ function SignupForm() {
             <div>
               <label
                 htmlFor="username"
-                className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
+                className="mb-1.5 block text-xs font-medium tracking-wider text-[#503C2C] uppercase"
               >
-                {isRTL ? "الإيميل أو اسم المستخدم" : "Email or Username"}
+                {isRTL ? "الإيميل أو اسم المستخدم" : "Email Address"}
               </label>
               <div className="relative">
                 <input
                   id="username"
-                  type="text"
+                  type="email"
                   required
-                  autoComplete="username"
+                  autoComplete="email"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="tarek.mansour@example.com"
-                  className="w-full h-12 px-4 ps-11 rounded-xl bg-white/90 border border-[#D8C8B4] focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] text-sm text-[#1C1917] placeholder:text-[#6B635B]/50 transition-all outline-none"
+                  className="h-12 w-full rounded-xl border border-[#D8C8B4] bg-white/90 px-4 ps-11 text-sm text-[#1C1917] transition-all outline-none placeholder:text-[#6B635B]/50 focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917]"
                 />
-                <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-[#6B635B]">
-                  <EnvelopeSimple className="w-4 h-4" />
+                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5 text-[#6B635B]">
+                  <EnvelopeSimple className="h-4 w-4" />
                 </div>
               </div>
             </div>
 
             {/* Phone with Country Dial Code */}
             <div>
-              <label className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5">
+              <label className="mb-1.5 block text-xs font-medium tracking-wider text-[#503C2C] uppercase">
                 {isRTL ? "رقم الموبايل (واتساب / اتصال)" : "Phone Number"}
               </label>
               <PhoneInputWithCountry
@@ -391,17 +422,17 @@ function SignupForm() {
 
             {/* Password */}
             <div>
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="mb-1.5 flex items-center justify-between">
                 <label
                   htmlFor="password"
-                  className="block text-xs uppercase tracking-wider font-medium text-[#503C2C]"
+                  className="block text-xs font-medium tracking-wider text-[#503C2C] uppercase"
                 >
                   {isRTL ? "كلمة السر" : "Password"}
                 </label>
                 {password && (
                   <span
                     className={cn(
-                      "text-[10px] font-mono px-2 py-0.5 rounded-full font-medium transition-colors",
+                      "rounded-full px-2 py-0.5 font-mono text-[10px] font-medium transition-colors",
                       strengthLabel.color
                     )}
                   >
@@ -418,28 +449,28 @@ function SignupForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full h-12 px-4 ps-11 pe-11 rounded-xl bg-white/90 border border-[#D8C8B4] focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] text-sm text-[#1C1917] placeholder:text-[#6B635B]/50 transition-all outline-none"
+                  className="h-12 w-full rounded-xl border border-[#D8C8B4] bg-white/90 px-4 ps-11 pe-11 text-sm text-[#1C1917] transition-all outline-none placeholder:text-[#6B635B]/50 focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917]"
                 />
-                <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-[#6B635B]">
-                  <Lock className="w-4 h-4" />
+                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5 text-[#6B635B]">
+                  <Lock className="h-4 w-4" />
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute inset-y-0 end-0 pe-3.5 flex items-center text-[#6B635B] hover:text-[#1C1917] transition-colors"
+                  className="absolute inset-y-0 end-0 flex items-center pe-3.5 text-[#6B635B] transition-colors hover:text-[#1C1917]"
                 >
                   {showPassword ? (
-                    <EyeSlash className="w-4 h-4" />
+                    <EyeSlash className="h-4 w-4" />
                   ) : (
-                    <Eye className="w-4 h-4" />
+                    <Eye className="h-4 w-4" />
                   )}
                 </button>
               </div>
 
               {/* Password Strength Meter Bars */}
               {password && (
-                <div className="grid grid-cols-4 gap-1.5 mt-2">
+                <div className="mt-2 grid grid-cols-4 gap-1.5">
                   {[1, 2, 3, 4].map((step) => (
                     <div
                       key={step}
@@ -461,7 +492,7 @@ function SignupForm() {
             <div>
               <label
                 htmlFor="confirm-password"
-                className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
+                className="mb-1.5 block text-xs font-medium tracking-wider text-[#503C2C] uppercase"
               >
                 {isRTL ? "أكّد كلمة السر" : "Confirm Password"}
               </label>
@@ -474,36 +505,49 @@ function SignupForm() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full h-12 px-4 ps-11 rounded-xl bg-white/90 border border-[#D8C8B4] focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] text-sm text-[#1C1917] placeholder:text-[#6B635B]/50 transition-all outline-none"
+                  className="h-12 w-full rounded-xl border border-[#D8C8B4] bg-white/90 px-4 ps-11 text-sm text-[#1C1917] transition-all outline-none placeholder:text-[#6B635B]/50 focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917]"
                 />
-                <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-[#6B635B]">
-                  <Lock className="w-4 h-4" />
+                <div className="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3.5 text-[#6B635B]">
+                  <Lock className="h-4 w-4" />
                 </div>
               </div>
             </div>
 
             {/* Terms Agreement */}
             <div className="pt-1">
-              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+              <label className="flex cursor-pointer items-start gap-2.5 select-none">
                 <input
                   type="checkbox"
                   required
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="w-4 h-4 mt-0.5 rounded border-[#D8C8B4] text-[#1C1917] focus:ring-[#1C1917]"
+                  className="mt-0.5 h-4 w-4 rounded border-[#D8C8B4] text-[#1C1917] focus:ring-[#1C1917]"
                 />
-                <span className="text-xs text-[#6B635B] leading-relaxed">
+                <span className="text-xs leading-relaxed text-[#6B635B]">
                   {isRTL ? (
                     <>
                       موافق على{" "}
-                      <span className="text-[#1C1917] underline">شروط الخدمة</span> و
-                      <span className="text-[#1C1917] underline"> سياسة الخصوصية وسرية التصميمات الهندسية</span>.
+                      <span className="text-[#1C1917] underline">
+                        شروط الخدمة
+                      </span>{" "}
+                      و
+                      <span className="text-[#1C1917] underline">
+                        {" "}
+                        سياسة الخصوصية وسرية التصميمات الهندسية
+                      </span>
+                      .
                     </>
                   ) : (
                     <>
                       I agree to the{" "}
-                      <span className="text-[#1C1917] underline">Terms of Service</span> and{" "}
-                      <span className="text-[#1C1917] underline">Privacy & Design NDA</span>.
+                      <span className="text-[#1C1917] underline">
+                        Terms of Service
+                      </span>{" "}
+                      and{" "}
+                      <span className="text-[#1C1917] underline">
+                        Privacy & Design NDA
+                      </span>
+                      .
                     </>
                   )}
                 </span>
@@ -514,12 +558,14 @@ function SignupForm() {
             <button
               type="submit"
               disabled={isSubmitting || isLoading}
-              className="w-full h-12 mt-4 rounded-xl bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] font-medium text-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              className="mt-4 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#1C1917] text-sm font-medium text-[#FAF7F2] shadow-md transition-all duration-200 hover:bg-[#342D28] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isSubmitting || isLoading ? (
                 <>
-                  <CircleNotch className="w-4 h-4 animate-spin" />
-                  <span>{isRTL ? "ثواني بنسجل حسابك..." : "Creating Account..."}</span>
+                  <CircleNotch className="h-4 w-4 animate-spin" />
+                  <span>
+                    {isRTL ? "ثواني بنسجل حسابك..." : "Creating Account..."}
+                  </span>
                 </>
               ) : (
                 <>
@@ -529,9 +575,9 @@ function SignupForm() {
                       : "Create Account & Start Commission"}
                   </span>
                   {isRTL ? (
-                    <ArrowLeft className="w-4 h-4" />
+                    <ArrowLeft className="h-4 w-4" />
                   ) : (
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="h-4 w-4" />
                   )}
                 </>
               )}
@@ -539,16 +585,18 @@ function SignupForm() {
           </form>
 
           {/* Switch to Login */}
-          <div className="mt-8 text-center border-t border-[#D8C8B4] pt-6">
+          <div className="mt-8 border-t border-[#D8C8B4] pt-6 text-center">
             <p className="text-xs text-[#6B635B]">
-              {isRTL ? "عندك حساب بالفعل في فالنتيا؟" : "Already an Atelier client?"}{" "}
+              {isRTL
+                ? "عندك حساب بالفعل في فالنتيا؟"
+                : "Already an Atelier client?"}{" "}
               <Link
                 href={
                   redirectParam
                     ? `/login?redirect=${encodeURIComponent(redirectParam)}`
                     : "/login"
                 }
-                className="font-medium text-[#1C1917] hover:text-[#B88460] underline underline-offset-4 transition-colors"
+                className="font-medium text-[#1C1917] underline underline-offset-4 transition-colors hover:text-[#B88460]"
               >
                 {isRTL ? "سجل دخولك هنا" : "Sign in here"}
               </Link>
@@ -557,16 +605,16 @@ function SignupForm() {
         </RevealOnScroll>
       </div>
     </div>
-  );
+  )
 }
 
 export default function SignupPage() {
   return (
     <React.Suspense
       fallback={
-        <div className="min-h-screen w-full bg-[#ECE3D5] flex items-center justify-center text-[#503C2C]">
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest">
-            <CircleNotch className="w-4 h-4 animate-spin" />
+        <div className="flex min-h-screen w-full items-center justify-center bg-[#ECE3D5] text-[#503C2C]">
+          <div className="flex items-center gap-2 font-mono text-xs tracking-widest uppercase">
+            <CircleNotch className="h-4 w-4 animate-spin" />
             <span>Loading Atelier Registration...</span>
           </div>
         </div>
@@ -574,5 +622,5 @@ export default function SignupPage() {
     >
       <SignupForm />
     </React.Suspense>
-  );
+  )
 }
