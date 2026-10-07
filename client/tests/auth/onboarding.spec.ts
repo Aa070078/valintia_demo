@@ -94,6 +94,7 @@ async function setup(
           username: "new@example.com",
           password: "Password123!",
           verificationToken: "test-registration-proof",
+          firstName: "New",
         })
         status = 201
         json = customer

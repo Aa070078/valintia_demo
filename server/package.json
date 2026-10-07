@@ -24,6 +24,8 @@
     "test:project-review": "npm run build && node --import tsx --test test/project-review.test.ts",
     "test:identity-onboarding": "npm run build && node --import tsx --test test/identity-onboarding.test.ts",
     "test:mail-smtp": "npm run build && node --import tsx --test test/mail-smtp.test.ts",
+    "test:welcome": "npm run build && node --import tsx --test test/welcome-email.test.ts",
+    "preview:welcome": "npm run build && tsx scripts/preview-welcome.ts",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "prisma:generate": "prisma generate",

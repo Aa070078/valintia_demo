@@ -73,7 +73,10 @@ export class MailService {
   /**
    * General mail sending method.
    */
-  async sendMail(options: SendMailOptions): Promise<void> {
+  async sendMail(
+    options: SendMailOptions,
+    failOnDeliveryError = false,
+  ): Promise<void> {
     try {
       await this.provider.sendMail({
         ...options,
@@ -111,7 +114,7 @@ export class MailService {
       this.logger.error(
         `SMTP delivery failed (code=${code}, responseCode=${responseCode})`,
       );
-      if (process.env.NODE_ENV !== 'production') {
+      if (!failOnDeliveryError && process.env.NODE_ENV !== 'production') {
         this.logger.warn(
           `[DEV MODE] SMTP delivery failed with placeholder credentials. Continuing for development testing.`,
         );

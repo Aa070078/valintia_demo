@@ -27,6 +27,7 @@ import { isRealEmail, requiresOnboarding } from './identity-policy.js';
 import { TemporaryLoginLimiter } from './temporary-login-limiter.service.js';
 import { OnboardingService } from './onboarding.service.js';
 import type { RequestUser } from '../common/decorators/current-user.decorator.js';
+import { WelcomeService } from '../infrastructure/mail/welcome.service.js';
 
 @Injectable()
 export class AuthService {
@@ -42,9 +43,11 @@ export class AuthService {
     @Inject(TemporaryLoginLimiter)
     private readonly temporaryLimiter: TemporaryLoginLimiter,
     @Inject(OnboardingService) private readonly onboarding: OnboardingService,
+    @Inject(WelcomeService) private readonly welcome: WelcomeService,
   ) {}
 
   /** Respond independently of account lookup/mail latency; no account-existence signal. */
+  // eslint-disable-next-line @typescript-eslint/require-await -- Preserve the existing promise-returning auth contract.
   private async requestAccountOtp(email: string, purpose: OtpPurpose) {
     const normalizedEmail = email.trim().toLowerCase();
     // Best-effort in-process work, with rejection handling. No durable queue is implied.
@@ -295,6 +298,8 @@ export class AuthService {
       throw error;
     }
 
+    // The unique insert has committed; retries conflict before this notification.
+    this.welcome.notify({ email: username, firstName: registerDto.firstName });
     return {
       id: newUser.id,
       username: newUser.username,

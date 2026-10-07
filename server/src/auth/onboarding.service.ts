@@ -12,13 +12,19 @@ import type { RequestUser } from '../common/decorators/current-user.decorator.js
 import { PrismaService } from '../infrastructure/database/prisma.service.js';
 import { OtpService } from '../otp/otp.service.js';
 import { OtpPurpose } from '../otp/enums/otp-purpose.enum.js';
-import { isRealEmail, requiresOnboarding } from './identity-policy.js';
+import {
+  isInternalRole,
+  isRealEmail,
+  requiresOnboarding,
+} from './identity-policy.js';
+import { WelcomeService } from '../infrastructure/mail/welcome.service.js';
 
 @Injectable()
 export class OnboardingService {
   constructor(
     @Inject(PrismaService) private readonly prisma: PrismaService,
     @Inject(OtpService) private readonly otp: OtpService,
+    @Inject(WelcomeService) private readonly welcome: WelcomeService,
   ) {}
 
   private assertSession(
@@ -73,7 +79,7 @@ export class OnboardingService {
   async verifyEmail(actor: RequestUser, input: string, otp: string) {
     const email = input.trim().toLowerCase();
     try {
-      return await this.prisma.$transaction(async (tx) => {
+      const committed = await this.prisma.$transaction(async (tx) => {
         // Shared with reissue/password replacement; only this account can consume its challenge.
         await tx.$queryRaw`SELECT id FROM users WHERE id = ${actor.id} FOR UPDATE`;
         const user = await tx.user.findUnique({ where: { id: actor.id } });
@@ -96,16 +102,24 @@ export class OnboardingService {
           },
         });
         return {
-          success: true,
-          email,
-          emailVerified: true,
-          mustChangePassword: user.mustChangePassword,
-          onboardingComplete: complete,
-          message: complete
-            ? 'Onboarding complete. Sign in with your real email and new password.'
-            : 'Email verified. Replace your temporary password.',
+          recipient:
+            complete && isInternalRole(user.role)
+              ? { email, firstName: user.username }
+              : null,
+          response: {
+            success: true,
+            email,
+            emailVerified: true,
+            mustChangePassword: user.mustChangePassword,
+            onboardingComplete: complete,
+            message: complete
+              ? 'Onboarding complete. Sign in with your real email and new password.'
+              : 'Email verified. Replace your temporary password.',
+          },
         };
       });
+      if (committed.recipient) this.welcome.notify(committed.recipient);
+      return committed.response;
     } catch (error) {
       if ((error as { code?: string }).code === 'P2002')
         throw new ConflictException('Email is already assigned');
@@ -115,7 +129,7 @@ export class OnboardingService {
 
   async changePassword(actor: RequestUser, newPassword: string) {
     const passwordHash = await bcrypt.hash(newPassword, 10);
-    return this.prisma.$transaction(async (tx) => {
+    const committed = await this.prisma.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM users WHERE id = ${actor.id} FOR UPDATE`;
       const user = await tx.user.findUnique({ where: { id: actor.id } });
       this.assertSession(user, actor);
@@ -130,11 +144,24 @@ export class OnboardingService {
           ...(user.emailVerified ? { onboardingVersion: null } : {}),
         },
       });
+      // Only the locked incomplete -> complete transition may send a welcome.
+      const recipient =
+        requiresOnboarding(user) &&
+        user.emailVerified &&
+        user.email &&
+        isInternalRole(user.role)
+          ? { email: user.email, firstName: user.username }
+          : null;
       return {
-        message: 'Password changed successfully',
-        mustChangePassword: false,
-        onboardingComplete: user.emailVerified,
+        recipient,
+        response: {
+          message: 'Password changed successfully',
+          mustChangePassword: false,
+          onboardingComplete: user.emailVerified,
+        },
       };
     });
+    if (committed.recipient) this.welcome.notify(committed.recipient);
+    return committed.response;
   }
 }
