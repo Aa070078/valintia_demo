@@ -12,8 +12,8 @@ import { NotificationProvider } from "@/features/notifications/context/notificat
 import { NotificationToast } from "@/features/notifications/components/notification-toast";
 
 function FirstLoginGlobalModal() {
-  const { requiresPasswordChange } = useAuth();
-  return <FirstLoginPasswordModal open={requiresPasswordChange} />;
+  const { requiresPasswordChange, isAuthenticated, onboardingSession } = useAuth();
+  return <FirstLoginPasswordModal open={requiresPasswordChange && isAuthenticated && !onboardingSession} />;
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {

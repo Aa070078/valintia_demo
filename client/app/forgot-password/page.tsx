@@ -1,240 +1,233 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  ArrowRight,
-  EnvelopeSimple,
-  Lock,
-  Buildings,
-  CircleNotch,
-  ShieldCheck,
-} from "@phosphor-icons/react";
-import { authApi } from "@/features/auth/api/auth.api";
-import { useLanguage } from "@/lib/i18n/language-context";
-import { getErrorMessage, cn } from "@/lib/utils";
-import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
+import * as React from "react"
+import Link from "next/link"
+import { authApi } from "@/features/auth/api/auth.api"
+import { getErrorMessage } from "@/lib/utils"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 export default function ForgotPasswordPage() {
-  const router = useRouter();
-  const { isRTL, language, toggleLanguage } = useLanguage();
+  const { isRTL } = useLanguage()
+  const [step, setStep] = React.useState<
+    "EMAIL" | "CODE" | "PASSWORD" | "DONE"
+  >("EMAIL")
+  const [email, setEmail] = React.useState("")
+  const [code, setCode] = React.useState("")
+  const [proof, setProof] = React.useState<string | null>(null)
+  const [password, setPassword] = React.useState("")
+  const [confirmation, setConfirmation] = React.useState("")
+  const [cooldown, setCooldown] = React.useState(0)
+  const [busy, setBusy] = React.useState(false)
+  const [error, setError] = React.useState("")
 
-  const [email, setEmail] = React.useState("");
-  const [error, setError] = React.useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  React.useEffect(() => {
+    const timer = window.setInterval(
+      () => setCooldown((value) => Math.max(0, value - 1)),
+      1000
+    )
+    return () => window.clearInterval(timer)
+  }, [])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) {
-      setError(
-        isRTL
-          ? "من فضلك اكتب بريدك الإلكتروني المسجل."
-          : "Please enter your registered email address."
-      );
-      return;
-    }
+  async function sendCode() {
+    await authApi.requestPasswordReset(email)
+    setEmail(email.trim().toLowerCase())
+    setCooldown(60)
+    setCode("")
+    setProof(null)
+    setStep("CODE")
+  }
 
-    setError(null);
-    setIsSubmitting(true);
-
+  async function submit(event: React.FormEvent) {
+    event.preventDefault()
+    setBusy(true)
+    setError("")
     try {
-      const normalizedEmail = email.trim().toLowerCase();
-      // Dispatch password reset request to backend
-      await authApi.requestForgotPassword(normalizedEmail);
-
-      // Navigate to OTP verification for PASSWORD_RESET
-      router.push(
-        `/verify-otp?email=${encodeURIComponent(
-          normalizedEmail
-        )}&purpose=PASSWORD_RESET`
-      );
-    } catch (err: unknown) {
-      console.error("Forgot password request failed:", err);
-      const apiMsg = getErrorMessage(err, isRTL);
+      if (step === "EMAIL") await sendCode()
+      else if (step === "CODE") {
+        setProof(await authApi.verifyPasswordReset(email, code))
+        setStep("PASSWORD")
+      } else if (step === "PASSWORD") {
+        if (!proof) throw new Error("Please request and verify a new code.")
+        if (password !== confirmation)
+          throw new Error("Passwords do not match.")
+        await authApi.resetPassword(proof, password)
+        setProof(null)
+        setPassword("")
+        setConfirmation("")
+        setStep("DONE")
+      }
+    } catch (failure) {
       setError(
-        apiMsg ||
-          (isRTL
-            ? "تعذر إرسال رمز الاستعادة حالياً. يرجى التأكد من البريد والمحاولة مرة أخرى."
-            : "Could not send password reset code. Please check your email and try again.")
-      );
+        getErrorMessage(failure) ||
+          "Could not reset your password. Please try again."
+      )
     } finally {
-      setIsSubmitting(false);
+      setBusy(false)
     }
-  };
+  }
+
+  async function resend() {
+    setBusy(true)
+    setError("")
+    try {
+      await sendCode()
+    } catch (failure) {
+      setError(getErrorMessage(failure) || "Could not request a new code.")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const fieldClass =
+    "mt-2 w-full rounded-lg border border-border bg-background p-3"
 
   return (
-    <div className="min-h-screen w-full bg-[#ECE3D5] text-[#1C1917] flex flex-col md:flex-row relative overflow-hidden">
-      {/* Top Floating Navigation & Language Switcher */}
-      <div className="absolute top-6 left-6 right-6 z-30 flex items-center justify-between pointer-events-auto">
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#503C2C] hover:text-[#1C1917] font-medium transition-colors bg-white/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#D8C8B4]/60 shadow-sm"
-        >
-          {isRTL ? (
-            <>
-              <ArrowRight className="h-3.5 w-3.5" />
-              <span>رجوع للدخول</span>
-            </>
-          ) : (
-            <>
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Back to Sign In</span>
-            </>
-          )}
-        </Link>
-
-        <button
-          onClick={toggleLanguage}
-          type="button"
-          className="text-xs font-medium tracking-wider text-[#503C2C] hover:text-[#1C1917] transition-colors bg-white/70 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[#D8C8B4]/60 shadow-sm"
-        >
-          {language === "en" ? "العربية" : "English"}
-        </button>
-      </div>
-
-      {/* LEFT PANEL: Architectural Brand & Depth Storytelling */}
-      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 xl:p-16 overflow-hidden bg-[#241F1B] text-[#FAF7F2]">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-45 mix-blend-luminosity scale-105 transition-transform duration-1000 ease-out"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=85')`,
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917] via-[#1C1917]/70 to-[#1C1917]/40" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(184,132,96,0.25),transparent_70%)]" />
-
-        <div className="relative z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-[#FAF7F2]/30 flex items-center justify-center bg-white/10 backdrop-blur-md">
-              <Buildings className="w-5 h-5 text-[#FAF7F2]" weight="light" />
-            </div>
-            <div>
-              <span className="block text-sm tracking-[0.25em] font-light uppercase text-[#FAF7F2]">
-                VALENTIA
-              </span>
-              <span className="block text-[10px] tracking-[0.2em] text-[#FAF7F2]/60 uppercase">
-                {isRTL ? "أتيليه التصميم والتشطيب المتكامل" : "Design & Build Atelier"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="relative z-10 max-w-lg space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#FAF7F2] text-xs font-mono uppercase tracking-widest">
-            <Lock className="w-3.5 h-3.5 text-[#B88460]" />
-            <span>{isRTL ? "استعادة آمنة" : "ACCOUNT RECOVERY"}</span>
-          </div>
-
-          <h2 className="font-serif text-3xl xl:text-4xl text-[#FAF7F2] font-normal tracking-tight leading-tight">
+    <main
+      className="flex min-h-screen items-center justify-center bg-background px-4 py-12 text-foreground"
+      dir={isRTL ? "rtl" : "ltr"}
+    >
+      <section className="w-full max-w-md space-y-5 rounded-2xl border border-border bg-card p-7 shadow-lg">
+        <p className="text-sm tracking-widest text-muted-foreground">
+          VALENTIA
+        </p>
+        <h1 className="text-2xl font-semibold">
+          {step === "DONE"
+            ? isRTL
+              ? "تم تغيير كلمة المرور"
+              : "Password updated"
+            : isRTL
+              ? "استعادة كلمة المرور"
+              : "Reset your password"}
+        </h1>
+        {step === "CODE" && (
+          <p className="text-sm text-muted-foreground">
             {isRTL
-              ? "استعادة كلمة المرور وحماية حسابك المعماري."
-              : "Recover your password and protect your atelier portfolio."}
-          </h2>
-
-          <p className="text-sm text-[#FAF7F2]/70 leading-relaxed">
-            {isRTL
-              ? "سنرسل لك رمز تحقق مؤمن عبر البريد الإلكتروني لتتمكن من إعادة تعيين كلمة المرور بكل سهولة."
-              : "We will dispatch a secure one-time verification code to your registered email to reset your credentials."}
+              ? "إذا كان الحساب مؤهلاً لاستعادة كلمة المرور، فسيصلك رمز على بريدك. تحقق من البريد الوارد والرسائل غير المرغوب فيها."
+              : "If the account is eligible for recovery, a code will arrive by email. Check your inbox and spam folder."}
           </p>
-        </div>
-
-        <div className="relative z-10 text-xs text-[#FAF7F2]/50 tracking-wider">
-          © {new Date().getFullYear()} VALENTIA DESIGN & BUILD. ALL RIGHTS RESERVED.
-        </div>
-      </div>
-
-      {/* RIGHT PANEL: Forgot Password Form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-20 sm:px-12 md:px-16 lg:px-20 xl:px-24 relative z-10 overflow-y-auto">
-        <RevealOnScroll direction="up" delayMs={100} className="w-full max-w-md mx-auto">
-          <div className="mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#DFD3C1]/50 border border-[#D8C8B4] text-xs font-mono uppercase tracking-widest text-[#503C2C] mb-3">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#B88460]" />
-              <span>{isRTL ? "استعادة الحساب" : "PASSWORD ASSISTANCE"}</span>
-            </div>
-
-            <h1 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-normal tracking-tight">
-              {isRTL ? "نسيت كلمة المرور؟" : "Forgot Password"}
-            </h1>
-
-            <p className="mt-2 text-sm text-[#6B635B] leading-relaxed">
-              {isRTL
-                ? "أدخل بريدك الإلكتروني المسجل وسنرسل لك رمز تحقق لتغيير كلمة المرور."
-                : "Enter your registered email address and we'll dispatch a 6-digit verification code."}
-            </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
-              <span className="w-2 h-2 rounded-full bg-red-500 mt-1.5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-xs uppercase tracking-wider font-medium text-[#503C2C] mb-1.5"
-              >
-                {isRTL ? "البريد الإلكتروني" : "Email Address"}
-              </label>
-              <div className="relative">
+        )}
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        {step !== "DONE" && (
+          <form onSubmit={submit} className="space-y-4">
+            {step === "EMAIL" && (
+              <label className="block text-sm" htmlFor="reset-email">
+                {isRTL ? "البريد الإلكتروني" : "Email address"}
                 <input
-                  id="email"
+                  id="reset-email"
                   type="email"
-                  required
                   autoComplete="email"
+                  required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tarek.mansour@example.com"
-                  className="w-full h-12 px-4 ps-11 rounded-xl bg-white/90 border border-[#D8C8B4] focus:border-[#1C1917] focus:ring-1 focus:ring-[#1C1917] text-sm text-[#1C1917] placeholder:text-[#6B635B]/50 transition-all outline-none"
+                  onChange={(event) => setEmail(event.target.value)}
+                  className={fieldClass}
                 />
-                <div className="absolute inset-y-0 start-0 ps-3.5 flex items-center pointer-events-none text-[#6B635B]">
-                  <EnvelopeSimple className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-
+              </label>
+            )}
+            {step === "CODE" && (
+              <label className="block text-sm" htmlFor="reset-code">
+                {isRTL ? "رمز التحقق" : "Verification code"}
+                <input
+                  id="reset-code"
+                  autoFocus
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  pattern="[0-9]{6}"
+                  maxLength={6}
+                  required
+                  value={code}
+                  onChange={(event) =>
+                    setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
+                  }
+                  className={fieldClass}
+                />
+              </label>
+            )}
+            {step === "PASSWORD" && (
+              <>
+                <label className="block text-sm" htmlFor="reset-password">
+                  {isRTL ? "كلمة المرور الجديدة" : "New password"}
+                  <input
+                    id="reset-password"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    className={fieldClass}
+                  />
+                </label>
+                <label className="block text-sm" htmlFor="reset-confirmation">
+                  {isRTL ? "تأكيد كلمة المرور" : "Confirm password"}
+                  <input
+                    id="reset-confirmation"
+                    type="password"
+                    autoComplete="new-password"
+                    minLength={6}
+                    required
+                    value={confirmation}
+                    onChange={(event) => setConfirmation(event.target.value)}
+                    className={fieldClass}
+                  />
+                </label>
+              </>
+            )}
             <button
-              type="submit"
-              disabled={isSubmitting || !email.trim()}
-              className={cn(
-                "w-full h-12 rounded-xl text-sm font-medium tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm mt-6",
-                email.trim() && !isSubmitting
-                  ? "bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3E2F22] active:scale-[0.99] cursor-pointer"
-                  : "bg-[#503C2C]/40 text-[#FAF7F2]/70 cursor-not-allowed"
-              )}
+              disabled={busy}
+              className="w-full rounded-lg bg-primary p-3 text-primary-foreground disabled:opacity-50"
             >
-              {isSubmitting ? (
-                <>
-                  <CircleNotch className="w-4 h-4 animate-spin" />
-                  <span>{isRTL ? "جارٍ الإرسال..." : "Sending Code..."}</span>
-                </>
-              ) : (
-                <>
-                  <span>{isRTL ? "إرسال رمز التحقق" : "Send Verification Code"}</span>
-                  {isRTL ? (
-                    <ArrowLeft className="w-4 h-4" />
-                  ) : (
-                    <ArrowRight className="w-4 h-4" />
-                  )}
-                </>
-              )}
+              {busy
+                ? isRTL
+                  ? "جارٍ المتابعة…"
+                  : "Please wait…"
+                : step === "EMAIL"
+                  ? isRTL
+                    ? "إرسال الرمز"
+                    : "Send code"
+                  : step === "CODE"
+                    ? isRTL
+                      ? "تأكيد الرمز"
+                      : "Verify code"
+                    : isRTL
+                      ? "حفظ كلمة المرور"
+                      : "Save password"}
             </button>
-
-            <div className="pt-4 text-center">
-              <Link
-                href="/login"
-                className="text-xs text-[#6B635B] hover:text-[#1C1917] transition-colors underline underline-offset-4"
-              >
-                {isRTL ? "تذكرت كلمة المرور؟ تسجيل الدخول" : "Remember your password? Sign in"}
-              </Link>
-            </div>
           </form>
-        </RevealOnScroll>
-      </div>
-    </div>
-  );
+        )}
+        {step === "CODE" && (
+          <button
+            onClick={resend}
+            disabled={busy || cooldown > 0}
+            className="text-sm text-primary disabled:opacity-50"
+          >
+            {cooldown > 0
+              ? `${isRTL ? "إعادة الإرسال خلال" : "Resend in"} ${cooldown}s`
+              : isRTL
+                ? "إعادة إرسال الرمز"
+                : "Resend code"}
+          </button>
+        )}
+        {(step === "CODE" || step === "PASSWORD") && (
+          <button
+            disabled={busy}
+            className="block text-sm text-muted-foreground"
+            onClick={() => {
+              setProof(null)
+              setError("")
+              setStep("EMAIL")
+            }}
+          >
+            {isRTL ? "البدء من جديد" : "Start again"}
+          </button>
+        )}
+        <Link href="/login" className="block text-sm text-primary underline">
+          {isRTL ? "العودة لتسجيل الدخول" : "Back to sign in"}
+        </Link>
+      </section>
+    </main>
+  )
 }

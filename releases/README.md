@@ -4,14 +4,16 @@ Index only — full audit notes live in the per-app logs linked below.
 
 | App | Log | Latest |
 |-----|-----|--------|
-| Client | [client.md](./client.md) | [2026-09-24 15:22] Valentia Sprint 1 Customer Frontend Foundation |
-| Dashboard | [dashboard.md](./dashboard.md) | — |
+| Client | [client.md](./client.md) | [2026-10-07 17:28] Connect frontend verification and onboarding sessions |
+| Dashboard | [dashboard.md](./dashboard.md) | [2026-10-07 17:28] Connect frontend verification and onboarding sessions |
 | Server | [server.md](./server.md) | [2026-10-05 01:16] Email-only password login and shared internal onboarding |
 | Meta (rules/skills/docs) | [meta.md](./meta.md) | [2026-09-03 21:02] Valentia brand, design system, business doc, and stack skills |
 
 ## Recent (newest first)
 
 <!-- Keep at most 30 entries. Newest at the top. -->
+- **[20261007-1728-auth-onboarding-integration](./client.md)** — Client — Connect frontend verification and onboarding sessions — 2026-10-07 17:28 — @abdelrhman632
+- **[20261007-1728-auth-onboarding-integration](./dashboard.md)** — Dashboard — Connect frontend verification and onboarding sessions — 2026-10-07 17:28 — @abdelrhman632
 - **[20261005-0116-email-only-password-login](./server.md)** ? Server ? Email-only password login and shared internal onboarding ? 2026-10-05 01:16 ? @abdelrhman632
 - **[20261005-0022-gmail-smtp-transport](./server.md)** — Server — Replace Resend delivery with Gmail SMTP — 2026-10-05 00:22 — @abdelrhman632
 - **[20261004-2346-restore-admin-login](./server.md)** — Server — Apply local migrations and restore administrator login — 2026-10-04 23:46 — @abdelrhman632

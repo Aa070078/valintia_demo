@@ -2,6 +2,36 @@
 
 Append-only audit log for changes under `client/`. Newest entry at the top.
 
+## [2026-10-07 17:28] Connect frontend verification and onboarding sessions
+
+**ID:** 20261007-1728-auth-onboarding-integration
+**By:** @abdelrhman632
+**App:** client
+**Requested:** Create a separate branch and connect verification, onboarding, and login tokens automatically so frontend onboarding works without copying Swagger tokens.
+**Scope:** `client/app/{login,signup,forgot-password}`, `client/features/auth`, `client/components/providers.tsx`, `client/lib/{api,auth}`, auth browser tests, dependency lockfile, environment example.
+
+### Summary
+Signup now verifies an inbox code and supplies its proof to registration before signing in by email. Restricted staff onboarding sessions stay separate from access credentials, resume after refresh, and finish email/password setup before obtaining normal access. Password reset carries its purpose-specific proof automatically. Internal roles receive their dashboard session through a URL fragment that the dashboard removes immediately.
+
+### Changes
+- Added registration verification dialog, reset-password UI, onboarding session storage, and role destination helper.
+- Preserved explicit scoped Authorization headers and prevented the legacy password modal from blocking onboarding.
+- Added `@playwright/test` ^1.63.0 and `npm run test:auth`; documented manual checks in `client/tests/auth/README.md`.
+- Added `NEXT_PUBLIC_DASHBOARD_URL` to the environment example and ignored generated browser-test artifacts.
+
+### Verification
+- Client and dashboard production builds and TypeScript checks passed.
+- ESLint passed for changed auth files.
+- `npm run test:auth`: 9 browser checks passed using intercepted API responses; no live account or email mutations.
+- Existing server `npm run test:auth-otp`: all 15 tests passed.
+
+### Notes
+- Work is on `feat/auth-onboarding-integration`; no push or master merge. Earlier local OTP diagnostics remain in the existing stash.
+- Live inbox signup/reset needs an eligible controlled account, configured SMTP, Redis, and database. Browser fixtures verify frontend integration rather than live delivery.
+- Local project APIs have a separate missing `projects.coverImage` database migration issue; no database reset or account eligibility changes were made.
+
+---
+
 ## [2026-10-06 23:28] Customer Auth Session Safe Fallback & Display Name Resilience
 
 **ID:** 20261006-2328-client-user-displayname-fallback  

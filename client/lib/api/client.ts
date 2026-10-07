@@ -1,9 +1,9 @@
-import axios, { type AxiosError } from "axios";
-import { tokenStorage } from "@/lib/auth/token-storage";
-import type { ApiError } from "./types";
+import axios, { type AxiosError } from "axios"
+import { tokenStorage } from "@/lib/auth/token-storage"
+import type { ApiError } from "./types"
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -12,19 +12,19 @@ export const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-});
+})
 
 apiClient.interceptors.request.use(
   (config) => {
     // If token exists in token storage adapter, attach as Bearer token
-    const token = tokenStorage.getToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const token = tokenStorage.getToken()
+    if (token && config.headers && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return config;
+    return config
   },
   (error) => Promise.reject(error)
-);
+)
 
 apiClient.interceptors.response.use(
   (response) => response,
@@ -38,7 +38,7 @@ apiClient.interceptors.response.use(
       error: error.response?.data?.error,
       code: error.response?.data?.code || error.code,
       errors: error.response?.data?.errors,
-    };
-    return Promise.reject(apiError);
+    }
+    return Promise.reject(apiError)
   }
-);
+)
