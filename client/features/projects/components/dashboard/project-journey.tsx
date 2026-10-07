@@ -27,7 +27,10 @@ interface ProjectJourneyProps {
 export function ProjectJourney({ projectStatus, stages, consultationAppointment }: ProjectJourneyProps) {
   const { isRTL } = useLanguage();
 
-  const isSubmitted = projectStatus === "submitted" || projectStatus === "initial_review";
+  const normalized = (projectStatus || "submitted").toLowerCase();
+  const isSubmittedOrBeyond = normalized !== "draft";
+  const isReadyForMeeting = normalized === "engineer_ready" || Boolean(consultationAppointment);
+  const isUnderReview = normalized === "under_engineer_review";
 
   const defaultStages: JourneyStage[] = [
     {
@@ -37,7 +40,7 @@ export function ProjectJourney({ projectStatus, stages, consultationAppointment 
       titleAr: "تأكيد طلب المشروع",
       descEn: "Initial specifications received and undergoing atelier review.",
       descAr: "استلمنا بيانات ومواصفات شقتك/فيلتك وفريق التصميم بيراجعها حالياً.",
-      status: isSubmitted ? "completed" : "in_progress",
+      status: isSubmittedOrBeyond ? "completed" : "in_progress",
       icon: CheckCircle,
     },
     {
@@ -47,12 +50,16 @@ export function ProjectJourney({ projectStatus, stages, consultationAppointment 
       titleAr: "مكالمة الاستشارة أونلاين",
       descEn: "Video sync with lead architect to align vision and materials.",
       descAr: "ميتينج فيديو مع رئيس المهندسين عشان نفهم ذوقك ونظبط تفاصيل التصميم والخامات.",
-      status: isSubmitted ? "in_progress" : "upcoming",
+      status: isSubmittedOrBeyond ? "in_progress" : "upcoming",
       scheduledDate: consultationAppointment
         ? (isRTL
             ? `الميعاد: ${consultationAppointment.date} (${consultationAppointment.timeSlot})`
             : `Booked: ${consultationAppointment.date} @ ${consultationAppointment.timeSlot}`)
-        : (isSubmitted ? (isRTL ? "متاح لحجز الموعد الآن" : "Ready to schedule") : undefined),
+        : isReadyForMeeting
+        ? (isRTL ? "متاح لحجز الموعد الآن ✨" : "Ready to schedule ✨")
+        : isUnderReview
+        ? (isRTL ? "المراجعة جارية بالمكتب الفني 📐" : "Review in progress 📐")
+        : (isRTL ? "في انتظار اعتماد المهندس ⏳" : "Awaiting engineer review ⏳"),
       icon: CalendarCheck,
     },
     {

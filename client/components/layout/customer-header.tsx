@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { SignInModal } from "@/features/auth/components/sign-in-modal";
+import { NotificationCenter } from "@/features/notifications/components/notification-center";
 
 export function CustomerHeader() {
   const pathname = usePathname();
@@ -155,6 +156,9 @@ export function CustomerHeader() {
                 عربي
               </button>
             </div>
+
+            {/* In-App Notification Center */}
+            <NotificationCenter />
 
             {/* Profile Circle / Auth Trigger */}
             <button

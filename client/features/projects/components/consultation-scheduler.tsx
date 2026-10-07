@@ -34,6 +34,9 @@ interface ConsultationSchedulerProps {
   projectLocation?: string;
   initialAppointment?: BookedAppointment | null;
   onAppointmentBooked?: (appointment: BookedAppointment | null) => void;
+  projectStatus?: string;
+  assignedEngineerName?: string;
+  engineerNote?: string;
 }
 
 const TIME_SLOTS = [
@@ -64,6 +67,9 @@ export function ConsultationScheduler({
   projectTitle,
   initialAppointment,
   onAppointmentBooked,
+  projectStatus = "submitted",
+  assignedEngineerName,
+  engineerNote,
 }: ConsultationSchedulerProps) {
   const { isRTL } = useLanguage();
 
@@ -290,42 +296,140 @@ export function ConsultationScheduler({
         </div>
       ) : (
         /* ─────────────────────────────────────────────────────────────
-            2. IF NOT BOOKED: INVITATION BANNER TO SCHEDULE CONSULTATION
+            2. IF NOT BOOKED: INVITATION BANNER ADAPTED TO REVIEW STATE
         ───────────────────────────────────────────────────────────── */
-        <div className="p-6 sm:p-7 rounded-3xl bg-[#503C2C] text-[#FAF7F2] shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-[#B88460]/40">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-[#B88460]/20 rounded-full blur-3xl pointer-events-none" />
+        (() => {
+          const normalized = (projectStatus || "submitted").toLowerCase();
+          const isAwaiting = normalized === "submitted" || normalized === "initial_review";
+          const isUnderReview = normalized === "under_engineer_review";
+          const isReady = normalized === "engineer_ready";
 
-          <div className="space-y-2 max-w-xl text-start">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF7F2]/10 border border-[#FAF7F2]/20 text-[10px] uppercase font-mono tracking-widest text-[#E5D7C7]">
-              <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
-              <span>{isRTL ? "الخطوة التالية المعتمدة · مرحلة 02" : "ACTIVE STAGE 02 · CONSULTATION MEETING"}</span>
+          if (isAwaiting) {
+            return (
+              <div className="p-6 sm:p-7 rounded-3xl bg-[#FAF7F2] border border-[#E8DEC8] text-[#1C1917] shadow-sm relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-[#B88460]/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="space-y-2 max-w-xl text-start">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-[10px] uppercase font-mono tracking-widest text-amber-900 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    <span>{isRTL ? "المرحلة 02 من 05 · في انتظار مراجعة المهندس" : "STAGE 02 · AWAITING ENGINEER REVIEW"}</span>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1C1917]">
+                    {isRTL
+                      ? "طلبك تم تسليمه وقيد المراجعة الفنية الأولية"
+                      : "Commission Submitted & Under Priority Technical Review"}
+                  </h3>
+
+                  <p className="text-xs text-[#78716C] leading-relaxed">
+                    {isRTL
+                      ? "استلمنا بيانات بيتك، والمهندس المسؤول بيفحص الرسومات المرفقة والمساحات للتأكد من اكتمالها قبل فتح المواعيد. سنرسل لك إشعاراً فور انتهاء المهندس وتأكيد جاهزيته لميتينج الاستشارة."
+                      : "Our architectural atelier is checking drawings and spatial requirements. You will receive an instant notification as soon as the lead architect declares readiness for the video consultation."}
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-center sm:items-end gap-2 shrink-0">
+                  <div className="px-5 py-3 rounded-full bg-[#EFE8DE] text-[#78716C] border border-[#D8C8B4] text-xs font-semibold flex items-center gap-2 select-none">
+                    <Clock className="w-4 h-4 text-[#B88460]" />
+                    <span>{isRTL ? "في انتظار اعتماد المهندس ⏳" : "Awaiting Engineer Review ⏳"}</span>
+                  </div>
+                  <span className="text-[10px] text-[#A8A29E]">
+                    {isRTL ? "سيتم فتح حجز الميعاد تلقائياً فور الاعتماد" : "Booking unlocks upon architect readiness"}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+
+          if (isUnderReview) {
+            return (
+              <div className="p-6 sm:p-7 rounded-3xl bg-[#FAF7F2] border border-[#B88460]/50 text-[#1C1917] shadow-md relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="space-y-2 max-w-xl text-start">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-[10px] uppercase font-mono tracking-widest text-emerald-900 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                    <span>{isRTL ? "المرحلة 02 من 05 · فحص المخططات جاري الآن" : "STAGE 02 · ARCHITECTURAL REVIEW ACTIVE"}</span>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-[#1C1917]">
+                    {isRTL
+                      ? "المهندس المسؤول يقوم بدراسة تفاصيل مشروعك حالياً"
+                      : "Lead Architect Is Currently Reviewing Your Blueprints"}
+                  </h3>
+
+                  <p className="text-xs text-[#78716C] leading-relaxed">
+                    {isRTL
+                      ? "المهندس المعين بدأ بمطابقة المساحات والرسومات الهندسية والخامات. فور تأكيده للجاهزية، سيصلك إشعار فوري ويمكنك حجز جلسة الاستشارة بالفيديو مباشرة."
+                      : "The assigned architect is analyzing floorplans and specifications. Booking will open immediately upon confirmation."}
+                  </p>
+
+                  {engineerNote && (
+                    <div className="mt-3 p-3 rounded-xl bg-white border border-[#E8DEC8] text-xs text-[#503C2C] flex items-start gap-2">
+                      <span className="font-bold shrink-0">{isRTL ? "ملاحظة المهندس:" : "Architect Note:"}</span>
+                      <span className="text-[#78716C] italic">{engineerNote}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col items-center sm:items-end gap-2 shrink-0">
+                  <div className="px-5 py-3 rounded-full bg-emerald-700 text-[#FAF7F2] text-xs font-semibold flex items-center gap-2 shadow-xs select-none">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{isRTL ? "المراجعة جارية بالمكتب الفني 📐" : "Review In Progress 📐"}</span>
+                  </div>
+                  <span className="text-[10px] text-[#A8A29E]">
+                    {isRTL ? "جاري الفحص... سيصلك تنبيه فوري" : "Live review active · notification incoming"}
+                  </span>
+                </div>
+              </div>
+            );
+          }
+
+          // Case: ENGINEER_READY (Or confirmed review)
+          return (
+            <div className="p-6 sm:p-7 rounded-3xl bg-[#503C2C] text-[#FAF7F2] shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border border-[#B88460]/40">
+              <div className="absolute top-0 right-0 w-72 h-72 bg-[#B88460]/25 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="space-y-2 max-w-xl text-start">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#B88460]/20 border border-[#B88460]/40 text-[10px] uppercase font-mono tracking-widest text-[#FAF7F2] font-bold">
+                  <Sparkle className="w-3.5 h-3.5 text-[#B88460]" />
+                  <span>{isRTL ? "المهندس جاهز لمقابلتك الآن · مرحلة 02" : "ARCHITECT READY · STAGE 02 UNLOCKED"}</span>
+                </div>
+
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                  {isRTL
+                    ? "المهندس اعتمد المراجعة! احجز موعد ميتينج الاستشارة الآن"
+                    : "Architect Ready! Pick Your Consultation Time Slot"}
+                </h3>
+
+                <p className="text-xs text-[#E5D7C7] leading-relaxed">
+                  {isRTL
+                    ? "انتهى المهندس من فحص كامل الملف الفني واعتماده، والآن يمكنك اختيار الميعاد الأنسب لك لمناقشة أسلوب التصميم والخامات بالفيديو عبر Google Meet."
+                    : "Review is fully certified. Choose your preferred time slot to discuss design aesthetics, materials, and spatial planning live on video."}
+                </p>
+
+                {engineerNote && (
+                  <div className="mt-2 p-3 rounded-xl bg-black/20 border border-white/10 text-xs text-[#E5D7C7]">
+                    <span className="font-bold text-white">{isRTL ? "ملاحظة المهندس: " : "Architect's Note: "}</span>
+                    <span>{engineerNote}</span>
+                  </div>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsBookingModalOpen(true)}
+                className={cn(
+                  "shrink-0 px-7 py-3.5 rounded-full bg-[#B88460] text-white hover:bg-[#A37250] active:scale-95 transition-all shadow-md flex items-center gap-2.5 font-semibold text-xs tracking-wider uppercase cursor-pointer animate-pulse hover:animate-none",
+                  isRTL && "tracking-normal font-sans"
+                )}
+              >
+                <CalendarPlus className="w-4 h-4" />
+                <span>{isRTL ? "اختيار وقت الميتينج الآن ←" : "Pick Meeting Time →"}</span>
+              </button>
             </div>
-
-            <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
-              {isRTL
-                ? "احجز ميعاد ميتينج الاستشارة مع رئيس المهندسين"
-                : "Schedule Your Lead Architect Consultation Meeting"}
-            </h3>
-
-            <p className="text-xs text-[#E5D7C7] leading-relaxed">
-              {isRTL
-                ? "طلب مشروعك تم اعتماده بنجاح. الخطوة الحالية هي حجز موعد ميتينج الاستشارة الأولية بالفيديو مع رئيس المهندسين لمراجعة متطلباتك واعتماد اتجاه التصميم قبل الانتقال لمرحلة المعاينة الميدانية."
-                : "Your commission is verified. The active milestone is your initial video consultation with our lead architect to align on design direction before the on-site survey."}
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsBookingModalOpen(true)}
-            className={cn(
-              "shrink-0 px-7 py-3.5 rounded-full bg-[#B88460] text-white hover:bg-[#A37250] active:scale-95 transition-all shadow-md flex items-center gap-2.5 font-semibold text-xs tracking-wider uppercase cursor-pointer",
-              isRTL && "tracking-normal font-sans"
-            )}
-          >
-            <CalendarPlus className="w-4 h-4" />
-            <span>{isRTL ? "اختيار وقت الميتينج الآن ←" : "Pick Meeting Time →"}</span>
-          </button>
-        </div>
+          );
+        })()
       )}
 
       {/* ─────────────────────────────────────────────────────────────

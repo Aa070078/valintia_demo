@@ -235,6 +235,8 @@ export default function ProjectDetailsPage() {
           projectLocation={project.property?.city || project.city}
           initialAppointment={appointment}
           onAppointmentBooked={(newApt) => setAppointment(newApt)}
+          projectStatus={project.status}
+          engineerNote={(project as any).engineerNote || (project as any).reviewNote}
         />
 
         {/* Tab Navigation */}

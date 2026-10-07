@@ -21,10 +21,19 @@ import {
   CheckSquare,
   PencilSimple,
   Check,
+  VideoCamera,
+  Play,
+  Sparkle,
+  ChatCircleText,
+  ArrowSquareOut,
+  X,
+  Clock,
+  FileText,
 } from "@phosphor-icons/react";
 import { useAuth } from "@/features/auth/context/auth-context";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
+import { adminApi, type AdminProject } from "../lib/admin-api";
 
 const STATUS_STEPS: SiteVisitStatus[] = [
   "ASSIGNED",
@@ -44,6 +53,73 @@ export function EngineerDashboard() {
   const [selectedVisit, setSelectedVisit] = React.useState<SiteVisit>(siteVisits[0]);
   const [editingItemId, setEditingItemId] = React.useState<string | null>(null);
   const [editValue, setEditValue] = React.useState("");
+
+  // Assigned projects review queue state
+  const [assignedProjects, setAssignedProjects] = React.useState<AdminProject[]>([]);
+  const [isLoadingProjects, setIsLoadingProjects] = React.useState(true);
+  const [actionLoadingId, setActionLoadingId] = React.useState<number | null>(null);
+  const [reviewNoteModal, setReviewNoteModal] = React.useState<{
+    projectId: number;
+    projectTitle: string;
+    action: "START" | "READY";
+  } | null>(null);
+  const [actionNote, setActionNote] = React.useState("");
+
+  const loadAssignedProjects = React.useCallback(async () => {
+    try {
+      setIsLoadingProjects(true);
+      const data = await adminApi.getProjects();
+      setAssignedProjects(data);
+    } catch (err) {
+      console.warn("Could not load assigned projects:", err);
+    } finally {
+      setIsLoadingProjects(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    loadAssignedProjects();
+  }, [loadAssignedProjects]);
+
+  const handleExecuteReviewAction = async () => {
+    if (!reviewNoteModal) return;
+    const { projectId, projectTitle, action } = reviewNoteModal;
+    try {
+      setActionLoadingId(projectId);
+      if (action === "START") {
+        await adminApi.startReview(projectId, actionNote.trim() || undefined);
+        window.dispatchEvent(
+          new CustomEvent("valentia:project-status-change", {
+            detail: {
+              projectId,
+              projectTitle,
+              toStatus: "UNDER_ENGINEER_REVIEW",
+              note: actionNote.trim() || undefined,
+            },
+          })
+        );
+      } else {
+        await adminApi.readyForConsultation(projectId, actionNote.trim() || undefined);
+        window.dispatchEvent(
+          new CustomEvent("valentia:project-status-change", {
+            detail: {
+              projectId,
+              projectTitle,
+              toStatus: "ENGINEER_READY",
+              note: actionNote.trim() || undefined,
+            },
+          })
+        );
+      }
+      setReviewNoteModal(null);
+      setActionNote("");
+      await loadAssignedProjects();
+    } catch (err) {
+      console.error("Failed to execute review transition:", err);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
 
   // Punch list state
   const [punchList, setPunchList] = React.useState([
@@ -138,6 +214,224 @@ export function EngineerDashboard() {
           </div>
         </div>
       </div>
+
+      {/* SECTION 0: ARCHITECTURAL REVIEW QUEUE & CONSULTATION READINESS */}
+      <div className="p-6 rounded-3xl border border-[#B88460]/40 bg-[#FAF7F2] shadow-sm space-y-5 text-[#1C1917]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E8DEC8] pb-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-[#B88460]/15 text-[#B88460] text-[10px] font-mono font-bold uppercase tracking-wider mb-1">
+              <Sparkle className="w-3.5 h-3.5" />
+              <span>{isRTL ? "منظومة اعتماد المشاريع والاستشارة" : "REVIEW & READINESS WORKFLOW"}</span>
+            </div>
+            <h2 className="text-xl font-serif font-bold text-[#1C1917]">
+              {isRTL
+                ? "طابور مراجعة المشاريع واعتماد الجاهزية للميتينج"
+                : "Project Review & Consultation Readiness Queue"}
+            </h2>
+            <p className="text-xs text-[#78716C] mt-0.5">
+              {isRTL
+                ? "افحص مخططات ومواصفات مشاريع العملاء، وابدأ المراجعة، ثم اعتمد جاهزيتها ليتم إرسال إشعار فوري للعميل لحجز ميعاد المكالمة."
+                : "Review customer specifications, advance state to Under Review, and certify readiness to trigger customer booking notifications."}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono px-3 py-1 rounded-full bg-white border border-[#D8C8B4] text-[#503C2C] font-semibold">
+              {assignedProjects.length} {isRTL ? "مشاريع محالة" : "Assigned Projects"}
+            </span>
+          </div>
+        </div>
+
+        {/* Projects Queue Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {assignedProjects.map((proj) => {
+            const statusUpper = proj.status.toUpperCase();
+            const isSubmitted = statusUpper === "SUBMITTED";
+            const isUnderReview = statusUpper === "UNDER_ENGINEER_REVIEW";
+            const isReady = statusUpper === "ENGINEER_READY";
+
+            return (
+              <div
+                key={proj.id}
+                className="p-5 rounded-2xl bg-white border border-[#E8DEC8] shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between gap-4"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-[#A8A29E]">
+                      COMMISSION · #{proj.id}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider",
+                        isSubmitted && "bg-amber-100 text-amber-900 border border-amber-300",
+                        isUnderReview && "bg-emerald-100 text-emerald-900 border border-emerald-300",
+                        isReady && "bg-[#B88460]/20 text-[#B88460] border border-[#B88460]/40"
+                      )}
+                    >
+                      {isSubmitted && (isRTL ? "في انتظار الفحص" : "SUBMITTED")}
+                      {isUnderReview && (isRTL ? "المراجعة جارية 📐" : "UNDER REVIEW")}
+                      {isReady && (isRTL ? "جاهز للميتينج ✨" : "ENGINEER READY")}
+                    </span>
+                  </div>
+
+                  <h3 className="font-serif font-bold text-sm text-[#1C1917] line-clamp-1">
+                    {proj.title}
+                  </h3>
+
+                  <div className="text-xs text-[#78716C] mt-1 space-y-0.5">
+                    <div>
+                      {isRTL ? "العميل: " : "Client: "}
+                      <span className="font-medium text-[#1C1917]">
+                        {proj.client?.username || "Client"}
+                      </span>
+                    </div>
+                    <div>
+                      {isRTL ? "الموقع: " : "Location: "}
+                      <span>{proj.property?.city || "Cairo"} · {proj.property?.compound || proj.property?.propertyType}</span>
+                    </div>
+                    {proj.spaces && proj.spaces.length > 0 && (
+                      <div>
+                        {isRTL ? "المساحات المحددة: " : "Configured Spaces: "}
+                        <span className="font-mono">{proj.spaces.length} {isRTL ? "غرف" : "spaces"}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Workflow Actions */}
+                <div className="pt-3 border-t border-[#F0E6D9] flex items-center justify-between gap-2">
+                  {isSubmitted && (
+                    <button
+                      type="button"
+                      disabled={actionLoadingId === proj.id}
+                      onClick={() =>
+                        setReviewNoteModal({
+                          projectId: proj.id,
+                          projectTitle: proj.title,
+                          action: "START",
+                        })
+                      }
+                      className="w-full py-2 px-3 rounded-xl bg-[#503C2C] text-[#FAF7F2] text-xs font-semibold hover:bg-[#3D2E22] transition-colors flex items-center justify-center gap-1.5 shadow-2xs cursor-pointer"
+                    >
+                      <Play className="w-3.5 h-3.5 text-[#B88460]" weight="fill" />
+                      <span>{isRTL ? "بدء المراجعة الفنية" : "Start Review"}</span>
+                    </button>
+                  )}
+
+                  {isUnderReview && (
+                    <button
+                      type="button"
+                      disabled={actionLoadingId === proj.id}
+                      onClick={() =>
+                        setReviewNoteModal({
+                          projectId: proj.id,
+                          projectTitle: proj.title,
+                          action: "READY",
+                        })
+                      }
+                      className="w-full py-2 px-3 rounded-xl bg-[#B88460] text-white text-xs font-semibold hover:bg-[#A37250] transition-colors flex items-center justify-center gap-1.5 shadow-xs cursor-pointer animate-pulse hover:animate-none"
+                    >
+                      <CheckCircle className="w-3.5 h-3.5 text-white" weight="fill" />
+                      <span>{isRTL ? "اعتماد وجاهز للميتينج ←" : "Mark Ready For Meeting →"}</span>
+                    </button>
+                  )}
+
+                  {isReady && (
+                    <div className="w-full py-2 px-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-semibold flex items-center justify-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-emerald-600" weight="bold" />
+                      <span>{isRTL ? "معتمد · إشعار العميل مفعل" : "Ready · Customer Notified"}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Review Action Modal with Note */}
+      {reviewNoteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-lg rounded-3xl bg-[#FAF7F2] border border-[#D8C8B4] p-6 shadow-2xl text-[#1C1917] relative">
+            <button
+              type="button"
+              onClick={() => {
+                setReviewNoteModal(null);
+                setActionNote("");
+              }}
+              className="absolute top-5 right-5 p-1 rounded-full bg-white border border-[#D8C8B4] text-[#78716C] hover:text-[#1C1917] transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="mb-4">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[#B88460] font-bold">
+                {reviewNoteModal.action === "START"
+                  ? (isRTL ? "بدء المراجعة الهندسية" : "START TECHNICAL REVIEW")
+                  : (isRTL ? "اعتماد الجاهزية للميتينج" : "CERTIFY CONSULTATION READINESS")}
+              </span>
+              <h3 className="text-lg font-serif font-bold text-[#1C1917] mt-0.5">
+                {reviewNoteModal.projectTitle}
+              </h3>
+              <p className="text-xs text-[#78716C] mt-1">
+                {reviewNoteModal.action === "START"
+                  ? (isRTL
+                      ? "سيتم تحويل المشروع إلى (قيد المراجعة) وإعلام العميل بأن المهندس يدرس المخططات."
+                      : "Project will move to Under Review; customer will see live engineering review status.")
+                  : (isRTL
+                      ? "سيتم اعتماد المشروع كـ (جاهز للميتينج) وإرسال إشعار فوري للعميل لحجز ميعاد المكالمة الاستشارية."
+                      : "Project will move to Ready; customer will receive instant notification to pick a meeting time.")}
+              </p>
+            </div>
+
+            <div className="space-y-2 mb-5">
+              <label className="text-xs font-semibold text-[#503C2C]">
+                {isRTL ? "ملاحظة المهندس للعميل (اختياري):" : "Engineer note for customer (optional):"}
+              </label>
+              <textarea
+                rows={3}
+                value={actionNote}
+                onChange={(e) => setActionNote(e.target.value)}
+                placeholder={
+                  reviewNoteModal.action === "START"
+                    ? (isRTL
+                        ? "مثال: بدأت دراسة توزيع مساحات الغرف ومطابقة الارتفاعات مع الرسومات المرفقة..."
+                        : "e.g. Started verifying room dimensions and spatial plans against drawings...")
+                    : (isRTL
+                        ? "مثال: تم فحص كامل الرسومات والمواصفات المعمارية وهي مكتملة ومستعدون للمناقشة بالفيديو..."
+                        : "e.g. Drawings and specs verified; ready to discuss aesthetic direction via video...")
+                }
+                className="w-full p-3 rounded-xl bg-white border border-[#D8C8B4] text-xs text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:ring-2 focus:ring-[#B88460] transition-all"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E8DEC8]">
+              <button
+                type="button"
+                onClick={() => {
+                  setReviewNoteModal(null);
+                  setActionNote("");
+                }}
+                className="px-4 py-2 rounded-full text-xs font-semibold text-[#78716C] hover:text-[#1C1917] transition-colors cursor-pointer"
+              >
+                {isRTL ? "إلغاء" : "Cancel"}
+              </button>
+              <button
+                type="button"
+                disabled={actionLoadingId !== null}
+                onClick={handleExecuteReviewAction}
+                className="px-6 py-2.5 rounded-full bg-[#503C2C] text-[#FAF7F2] text-xs font-semibold hover:bg-[#3D2E22] transition-all shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {actionLoadingId !== null
+                  ? (isRTL ? "جاري الحفظ..." : "Saving...")
+                  : reviewNoteModal.action === "START"
+                  ? (isRTL ? "تأكيد وبدء المراجعة" : "Confirm & Start")
+                  : (isRTL ? "اعتماد وإرسال الإشعار للعميل ←" : "Confirm & Notify Client →")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* SECTION 1: TODAY'S SITE VISITS & STEPPER */}
       <div className="space-y-4">

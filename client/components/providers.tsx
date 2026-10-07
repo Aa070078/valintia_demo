@@ -8,6 +8,9 @@ import { LanguageProvider } from "@/lib/i18n/language-context";
 import { AuthProvider, useAuth } from "@/features/auth/context/auth-context";
 import { FirstLoginPasswordModal } from "@/features/auth/components/first-login-password-modal";
 
+import { NotificationProvider } from "@/features/notifications/context/notification-context";
+import { NotificationToast } from "@/features/notifications/components/notification-toast";
+
 function FirstLoginGlobalModal() {
   const { requiresPasswordChange } = useAuth();
   return <FirstLoginPasswordModal open={requiresPasswordChange} />;
@@ -32,10 +35,13 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <AuthProvider>
           <LanguageProvider>
-            <TooltipProvider>
-              {children}
-              <FirstLoginGlobalModal />
-            </TooltipProvider>
+            <NotificationProvider>
+              <TooltipProvider>
+                {children}
+                <FirstLoginGlobalModal />
+                <NotificationToast />
+              </TooltipProvider>
+            </NotificationProvider>
           </LanguageProvider>
         </AuthProvider>
       </ThemeProvider>
