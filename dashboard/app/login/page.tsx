@@ -88,12 +88,6 @@ function LoginFormContent() {
     }
   };
 
-  const handleQuickFill = (testEmail: string, testPass: string) => {
-    setEmail(testEmail);
-    setPassword(testPass);
-    setError(null);
-  };
-
   const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
 
   return (
@@ -222,36 +216,6 @@ function LoginFormContent() {
               )}
             </button>
           </form>
-
-          {/* Quick Credential Test Chips for QA / Local Validation */}
-          <div className="border-t border-border/70 pt-4 space-y-2">
-            <span className="block text-[10px] font-mono uppercase text-muted-foreground">
-              {isRTL ? "حسابات التحقق التجريبية المعتمدة:" : "Available Seeded Roles (One-Click Fill):"}
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => handleQuickFill("engineer1@test.com", "Engineer123!")}
-                className="px-2.5 py-1 rounded-lg border border-border bg-muted/40 hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
-              >
-                👷 {isRTL ? "مهندس معماري" : "Engineer"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("pm@test.com", "ProjectManager123!")}
-                className="px-2.5 py-1 rounded-lg border border-border bg-muted/40 hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
-              >
-                📋 {isRTL ? "مدير مشروعات" : "PM"}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickFill("admin@test.com", "Admin123!")}
-                className="px-2.5 py-1 rounded-lg border border-border bg-muted/40 hover:bg-muted text-[11px] font-mono text-foreground transition-colors cursor-pointer"
-              >
-                🛡️ {isRTL ? "مسؤول النظام" : "Admin"}
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 

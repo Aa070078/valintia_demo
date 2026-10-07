@@ -371,58 +371,6 @@ function LoginForm() {
             </button>
           </form>
 
-          {/* Quick Role Test Fillers */}
-          <div className="mt-6 border-t border-[#D8C8B4]/70 pt-4 space-y-2">
-            <span className="block text-[11px] font-mono uppercase text-[#6B635B]">
-              {isRTL ? "تسجيل دخول تجريبي معتمد لجميع الرتب والأدوار:" : "Verified Role Quick-Fill:"}
-            </span>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("engineer1@test.com");
-                  setPassword("Engineer123!");
-                  setError(null);
-                }}
-                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
-              >
-                👷 {isRTL ? "مهندس معماري" : "Engineer"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("pm@test.com");
-                  setPassword("ProjectManager123!");
-                  setError(null);
-                }}
-                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
-              >
-                📋 {isRTL ? "مدير مشروعات" : "PM"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("admin@test.com");
-                  setPassword("Admin123!");
-                  setError(null);
-                }}
-                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
-              >
-                🛡️ {isRTL ? "مسؤول النظام" : "Admin"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setUsername("customer1@test.com");
-                  setPassword("Customer123!");
-                  setError(null);
-                }}
-                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
-              >
-                👤 {isRTL ? "عميل" : "Customer"}
-              </button>
-            </div>
-          </div>
 
           {/* Switch to Signup */}
           <div className="mt-8 text-center border-t border-[#D8C8B4] pt-6">
