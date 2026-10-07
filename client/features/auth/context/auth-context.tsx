@@ -29,6 +29,7 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   changePassword: (dto: ProposedChangePasswordDto & { onboardingToken?: string }) => Promise<boolean>;
   refreshCurrentUser: () => Promise<User | null>;
+  refreshUser: () => Promise<User | null>;
   devSwitchRole: (role: UserRole) => Promise<{ redirectUrl?: string }>;
 }
 
@@ -159,6 +160,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout,
     changePassword,
     refreshCurrentUser,
+    refreshUser: refreshCurrentUser,
     devSwitchRole,
   };
 

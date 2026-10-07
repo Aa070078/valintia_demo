@@ -20,6 +20,7 @@ import {
   Compass,
 } from "@phosphor-icons/react";
 import { useAuth } from "@/features/auth/context/auth-context";
+import { authApi } from "@/features/auth/api/auth.api";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PhoneInputWithCountry } from "@/features/projects/components/phone-input-with-country";
 import { TiltCard } from "@/components/motion/tilt-card";
@@ -124,32 +125,33 @@ function SignupForm() {
     setIsSubmitting(true);
 
     try {
+      const normalizedEmail = username.trim().toLowerCase();
       const fullPhone = phone ? `${countryCode} ${phone}` : undefined;
-      const res = await signup({
-        username: username.trim(),
+
+      // 1. Dispatch EMAIL_VERIFICATION challenge via real backend
+      await authApi.sendRegistrationOtp(normalizedEmail);
+
+      // 2. Cache registration credentials in session storage to complete registration after OTP proof
+      const pendingData = {
+        username: normalizedEmail,
         password,
         name: name.trim() || undefined,
         phone: fullPhone,
         role: "CUSTOMER",
-      });
+      };
+      sessionStorage.setItem("valentia_pending_signup", JSON.stringify(pendingData));
 
-      if (res?.redirectUrl) {
-        window.location.href = res.redirectUrl;
-      } else {
-        const destination =
-          redirectParam && redirectParam.startsWith("/")
-            ? redirectParam
-            : "/projects/new";
-        router.push(destination);
-      }
+      // 3. Navigate to OTP confirmation page
+      const redirectQuery = redirectParam ? `&redirect=${encodeURIComponent(redirectParam)}` : "";
+      router.push(`/verify-otp?email=${encodeURIComponent(normalizedEmail)}&purpose=EMAIL_VERIFICATION${redirectQuery}`);
     } catch (err: unknown) {
-      console.error("Signup failed:", err);
+      console.error("Signup verification dispatch failed:", err);
       const apiMsg = getErrorMessage(err);
       setError(
         apiMsg ||
         (isRTL
-          ? "مقدرناش ننشئ الحساب دلوقتي، اسم المستخدم أو الإيميل ده مسجل قبل كده."
-          : "Account registration could not be completed. The username may already exist.")
+          ? "مقدرناش نرسل رمز التحقق دلوقتي. اتأكد من صحة البريد الإلكتروني وجرب تاني."
+          : "Could not dispatch verification code. Please check your email and try again.")
       );
     } finally {
       setIsSubmitting(false);

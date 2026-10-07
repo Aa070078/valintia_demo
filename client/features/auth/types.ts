@@ -76,6 +76,7 @@ export interface ProposedSignupDto {
   name?: string;
   phone?: string;
   role?: UserRole;
+  verificationToken?: string;
 }
 
 export interface CreateStaffDto {
@@ -94,6 +95,48 @@ export interface ProposedChangePasswordDto {
 export interface ChangePasswordResponse {
   message: string;
   mustChangePassword: boolean;
+}
+
+export type OtpPurpose = "EMAIL_VERIFICATION" | "PASSWORD_RESET" | "LOGIN";
+
+export interface SendOtpDto {
+  email: string;
+  purpose?: OtpPurpose;
+}
+
+export interface SendOtpResponse {
+  success: boolean;
+  message: string;
+  expiresInSeconds?: number;
+  cooldownSeconds?: number;
+}
+
+export interface VerifyOtpDto {
+  email: string;
+  otp: string;
+  purpose?: OtpPurpose;
+}
+
+export interface VerifyOtpResponse {
+  success: boolean;
+  message: string;
+  verified: boolean;
+  verificationToken?: string;
+  passwordResetToken?: string;
+}
+
+export interface LoginOtpRequestDto {
+  email: string;
+}
+
+export interface LoginOtpVerifyDto {
+  email: string;
+  otp: string;
+}
+
+export interface ResetPasswordDto {
+  passwordResetToken: string;
+  newPassword: string;
 }
 
 /**

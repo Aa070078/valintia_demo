@@ -11,6 +11,9 @@ import type {
   CreateStaffDto,
   OnboardingEmailRequestResponse,
   OnboardingEmailVerifyResponse,
+  SendOtpResponse,
+  VerifyOtpResponse,
+  ResetPasswordDto,
 } from "../types";
 
 /**
@@ -280,19 +283,70 @@ export const authApi = {
   },
 
   /**
+   * Endpoint: POST /otp/send
+   * Dispatches EMAIL_VERIFICATION OTP challenge
+   */
+  async sendRegistrationOtp(email: string): Promise<SendOtpResponse> {
+    try {
+      const response = await apiClient.post<SendOtpResponse>("/otp/send", {
+        email: email.trim().toLowerCase(),
+        purpose: "EMAIL_VERIFICATION",
+      });
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        throw error;
+      }
+      return {
+        success: true,
+        message: "Demo verification code dispatched",
+        expiresInSeconds: 900,
+        cooldownSeconds: 60,
+      };
+    }
+  },
+
+  /**
+   * Endpoint: POST /otp/verify
+   * Verifies EMAIL_VERIFICATION challenge and returns verificationToken proof
+   */
+  async verifyRegistrationOtp(email: string, otp: string): Promise<VerifyOtpResponse> {
+    try {
+      const response = await apiClient.post<VerifyOtpResponse>("/otp/verify", {
+        email: email.trim().toLowerCase(),
+        otp: otp.trim(),
+        purpose: "EMAIL_VERIFICATION",
+      });
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        throw error;
+      }
+      return {
+        success: true,
+        verified: true,
+        message: "Code verified (demo fallback)",
+        verificationToken: `mock-email-verification-token-${Date.now()}`,
+      };
+    }
+  },
+
+  /**
    * Endpoint: POST /auth/register followed by real login
+   * Requires verificationToken from EMAIL_VERIFICATION OTP stage.
    */
   async signup(dto: ProposedSignupDto): Promise<AuthSession> {
     try {
       // 1. Customer registration on real Backend
       await apiClient.post("/auth/register", {
-        username: dto.username,
+        username: dto.username.trim().toLowerCase(),
         password: dto.password,
+        verificationToken: dto.verificationToken,
       });
 
       // 2. Immediate real login to obtain access token
       const loginResponse = await apiClient.post<BackendAuthResponse>("/auth/login", {
-        username: dto.username,
+        email: dto.username.trim().toLowerCase(),
         password: dto.password,
       });
 
@@ -338,6 +392,109 @@ export const authApi = {
         user: newUser,
         token: mockToken,
       };
+    }
+  },
+
+  /**
+   * Endpoint: POST /auth/login/otp/request
+   */
+  async requestLoginOtp(email: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>("/auth/login/otp/request", {
+        email: email.trim().toLowerCase(),
+      });
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return { message: "If an account with that email exists, an OTP code has been sent." };
+    }
+  },
+
+  /**
+   * Endpoint: POST /auth/login/otp/verify
+   */
+  async verifyLoginOtp(email: string, otp: string): Promise<AuthSession> {
+    try {
+      const response = await apiClient.post<BackendAuthResponse>("/auth/login/otp/verify", {
+        email: email.trim().toLowerCase(),
+        otp: otp.trim(),
+      });
+      const backendUser = response.data.user;
+      const user: User = {
+        id: backendUser.id,
+        username: backendUser.username,
+        name: backendUser.username.split("@")[0],
+        role: backendUser.role,
+        mustChangePassword: Boolean(backendUser.mustChangePassword),
+        requiresPasswordChange: Boolean(backendUser.mustChangePassword),
+      };
+      const accessToken = response.data.accessToken || "";
+      tokenStorage.setToken(accessToken);
+      saveLocalUser(user, true);
+      return {
+        token: accessToken,
+        user,
+      };
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      const user = DEMO_PERSONAS.CUSTOMER;
+      const mockToken = `mock-jwt-customer-otp-${Date.now()}`;
+      tokenStorage.setToken(mockToken);
+      saveLocalUser(user, true);
+      return { token: mockToken, user };
+    }
+  },
+
+  /**
+   * Endpoint: POST /auth/forgot-password
+   */
+  async requestForgotPassword(email: string): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>("/auth/forgot-password", {
+        email: email.trim().toLowerCase(),
+      });
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return { message: "If an account with that email exists, a password reset code has been sent." };
+    }
+  },
+
+  /**
+   * Endpoint: POST /otp/verify (with purpose=PASSWORD_RESET)
+   */
+  async verifyPasswordResetOtp(email: string, otp: string): Promise<VerifyOtpResponse> {
+    try {
+      const response = await apiClient.post<VerifyOtpResponse>("/otp/verify", {
+        email: email.trim().toLowerCase(),
+        otp: otp.trim(),
+        purpose: "PASSWORD_RESET",
+      });
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return {
+        success: true,
+        verified: true,
+        message: "Reset code verified",
+        passwordResetToken: `mock-password-reset-token-${Date.now()}`,
+      };
+    }
+  },
+
+  /**
+   * Endpoint: POST /auth/reset-password
+   */
+  async resetPassword(dto: ResetPasswordDto): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post<{ message: string }>("/auth/reset-password", {
+        passwordResetToken: dto.passwordResetToken,
+        newPassword: dto.newPassword,
+      });
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return { message: "Password reset successfully (mock)" };
     }
   },
 
