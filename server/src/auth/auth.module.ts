@@ -12,10 +12,12 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { OnboardingService } from './onboarding.service.js';
 import { TemporaryLoginLimiter } from './temporary-login-limiter.service.js';
 import { RedisModule } from '../infrastructure/redis/redis.module.js';
+import { MailModule } from '../infrastructure/mail/mail.module.js';
 
 @Module({
   imports: [
     PrismaModule,
+    MailModule,
     RedisModule,
     EmailVerificationModule,
     OtpModule,

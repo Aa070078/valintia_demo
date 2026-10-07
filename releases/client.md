@@ -2,6 +2,30 @@
 
 Append-only audit log for changes under `client/`. Newest entry at the top.
 
+## [2026-10-07 17:52] Branded bilingual welcome email
+
+**ID:** 20261007-1752-branded-welcome-email
+**By:** @abdelrhman632
+**App:** client
+**Requested:** Personalize the bilingual welcome email with the recipient's first name after verified registration.
+**Scope:** `client/features/auth/api/auth.api.ts`, `client/tests/auth/onboarding.spec.ts`
+
+### Summary
+The registration adapter now supplies the first part of the existing name field as optional `firstName`. This field is used only in the backend welcome notification and does not change the verification/token flow or user schema.
+
+### Changes
+- Supply a trimmed first name of at most 80 characters when a registration name exists.
+- Update the browser contract assertion for the optional name field.
+
+### Verification
+- Client TypeScript, targeted lint and all 9 auth browser tests passed.
+- Restarted local client; signup returned HTTP 200. No real email sent by automated checks.
+
+### Notes
+- Local branch `feat/branded-welcome-email`; nothing pushed or merged.
+
+---
+
 ## [2026-10-07 17:28] Connect frontend verification and onboarding sessions
 
 **ID:** 20261007-1728-auth-onboarding-integration

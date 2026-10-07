@@ -1,5 +1,87 @@
 # Releases — Server
 
+## [2026-10-07 18:15] Match welcome logo MIME type to actual image data
+
+**ID:** 20261007-1815-welcome-logo-mime-type
+**By:** @abdelrhman632
+**App:** server
+**Requested:** Fix the welcome logo still appearing broken in Gmail.
+**Scope:** Welcome logo format helper, welcome service, preview generator, regression tests and email documentation.
+
+### Summary
+Found that the unchanged source `valentia-logo.png` contains JPEG/JFIF bytes, while the attachment and preview were labelled `image/png`. Corrected outgoing attachment MIME and filename based on the image signature without modifying the logo. The earlier browser preview and byte-equality checks did not catch this mismatch.
+
+### Changes
+- Detect JPEG/PNG signatures, use the matching MIME type and attachment extension, and reject unsupported image data.
+- Make browser preview data URIs use the same detected format.
+- Extend serialized-message regression checks to verify JPEG MIME, `.jpg` filename and exact source bytes.
+
+### Verification
+- Backend build and targeted lint passed; all 14 welcome tests passed without SMTP/network delivery.
+- Regenerated local HTML preview with `image/jpeg`; backend health returned HTTP 200.
+- Stopped the stale backend and started a fresh compiled instance at 18:20; confirmed port 5000 serves the corrected build.
+
+### Notes
+- Confirmed defect: JPEG data was advertised as PNG. Received Gmail rendering after correction still needs a new message test; old messages are immutable.
+- Gmail screenshot also shows Spam. Gmail may withhold images from suspicious messages; this is separate from the confirmed MIME mismatch.
+- No real email sent by the agent, no asset edits, no pushes or merges.
+
+
+## [2026-10-07 17:58] Correct welcome logo Content-ID format
+
+**ID:** 20261007-1758-welcome-logo-content-id
+**By:** @abdelrhman632
+**App:** server
+**Requested:** Investigate a broken welcome email logo shown in the Tempail inbox.
+**Scope:** Welcome service/template, welcome tests, email troubleshooting documentation.
+
+### Summary
+Verified that the actual outgoing message already includes an inline PNG MIME part. Replaced the bare reused Content-ID with a unique email-shaped identifier per message and the same reference in HTML, following Nodemailer embedded-image guidance. Added serialization checks to cover the transport boundary beyond the earlier adapter-only tests.
+
+### Changes
+- Generate a UUID-based Content-ID in an identifier namespace, with matching HTML `cid:` source; preserve original image bytes.
+- Test actual multipart/related structure, inline image disposition, PNG bytes, folded Content-ID headers and per-message uniqueness using local stream transport.
+- Document that raw browser HTML needs MIME resolution and old messages cannot update retroactively.
+
+### Verification
+- Backend build, targeted lint and all 13 welcome tests passed. Stream transport makes no network requests.
+- Tempail public link responded, but its message iframe lacked the recipient session. Provider handling of the affected message could not be verified.
+
+### Notes
+- Confirmed: original PNG was attached; prior Content-ID lacked addr-spec syntax and uniqueness. Not confirmed: whether this caused the Tempail rendering failure.
+- No real email sent by the agent; inbox rendering still needs a new user-triggered welcome test. No push or merge.
+
+
+## [2026-10-07 17:52] Branded bilingual welcome email
+
+**ID:** 20261007-1752-branded-welcome-email
+**By:** @abdelrhman632
+**App:** server
+**Requested:** Add a branded Arabic-first welcome email after successful verified registration or staff onboarding; restart the system for manual email testing.
+**Scope:** Auth registration/onboarding services and registration DTO, mail service/module/interfaces, welcome template/service, configuration, bundled logo, Nest asset packaging, preview script, tests and environment example.
+
+### Summary
+Welcome notification runs after the unique customer insert or the row-locked staff completion transaction commits. Existing uniqueness and persisted onboarding transitions prevent repeat requests from sending duplicate welcomes. SMTP failure is caught after commit, preserving successful account setup. The email contains Arabic RTL then English LTR copy, two configured login buttons, a safely escaped first name, the unchanged logo as an inline CID attachment, and bilingual plain text.
+
+### Changes
+- Added `welcome.service.ts`, `welcome.template.ts`, bundled unchanged logo bytes, and a self-contained HTML/plain-text preview generator.
+- Added `WELCOME_EMAIL_ENABLED`, `WELCOME_FRONTEND_LOGIN_URL`, and optional `WELCOME_LOGO_PATH`; reject unresolved/development login URLs before production SMTP.
+- Extended MailService with optional strict failure reporting for welcome mail; preserved legacy OTP delivery behavior. Made SMTP tests explicitly select production/development behavior.
+- Added optional registration `firstName` for this notification only; no schema changes or new dependencies.
+- Enabled welcome delivery in ignored local development configuration at the user's request and restarted backend/client/dashboard. No agent-generated real email tests.
+
+### Verification
+- Backend build passed. Combined welcome, SMTP and auth/OTP suites: 33 tests passed with fake external adapters.
+- Client TypeScript and 9 auth browser checks passed; targeted server/client source lint passed.
+- Inspected local HTML preview in Edge; mobile viewport did not overflow. Verified bundled PNG exactly matches the root asset.
+- Restarted services: client signup, dashboard login and backend health returned HTTP 200.
+
+### Notes
+- Local branch `feat/branded-welcome-email`; no push or merge. Local HTML preview at `server/test/previews/welcome.html` is generated and ignored.
+- Existing mail architecture is best effort with a single SMTP attempt; no durable queue/automatic resend. A crash between commit and delivery or a delivery failure may lose the welcome message. SMTP acceptance alone is not inbox delivery.
+- Default delivery remains disabled; local enabling permits the user to test through signup or staff onboarding. Completed-account login sends no new welcome.
+
+
 ## [2026-10-05 00:22] Replace Resend delivery with Gmail SMTP
 
 ## [2026-10-05 01:16] Email-only password login and shared internal onboarding

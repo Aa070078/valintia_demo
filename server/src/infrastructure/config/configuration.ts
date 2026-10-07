@@ -1,4 +1,5 @@
 import { registerAs } from '@nestjs/config';
+import { resolve } from 'node:path';
 
 export const appConfig = registerAs('app', () => ({
   nodeEnv: process.env.NODE_ENV ?? 'development',
@@ -92,6 +93,14 @@ export const mailConfig = registerAs('mail', () => ({
     pass: process.env.SMTP_PASS,
     secure: process.env.SMTP_SECURE,
   },
+}));
+
+export const welcomeConfig = registerAs('welcome', () => ({
+  enabled: process.env.WELCOME_EMAIL_ENABLED ?? 'false',
+  frontendLoginUrl: process.env.WELCOME_FRONTEND_LOGIN_URL,
+  logoPath:
+    process.env.WELCOME_LOGO_PATH ??
+    resolve(__dirname, '../../assets/brand/valentia-logo.png'),
 }));
 
 /** Used for HTTP Basic Auth on /docs (+ OpenAPI YAML) when NODE_ENV=production. */

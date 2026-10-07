@@ -1,8 +1,23 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 /** Registration consumes OTP proof; it does not accept frontend verified flags. */
 export class RegisterDto {
+  @ApiPropertyOptional({
+    description: 'First name used only in the welcome email',
+    example: 'Omar',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  firstName?: string;
+
   // Existing contract uses username for the email bound to verificationToken.
   @ApiProperty({ example: 'customer@example.com' })
   @IsString()

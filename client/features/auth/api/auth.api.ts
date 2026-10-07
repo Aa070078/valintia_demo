@@ -392,6 +392,7 @@ export const authApi = {
       username: email,
       password: dto.password,
       verificationToken: dto.verificationToken,
+      ...(dto.name?.trim() ? { firstName: dto.name.trim().split(/\s+/)[0].slice(0, 80) } : {}),
     })
     try {
       return await authApi.login({

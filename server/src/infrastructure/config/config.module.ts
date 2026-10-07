@@ -13,6 +13,7 @@ import {
   redisConfig,
   swaggerConfig,
   throttleConfig,
+  welcomeConfig,
 } from './configuration';
 
 @Module({
@@ -33,6 +34,7 @@ import {
         swaggerConfig,
         otpConfig,
         mailConfig,
+        welcomeConfig,
       ],
     }),
   ],

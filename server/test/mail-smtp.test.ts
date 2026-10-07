@@ -24,8 +24,11 @@ let options: any;
 let sent: any[];
 let failure: unknown;
 let logs: string[];
+let savedNodeEnv: string | undefined;
 
 beforeEach(() => {
+  savedNodeEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production';
   sent = [];
   logs = [];
   failure = undefined;
@@ -45,7 +48,11 @@ beforeEach(() => {
     logs.push(String(message));
   });
 });
-afterEach(() => mock.restoreAll());
+afterEach(() => {
+  mock.restoreAll();
+  if (savedNodeEnv === undefined) delete process.env.NODE_ENV;
+  else process.env.NODE_ENV = savedNodeEnv;
+});
 
 test('SMTP configuration reads only the six requested environment variables', () => {
   const keys = [
@@ -210,4 +217,18 @@ test('existing sendMail and setProvider interfaces remain available for isolated
   });
   assert.equal(sent[0].from, from);
   assert.equal(sent[0].text, 'Plain text');
+});
+
+test('strict welcome delivery reports development SMTP failures while legacy OTP behavior remains unchanged', async () => {
+  process.env.NODE_ENV = 'development';
+  const mail = new MailService(new ConfigService(settings()));
+  failure = { code: 'ECONNECTION', responseCode: 421 };
+  await mail.sendOtpEmail('recipient@example.com', '482910');
+  await assert.rejects(
+    mail.sendMail(
+      { to: 'recipient@example.com', subject: 'Welcome', text: 'Test' },
+      true,
+    ),
+    ServiceUnavailableException,
+  );
 });

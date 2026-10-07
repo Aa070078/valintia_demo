@@ -4,6 +4,13 @@ export interface SendMailOptions {
   text?: string;
   html?: string;
   from?: string;
+  attachments?: Array<{
+    filename: string;
+    content: Buffer;
+    contentType: string;
+    cid: string;
+    contentDisposition: 'inline';
+  }>;
 }
 
 export interface MailProvider {
