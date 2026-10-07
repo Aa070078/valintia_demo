@@ -20,6 +20,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { getErrorMessage } from "@/lib/utils";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { RevealOnScroll } from "@/components/motion/reveal-on-scroll";
+import { StaffOnboardingModal } from "@/features/auth/components/staff-onboarding-modal";
 
 function LoginForm() {
   const router = useRouter();
@@ -34,6 +35,23 @@ function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [onboardingSession, setOnboardingSession] = React.useState<{
+    token: string;
+    user: any;
+  } | null>(null);
+
+  const handleOnboardingSuccess = (targetRedirectUrl?: string) => {
+    setOnboardingSession(null);
+    if (targetRedirectUrl) {
+      window.location.href = targetRedirectUrl;
+    } else {
+      const destination =
+        redirectParam && redirectParam.startsWith("/")
+          ? redirectParam
+          : "/projects";
+      router.push(destination);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +74,14 @@ function LoginForm() {
         rememberMe,
       });
 
+      if (res?.onboardingRequired && res.onboardingToken) {
+        setOnboardingSession({
+          token: res.onboardingToken,
+          user: res.user || null,
+        });
+        return;
+      }
+
       if (res?.redirectUrl) {
         window.location.href = res.redirectUrl;
       } else {
@@ -66,12 +92,18 @@ function LoginForm() {
         router.push(destination);
       }
     } catch (err: unknown) {
-      console.error("Login failed:", err);
       const apiMsg = getErrorMessage(err);
+      console.warn("Login attempt failed:", apiMsg || err);
+      
+      let displayError = apiMsg;
+      if (isRTL && (!displayError || displayError.toLowerCase().includes("invalid credentials"))) {
+        displayError = "بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى.";
+      }
+      
       setError(
-        apiMsg ||
+        displayError ||
         (isRTL
-          ? "بيانات الدخول مش صحيحة. اتأكد من اسم المستخدم وكلمة السر وجرب تاني."
+          ? "بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى."
           : "Invalid credentials. Please verify your username and password.")
       );
     } finally {
@@ -339,6 +371,59 @@ function LoginForm() {
             </button>
           </form>
 
+          {/* Quick Role Test Fillers */}
+          <div className="mt-6 border-t border-[#D8C8B4]/70 pt-4 space-y-2">
+            <span className="block text-[11px] font-mono uppercase text-[#6B635B]">
+              {isRTL ? "تسجيل دخول تجريبي معتمد لجميع الرتب والأدوار:" : "Verified Role Quick-Fill:"}
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("engineer1@test.com");
+                  setPassword("Engineer123!");
+                  setError(null);
+                }}
+                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
+              >
+                👷 {isRTL ? "مهندس معماري" : "Engineer"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("pm@test.com");
+                  setPassword("ProjectManager123!");
+                  setError(null);
+                }}
+                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
+              >
+                📋 {isRTL ? "مدير مشروعات" : "PM"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("admin@test.com");
+                  setPassword("Admin123!");
+                  setError(null);
+                }}
+                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
+              >
+                🛡️ {isRTL ? "مسؤول النظام" : "Admin"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUsername("customer1@test.com");
+                  setPassword("Customer123!");
+                  setError(null);
+                }}
+                className="px-2.5 py-1 rounded-lg border border-[#D8C8B4] bg-white/70 hover:bg-white text-[11px] font-mono text-[#1C1917] transition-colors cursor-pointer"
+              >
+                👤 {isRTL ? "عميل" : "Customer"}
+              </button>
+            </div>
+          </div>
+
           {/* Switch to Signup */}
           <div className="mt-8 text-center border-t border-[#D8C8B4] pt-6">
             <p className="text-xs text-[#6B635B]">
@@ -369,6 +454,16 @@ function LoginForm() {
           </div>
         </RevealOnScroll>
       </div>
+
+      {onboardingSession && (
+        <StaffOnboardingModal
+          open={Boolean(onboardingSession)}
+          onboardingToken={onboardingSession.token}
+          user={onboardingSession.user}
+          onSuccess={handleOnboardingSuccess}
+          onCancel={() => setOnboardingSession(null)}
+        />
+      )}
     </div>
   );
 }

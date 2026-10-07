@@ -1,32 +1,80 @@
-import { Geist_Mono, IBM_Plex_Sans, Space_Grotesk } from "next/font/google"
+import type { Metadata, Viewport } from "next";
+import { Inter, Cormorant_Garamond, IBM_Plex_Sans_Arabic, Alexandria } from "next/font/google";
 
-import "./globals.css"
-import { Providers } from "@/components/providers"
+import "./globals.css";
+import { Providers } from "@/components/providers";
 import { cn } from "@/lib/utils";
 
-const spaceGroteskHeading = Space_Grotesk({subsets:['latin'],variable:'--font-heading'});
-
-const ibmPlexSans = IBM_Plex_Sans({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-mono",
-})
+  variable: "--font-heading",
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const ibmPlexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-arabic",
+  weight: ["300", "400", "500"],
+  display: "swap",
+});
+
+const alexandria = Alexandria({
+  subsets: ["arabic", "latin"],
+  variable: "--font-arabic-heading",
+  weight: ["300", "400", "500"],
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "Valentia — Operations & Field Workspace",
+  description: "Interior Design & Fit-Out Engineering Operations Desk",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#FAF7F2",
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html
-      lang="en"
+      lang="ar"
+      dir="rtl"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", ibmPlexSans.variable, spaceGroteskHeading.variable)}
+      className={cn(
+        "antialiased",
+        inter.variable,
+        cormorant.variable,
+        ibmPlexArabic.variable,
+        alexandria.variable,
+        "font-sans"
+      )}
     >
-      <body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var l=localStorage.getItem("valentia_lang");if(l==="en"){document.documentElement.lang="en";document.documentElement.dir="ltr";}else{document.documentElement.lang="ar";document.documentElement.dir="rtl";}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-screen bg-background text-foreground">
         <Providers>{children}</Providers>
       </body>
     </html>
-  )
+  );
 }

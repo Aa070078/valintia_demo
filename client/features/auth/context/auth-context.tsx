@@ -10,6 +10,13 @@ import type {
 } from "../types";
 import { authApi } from "../api/auth.api";
 
+export interface LoginResult {
+  redirectUrl?: string;
+  onboardingRequired?: boolean;
+  onboardingToken?: string;
+  user?: User;
+}
+
 interface AuthContextValue {
   user: User | null;
   role: UserRole;
@@ -17,10 +24,11 @@ interface AuthContextValue {
   mustChangePassword: boolean;
   requiresPasswordChange: boolean;
   isLoading: boolean;
-  login: (dto: ProposedLoginDto) => Promise<{ redirectUrl?: string }>;
+  login: (dto: ProposedLoginDto) => Promise<LoginResult>;
   signup: (dto: ProposedSignupDto) => Promise<{ redirectUrl?: string }>;
   logout: () => Promise<void>;
-  changePassword: (dto: ProposedChangePasswordDto) => Promise<boolean>;
+  changePassword: (dto: ProposedChangePasswordDto & { onboardingToken?: string }) => Promise<boolean>;
+  refreshCurrentUser: () => Promise<User | null>;
   devSwitchRole: (role: UserRole) => Promise<{ redirectUrl?: string }>;
 }
 
@@ -44,28 +52,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  const handleRoleRedirection = (role: UserRole): { redirectUrl?: string } => {
+  const handleRoleRedirection = (role: UserRole, token?: string): { redirectUrl?: string } => {
+    const tokenQuery = token ? `?token=${encodeURIComponent(token)}` : "";
+    const dashboardBase =
+      typeof window !== "undefined" && window.location.hostname === "localhost"
+        ? "http://localhost:3001"
+        : "";
+
     if (role === "PROJECT_MANAGER") {
-      return { redirectUrl: "/dashboard/pm" };
+      return { redirectUrl: `${dashboardBase}/pm${tokenQuery}` };
     }
     if (role === "ENGINEER") {
-      return { redirectUrl: "/dashboard/engineer" };
+      return { redirectUrl: `${dashboardBase}/engineer${tokenQuery}` };
     }
-    if (role === "COMPANY_OWNER") {
-      return { redirectUrl: "/dashboard/owner" };
-    }
-    if (role === "ADMINISTRATOR" || role === "ADMIN") {
-      return { redirectUrl: "/dashboard/admin" };
+    if (role === "COMPANY_OWNER" || role === "ADMINISTRATOR" || role === "ADMIN") {
+      return { redirectUrl: `${dashboardBase}/admin${tokenQuery}` };
     }
     return { redirectUrl: "/projects" };
   };
 
-  const login = async (dto: ProposedLoginDto): Promise<{ redirectUrl?: string }> => {
+  const refreshCurrentUser = async (): Promise<User | null> => {
+    try {
+      const current = await authApi.getCurrentUser();
+      setUser(current);
+      return current;
+    } catch {
+      return null;
+    }
+  };
+
+  const login = async (dto: ProposedLoginDto): Promise<LoginResult> => {
     setIsLoading(true);
     try {
       const session = await authApi.login(dto);
       setUser(session.user);
-      return handleRoleRedirection(session.user.role);
+      if (session.onboardingRequired || session.user.onboardingRequired) {
+        return {
+          onboardingRequired: true,
+          onboardingToken: session.onboardingToken || session.token,
+          user: session.user,
+        };
+      }
+      return handleRoleRedirection(session.user.role, session.token);
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +115,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   };
 
-  const changePassword = async (dto: ProposedChangePasswordDto): Promise<boolean> => {
+  const changePassword = async (
+    dto: ProposedChangePasswordDto & { onboardingToken?: string }
+  ): Promise<boolean> => {
     setIsLoading(true);
     try {
       await authApi.changePassword(dto);
@@ -97,6 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           mustChangePassword: false,
           requiresPasswordChange: false,
           isFirstLogin: false,
+          onboardingRequired: false,
         });
       }
       return true;
@@ -127,6 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signup,
     logout,
     changePassword,
+    refreshCurrentUser,
     devSwitchRole,
   };
 

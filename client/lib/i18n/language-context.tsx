@@ -235,6 +235,8 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
 
     // Status Chips
     "status.draft": "Draft",
+    "status.submitted": "Submitted",
+    "status.initial_review": "Initial Review",
     "status.concept_selected": "Concept Selected",
     "status.drawing_uploaded": "Drawing Uploaded",
     "status.under_engineer_review": "Under Review",
@@ -502,6 +504,8 @@ const DICTIONARY: Record<Language, Record<string, string>> = {
 
     // Status Chips
     "status.draft": "مسودة",
+    "status.submitted": "تم تقديم الطلب",
+    "status.initial_review": "قيد المراجعة الهندسية",
     "status.concept_selected": "تم اختيار الستايل",
     "status.drawing_uploaded": "اترفعت الرسومات",
     "status.under_engineer_review": "تحت المراجعة الهندسية",

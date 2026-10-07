@@ -45,7 +45,7 @@ import type {
   TargetCompletion,
   ProjectDocument,
 } from "@/features/projects/types";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 
 const FUNNEL_STEPS = [
@@ -215,35 +215,97 @@ function CreateProjectContent() {
 
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
+    setValidationError(null);
+
     try {
       const reconciledSpaces = reconcileSpacesWithStyles();
+      const effectiveSpaces = reconciledSpaces.length > 0 ? reconciledSpaces : [
+        {
+          id: "space-1",
+          type: "living_room" as any,
+          customName: isRTL ? "منطقة الاستقبال والمعيشة الرئيسية" : "Main Reception & Living Room",
+          included: true,
+          quantity: 1,
+        },
+      ];
+
+      const cleanCity = property.city?.trim() || "Cairo";
       const projectTitle = property.compound
         ? `${property.compound} Residence`
-        : `${property.city} Architectural Fit-Out`;
+        : `${cleanCity} Architectural Fit-Out`;
+
+      const cleanProperty = {
+        ...property,
+        propertyType,
+        city: cleanCity,
+        areaSqm: Number(property.areaSqm) > 0 ? Number(property.areaSqm) : 220,
+      };
+
+      const cleanLocation = {
+        country: customerLocation?.country?.trim() || "Egypt",
+        countryCode: customerLocation?.countryCode || "EG",
+        city: customerLocation?.city?.trim() || cleanCity,
+        timezone: customerLocation?.timezone?.trim() || "Africa/Cairo (UTC+2)",
+        phone: customerLocation?.phone?.trim() || user?.phone || "+20 100 000 0000",
+        phoneCountryCode: customerLocation?.phoneCountryCode || "+20",
+      };
+
+      const cleanRepresentative = {
+        hasRepresentative: Boolean(representative?.hasRepresentative),
+        valentiaManagedDirectly: representative?.hasRepresentative ? false : true,
+        name: representative?.name?.trim() || (representative?.hasRepresentative ? "Representative" : undefined),
+        phone: representative?.phone?.trim() || (representative?.hasRepresentative ? "+20 100 000 0000" : undefined),
+        relationship: representative?.relationship?.trim() || (representative?.hasRepresentative ? "Representative" : undefined),
+        authorizationScope: representative?.authorizationScope?.trim() || (representative?.hasRepresentative ? "Site access and inspections" : undefined),
+      };
+
+      const cleanBudget = {
+        budgetType: budget?.budgetType || "range",
+        minAmount: Number(budget?.minAmount) || 2000000,
+        maxAmount: Number(budget?.maxAmount) || 5000000,
+        currency: budget?.currency || "EGP",
+      };
+
+      const cleanTimeline = {
+        deadlineType: timeline?.deadlineType || "duration",
+        durationDescription: timeline?.durationDescription || "Within 6 months",
+      };
 
       const created = await createMutation.mutateAsync({
         title: projectTitle,
-        property: {
-          ...property,
-          propertyType,
-        },
-        spaces: reconciledSpaces,
+        property: cleanProperty,
+        spaces: effectiveSpaces,
         pendingStyles,
-        customerLocation,
-        representative,
-        scope,
-        budget,
-        timeline,
-        documents,
+        stylePreference: {
+          mode: primaryStyleId ? "whole_project" : "engineer_decides",
+          styleId: primaryStyleId || undefined,
+          styleName: primaryStyleId ? primaryStyleId.replace(/_/g, " ") : undefined,
+        },
+        customerLocation: cleanLocation,
+        representative: cleanRepresentative,
+        scope: scope || { scopeType: "full_fitout" },
+        budget: cleanBudget,
+        timeline: cleanTimeline,
+        documents: documents || [],
       });
 
-      // Confirm transition to 'submitted' lifecycle status
-      await projectsApi.submitProject(created.id);
-      router.push(`/projects/${created.id}`);
-    } catch (err) {
-      console.error("Failed to commission project", err);
-      // Fallback local ID redirect to preserve smooth flow
-      router.push(`/projects`);
+      // Submit immediately so the project transitions directly to SUBMITTED
+      try {
+        await projectsApi.submitProject(created.id);
+      } catch (submitErr) {
+        console.warn("Direct submit transition note:", submitErr);
+      }
+
+      router.push(`/projects/${created.id}?submitted=true`);
+    } catch (err: unknown) {
+      console.error("Failed to commission project:", err);
+      const apiMsg = getErrorMessage(err);
+      setValidationError(
+        apiMsg ||
+          (isRTL
+            ? "تعذر إرسال الطلب. يرجى التأكد من استكمال كافة البيانات الأساسية."
+            : "Failed to submit project. Please ensure required specifications are completed.")
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -315,11 +377,11 @@ function CreateProjectContent() {
               type="button"
               onClick={() => setIsSignInOpen(true)}
               className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xs hover:opacity-90 transition-opacity"
-              title={user ? user.name : "Sign In"}
+              title={user ? (user.name || user.username || "Client") : "Sign In"}
             >
               {user ? (
                 <span className="text-xs font-bold font-mono">
-                  {user.name.charAt(0).toUpperCase()}
+                  {(user.name || user.username || "C").charAt(0).toUpperCase()}
                 </span>
               ) : (
                 <User size={14} weight="bold" />

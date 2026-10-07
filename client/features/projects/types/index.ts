@@ -212,11 +212,25 @@ export interface Project {
   compound?: string;
 }
 
+export interface ProjectStylePreference {
+  mode: "whole_project" | "per_space" | "engineer_decides";
+  styleId?: string;
+  styleName?: string;
+  notes?: string;
+  spacePreferences?: Array<{
+    spaceId: number;
+    styleId: string;
+    styleName?: string;
+    notes?: string;
+  }>;
+}
+
 export interface CreateProjectDto {
   title?: string;
   property: PropertyEntity;
   spaces: SpaceEntity[];
   pendingStyles?: PendingStyleSelection[];
+  stylePreference?: ProjectStylePreference;
   customerLocation?: CustomerLocation;
   representative?: AuthorizedRepresentative;
   scope?: ProjectScope;

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,6 +11,7 @@ import {
   HouseLine,
   UsersThree,
   FilePdf,
+  CheckCircle,
 } from "@phosphor-icons/react";
 import { CustomerShell } from "@/components/layout/customer-shell";
 import { EditorialHeader } from "@/features/projects/components/editorial-header";
@@ -20,6 +21,10 @@ import { ProjectOverviewTab } from "@/features/projects/components/dashboard/pro
 import { ProjectSpacesTab } from "@/features/projects/components/dashboard/project-spaces-tab";
 import { ProjectTeamTab } from "@/features/projects/components/dashboard/project-team-tab";
 import { ProjectDocumentsTab } from "@/features/projects/components/dashboard/project-documents-tab";
+import {
+  ConsultationScheduler,
+  type BookedAppointment,
+} from "@/features/projects/components/consultation-scheduler";
 import {
   useProject,
   useSubmitProject,
@@ -33,13 +38,25 @@ type ActiveTab = "overview" | "spaces" | "team" | "documents";
 
 export default function ProjectDetailsPage() {
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
   const id = params?.id as string;
   const { isRTL } = useLanguage();
 
   const [activeTab, setActiveTab] = React.useState<ActiveTab>("overview");
+  const [appointment, setAppointment] = React.useState<BookedAppointment | null>(null);
 
   const { data: project, isLoading, error } = useProject(id);
   const submitMutation = useSubmitProject(id);
+
+  React.useEffect(() => {
+    if (!id) return;
+    try {
+      const saved = localStorage.getItem(`valentia_appointment_proj_${id}`);
+      if (saved) {
+        setAppointment(JSON.parse(saved));
+      }
+    } catch {}
+  }, [id]);
 
   if (isLoading) {
     return (
@@ -185,7 +202,42 @@ export default function ProjectDetailsPage() {
         </div>
 
         {/* Dynamic Project Roadmap Timeline */}
-        <ProjectJourney projectStatus={project.status} />
+        <ProjectJourney
+          projectStatus={project.status}
+          consultationAppointment={appointment}
+        />
+
+        {/* Just Submitted Success Alert Banner */}
+        {searchParams.get("submitted") === "true" && (
+          <div className="p-5 rounded-3xl bg-emerald-50 border border-emerald-300 text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm animate-in fade-in duration-300">
+            <div className="flex items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+                <CheckCircle className="w-6 h-6" weight="fill" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-emerald-950 font-serif">
+                  {isRTL ? "تم تسليم واعتماد طلب مشروعك بنجاح!" : "Project Submitted & Commissioned Successfully!"}
+                </h4>
+                <p className="text-xs text-emerald-800 mt-0.5 leading-relaxed">
+                  {isRTL
+                    ? "طلبك الآن قيد المراجعة الهندسية الفورية لدى مهندسي فالنتيا. يمكنك حجز موعد ميتينج الاستشارة أدناه."
+                    : "Your specifications are now under priority architectural review. Reserve your consultation meeting slot below."}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Consultation Scheduling Desk (Locked to Stage 02) */}
+        <ConsultationScheduler
+          projectId={project.id}
+          projectTitle={displayTitle}
+          projectLocation={project.property?.city || project.city}
+          initialAppointment={appointment}
+          onAppointmentBooked={(newApt) => setAppointment(newApt)}
+          projectStatus={project.status}
+          engineerNote={(project as any).engineerNote || (project as any).reviewNote}
+        />
 
         {/* Tab Navigation */}
         <div className="flex items-center gap-2 border-b border-border pb-3 overflow-x-auto scrollbar-none">

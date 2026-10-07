@@ -17,10 +17,13 @@ export type Role =
 
 /**
  * ProjectStatus strictly matches Prisma backend enum:
- * enum ProjectStatus { DRAFT, SUBMITTED }
- * Assignment is derived from leadEngineerId / assignment != null.
+ * enum ProjectStatus { DRAFT, SUBMITTED, UNDER_ENGINEER_REVIEW, ENGINEER_READY }
  */
-export type ProjectStatus = "DRAFT" | "SUBMITTED";
+export type ProjectStatus =
+  | "DRAFT"
+  | "SUBMITTED"
+  | "UNDER_ENGINEER_REVIEW"
+  | "ENGINEER_READY";
 
 export type ScheduleHealth = "ON_SCHEDULE" | "AT_RISK" | "DELAYED";
 
@@ -90,6 +93,15 @@ export interface AuditLogEntry {
   details: string;
 }
 
+export interface AssignedEngineerInfo {
+  id: number;
+  name: string;
+  role?: "LEAD_ARCHITECT" | "SITE_SUPERVISOR" | "MEP_ENGINEER" | string;
+  phone?: string;
+  email?: string;
+  assignedAt?: string;
+}
+
 export interface ProjectOverview {
   id: string;
   code: string;
@@ -118,6 +130,7 @@ export interface ProjectOverview {
   health: ScheduleHealth;
   leadEngineerId?: number | null;
   leadEngineerName?: string | null;
+  assignedEngineers?: AssignedEngineerInfo[];
   completionPercent: number;
   spaces?: ProjectSpaceSummary[];
   scopeType?: string;
@@ -127,3 +140,4 @@ export interface ProjectOverview {
   nextMilestoneDate: string;
   createdAt: string;
 }
+

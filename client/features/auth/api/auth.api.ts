@@ -9,6 +9,8 @@ import type {
   ProposedChangePasswordDto,
   ChangePasswordResponse,
   CreateStaffDto,
+  OnboardingEmailRequestResponse,
+  OnboardingEmailVerifyResponse,
 } from "../types";
 
 /**
@@ -129,7 +131,15 @@ function getLocalUser(): User | null {
   const stored = sessionStorage.getItem(USER_SESSION_KEY) || localStorage.getItem(USER_SESSION_KEY);
   if (!stored) return DEMO_PERSONAS.CUSTOMER;
   try {
-    return JSON.parse(stored);
+    const parsed = JSON.parse(stored);
+    if (parsed && !parsed.name) {
+      parsed.name = parsed.username
+        ? parsed.username.split("@")[0]
+        : parsed.email
+        ? parsed.email.split("@")[0]
+        : "Client";
+    }
+    return parsed;
   } catch {
     return DEMO_PERSONAS.CUSTOMER;
   }
@@ -160,22 +170,29 @@ interface BackendUser {
 }
 
 interface BackendAuthResponse {
-  accessToken: string;
+  accessToken?: string;
+  onboardingToken?: string;
+  onboardingRequired?: boolean;
   user: BackendUser;
 }
 
 function mapBackendUser(backendUser: BackendUser): User {
+  const emailCandidate = (backendUser as any).email || "";
+  const nameCandidate =
+    (backendUser as any).name ||
+    (backendUser.username ? backendUser.username.split("@")[0] : emailCandidate ? emailCandidate.split("@")[0] : "Client");
+
   return {
     id: backendUser.id,
     username: backendUser.username,
-    name: backendUser.username.split("@")[0],
+    name: nameCandidate,
+    email: emailCandidate || undefined,
     role: backendUser.role,
     mustChangePassword: Boolean(backendUser.mustChangePassword),
     requiresPasswordChange: Boolean(backendUser.mustChangePassword),
+    onboardingRequired: Boolean((backendUser as any).onboardingRequired),
   };
 }
-
-
 
 export const authApi = {
   /**
@@ -183,8 +200,9 @@ export const authApi = {
    * Returns JWT token and authenticated user payload.
    */
   async login(dto: ProposedLoginDto): Promise<AuthSession> {
+    const emailCandidate = (dto.email || dto.username || "").trim();
     const loginPayload = {
-      username: dto.username || dto.email || "",
+      email: emailCandidate,
       password: dto.password,
     };
 
@@ -192,11 +210,16 @@ export const authApi = {
       const response = await apiClient.post<BackendAuthResponse>("/auth/login", loginPayload);
       const backendUser = response.data.user;
       const user = mapBackendUser(backendUser);
-      tokenStorage.setToken(response.data.accessToken);
+      const token = response.data.accessToken || response.data.onboardingToken || "";
+      if (token) {
+        tokenStorage.setToken(token);
+      }
       saveLocalUser(user, dto.rememberMe !== false);
       return {
-        token: response.data.accessToken,
+        token,
         user,
+        onboardingToken: response.data.onboardingToken,
+        onboardingRequired: response.data.onboardingRequired,
       };
     } catch (error) {
       if (!IS_MOCK_FALLBACK_ALLOWED) {
@@ -284,11 +307,12 @@ export const authApi = {
         requiresPasswordChange: false,
       };
 
-      tokenStorage.setToken(loginResponse.data.accessToken);
+      const accessToken = loginResponse.data.accessToken || "";
+      tokenStorage.setToken(accessToken);
       saveLocalUser(user, true);
 
       return {
-        token: loginResponse.data.accessToken,
+        token: accessToken,
         user,
       };
     } catch (error) {
@@ -324,34 +348,101 @@ export const authApi = {
   const token = tokenStorage.getToken();
   if (!token) return null;
 
-  try {
-    const response = await apiClient.get<BackendUser>("/auth/me");
-
-    const user = mapBackendUser(response.data);
-
-    saveLocalUser(user);
-
-    return user;
-  } catch {
-    if (!IS_MOCK_FALLBACK_ALLOWED) {
-      tokenStorage.removeToken();
-      saveLocalUser(null);
-      return null;
+    try {
+      const response = await apiClient.get<BackendUser>("/auth/me");
+      const user = mapBackendUser(response.data);
+      saveLocalUser(user);
+      return user;
+    } catch {
+      if (!IS_MOCK_FALLBACK_ALLOWED) {
+        tokenStorage.removeToken();
+        saveLocalUser(null);
+        return null;
+      }
+      return getLocalUser();
     }
+  },
 
-    return getLocalUser();
-  }
-},
+  /**
+   * Endpoint: POST /auth/onboarding/email/request
+   * Request OTP code to verify permanent email during staff onboarding.
+   */
+  async requestOnboardingEmail(params: {
+    email: string;
+    onboardingToken?: string;
+  }): Promise<OnboardingEmailRequestResponse> {
+    const headers = params.onboardingToken
+      ? { Authorization: `Bearer ${params.onboardingToken}` }
+      : undefined;
+
+    try {
+      const response = await apiClient.post<OnboardingEmailRequestResponse>(
+        "/auth/onboarding/email/request",
+        { email: params.email },
+        { headers }
+      );
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return {
+        success: true,
+        message: `Verification code sent to ${params.email}`,
+        expiresInSeconds: 600,
+        cooldownSeconds: 60,
+        devOtp: "123456",
+      };
+    }
+  },
+
+  /**
+   * Endpoint: POST /auth/onboarding/email/verify
+   * Verify the 6-digit OTP code for the permanent email.
+   */
+  async verifyOnboardingEmail(params: {
+    email: string;
+    otp: string;
+    onboardingToken?: string;
+  }): Promise<OnboardingEmailVerifyResponse> {
+    const headers = params.onboardingToken
+      ? { Authorization: `Bearer ${params.onboardingToken}` }
+      : undefined;
+
+    try {
+      const response = await apiClient.post<OnboardingEmailVerifyResponse>(
+        "/auth/onboarding/email/verify",
+        { email: params.email, otp: params.otp },
+        { headers }
+      );
+      return response.data;
+    } catch (error) {
+      if (!IS_MOCK_FALLBACK_ALLOWED) throw error;
+      return {
+        success: true,
+        email: params.email,
+        emailVerified: true,
+        mustChangePassword: true,
+        onboardingComplete: false,
+        message: "Email verified successfully.",
+      };
+    }
+  },
 
   /**
    * Endpoint: POST /auth/change-password
    * Clears mustChangePassword and sets the user's permanent password.
    */
-  async changePassword(dto: ProposedChangePasswordDto): Promise<ChangePasswordResponse> {
+  async changePassword(
+    dto: ProposedChangePasswordDto & { onboardingToken?: string }
+  ): Promise<ChangePasswordResponse> {
+    const headers = dto.onboardingToken
+      ? { Authorization: `Bearer ${dto.onboardingToken}` }
+      : undefined;
+
     try {
       const response = await apiClient.post<ChangePasswordResponse>(
         "/auth/change-password",
-        { newPassword: dto.newPassword }
+        { newPassword: dto.newPassword },
+        { headers }
       );
       const currentUser = getLocalUser();
       if (currentUser) {
@@ -360,6 +451,7 @@ export const authApi = {
           mustChangePassword: false,
           requiresPasswordChange: false,
           isFirstLogin: false,
+          onboardingRequired: false,
         });
       }
       return response.data;
