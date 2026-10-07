@@ -270,4 +270,39 @@ export const adminApi = {
       return [];
     }
   },
+
+  /**
+   * Engineer gets persisted review context for their assigned project.
+   */
+  async getReviewContext(projectId: number): Promise<any> {
+    const res = await apiClient.get(`/projects/${projectId}/review`);
+    return res.data;
+  },
+
+  /**
+   * Engineer starts review of assigned SUBMITTED project (SUBMITTED -> UNDER_ENGINEER_REVIEW).
+   */
+  async startReview(
+    projectId: number,
+    note?: string
+  ): Promise<{ projectId: number; status: string; message: string }> {
+    const payload = note ? { note } : {};
+    const res = await apiClient.post(`/projects/${projectId}/review/start`, payload);
+    return res.data;
+  },
+
+  /**
+   * Engineer marks reviewed project ready for consultation (UNDER_ENGINEER_REVIEW -> ENGINEER_READY).
+   */
+  async readyForConsultation(
+    projectId: number,
+    note?: string
+  ): Promise<{ projectId: number; status: string; message: string }> {
+    const payload = note ? { note } : {};
+    const res = await apiClient.post(
+      `/projects/${projectId}/review/ready-for-consultation`,
+      payload
+    );
+    return res.data;
+  },
 };
