@@ -40,7 +40,7 @@ const INITIAL_NOTIFICATIONS: AppNotification[] = [
     type: "info",
     timestamp: new Date().toISOString(),
     read: false,
-    link: "/projects",
+    link: "/projects/new",
   },
 ];
 
@@ -151,7 +151,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
             ? `Review certified for ${title}. Ready for meeting. Note: ${note}`
             : `Technical review approved for ${title}. You can now select your consultation meeting slot.`,
           type: "engineer_ready",
-          link: `/projects/${projectId}`,
+          link: `/projects/${projectId}#consultation-schedule`,
         });
       }
     };

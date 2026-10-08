@@ -207,11 +207,12 @@ export function StepSpaces({
             >
               {/* Top Row: Photo Thumbnail + Details */}
               <div className="flex items-start gap-3.5 min-w-0">
-                <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-border bg-muted shadow-2xs">
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-border bg-[#EAE2D7] shadow-2xs">
                   <Image
                     src={curated.imageSrc}
                     alt={curated.defaultName}
                     fill
+                    unoptimized
                     className="object-cover transition-transform duration-500 hover:scale-105"
                     sizes="64px"
                   />

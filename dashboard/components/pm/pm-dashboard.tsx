@@ -701,7 +701,7 @@ export function PmDashboard() {
             </div>
 
             {/* Engineers Selection List */}
-            <div className="space-y-2.5">
+            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1.5 scrollbar-thin">
               {engineers.map((eng) => {
                 const isSelected = selectedAssignments.some((a) => a.engineerId === eng.id);
                 const currentAssignment = selectedAssignments.find((a) => a.engineerId === eng.id);

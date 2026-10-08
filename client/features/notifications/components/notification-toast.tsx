@@ -90,7 +90,13 @@ export function NotificationToast() {
                   : "bg-[#B88460] text-white hover:bg-[#A37250]"
               )}
             >
-              <span>{isRTL ? "احجز ميعاد الميتينج الآن" : "Book Meeting Now"}</span>
+              <span>
+                {isReady
+                  ? (isRTL ? "احجز ميعاد الاستشارة الآن" : "Book Meeting Now")
+                  : activeToast.type === "review_started"
+                  ? (isRTL ? "متابعة المراجعة الهندسية" : "View Review Status")
+                  : (isRTL ? "استعراض التفاصيل" : "View Details")}
+              </span>
               {isRTL ? (
                 <ArrowLeft className="w-3.5 h-3.5" />
               ) : (

@@ -196,7 +196,7 @@ export function ConsultationScheduler({
     : "";
 
   return (
-    <div className="w-full">
+    <div id="consultation-schedule" className="w-full scroll-mt-24">
       {/* ─────────────────────────────────────────────────────────────
           1. IF APPOINTMENT IS ALREADY BOOKED: SHOW CONFIRMED CARD
       ───────────────────────────────────────────────────────────── */}

@@ -1121,8 +1121,8 @@ export function AdminDashboard() {
       ───────────────────────────────────────────────────────────── */}
       {assigningProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-lg rounded-3xl bg-card border border-border p-6 sm:p-7 shadow-2xl relative text-foreground">
-            <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
+          <div className="w-full max-w-lg max-h-[90vh] flex flex-col rounded-3xl bg-card border border-border p-6 sm:p-7 shadow-2xl relative text-foreground overflow-hidden">
+            <div className="flex items-center justify-between border-b border-border pb-4 mb-4 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                   <HardHat className="w-5 h-5" />
@@ -1145,12 +1145,12 @@ export function AdminDashboard() {
               </button>
             </div>
 
-            <div className="space-y-4 mb-6">
-              <label className="block text-xs font-semibold text-foreground uppercase tracking-wider">
+            <div className="space-y-4 mb-5 flex-1 min-h-0 flex flex-col">
+              <label className="block text-xs font-semibold text-foreground uppercase tracking-wider shrink-0">
                 {isRTL ? "اختر المهندس المعماري / التنفيذي" : "Select Eligible Engineer"}
               </label>
 
-              <div className="space-y-2">
+              <div className="space-y-2 overflow-y-auto max-h-[380px] pr-1.5 scrollbar-thin">
                 {engineers.map((eng) => {
                   const isSelected = selectedEngineerId === eng.id;
                   return (

@@ -449,8 +449,8 @@ export function StaffOnboardingModal({
                 type="submit"
                 disabled={isSubmitting || !email.trim()}
                 className={cn(
-                  "ml-auto flex h-12 cursor-pointer items-center gap-2 rounded-full bg-[#503C2C] px-6 text-xs font-semibold tracking-wider text-[#FAF7F2] uppercase shadow-md transition-all hover:bg-[#3D2E22] active:scale-95 disabled:opacity-50",
-                  isRTL && "font-sans tracking-normal"
+                  "ml-auto flex h-12 cursor-pointer items-center gap-2 rounded-xl bg-[#1C1917] px-6 text-sm font-medium text-[#FAF7F2] shadow-sm transition-all hover:bg-[#342D28] active:scale-98 disabled:cursor-not-allowed disabled:opacity-40",
+                  isRTL && "font-sans"
                 )}
               >
                 {isSubmitting ? (
@@ -538,8 +538,8 @@ export function StaffOnboardingModal({
               type="submit"
               disabled={isSubmitting || otp.join("").length !== 6}
               className={cn(
-                "flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#503C2C] text-xs font-semibold tracking-wider text-[#FAF7F2] uppercase shadow-md transition-all hover:bg-[#3D2E22] active:scale-95 disabled:opacity-50",
-                isRTL && "font-sans tracking-normal"
+                "flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#1C1917] text-sm font-medium tracking-normal text-[#FAF7F2] shadow-sm transition-all hover:bg-[#342D28] active:scale-98 disabled:cursor-not-allowed disabled:opacity-40",
+                isRTL && "font-sans"
               )}
             >
               {isSubmitting ? (
@@ -624,8 +624,8 @@ export function StaffOnboardingModal({
                   newPassword !== confirmPassword
                 }
                 className={cn(
-                  "flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-[#B88460] text-xs font-semibold tracking-wider text-white uppercase shadow-md transition-all hover:bg-[#A37250] active:scale-95 disabled:opacity-50",
-                  isRTL && "font-sans tracking-normal"
+                  "flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#1C1917] text-sm font-medium tracking-normal text-[#FAF7F2] shadow-sm transition-all hover:bg-[#342D28] active:scale-98 disabled:cursor-not-allowed disabled:opacity-40",
+                  isRTL && "font-sans"
                 )}
               >
                 {isSubmitting ? (
