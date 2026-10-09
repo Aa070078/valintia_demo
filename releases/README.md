@@ -4,14 +4,17 @@ Index only — full audit notes live in the per-app logs linked below.
 
 | App | Log | Latest |
 |-----|-----|--------|
-| Client | [client.md](./client.md) | [2026-10-07 17:52] Branded bilingual welcome email |
-| Dashboard | [dashboard.md](./dashboard.md) | [2026-10-07 17:28] Connect frontend verification and onboarding sessions |
-| Server | [server.md](./server.md) | [2026-10-07 18:15] Match welcome logo MIME type to actual image data |
+| Client | [client.md](./client.md) | [2026-10-08 15:39] Replace runtime mock data with database-backed workspaces |
+| Dashboard | [dashboard.md](./dashboard.md) | [2026-10-08 15:39] Replace runtime mock data with database-backed workspaces |
+| Server | [server.md](./server.md) | [2026-10-08 15:39] Replace runtime mock data with database-backed workspaces |
 | Meta (rules/skills/docs) | [meta.md](./meta.md) | [2026-09-03 21:02] Valentia brand, design system, business doc, and stack skills |
 
 ## Recent (newest first)
 
 <!-- Keep at most 30 entries. Newest at the top. -->
+- **[20261008-1539-db-backed-workspaces](./client.md)** — Client — Replace runtime mock data with database-backed workspaces — 2026-10-08 15:39 — @abdelrhman632
+- **[20261008-1539-db-backed-workspaces](./dashboard.md)** — Dashboard — Replace runtime mock data with database-backed workspaces — 2026-10-08 15:39 — @abdelrhman632
+- **[20261008-1539-db-backed-workspaces](./server.md)** — Server — Replace runtime mock data with database-backed workspaces — 2026-10-08 15:39 — @abdelrhman632
 - **[20261007-1815-welcome-logo-mime-type](./server.md)** — Server — Match welcome logo MIME type to actual image data — 2026-10-07 18:15 — @abdelrhman632
 - **[20261007-1758-welcome-logo-content-id](./server.md)** — Server — Correct welcome logo Content-ID format — 2026-10-07 17:58 — @abdelrhman632
 - **[20261007-1752-branded-welcome-email](./server.md)** — Server — Branded bilingual welcome email — 2026-10-07 17:52 — @abdelrhman632

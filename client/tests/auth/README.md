@@ -1,6 +1,6 @@
 # Auth integration checks
 
-Run the backend on port 5000, client on 3000, and dashboard on 3001. In the client environment set `NEXT_PUBLIC_API_URL=http://localhost:5000/api`, `NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001`, and `NEXT_PUBLIC_ENABLE_MOCK_FALLBACK=false`. Set the dashboard API URL to the same backend.
+Run the backend on port 5000, client on 3000, and dashboard on 3001. In the client environment set `NEXT_PUBLIC_API_URL=http://localhost:5000/api`, `NEXT_PUBLIC_DASHBOARD_URL=http://localhost:3001`. Set the dashboard API URL to the same backend. Runtime account/project mocks have been removed.
 
 From `client/`, run `npm run test:auth`. Windows uses installed Microsoft Edge; elsewhere install Chromium with `npx playwright install chromium`. Set `PLAYWRIGHT_CHANNEL` to select another installed browser.
 
@@ -14,3 +14,9 @@ For a live check:
 4. Wrong or expired codes must show an error and prevent completion. Use resend after the cooldown or cancel onboarding to sign out.
 
 Local project APIs currently require database migration repair: the existing database is missing `projects.coverImage`. Auth browser tests do not resolve or conceal this separate issue. Do not reset the database or alter account eligibility to force these checks to pass.
+
+On `feat/db-backed-workspaces`, open `http://localhost:3001/admin` with an administrator session, select **Staff Directory & Vouchers**, and find the incomplete account. **Revoke & reissue temp credentials** opens a confirmation before calling `POST /api/users/:id/revoke-temporary-credentials`. Cancel does nothing. Confirm invalidates the old credentials and onboarding sessions; copy the newly returned voucher from the page. Active accounts must use verified-email password recovery instead. The directory uses administrator-only `GET /api/users`; it never returns password hashes or existing temporary passwords.
+
+`workspace-data.spec.ts` covers empty/error queues, the staff bearer token, revoke confirmation/cancel/success/failure, and role restrictions. Tests intercept the API and do not change real accounts or send email. Run `npm run test:users-directory` from `server/` for the corresponding HTTP authorization/response checks. The existing database-backed `test:identity-onboarding` suite is currently blocked during migration setup by the historical schema-qualified `public.SpaceType_old` reference.
+
+Old browser project/staff/appointment caches are no longer read. Form choices and test fixtures remain; fake business records, fake authentication, fake successful writes, and sample analytics are removed. Consultation booking/MOM show unavailable until supported by backend endpoints. Legacy client staff pages link to the shared dashboard.

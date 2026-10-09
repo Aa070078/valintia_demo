@@ -2,6 +2,37 @@
 
 Append-only audit log for changes under `client/`. Newest entry at the top.
 
+## [2026-10-08 15:39] Replace runtime mock data with database-backed workspaces
+
+**ID:** 20261008-1539-db-backed-workspaces
+**By:** @abdelrhman632 (git config; gh unavailable)
+**App:** client
+**Requested:** Create a new branch, remove runtime mock data, integrate temporary credential revocation in the branded admin frontend, and start port 3001 first.
+**Scope:** `client/features/auth/`, `client/features/projects/`, `client/features/dashboard/`, `client/features/notifications/`, `client/app/projects/new/page.tsx`, `client/.env.example`, `client/tests/auth/`
+
+### Summary
+Business data and successful mutations come from the API/database, with truthful empty/error states and a usable onboarding credential recovery action.
+
+### Changes
+- Removed demo personas, fake JWTs, role switching, local credential/password storage and simulated successful auth/project writes.
+- Project adapters now propagate API errors. Project caches are scoped to the authenticated account; notifications start empty and derive from actual project changes.
+- Removed seeded project/staff/operational datasets and unused duplicate staff API/modal. Legacy staff views link to the shared dashboard using the established fragment handoff.
+- New project forms no longer select demo prefills. Consultation booking displays unavailable instead of saving fictitious local appointments.
+- Added five browser checks for database-empty/error states, token isolation and revoke behavior; documented manual retesting.
+
+### Verification
+- Client and dashboard production builds and TypeScript checks passed; targeted ESLint passed.
+- All 14 browser checks passed (nine existing auth/onboarding checks plus five workspace/revoke checks), using intercepted adapters without real account/email changes.
+- Server build and 17 auth/OTP/directory HTTP checks passed.
+- Existing database-backed identity suite is blocked in setup: historical migration references public.SpaceType_old while running in an isolated schema. This is not a functional assertion failure in the directory feature.
+
+### Notes
+- Local branch: feat/db-backed-workspaces; no push or merge into master.
+- Live database project schema repair remains required before real project CRUD/review can be tested. No normal-schema migrations, resets, account eligibility changes or real credential revocations were performed.
+- Static form choices and automated test fixtures remain; runtime mock business records are removed. Unsupported consultation/MOM operations show unavailable.
+
+---
+
 ## [2026-10-07 17:52] Branded bilingual welcome email
 
 **ID:** 20261007-1752-branded-welcome-email

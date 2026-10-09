@@ -345,6 +345,45 @@ test('admin provisions only profile/role; credentials unique, bcrypt only, no se
   await create('ADMINISTRATOR').expect(400);
 });
 
+test('administrator directory includes incomplete staff, excludes customers and secrets, and enforces access', async () => {
+  const pending = (await create().expect(201)).body;
+  for (const role of ['PROJECT_MANAGER', 'COMPANY_OWNER'])
+    await create(role).expect(201);
+  const response = await request(app.getHttpServer())
+    .get('/users')
+    .set('Authorization', `Bearer ${admin.token}`)
+    .expect(200);
+  const listed = response.body.find((user: any) => user.id === pending.id);
+  assert.equal(listed.email, null);
+  assert.equal(listed.emailVerified, false);
+  assert.equal(listed.mustChangePassword, true);
+  assert.deepEqual(
+    Object.keys(listed).sort(),
+    [
+      'id',
+      'username',
+      'email',
+      'role',
+      'emailVerified',
+      'mustChangePassword',
+      'temporaryCredentialsExpiresAt',
+      'createdAt',
+    ].sort(),
+  );
+  assert.ok(
+    response.body.every((user: any) =>
+      ['ENGINEER', 'PROJECT_MANAGER', 'COMPANY_OWNER'].includes(user.role),
+    ),
+  );
+  for (const token of [customer.token, activeEngineer.token]) {
+    await request(app.getHttpServer())
+      .get('/users')
+      .set('Authorization', `Bearer ${token}`)
+      .expect(403);
+  }
+  await request(app.getHttpServer()).get('/users').expect(401);
+});
+
 test('non-admin cannot provision or revoke; all internal roles supported', async () => {
   const u = await provision();
   for (const role of ['PROJECT_MANAGER', 'COMPANY_OWNER']) {

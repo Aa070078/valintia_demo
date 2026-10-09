@@ -1,5 +1,35 @@
 # Releases — Server
 
+## [2026-10-08 15:39] Replace runtime mock data with database-backed workspaces
+
+**ID:** 20261008-1539-db-backed-workspaces
+**By:** @abdelrhman632 (git config; gh unavailable)
+**App:** server
+**Requested:** Create a new branch, remove runtime mock data, integrate temporary credential revocation in the branded admin frontend, and start port 3001 first.
+**Scope:** `server/src/users/users.controller.ts`, `server/src/users/users.service.ts`, `server/test/users-directory.test.ts`, `server/test/identity-onboarding.test.ts`, `server/package.json`
+
+### Summary
+Business data and successful mutations come from the API/database, with truthful empty/error states and a usable onboarding credential recovery action.
+
+### Changes
+- Added administrator-only GET /api/users with an explicit safe select for staff profile/role, email verification, password-change requirement and temporary credential expiration.
+- No hashes, passwords, temporary logins or onboarding secrets appear in the directory response. Existing provisioning/reissue semantics are preserved.
+- Added HTTP checks through real Nest controller/service/JWT/roles guards with external adapters stubbed; added directory coverage to the existing isolated database suite and a test:users-directory command.
+- Inspected live database/migration status read-only. Staff directory and eligible-engineer APIs return 200; project API returns 500 and projects.coverImage is absent. Historical expand_project_domain migration is unfinished.
+
+### Verification
+- Client and dashboard production builds and TypeScript checks passed; targeted ESLint passed.
+- All 14 browser checks passed (nine existing auth/onboarding checks plus five workspace/revoke checks), using intercepted adapters without real account/email changes.
+- Server build and 17 auth/OTP/directory HTTP checks passed.
+- Existing database-backed identity suite is blocked in setup: historical migration references public.SpaceType_old while running in an isolated schema. This is not a functional assertion failure in the directory feature.
+
+### Notes
+- Local branch: feat/db-backed-workspaces; no push or merge into master.
+- Live database project schema repair remains required before real project CRUD/review can be tested. No normal-schema migrations, resets, account eligibility changes or real credential revocations were performed.
+- Static form choices and automated test fixtures remain; runtime mock business records are removed. Unsupported consultation/MOM operations show unavailable.
+
+---
+
 ## [2026-10-07 18:15] Match welcome logo MIME type to actual image data
 
 **ID:** 20261007-1815-welcome-logo-mime-type

@@ -1,14 +1,13 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
 import {
   ProjectListItem,
   ProjectReviewContext,
   ProjectActivity,
   ConsultationAppointment,
   EngineerWorkQueueFilter,
-  ProjectReviewAction,
-} from "../types/engineer.types";
+} from "../types/engineer.types"
 import {
   getAssignedProjects,
   getProjectReviewContext,
@@ -16,238 +15,139 @@ import {
   markReadyForConsultation,
   getProjectActivity,
   getConsultations,
-} from "../api/engineer.api";
-import { useLanguage } from "@/lib/i18n/language-context";
-
-// Fallback seed projects for offline / demo view matching Sprint 2 review statuses
-const FALLBACK_ASSIGNED_PROJECTS: ProjectListItem[] = [
-  {
-    id: 101,
-    title: "Palm Hills Villa 420 - Private Residence",
-    status: "UNDER_ENGINEER_REVIEW",
-    notes: "Skylight living area structural review and MEP riser clearance check required.",
-    clientId: 12,
-    property: {
-      id: 201,
-      projectId: 101,
-      propertyType: "Villa",
-      areaSqm: "450",
-      city: "6th of October",
-      compound: "Palm Hills",
-    },
-    spaces: [
-      { id: 301, projectId: 101, type: "LIVING_ROOM" },
-      { id: 302, projectId: 101, type: "KITCHEN" },
-      { id: 303, projectId: 101, type: "MASTER_BEDROOM" },
-      { id: 304, projectId: 101, type: "BALCONY" },
-    ],
-    assignment: {
-      id: 401,
-      projectId: 101,
-      engineerId: 1,
-      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    },
-    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-  },
-  {
-    id: 102,
-    title: "Swan Lake Penthouse B4",
-    status: "SUBMITTED",
-    notes: "Customer brief locked and submitted. Ready for preliminary architectural assessment.",
-    clientId: 14,
-    property: {
-      id: 202,
-      projectId: 102,
-      propertyType: "Penthouse",
-      areaSqm: "320",
-      city: "New Cairo",
-      compound: "Swan Lake",
-    },
-    spaces: [
-      { id: 305, projectId: 102, type: "LIVING_ROOM" },
-      { id: 306, projectId: 102, type: "BEDROOM" },
-      { id: 307, projectId: 102, type: "BATHROOM" },
-    ],
-    assignment: {
-      id: 402,
-      projectId: 102,
-      engineerId: 1,
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-    },
-    createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: 103,
-    title: "Katameya Dunes Luxury Villa",
-    status: "ENGINEER_READY",
-    notes: "Architectural feasibility approved. Ready for customer consultation booking.",
-    clientId: 18,
-    property: {
-      id: 203,
-      projectId: 103,
-      propertyType: "Villa",
-      areaSqm: "580",
-      city: "New Cairo",
-      compound: "Katameya Dunes",
-    },
-    spaces: [
-      { id: 308, projectId: 103, type: "LIVING_ROOM" },
-      { id: 309, projectId: 103, type: "KITCHEN" },
-      { id: 310, projectId: 103, type: "MASTER_BEDROOM" },
-    ],
-    assignment: {
-      id: 403,
-      projectId: 103,
-      engineerId: 1,
-      createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
-    },
-    createdAt: new Date(Date.now() - 86400000 * 6).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
-  },
-];
+} from "../api/engineer.api"
+import { useLanguage } from "@/lib/i18n/language-context"
 
 export function useEngineerWorkspace() {
-  const [projects, setProjects] = React.useState<ProjectListItem[]>([]);
-  const [consultations, setConsultations] = React.useState<ConsultationAppointment[]>([]);
-  const [selectedProjectId, setSelectedProjectId] = React.useState<number | null>(null);
-  const [reviewContext, setReviewContext] = React.useState<ProjectReviewContext | null>(null);
-  const [activities, setActivities] = React.useState<ProjectActivity[]>([]);
-  const [activeFilter, setActiveFilter] = React.useState<EngineerWorkQueueFilter>("ALL");
-  const { language, isRTL, toggleLanguage } = useLanguage();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [isTransitioning, setIsTransitioning] = React.useState(false);
-  const [feedback, setFeedback] = React.useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [projects, setProjects] = React.useState<ProjectListItem[]>([])
+  const [consultations, setConsultations] = React.useState<
+    ConsultationAppointment[]
+  >([])
+  const [selectedProjectId, setSelectedProjectId] = React.useState<
+    number | null
+  >(null)
+  const [reviewContext, setReviewContext] =
+    React.useState<ProjectReviewContext | null>(null)
+  const [activities, setActivities] = React.useState<ProjectActivity[]>([])
+  const [activeFilter, setActiveFilter] =
+    React.useState<EngineerWorkQueueFilter>("ALL")
+  const { language, isRTL, toggleLanguage } = useLanguage()
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [isTransitioning, setIsTransitioning] = React.useState(false)
+  const [feedback, setFeedback] = React.useState<{
+    type: "success" | "error"
+    text: string
+  } | null>(null)
 
   // Fetch initial assigned projects & consultations
   React.useEffect(() => {
-    let ignore = false;
+    let ignore = false
 
     async function initializeWorkspace() {
       try {
-        const [fetchedProjects, fetchedConsultations] = await Promise.allSettled([
-          getAssignedProjects(),
-          getConsultations(),
-        ]);
+        const [fetchedProjects, fetchedConsultations] =
+          await Promise.allSettled([getAssignedProjects(), getConsultations()])
 
-        if (ignore) return;
+        if (ignore) return
 
-        if (fetchedProjects.status === "fulfilled" && fetchedProjects.value.length > 0) {
-          setProjects(fetchedProjects.value);
+        if (
+          fetchedProjects.status === "fulfilled" &&
+          Array.isArray(fetchedProjects.value)
+        ) {
+          setProjects(fetchedProjects.value)
         } else {
-          setProjects(FALLBACK_ASSIGNED_PROJECTS);
+          setProjects([])
+          setFeedback({
+            type: "error",
+            text: "Unable to load assigned projects. Please retry.",
+          })
         }
 
         if (fetchedConsultations.status === "fulfilled") {
-          setConsultations(fetchedConsultations.value);
+          setConsultations(fetchedConsultations.value)
         }
       } catch (err: unknown) {
         if (!ignore) {
-          console.warn("Failed fetching live projects, falling back to mock fixtures", err);
-          setProjects(FALLBACK_ASSIGNED_PROJECTS);
+          console.warn("Unable to load assigned projects", err)
+          setProjects([])
+          setFeedback({
+            type: "error",
+            text: "Unable to load assigned projects. Please retry.",
+          })
         }
       } finally {
         if (!ignore) {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
     }
 
-    initializeWorkspace();
+    initializeWorkspace()
 
     return () => {
-      ignore = true;
-    };
-  }, []);
+      ignore = true
+    }
+  }, [])
 
   const selectProject = React.useCallback((id: number | null) => {
-    setSelectedProjectId(id);
-    if (!id) {
-      setReviewContext(null);
-      setActivities([]);
-    }
-  }, []);
+    setSelectedProjectId(id)
+    setReviewContext(null)
+    setActivities([])
+  }, [])
 
   // Load single project context when selected
   React.useEffect(() => {
     if (!selectedProjectId) {
-      return;
+      return
     }
 
-    let isMounted = true;
+    let isMounted = true
     async function fetchDetails() {
       try {
         const [contextRes, activityRes] = await Promise.allSettled([
           getProjectReviewContext(selectedProjectId!),
           getProjectActivity(selectedProjectId!),
-        ]);
+        ])
 
-        if (!isMounted) return;
+        if (!isMounted) return
 
         if (contextRes.status === "fulfilled") {
-          setReviewContext(contextRes.value);
+          setReviewContext(contextRes.value)
         } else {
-          // Construct fallback review context from list item
-          const match = projects.find((p) => p.id === selectedProjectId);
-          if (match) {
-            const allowedActions: ProjectReviewAction[] =
-              match.status === "SUBMITTED"
-                ? ["START_REVIEW"]
-                : match.status === "UNDER_ENGINEER_REVIEW"
-                ? ["MARK_READY_FOR_CONSULTATION"]
-                : [];
-
-            setReviewContext({
-              id: match.id,
-              title: match.title,
-              status: match.status,
-              notes: match.notes,
-              clientId: match.clientId,
-              client: {
-                id: match.clientId,
-                username: `client_${match.clientId}`,
-                name: "Customer Client",
-                email: "customer@example.com",
-              },
-              property: match.property || null,
-              spaces: match.spaces || [],
-              assignment: match.assignment || {
-                id: 1,
-                projectId: match.id,
-                engineerId: 1,
-                createdAt: match.createdAt,
-              },
-              activities: [],
-              allowedActions,
-              createdAt: match.createdAt,
-              updatedAt: match.updatedAt,
-            });
-          }
+          setReviewContext(null)
+          setFeedback({
+            type: "error",
+            text: "Unable to load project review. Please retry.",
+          })
         }
 
         if (activityRes.status === "fulfilled") {
-          setActivities(activityRes.value);
+          setActivities(activityRes.value)
+        } else {
+          setFeedback({
+            type: "error",
+            text: "Unable to load project activity.",
+          })
         }
       } catch (err) {
-        console.warn("Error fetching review context:", err);
+        console.warn("Error fetching review context:", err)
       }
     }
 
-    fetchDetails();
+    fetchDetails()
     return () => {
-      isMounted = false;
-    };
-  }, [selectedProjectId, projects]);
+      isMounted = false
+    }
+  }, [selectedProjectId, projects])
 
   // Workflow Action 1: Start Review
   const handleStartReview = async (projectId: number, note?: string) => {
-    setIsTransitioning(true);
+    setIsTransitioning(true)
     try {
-      const res = await startReview(projectId, note);
+      const res = await startReview(projectId, note)
       setProjects((prev) =>
         prev.map((p) => (p.id === projectId ? { ...p, status: res.status } : p))
-      );
+      )
       if (selectedProjectId === projectId) {
         setReviewContext((prev) =>
           prev
@@ -258,7 +158,7 @@ export function useEngineerWorkspace() {
                 activities: [res.activity, ...(prev.activities || [])],
               }
             : null
-        );
+        )
       }
       setFeedback({
         type: "success",
@@ -266,61 +166,28 @@ export function useEngineerWorkspace() {
           language === "ar"
             ? "تم بدء مراجعة المشروع رسميًا وتحويله إلى: قيد المراجعة الهندسية."
             : "Project review officially started. State moved to: Under Review.",
-      });
-    } catch {
-      // Offline fallback mutation
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === projectId
-            ? { ...p, status: "UNDER_ENGINEER_REVIEW" as const }
-            : p
-        )
-      );
-      if (selectedProjectId === projectId) {
-        setReviewContext((prev) =>
-          prev
-            ? {
-                ...prev,
-                status: "UNDER_ENGINEER_REVIEW",
-                allowedActions: ["MARK_READY_FOR_CONSULTATION"],
-                activities: [
-                  {
-                    id: Date.now(),
-                    projectId,
-                    actorId: 1,
-                    actorRole: "ENGINEER",
-                    action: "REVIEW_STARTED",
-                    fromStatus: "SUBMITTED",
-                    toStatus: "UNDER_ENGINEER_REVIEW",
-                    note: note || null,
-                    createdAt: new Date().toISOString(),
-                  },
-                  ...(prev.activities || []),
-                ],
-              }
-            : null
-        );
-      }
+      })
+    } catch (error) {
       setFeedback({
-        type: "success",
-        text:
-          language === "ar"
-            ? "تم بدء المراجعة الهندسية بنجاح."
-            : "Review started successfully.",
-      });
+        type: "error",
+        text: error instanceof Error ? error.message : "Project update failed.",
+      })
     } finally {
-      setIsTransitioning(false);
+      setIsTransitioning(false)
     }
-  };
+  }
 
   // Workflow Action 2: Mark Ready For Consultation
-  const handleReadyForConsultation = async (projectId: number, note?: string) => {
-    setIsTransitioning(true);
+  const handleReadyForConsultation = async (
+    projectId: number,
+    note?: string
+  ) => {
+    setIsTransitioning(true)
     try {
-      const res = await markReadyForConsultation(projectId, note);
+      const res = await markReadyForConsultation(projectId, note)
       setProjects((prev) =>
         prev.map((p) => (p.id === projectId ? { ...p, status: res.status } : p))
-      );
+      )
       if (selectedProjectId === projectId) {
         setReviewContext((prev) =>
           prev
@@ -331,7 +198,7 @@ export function useEngineerWorkspace() {
                 activities: [res.activity, ...(prev.activities || [])],
               }
             : null
-        );
+        )
       }
       setFeedback({
         type: "success",
@@ -339,50 +206,16 @@ export function useEngineerWorkspace() {
           language === "ar"
             ? "تم اعتماد الجاهزية للاستشارة الهندسية بنجاح. أصبحت الاستشارة متاحة للعميل."
             : "Project marked ready for consultation. Customer may now book.",
-      });
-    } catch {
-      // Offline fallback mutation
-      setProjects((prev) =>
-        prev.map((p) =>
-          p.id === projectId ? { ...p, status: "ENGINEER_READY" as const } : p
-        )
-      );
-      if (selectedProjectId === projectId) {
-        setReviewContext((prev) =>
-          prev
-            ? {
-                ...prev,
-                status: "ENGINEER_READY",
-                allowedActions: [],
-                activities: [
-                  {
-                    id: Date.now(),
-                    projectId,
-                    actorId: 1,
-                    actorRole: "ENGINEER",
-                    action: "CONSULTATION_READY",
-                    fromStatus: "UNDER_ENGINEER_REVIEW",
-                    toStatus: "ENGINEER_READY",
-                    note: note || null,
-                    createdAt: new Date().toISOString(),
-                  },
-                  ...(prev.activities || []),
-                ],
-              }
-            : null
-        );
-      }
+      })
+    } catch (error) {
       setFeedback({
-        type: "success",
-        text:
-          language === "ar"
-            ? "تم اعتماد الجاهزية للاستشارة الهندسية."
-            : "Marked ready for consultation.",
-      });
+        type: "error",
+        text: error instanceof Error ? error.message : "Project update failed.",
+      })
     } finally {
-      setIsTransitioning(false);
+      setIsTransitioning(false)
     }
-  };
+  }
 
   return {
     projects,
@@ -404,11 +237,14 @@ export function useEngineerWorkspace() {
     handleReadyForConsultation,
     refetchProjects: async () => {
       try {
-        const fetched = await getAssignedProjects();
-        if (fetched.length > 0) setProjects(fetched);
+        const fetched = await getAssignedProjects()
+        setProjects(fetched)
       } catch {
-        // Keep current state
+        setFeedback({
+          type: "error",
+          text: "Unable to refresh assigned projects. Please retry.",
+        })
       }
     },
-  };
+  }
 }
