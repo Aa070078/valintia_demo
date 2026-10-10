@@ -808,9 +808,9 @@ export function PmDashboard() {
               <button
                 type="button"
                 onClick={() => handleConfirmAssignment(targetAssignProject.id)}
-                className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2] text-xs font-medium transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-[#D8C8B4] hover:bg-[#C9B7A0] text-[#1C1917] border border-[#C5B49E] text-xs font-semibold transition-colors flex items-center gap-1.5 shadow-sm cursor-pointer"
               >
-                <Check className="w-3.5 h-3.5 text-[#B88460]" />
+                <Check className="w-3.5 h-3.5 text-[#503C2C]" />
                 <span>
                   {isRTL
                     ? `تأكيد تكليف الفريق (${selectedAssignments.length} مهندس)`

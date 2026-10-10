@@ -377,7 +377,7 @@ function LoginForm() {
             <button
               type="submit"
               disabled={isSubmitting || isLoading}
-              className="mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#1C1917] text-sm font-medium text-[#FAF7F2] shadow-md transition-all duration-200 hover:bg-[#342D28] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-2 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#D8C8B4] text-sm font-semibold text-[#1C1917] border border-[#C5B49E] shadow-sm transition-all duration-200 hover:bg-[#C9B7A0] active:scale-98 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isSubmitting || isLoading ? (
                 <>

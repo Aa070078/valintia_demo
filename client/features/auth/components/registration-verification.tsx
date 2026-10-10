@@ -108,7 +108,7 @@ export function RegistrationVerification({
         <button
           type="submit"
           disabled={busy || (!proof && code.length !== 6)}
-          className="w-full rounded-xl bg-[#1C1917] p-3.5 text-sm font-medium text-[#FAF7F2] shadow-sm transition-all hover:bg-[#342D28] active:scale-98 disabled:cursor-not-allowed disabled:opacity-40"
+          className="w-full rounded-xl bg-[#D8C8B4] p-3.5 text-sm font-semibold text-[#1C1917] border border-[#C5B49E] shadow-sm transition-all hover:bg-[#C9B7A0] active:scale-98 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {busy
             ? isRTL

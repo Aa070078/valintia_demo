@@ -149,12 +149,12 @@ export function NotificationCenter() {
                             handleCardClick(item);
                           }}
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-medium transition-all active:scale-95 cursor-pointer shadow-xs",
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold transition-all active:scale-95 cursor-pointer shadow-xs border",
                             isReady
-                              ? "bg-[#1C1917] hover:bg-[#342D28] text-[#FAF7F2]"
+                              ? "bg-[#D8C8B4] hover:bg-[#C9B7A0] text-[#1C1917] border-[#C5B49E]"
                               : item.read
-                              ? "bg-[#EFE7DC] hover:bg-[#E2D7C8] text-[#503C2C]"
-                              : "bg-[#503C2C] hover:bg-[#3D2E22] text-[#FAF7F2]"
+                              ? "bg-[#FAF7F2] hover:bg-[#EFE7DC] text-[#6B635B] border-[#E8DEC8]"
+                              : "bg-[#D8C8B4] hover:bg-[#C9B7A0] text-[#1C1917] border-[#C5B49E]"
                           )}
                         >
                           <span>

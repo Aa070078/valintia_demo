@@ -460,8 +460,8 @@ function VerifyOtpContent() {
               className={cn(
                 "w-full h-12 rounded-xl text-sm font-medium tracking-wider transition-all flex items-center justify-center gap-2 shadow-sm",
                 isComplete && !isVerifying
-                  ? "bg-[#503C2C] text-[#FAF7F2] hover:bg-[#3E2F22] active:scale-[0.99] cursor-pointer"
-                  : "bg-[#503C2C]/40 text-[#FAF7F2]/70 cursor-not-allowed"
+                  ? "bg-[#D8C8B4] text-[#1C1917] border border-[#C5B49E] hover:bg-[#C9B7A0] active:scale-[0.99] cursor-pointer"
+                  : "bg-[#D8C8B4]/40 text-[#1C1917]/40 border border-[#D8C8B4]/30 cursor-not-allowed"
               )}
             >
               {isVerifying ? (
