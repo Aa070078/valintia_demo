@@ -1,15 +1,15 @@
-"use client";
+"use client"
 
-import * as React from "react";
+import * as React from "react"
 import {
   ProjectReviewContext,
   ProjectActivity,
   ConsultationAppointment,
   ProjectWorkspaceTab,
-} from "../types/engineer.types";
-import { BriefReviewPanel } from "./brief-review-panel";
-import { MomComposer } from "./mom-composer";
-import { ActivityLogView } from "./activity-log-view";
+} from "../types/engineer.types"
+import { BriefReviewPanel } from "./brief-review-panel"
+import { MomComposer } from "./mom-composer"
+import { ActivityLogView } from "./activity-log-view"
 import {
   ArrowLeft,
   ArrowRight,
@@ -20,24 +20,22 @@ import {
   FileText,
   CalendarCheck,
   NotePencil,
-  FilePdf,
-  Image as ImageIcon,
   Lock,
   VideoCamera,
   FolderOpen,
-} from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
+} from "@phosphor-icons/react"
+import { cn } from "@/lib/utils"
 
 interface ProjectWorkspaceProps {
-  context: ProjectReviewContext;
-  activities: ProjectActivity[];
-  consultations: ConsultationAppointment[];
-  onBack: () => void;
-  onStartReview: (projectId: number, note?: string) => Promise<void>;
-  onReadyForConsultation: (projectId: number, note?: string) => Promise<void>;
-  isTransitioning: boolean;
-  isRTL: boolean;
-  initialTab?: ProjectWorkspaceTab;
+  context: ProjectReviewContext
+  activities: ProjectActivity[]
+  consultations: ConsultationAppointment[]
+  onBack: () => void
+  onStartReview: (projectId: number, note?: string) => Promise<void>
+  onReadyForConsultation: (projectId: number, note?: string) => Promise<void>
+  isTransitioning: boolean
+  isRTL: boolean
+  initialTab?: ProjectWorkspaceTab
 }
 
 export function ProjectWorkspace({
@@ -51,120 +49,123 @@ export function ProjectWorkspace({
   isRTL,
   initialTab = "brief_review",
 }: ProjectWorkspaceProps) {
-  const [activeTab, setActiveTab] = React.useState<ProjectWorkspaceTab>(initialTab);
+  const [activeTab, setActiveTab] =
+    React.useState<ProjectWorkspaceTab>(initialTab)
 
   // Find consultation for this project
   const projectConsultation = consultations.find(
     (c) => c.projectId === context.id
-  );
+  )
 
   const getStatusBadge = () => {
     switch (context.status) {
       case "SUBMITTED":
         return {
-          label: isRTL ? "مُسلّم حديثاً · بانتظار المراجعة" : "Submitted · Pending Review",
+          label: isRTL
+            ? "مُسلّم حديثاً · بانتظار المراجعة"
+            : "Submitted · Pending Review",
           className:
             "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border-blue-300",
-        };
+        }
       case "UNDER_ENGINEER_REVIEW":
         return {
           label: isRTL ? "قيد المراجعة الهندسية" : "Under Engineer Review",
           className:
             "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-300",
-        };
+        }
       case "ENGINEER_READY":
         return {
           label: isRTL ? "معتمد للاستشارة" : "Ready for Consultation",
           className:
             "bg-[#B88460]/15 text-[#8F5A36] dark:bg-[#B88460]/20 dark:text-[#E5D5C5] border-[#B88460]/30",
-        };
+        }
       default:
         return {
           label: context.status,
           className: "bg-muted text-muted-foreground border-border",
-        };
+        }
     }
-  };
+  }
 
-  const statusBadge = getStatusBadge();
+  const statusBadge = getStatusBadge()
 
   const tabs: {
-    id: ProjectWorkspaceTab;
-    labelAr: string;
-    labelEn: string;
-    icon: React.ReactNode;
+    id: ProjectWorkspaceTab
+    labelAr: string
+    labelEn: string
+    icon: React.ReactNode
   }[] = [
     {
       id: "brief_review",
       labelAr: "المراجعة الهندسية والاعتماد",
       labelEn: "Brief Review & Signoff",
-      icon: <FileText className="w-4 h-4" />,
+      icon: <FileText className="h-4 w-4" />,
     },
     {
       id: "overview",
       labelAr: "نظرة عامة على العقار",
       labelEn: "Property Overview",
-      icon: <Buildings className="w-4 h-4" />,
+      icon: <Buildings className="h-4 w-4" />,
     },
     {
       id: "files_drawings",
-      labelAr: "الملفات والمخططات (2)",
-      labelEn: "Files & Drawings (2)",
-      icon: <FolderOpen className="w-4 h-4" />,
+      labelAr: "الملفات والمخططات",
+      labelEn: "Files & Drawings",
+      icon: <FolderOpen className="h-4 w-4" />,
     },
     {
       id: "consultation",
       labelAr: "جلسة الاستشارة",
       labelEn: "Consultation Session",
-      icon: <CalendarCheck className="w-4 h-4" />,
+      icon: <CalendarCheck className="h-4 w-4" />,
     },
     {
       id: "mom",
       labelAr: "محضر الاجتماع (MOM)",
       labelEn: "Minutes of Meeting",
-      icon: <NotePencil className="w-4 h-4" />,
+      icon: <NotePencil className="h-4 w-4" />,
     },
     {
       id: "activity",
       labelAr: "سجل النشاط الموثق",
       labelEn: "Activity Log",
-      icon: <Clock className="w-4 h-4" />,
+      icon: <Clock className="h-4 w-4" />,
     },
-  ];
+  ]
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="animate-in space-y-6 duration-300 fade-in">
       {/* Top Breadcrumb & Back Control */}
       <div className="flex items-center justify-between border-b border-border/70 pb-4">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors cursor-pointer group"
+          className="group inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           {isRTL ? (
-            <ArrowRight className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
           ) : (
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
           )}
           <span>{isRTL ? "العودة للمشروعات" : "Back to projects"}</span>
         </button>
 
-        <span className="text-xs font-mono text-muted-foreground">
+        <span className="font-mono text-xs text-muted-foreground">
           Project ID: #{context.id}
         </span>
       </div>
 
       {/* Project Identity Hero Bar */}
-      <div className="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="space-y-4 rounded-2xl border border-border bg-card p-5 shadow-xs sm:p-6">
+        <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider">
+              <span className="font-mono text-[10px] tracking-wider text-muted-foreground uppercase">
                 COMMISSION DOSSIER #{context.id}
               </span>
               <span
                 className={cn(
-                  "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium border",
+                  "inline-flex items-center rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-medium",
                   statusBadge.className
                 )}
               >
@@ -172,29 +173,32 @@ export function ProjectWorkspace({
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-serif font-medium text-foreground">
+            <h1 className="font-serif text-xl font-medium text-foreground sm:text-2xl">
               {context.title}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               <span className="flex items-center gap-1 font-medium text-foreground">
-                <User className="w-3.5 h-3.5 text-primary" />
+                <User className="h-3.5 w-3.5 text-primary" />
                 <span>{context.client.name || context.client.username}</span>
               </span>
               {context.property && (
                 <>
                   <span>·</span>
                   <span className="flex items-center gap-1">
-                    <Buildings className="w-3.5 h-3.5" />
+                    <Buildings className="h-3.5 w-3.5" />
                     <span>
-                      {context.property.propertyType} · {context.property.areaSqm} m²
+                      {context.property.propertyType} ·{" "}
+                      {context.property.areaSqm} m²
                     </span>
                   </span>
                   <span>·</span>
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5" />
+                    <MapPin className="h-3.5 w-3.5" />
                     <span>
-                      {context.property.compound ? `${context.property.compound}, ` : ""}
+                      {context.property.compound
+                        ? `${context.property.compound}, `
+                        : ""}
                       {context.property.city}
                     </span>
                   </span>
@@ -204,22 +208,22 @@ export function ProjectWorkspace({
           </div>
 
           {/* Permitted Next Action Box */}
-          <div className="p-3 rounded-xl bg-muted/40 border border-border/80 text-xs space-y-1 md:text-end shrink-0 max-w-xs">
-            <span className="text-[10px] font-mono uppercase text-muted-foreground block">
+          <div className="max-w-xs shrink-0 space-y-1 rounded-xl border border-border/80 bg-muted/40 p-3 text-xs md:text-end">
+            <span className="block font-mono text-[10px] text-muted-foreground uppercase">
               {isRTL ? "الإجراء القادم المسموح به:" : "Permitted Next Action:"}
             </span>
-            <span className="font-semibold text-foreground block">
+            <span className="block font-semibold text-foreground">
               {context.status === "SUBMITTED"
                 ? isRTL
                   ? "بدء المراجعة الهندسية وتدقيق المخططات"
                   : "Start Engineering Review"
                 : context.status === "UNDER_ENGINEER_REVIEW"
-                ? isRTL
-                  ? "تدقيق المواصفات وتأكيد الجاهزية للاستشارة"
-                  : "Audit & Sign Off Readiness"
-                : isRTL
-                ? "بانتظار قيام العميل بحجز جلسة الاستشارة"
-                : "Waiting for Client to Book Session"}
+                  ? isRTL
+                    ? "تدقيق المواصفات وتأكيد الجاهزية للاستشارة"
+                    : "Audit & Sign Off Readiness"
+                  : isRTL
+                    ? "بانتظار قيام العميل بحجز جلسة الاستشارة"
+                    : "Waiting for Client to Book Session"}
             </span>
           </div>
         </div>
@@ -232,10 +236,10 @@ export function ProjectWorkspace({
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer",
+                "flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium whitespace-nowrap transition-all",
                 activeTab === tab.id
-                  ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "bg-primary font-semibold text-primary-foreground shadow-xs"
+                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
               )}
             >
               {tab.icon}
@@ -257,41 +261,43 @@ export function ProjectWorkspace({
       )}
 
       {activeTab === "overview" && (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
-          <h3 className="text-base font-serif font-medium text-foreground border-b border-border pb-3">
-            {isRTL ? "تفاصيل العقار ونطاق الأعمال" : "Property & Scope Overview"}
+        <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-xs">
+          <h3 className="border-b border-border pb-3 font-serif text-base font-medium text-foreground">
+            {isRTL
+              ? "تفاصيل العقار ونطاق الأعمال"
+              : "Property & Scope Overview"}
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-            <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
-              <span className="text-muted-foreground block text-[11px]">
+          <div className="grid grid-cols-1 gap-4 text-xs sm:grid-cols-2 md:grid-cols-4">
+            <div className="rounded-xl border border-border bg-muted/30 p-3.5">
+              <span className="block text-[11px] text-muted-foreground">
                 {isRTL ? "النوع المعماري:" : "Typology:"}
               </span>
-              <span className="font-mono font-medium text-sm text-foreground">
+              <span className="font-mono text-sm font-medium text-foreground">
                 {context.property?.propertyType || "Residential"}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
-              <span className="text-muted-foreground block text-[11px]">
+            <div className="rounded-xl border border-border bg-muted/30 p-3.5">
+              <span className="block text-[11px] text-muted-foreground">
                 {isRTL ? "المساحة الإجمالية:" : "Gross Area:"}
               </span>
-              <span className="font-mono font-medium text-sm text-foreground">
+              <span className="font-mono text-sm font-medium text-foreground">
                 {context.property?.areaSqm || "—"} m²
               </span>
             </div>
-            <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
-              <span className="text-muted-foreground block text-[11px]">
+            <div className="rounded-xl border border-border bg-muted/30 p-3.5">
+              <span className="block text-[11px] text-muted-foreground">
                 {isRTL ? "المجمع / الكمبوند:" : "Compound:"}
               </span>
-              <span className="font-medium text-sm text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {context.property?.compound || (isRTL ? "منفصل" : "Standalone")}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl bg-muted/30 border border-border">
-              <span className="text-muted-foreground block text-[11px]">
+            <div className="rounded-xl border border-border bg-muted/30 p-3.5">
+              <span className="block text-[11px] text-muted-foreground">
                 {isRTL ? "المدينة:" : "City:"}
               </span>
-              <span className="font-medium text-sm text-foreground">
+              <span className="text-sm font-medium text-foreground">
                 {context.property?.city || "Cairo"}
               </span>
             </div>
@@ -299,21 +305,21 @@ export function ProjectWorkspace({
 
           {/* Spaces Breakdown */}
           <div className="space-y-3">
-            <h4 className="text-xs font-mono uppercase text-muted-foreground">
+            <h4 className="font-mono text-xs text-muted-foreground uppercase">
               {isRTL
                 ? `المساحات والغرف المحددة (${context.spaces.length})`
                 : `Itemized Spaces (${context.spaces.length})`}
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {context.spaces.map((sp) => (
                 <div
                   key={sp.id}
-                  className="p-3 rounded-xl border border-border bg-background/50 flex items-center justify-between text-xs"
+                  className="flex items-center justify-between rounded-xl border border-border bg-background/50 p-3 text-xs"
                 >
                   <span className="font-medium text-foreground">
                     {sp.type.replace(/_/g, " ")}
                   </span>
-                  <span className="text-[10px] font-mono text-muted-foreground">
+                  <span className="font-mono text-[10px] text-muted-foreground">
                     #{sp.id}
                   </span>
                 </div>
@@ -322,10 +328,10 @@ export function ProjectWorkspace({
           </div>
 
           {/* Future Stage Indicator (Sprint 3+ locked) */}
-          <div className="p-4 rounded-xl border border-dashed border-border bg-muted/10 text-xs text-muted-foreground flex items-center gap-3">
-            <Lock className="w-5 h-5 text-muted-foreground shrink-0" />
+          <div className="flex items-center gap-3 rounded-xl border border-dashed border-border bg-muted/10 p-4 text-xs text-muted-foreground">
+            <Lock className="h-5 w-5 shrink-0 text-muted-foreground" />
             <div>
-              <span className="font-medium text-foreground block">
+              <span className="block font-medium text-foreground">
                 {isRTL
                   ? "مراحل المسح الميداني والتنفيذ (مراحل مستقبلية)"
                   : "Field Survey, BOQ & Procurement (Future Sprint Stages)"}
@@ -341,13 +347,15 @@ export function ProjectWorkspace({
       )}
 
       {activeTab === "files_drawings" && (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
+        <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-xs">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div>
-              <h3 className="text-base font-serif font-medium text-foreground">
-                {isRTL ? "الملفات والمخططات المقدمة" : "Submitted Files & Drawings"}
+              <h3 className="font-serif text-base font-medium text-foreground">
+                {isRTL
+                  ? "الملفات والمخططات المقدمة"
+                  : "Submitted Files & Drawings"}
               </h3>
-              <p className="text-xs text-muted-foreground font-mono">
+              <p className="font-mono text-xs text-muted-foreground">
                 {isRTL
                   ? "المخططات والصور التي رفعها العميل مع كراسة المتطلبات"
                   : "Customer floor plans, concept photographs, and architectural files"}
@@ -355,52 +363,24 @@ export function ProjectWorkspace({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl border border-border bg-background/60 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0">
-                <FilePdf className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-foreground">
-                  Architectural-Layout-FloorPlan.pdf
-                </div>
-                <div className="text-[11px] text-muted-foreground font-mono">
-                  4.2 MB · Submitted with brief
-                </div>
-                <span className="inline-block mt-1 text-[11px] text-primary hover:underline font-mono cursor-pointer">
-                  {isRTL ? "معاينة المخطط المعماري" : "Inspect Floor Plan"}
-                </span>
-              </div>
-            </div>
-
-            <div className="p-4 rounded-xl border border-border bg-background/60 flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-amber-600 flex items-center justify-center shrink-0">
-                <ImageIcon className="w-5 h-5" />
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-foreground">
-                  Existing-Site-Condition-Photos.zip
-                </div>
-                <div className="text-[11px] text-muted-foreground font-mono">
-                  18.5 MB · Uploaded by Customer
-                </div>
-                <span className="inline-block mt-1 text-[11px] text-primary hover:underline font-mono cursor-pointer">
-                  {isRTL ? "تنزيل وفحص الصور" : "Download & Inspect Photos"}
-                </span>
-              </div>
-            </div>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            {isRTL
+              ? "الملفات غير متاحة في عرض المراجعة الحالي."
+              : "Attachments are unavailable in the current review view."}
+          </p>
         </div>
       )}
 
       {activeTab === "consultation" && (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-6 shadow-xs">
+        <div className="space-y-6 rounded-2xl border border-border bg-card p-6 shadow-xs">
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div>
-              <h3 className="text-base font-serif font-medium text-foreground">
-                {isRTL ? "جلسة الاستشارة المعمارية المجانية" : "Architectural Consultation Session"}
+              <h3 className="font-serif text-base font-medium text-foreground">
+                {isRTL
+                  ? "جلسة الاستشارة المعمارية المجانية"
+                  : "Architectural Consultation Session"}
               </h3>
-              <p className="text-xs text-muted-foreground font-mono">
+              <p className="font-mono text-xs text-muted-foreground">
                 {isRTL
                   ? "توقيت الجلسة، الرابط، وحالة الموعد"
                   : "Session slot, video link, and appointment status in Cairo Time"}
@@ -409,14 +389,14 @@ export function ProjectWorkspace({
           </div>
 
           {projectConsultation ? (
-            <div className="p-5 rounded-xl border border-border bg-background/60 space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-4 rounded-xl border border-border bg-background/60 p-5">
+              <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-medium bg-[#503C2C]/10 text-[#503C2C] dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2] border border-[#503C2C]/20">
+                    <span className="rounded-full border border-[#503C2C]/20 bg-[#503C2C]/10 px-2.5 py-0.5 font-mono text-xs font-medium text-[#503C2C] dark:bg-[#FAF7F2]/10 dark:text-[#FAF7F2]">
                       {projectConsultation.status}
                     </span>
-                    <span className="text-xs font-mono text-muted-foreground">
+                    <span className="font-mono text-xs text-muted-foreground">
                       {projectConsultation.durationMinutes} min
                     </span>
                   </div>
@@ -428,7 +408,8 @@ export function ProjectWorkspace({
                     }).format(new Date(projectConsultation.scheduledAt))}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Client: {projectConsultation.clientName} ({projectConsultation.clientPhone})
+                    Client: {projectConsultation.clientName} (
+                    {projectConsultation.clientPhone})
                   </div>
                 </div>
 
@@ -437,34 +418,38 @@ export function ProjectWorkspace({
                     href={projectConsultation.meetingLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium flex items-center gap-1.5 shadow-xs transition-all self-start sm:self-center"
+                    className="flex items-center gap-1.5 self-start rounded-xl bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-xs transition-all hover:bg-primary/90 sm:self-center"
                   >
-                    <VideoCamera className="w-4 h-4" />
-                    <span>{isRTL ? "دخول جلسة الاستشارة" : "Join Consultation"}</span>
+                    <VideoCamera className="h-4 w-4" />
+                    <span>
+                      {isRTL ? "دخول جلسة الاستشارة" : "Join Consultation"}
+                    </span>
                   </a>
                 )}
               </div>
 
               {projectConsultation.notes && (
-                <div className="p-3 rounded-lg bg-muted/40 border border-border text-xs text-muted-foreground">
+                <div className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
                   <strong>Agenda Note:</strong> {projectConsultation.notes}
                 </div>
               )}
             </div>
           ) : (
-            <div className="p-8 rounded-xl border border-dashed border-border text-center space-y-2">
-              <CalendarCheck className="w-8 h-8 mx-auto text-muted-foreground" />
+            <div className="space-y-2 rounded-xl border border-dashed border-border p-8 text-center">
+              <CalendarCheck className="mx-auto h-8 w-8 text-muted-foreground" />
               <h4 className="text-xs font-medium text-foreground">
-                {isRTL ? "لم يتم حجز موعد استشارة بعد" : "No Consultation Booked Yet"}
+                {isRTL
+                  ? "لم يتم حجز موعد استشارة بعد"
+                  : "No Consultation Booked Yet"}
               </h4>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+              <p className="mx-auto max-w-sm text-xs text-muted-foreground">
                 {context.status === "ENGINEER_READY"
                   ? isRTL
                     ? "المشروع جاهز للاستشارة وبانتظار قيام العميل باختيار وتأكيد الموعد المناسب."
                     : "Feasibility is signed off. Waiting for customer to select and book a consultation slot."
                   : isRTL
-                  ? "يجب إنهاء المراجعة الهندسية واعتماد الجاهزية للاستشارة أولاً حتى يتمكن العميل من حجز الموعد."
-                  : "Complete engineering review and sign off readiness first to unlock consultation booking for customer."}
+                    ? "يجب إنهاء المراجعة الهندسية واعتماد الجاهزية للاستشارة أولاً حتى يتمكن العميل من حجز الموعد."
+                    : "Complete engineering review and sign off readiness first to unlock consultation booking for customer."}
               </p>
             </div>
           )}
@@ -486,5 +471,5 @@ export function ProjectWorkspace({
         </div>
       )}
     </div>
-  );
+  )
 }

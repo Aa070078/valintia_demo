@@ -69,7 +69,7 @@ function CreateProjectContent() {
   const { user } = useAuth();
   const [isSignInOpen, setIsSignInOpen] = React.useState(false);
 
-  // Centralized initial state (empty in real API mode, showcase defaults in demo mode)
+  // New projects begin with an unfilled form; no showcase account or project data.
   const initialData = React.useMemo(() => getInitialWizardState(), []);
 
   // 11 Step Form State

@@ -1,13 +1,13 @@
-"use client";
+"use client"
 
-import * as React from "react";
-import { useEngineerWorkspace } from "@/features/engineer/hooks/use-engineer-workspace";
-import { HighestPriorityAction } from "@/features/engineer/components/highest-priority-action";
-import { NeedsAttention } from "@/features/engineer/components/needs-attention";
-import { AssignedProjectsQueue } from "@/features/engineer/components/assigned-projects-queue";
-import { AppointmentsCalendar } from "@/features/engineer/components/appointments-calendar";
-import { ProjectWorkspace } from "@/features/engineer/components/project-workspace";
-import { ProjectWorkspaceTab } from "@/features/engineer/types/engineer.types";
+import * as React from "react"
+import { useEngineerWorkspace } from "@/features/engineer/hooks/use-engineer-workspace"
+import { HighestPriorityAction } from "@/features/engineer/components/highest-priority-action"
+import { NeedsAttention } from "@/features/engineer/components/needs-attention"
+import { AssignedProjectsQueue } from "@/features/engineer/components/assigned-projects-queue"
+import { AppointmentsCalendar } from "@/features/engineer/components/appointments-calendar"
+import { ProjectWorkspace } from "@/features/engineer/components/project-workspace"
+import { ProjectWorkspaceTab } from "@/features/engineer/types/engineer.types"
 import {
   Compass,
   Buildings,
@@ -16,10 +16,12 @@ import {
   WarningCircle,
   Translate,
   Spinner,
-} from "@phosphor-icons/react";
-import { cn } from "@/lib/utils";
+} from "@phosphor-icons/react"
+import { useAuth } from "@/components/auth/auth-context"
+import { cn } from "@/lib/utils"
 
 export function EngineerDashboard() {
+  const { user } = useAuth()
   const {
     projects,
     consultations,
@@ -37,21 +39,40 @@ export function EngineerDashboard() {
     setFeedback,
     handleStartReview,
     handleReadyForConsultation,
-  } = useEngineerWorkspace();
+  } = useEngineerWorkspace()
 
-  const [activeMainView, setActiveMainView] = React.useState<"projects" | "calendar">("projects");
-  const [targetTab, setTargetTab] = React.useState<ProjectWorkspaceTab>("brief_review");
+  const [activeMainView, setActiveMainView] = React.useState<
+    "projects" | "calendar"
+  >("projects")
+  const [targetTab, setTargetTab] =
+    React.useState<ProjectWorkspaceTab>("brief_review")
 
   // Handle opening project with specific tab
-  const handleOpenProject = (projectId: number, tab: ProjectWorkspaceTab = "brief_review") => {
-    setTargetTab(tab);
-    setSelectedProjectId(projectId);
-  };
+  const handleOpenProject = (
+    projectId: number,
+    tab: ProjectWorkspaceTab = "brief_review"
+  ) => {
+    setTargetTab(tab)
+    setSelectedProjectId(projectId)
+  }
 
   // If a project is selected, render the dedicated Project Workspace view
   if (selectedProjectId !== null && reviewContext) {
     return (
-      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-in fade-in duration-300">
+      <div className="mx-auto w-full max-w-7xl animate-in p-4 duration-300 fade-in sm:p-6 lg:p-8">
+        {feedback && (
+          <p
+            role="status"
+            className={cn(
+              "mb-4 rounded-xl border p-4 text-sm",
+              feedback.type === "error"
+                ? "border-destructive/30 bg-destructive/10 text-destructive"
+                : "border-primary/30 bg-primary/10 text-primary"
+            )}
+          >
+            {feedback.text}
+          </p>
+        )}
         <ProjectWorkspace
           context={reviewContext}
           activities={activities}
@@ -64,27 +85,27 @@ export function EngineerDashboard() {
           initialTab={targetTab}
         />
       </div>
-    );
+    )
   }
 
   return (
-    <div className="space-y-8 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full animate-in fade-in duration-300">
+    <div className="mx-auto w-full max-w-7xl animate-in space-y-8 p-4 duration-300 fade-in sm:p-6 lg:p-8">
       {/* Top Header: Operational Workspace Identity */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col justify-between gap-4 border-b border-border pb-6 sm:flex-row sm:items-center">
         <div>
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-mono uppercase tracking-wider mb-2">
-            <Compass className="w-3.5 h-3.5" />
+          <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary/10 px-2.5 py-1 font-mono text-xs tracking-wider text-primary uppercase">
+            <Compass className="h-3.5 w-3.5" />
             <span>
               {isRTL ? "منظومة المهندس المعماري" : "ENGINEER OPERATIONAL DESK"}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-serif font-medium text-foreground tracking-tight">
+          <h1 className="font-serif text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
             {isRTL ? "مساحة عمل المهندس" : "Engineer Workspace"}
           </h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1 max-w-2xl leading-relaxed">
+          <p className="mt-1 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
             {isRTL
-              ? "مرحباً، م. كريم السيد. راجع كراسات المتطلبات المسندة إليك، دقق المخططات، اعتمد الجاهزية للاستشارة، وأدر مواعيد ومحاضر الجلسات."
-              : "Welcome, Eng. Karim El-Sayed. Review assigned customer briefs, audit floor plans, sign off consultation readiness, and manage session MOM records."}
+              ? "راجع المشاريع المسندة إليك واعتمد الجاهزية للاستشارة."
+              : "Review your assigned customer briefs and sign off consultation readiness."}
           </p>
         </div>
 
@@ -93,23 +114,24 @@ export function EngineerDashboard() {
           <button
             type="button"
             onClick={toggleLanguage}
-            className="px-3 py-1.5 rounded-xl border border-border bg-card hover:bg-muted text-xs font-mono text-foreground flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 font-mono text-xs text-foreground shadow-xs transition-all hover:bg-muted"
             title={isRTL ? "Switch to English" : "التبديل إلى العربية"}
           >
-            <Translate className="w-4 h-4 text-primary" />
+            <Translate className="h-4 w-4 text-primary" />
             <span>{isRTL ? "English" : "عربي"}</span>
           </button>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border bg-card shadow-xs">
-            <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs font-mono">
-              KS
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-1.5 shadow-xs">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 font-mono text-xs font-bold text-primary">
+              {user?.username?.slice(0, 2).toUpperCase() || "—"}
             </div>
             <div className="text-start">
-              <span className="block text-xs font-medium text-foreground leading-tight">
-                Eng. Karim El-Sayed
+              <span className="block text-xs leading-tight font-medium text-foreground">
+                {user?.username || "—"}
               </span>
-              <span className="block text-[10px] font-mono text-muted-foreground">
-                {projects.length} {isRTL ? "مشروعات نشطة" : "Active Commissions"}
+              <span className="block font-mono text-[10px] text-muted-foreground">
+                {projects.length}{" "}
+                {isRTL ? "مشروعات نشطة" : "Active Commissions"}
               </span>
             </div>
           </div>
@@ -120,24 +142,24 @@ export function EngineerDashboard() {
       {feedback && (
         <div
           className={cn(
-            "p-4 rounded-xl text-xs font-medium flex items-center justify-between animate-in fade-in",
+            "flex animate-in items-center justify-between rounded-xl p-4 text-xs font-medium fade-in",
             feedback.type === "success"
-              ? "bg-[#EFE8DE] border border-[#B88460]/30 text-[#503C2C] dark:bg-[#2C2621] dark:border-[#B88460]/40 dark:text-[#F5EFE6]"
-              : "bg-destructive/10 border border-destructive/20 text-destructive"
+              ? "border border-[#B88460]/30 bg-[#EFE8DE] text-[#503C2C] dark:border-[#B88460]/40 dark:bg-[#2C2621] dark:text-[#F5EFE6]"
+              : "border border-destructive/20 bg-destructive/10 text-destructive"
           )}
         >
           <div className="flex items-center gap-2">
             {feedback.type === "success" ? (
-              <CheckCircle className="w-4 h-4 text-[#B88460] shrink-0" />
+              <CheckCircle className="h-4 w-4 shrink-0 text-[#B88460]" />
             ) : (
-              <WarningCircle className="w-4 h-4 text-destructive shrink-0" />
+              <WarningCircle className="h-4 w-4 shrink-0 text-destructive" />
             )}
             <span>{feedback.text}</span>
           </div>
           <button
             type="button"
             onClick={() => setFeedback(null)}
-            className="text-muted-foreground hover:text-foreground text-xs font-mono"
+            className="font-mono text-xs text-muted-foreground hover:text-foreground"
           >
             ✕
           </button>
@@ -146,9 +168,9 @@ export function EngineerDashboard() {
 
       {/* Loading state indicator */}
       {isLoading ? (
-        <div className="p-16 text-center space-y-3">
-          <Spinner className="w-8 h-8 animate-spin mx-auto text-primary" />
-          <p className="text-xs text-muted-foreground font-mono">
+        <div className="space-y-3 p-16 text-center">
+          <Spinner className="mx-auto h-8 w-8 animate-spin text-primary" />
+          <p className="font-mono text-xs text-muted-foreground">
             {isRTL
               ? "جارٍ تحميل المشروعات والمواعيد المسندة..."
               : "Synchronizing assigned commissions & consultation calendar..."}
@@ -178,13 +200,13 @@ export function EngineerDashboard() {
               type="button"
               onClick={() => setActiveMainView("projects")}
               className={cn(
-                "px-4 py-2 rounded-t-xl text-xs font-medium transition-all flex items-center gap-2 border-b-2 cursor-pointer",
+                "flex cursor-pointer items-center gap-2 rounded-t-xl border-b-2 px-4 py-2 text-xs font-medium transition-all",
                 activeMainView === "projects"
-                  ? "border-primary text-primary font-semibold bg-muted/30"
+                  ? "border-primary bg-muted/30 font-semibold text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
-              <Buildings className="w-4 h-4" />
+              <Buildings className="h-4 w-4" />
               <span>
                 {isRTL
                   ? `طابور المشروعات المسندة (${projects.length})`
@@ -196,13 +218,13 @@ export function EngineerDashboard() {
               type="button"
               onClick={() => setActiveMainView("calendar")}
               className={cn(
-                "px-4 py-2 rounded-t-xl text-xs font-medium transition-all flex items-center gap-2 border-b-2 cursor-pointer",
+                "flex cursor-pointer items-center gap-2 rounded-t-xl border-b-2 px-4 py-2 text-xs font-medium transition-all",
                 activeMainView === "calendar"
-                  ? "border-primary text-primary font-semibold bg-muted/30"
+                  ? "border-primary bg-muted/30 font-semibold text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               )}
             >
-              <CalendarCheck className="w-4 h-4" />
+              <CalendarCheck className="h-4 w-4" />
               <span>
                 {isRTL
                   ? `الأجندة والمواعيد (${consultations.length})`
@@ -221,14 +243,21 @@ export function EngineerDashboard() {
               isRTL={isRTL}
             />
           ) : (
-            <AppointmentsCalendar
-              consultations={consultations}
-              onOpenProject={(id, tab) => handleOpenProject(id, tab)}
-              isRTL={isRTL}
-            />
+            <div className="space-y-4">
+              <p className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+                {isRTL
+                  ? "إدارة مواعيد الاستشارات غير متاحة حاليًا."
+                  : "Consultation scheduling is currently unavailable."}
+              </p>
+              <AppointmentsCalendar
+                consultations={consultations}
+                onOpenProject={(id, tab) => handleOpenProject(id, tab)}
+                isRTL={isRTL}
+              />
+            </div>
           )}
         </>
       )}
     </div>
-  );
+  )
 }

@@ -22,6 +22,23 @@ export class UsersService {
     @Inject(ConfigService) private readonly config: ConfigService,
   ) {}
 
+  listInternalUsers() {
+    return this.prisma.user.findMany({
+      where: { role: { in: ['ENGINEER', 'PROJECT_MANAGER', 'COMPANY_OWNER'] } },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        emailVerified: true,
+        mustChangePassword: true,
+        temporaryCredentialsExpiresAt: true,
+        createdAt: true,
+      },
+    });
+  }
+
   private async credentials() {
     const temporaryPassword = `Tmp!${randomBytes(12).toString('base64url')}`;
     return {

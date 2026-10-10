@@ -1,3 +1,4 @@
+import { getAccessToken } from "@/lib/auth-storage"
 /**
  * Engineer API Service & Adapters
  * Connects to live NestJS backend endpoints merged in master (PR #20).
@@ -11,47 +12,34 @@ import {
   ProjectActivity,
   ConsultationAppointment,
   MomRecord,
-} from "../types/engineer.types";
+} from "../types/engineer.types"
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api";
+  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:5000/api"
 
 function getAuthHeader(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  try {
-    const token =
-      localStorage.getItem("valentia_auth_token") ||
-      document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("valentia_auth_token="))
-        ?.split("=")[1];
-    if (token) {
-      return { Authorization: `Bearer ${decodeURIComponent(token)}` };
-    }
-  } catch {
-    // LocalStorage or cookie unavailable
-  }
-  return {};
+  const token = getAccessToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    let errMessage = `HTTP error ${res.status}: ${res.statusText}`;
+    let errMessage = `HTTP error ${res.status}: ${res.statusText}`
     try {
-      const data = await res.json();
+      const data = await res.json()
       if (data?.message) {
         errMessage = Array.isArray(data.message)
           ? data.message.join(", ")
-          : data.message;
+          : data.message
       }
     } catch {
       // Body not JSON
     }
-    const err = new Error(errMessage) as Error & { status?: number };
-    err.status = res.status;
-    throw err;
+    const err = new Error(errMessage) as Error & { status?: number }
+    err.status = res.status
+    throw err
   }
-  return res.json();
+  return res.json()
 }
 
 /**
@@ -62,15 +50,20 @@ export async function getAssignedProjects(): Promise<ProjectListItem[]> {
   const headers = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
-  };
+  }
 
   const res = await fetch(`${API_BASE_URL}/projects`, {
     method: "GET",
     headers,
     cache: "no-store",
-  });
+  })
 
-  return handleResponse<ProjectListItem[]>(res);
+  const data = await handleResponse<ProjectListItem[]>(res)
+  return data.map((project) => ({
+    ...project,
+    id: Number(project.id),
+    status: project.status.toUpperCase() as ProjectListItem["status"],
+  }))
 }
 
 /**
@@ -83,15 +76,15 @@ export async function getProjectReviewContext(
   const headers = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
-  };
+  }
 
   const res = await fetch(`${API_BASE_URL}/projects/${id}/review`, {
     method: "GET",
     headers,
     cache: "no-store",
-  });
+  })
 
-  return handleResponse<ProjectReviewContext>(res);
+  return handleResponse<ProjectReviewContext>(res)
 }
 
 /**
@@ -105,15 +98,15 @@ export async function startReview(
   const headers = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
-  };
+  }
 
   const res = await fetch(`${API_BASE_URL}/projects/${id}/review/start`, {
     method: "POST",
     headers,
     body: JSON.stringify(note ? { note } : {}),
-  });
+  })
 
-  return handleResponse<ProjectReviewTransition>(res);
+  return handleResponse<ProjectReviewTransition>(res)
 }
 
 /**
@@ -127,7 +120,7 @@ export async function markReadyForConsultation(
   const headers = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
-  };
+  }
 
   const res = await fetch(
     `${API_BASE_URL}/projects/${id}/review/ready-for-consultation`,
@@ -136,9 +129,9 @@ export async function markReadyForConsultation(
       headers,
       body: JSON.stringify(note ? { note } : {}),
     }
-  );
+  )
 
-  return handleResponse<ProjectReviewTransition>(res);
+  return handleResponse<ProjectReviewTransition>(res)
 }
 
 /**
@@ -151,124 +144,36 @@ export async function getProjectActivity(
   const headers = {
     "Content-Type": "application/json",
     ...getAuthHeader(),
-  };
+  }
 
   const res = await fetch(`${API_BASE_URL}/projects/${id}/activity`, {
     method: "GET",
     headers,
     cache: "no-store",
-  });
+  })
 
-  return handleResponse<ProjectActivity[]>(res);
+  return handleResponse<ProjectActivity[]>(res)
 }
 
 // =========================================================================
 // SPRINT 2: CONSULTATION & MOM ADAPTERS (READY FOR API HOOKUP)
 // =========================================================================
 
-const LOCAL_CONSULTATIONS_KEY = "valentia_consultations_cache";
-const LOCAL_MOM_KEY = "valentia_mom_records_cache";
-
-/**
- * Default Seed Consultations for Sprint 2 Engineer Workspace
- */
-const SEED_CONSULTATIONS: ConsultationAppointment[] = [
-  {
-    id: "consult-01",
-    projectId: 1,
-    projectTitle: "Palm Hills Villa 420 - Luxury Fitout",
-    clientName: "Tarek Mansour",
-    clientPhone: "+20 100 123 4567",
-    clientEmail: "tarek.mansour@example.com",
-    // Today at 2:00 PM UTC = 4:00 PM Cairo (UTC+2)
-    scheduledAt: new Date(Date.now() + 3600000 * 2).toISOString(),
-    durationMinutes: 45,
-    status: "CONFIRMED",
-    meetingLink: "https://meet.google.com/val-palm-420",
-    notes: "Review open layout partition removal and preliminary lighting concept.",
-  },
-  {
-    id: "consult-02",
-    projectId: 2,
-    projectTitle: "Swan Lake Penthouse B4",
-    clientName: "Laila El-Kady",
-    clientPhone: "+20 101 987 6543",
-    clientEmail: "laila.kady@example.com",
-    // Tomorrow at 11:00 AM UTC = 1:00 PM Cairo
-    scheduledAt: new Date(Date.now() + 86400000).toISOString(),
-    durationMinutes: 45,
-    status: "REQUESTED",
-    notes: "Initial consultation request awaiting time slot confirmation.",
-  },
-];
-
+// No consultation/MOM database endpoints exist in this checkout.
 export async function getConsultations(): Promise<ConsultationAppointment[]> {
-  if (typeof window === "undefined") return SEED_CONSULTATIONS;
-  try {
-    const raw = localStorage.getItem(LOCAL_CONSULTATIONS_KEY);
-    if (!raw) {
-      localStorage.setItem(LOCAL_CONSULTATIONS_KEY, JSON.stringify(SEED_CONSULTATIONS));
-      return SEED_CONSULTATIONS;
-    }
-    return JSON.parse(raw);
-  } catch {
-    return SEED_CONSULTATIONS;
-  }
+  return []
 }
-
 export async function getMomForProject(
-  projectId: number
+  _projectId: number
 ): Promise<MomRecord | null> {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(LOCAL_MOM_KEY);
-    if (!raw) return null;
-    const records: MomRecord[] = JSON.parse(raw);
-    return records.find((m) => m.projectId === projectId) || null;
-  } catch {
-    return null;
-  }
+  void _projectId
+  return null
 }
-
 export async function saveMomRecord(
-  data: Omit<MomRecord, "id" | "createdAt" | "updatedAt"> & { id?: string }
+  _data: Omit<MomRecord, "id" | "createdAt" | "updatedAt"> & { id?: string }
 ): Promise<MomRecord> {
-  const existingRecords: MomRecord[] = (() => {
-    try {
-      const raw = localStorage.getItem(LOCAL_MOM_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
-  })();
-
-  const now = new Date().toISOString();
-  let saved: MomRecord;
-
-  if (data.id) {
-    saved = {
-      ...data,
-      id: data.id,
-      createdAt: now,
-      updatedAt: now,
-    };
-    const idx = existingRecords.findIndex((r) => r.id === data.id);
-    if (idx >= 0) {
-      saved.createdAt = existingRecords[idx].createdAt;
-      existingRecords[idx] = saved;
-    } else {
-      existingRecords.push(saved);
-    }
-  } else {
-    saved = {
-      ...data,
-      id: `mom-${Date.now()}`,
-      createdAt: now,
-      updatedAt: now,
-    };
-    existingRecords.push(saved);
-  }
-
-  localStorage.setItem(LOCAL_MOM_KEY, JSON.stringify(existingRecords));
-  return saved;
+  void _data
+  throw new Error(
+    "Meeting minutes are unavailable until the server supports them."
+  )
 }

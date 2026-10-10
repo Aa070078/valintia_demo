@@ -9,26 +9,26 @@ import type {
   ProjectBudget,
   TargetCompletion,
   ProjectDocument,
-} from "../types";
+} from "../types"
 
 export interface WizardFormData {
-  propertyType: PropertyType | "" | null;
-  property: PropertyEntity;
-  spaces: SpaceEntity[];
-  primaryStyleId: string;
-  pendingStyles: PendingStyleSelection[];
-  customerLocation: CustomerLocation;
-  representative: AuthorizedRepresentative;
-  scope: ProjectScope;
-  budget: ProjectBudget;
-  timeline: TargetCompletion;
-  documents: ProjectDocument[];
+  propertyType: PropertyType | "" | null
+  property: PropertyEntity
+  spaces: SpaceEntity[]
+  primaryStyleId: string
+  pendingStyles: PendingStyleSelection[]
+  customerLocation: CustomerLocation
+  representative: AuthorizedRepresentative
+  scope: ProjectScope
+  budget: ProjectBudget
+  timeline: TargetCompletion
+  documents: ProjectDocument[]
 }
 
 export interface StepValidationResult {
-  isValid: boolean;
-  errorEn?: string;
-  errorAr?: string;
+  isValid: boolean
+  errorEn?: string
+  errorAr?: string
 }
 
 /**
@@ -42,42 +42,50 @@ export function validateStep(
   switch (step) {
     case 1: {
       // Step 1: Property Type (Selected value required)
-      const valid = Boolean(data.propertyType && data.propertyType.trim().length > 0);
+      const valid = Boolean(
+        data.propertyType && data.propertyType.trim().length > 0
+      )
       return {
         isValid: valid,
-        errorEn: valid ? undefined : "Please select a property typology to proceed.",
+        errorEn: valid
+          ? undefined
+          : "Please select a property typology to proceed.",
         errorAr: valid ? undefined : "يرجى اختيار نوع العقار للمتابعة.",
-      };
+      }
     }
 
     case 2: {
       // Step 2: Property Information / Specs (City required, Area > 0; compound is OPTIONAL)
-      const hasCity = Boolean(data.property?.city && data.property.city.trim().length > 0);
-      const hasArea = Boolean(data.property?.areaSqm && Number(data.property.areaSqm) > 0);
-      const valid = hasCity && hasArea;
+      const hasCity = Boolean(
+        data.property?.city && data.property.city.trim().length > 0
+      )
+      const hasArea = Boolean(
+        data.property?.areaSqm && Number(data.property.areaSqm) > 0
+      )
+      const valid = hasCity && hasArea
       return {
         isValid: valid,
         errorEn: valid
           ? undefined
           : !hasCity
-          ? "Please enter the city or region in Egypt."
-          : "Please enter a valid total area (m²).",
+            ? "Please enter the city or region in Egypt."
+            : "Please enter a valid total area (m²).",
         errorAr: valid
           ? undefined
           : !hasCity
-          ? "يرجى إدخال المدينة أو المنطقة في مصر."
-          : "يرجى إدخال إجمالي المساحة بالمتر المربع (م²).",
-      };
+            ? "يرجى إدخال المدينة أو المنطقة في مصر."
+            : "يرجى إدخال إجمالي المساحة بالمتر المربع (م²).",
+      }
     }
 
     case 3: {
       // Step 3: Spaces (At least one included space with quantity > 0)
       const valid = Boolean(
         data.spaces &&
-          data.spaces.some(
-            (s) => s.included && (Number(s.quantity) > 0 || Number(s.count) > 0)
-          )
-      );
+        data.spaces.some(
+          (s) => s.included && (Number(s.quantity) > 0 || Number(s.count) > 0)
+        )
+      )
       return {
         isValid: valid,
         errorEn: valid
@@ -86,14 +94,18 @@ export function validateStep(
         errorAr: valid
           ? undefined
           : "يرجى إضافة فراغ أو غرفة واحدة على الأقل للتشطيب.",
-      };
+      }
     }
 
     case 4: {
       // Step 4: Style Discovery (Primary style OR pending style/reference selection required)
-      const hasPrimary = Boolean(data.primaryStyleId && data.primaryStyleId.trim().length > 0);
-      const hasPending = Boolean(data.pendingStyles && data.pendingStyles.length > 0);
-      const valid = hasPrimary || hasPending;
+      const hasPrimary = Boolean(
+        data.primaryStyleId && data.primaryStyleId.trim().length > 0
+      )
+      const hasPending = Boolean(
+        data.pendingStyles && data.pendingStyles.length > 0
+      )
+      const valid = hasPrimary || hasPending
       return {
         isValid: valid,
         errorEn: valid
@@ -102,22 +114,24 @@ export function validateStep(
         errorAr: valid
           ? undefined
           : "يرجى اختيار التوجه الجمالي والتصميمي للوحدة.",
-      };
+      }
     }
 
     case 5: {
       // Step 5: Customer Location / Timezone (Country, City, Phone required)
       const hasCountry = Boolean(
-        data.customerLocation?.country && data.customerLocation.country.trim().length > 0
-      );
+        data.customerLocation?.country &&
+        data.customerLocation.country.trim().length > 0
+      )
       const hasCity = Boolean(
-        data.customerLocation?.city && data.customerLocation.city.trim().length > 0
-      );
+        data.customerLocation?.city &&
+        data.customerLocation.city.trim().length > 0
+      )
       const hasPhone = Boolean(
         data.customerLocation?.phone &&
-          data.customerLocation.phone.trim().replace(/\s+/g, "").length >= 7
-      );
-      const valid = hasCountry && hasCity && hasPhone;
+        data.customerLocation.phone.trim().replace(/\s+/g, "").length >= 7
+      )
+      const valid = hasCountry && hasCity && hasPhone
       return {
         isValid: valid,
         errorEn: valid
@@ -126,22 +140,22 @@ export function validateStep(
         errorAr: valid
           ? undefined
           : "يرجى إدخال دولة الإقامة والمدينة ورقم هاتف صالح للتواصل.",
-      };
+      }
     }
 
     case 6: {
       // Step 6: Authorized Representative (If representative selected, name & phone required; if false, valid)
       if (!data.representative?.hasRepresentative) {
-        return { isValid: true };
+        return { isValid: true }
       }
       const hasName = Boolean(
         data.representative.name && data.representative.name.trim().length >= 2
-      );
+      )
       const hasPhone = Boolean(
         data.representative.phone &&
-          data.representative.phone.trim().replace(/\s+/g, "").length >= 7
-      );
-      const valid = hasName && hasPhone;
+        data.representative.phone.trim().replace(/\s+/g, "").length >= 7
+      )
+      const valid = hasName && hasPhone
       return {
         isValid: valid,
         errorEn: valid
@@ -150,14 +164,14 @@ export function validateStep(
         errorAr: valid
           ? undefined
           : "يرجى إدخال اسم ورقم هاتف المفوض بمصر للمتابعة.",
-      };
+      }
     }
 
     case 7: {
       // Step 7: Scope of Work (scopeType required)
       const valid = Boolean(
         data.scope?.scopeType && data.scope.scopeType.trim().length > 0
-      );
+      )
       return {
         isValid: valid,
         errorEn: valid
@@ -166,18 +180,18 @@ export function validateStep(
         errorAr: valid
           ? undefined
           : "يرجى تحديد حجم ونطاق أعمال التشطيب المطلوبة.",
-      };
+      }
     }
 
     case 8: {
       // Step 8: Budget (exact: exactAmount > 0; range: min > 0 and max >= min; undecided: valid)
-      const type = data.budget?.budgetType;
+      const type = data.budget?.budgetType
       if (type === "undecided") {
-        return { isValid: true };
+        return { isValid: true }
       }
       if (type === "exact") {
-        const exact = Number(data.budget?.exactAmount);
-        const valid = !isNaN(exact) && exact > 0;
+        const exact = Number(data.budget?.exactAmount)
+        const valid = !isNaN(exact) && exact > 0
         return {
           isValid: valid,
           errorEn: valid
@@ -186,12 +200,12 @@ export function validateStep(
           errorAr: valid
             ? undefined
             : "يرجى إدخال قيمة الميزانية التقديرية بشكل صحيح.",
-        };
+        }
       }
       if (type === "range") {
-        const min = Number(data.budget?.minAmount);
-        const max = Number(data.budget?.maxAmount);
-        const valid = !isNaN(min) && !isNaN(max) && min > 0 && max >= min;
+        const min = Number(data.budget?.minAmount)
+        const max = Number(data.budget?.maxAmount)
+        const valid = !isNaN(min) && !isNaN(max) && min > 0 && max >= min
         return {
           isValid: valid,
           errorEn: valid
@@ -200,53 +214,52 @@ export function validateStep(
           errorAr: valid
             ? undefined
             : "يرجى تحديد مدى ميزانية صالح بحيث يكون الحد الأقصى أكبر من أو يساوي الحد الأدنى.",
-        };
+        }
       }
       return {
         isValid: false,
         errorEn: "Please select a budget preference or choose undecided.",
         errorAr: "يرجى تحديد تفضيل الميزانية أو اختيار غير محدد.",
-      };
+      }
     }
 
     case 9: {
       // Step 9: Target Completion (deadlineType selected)
       const valid = Boolean(
-        data.timeline?.deadlineType && data.timeline.deadlineType.trim().length > 0
-      );
+        data.timeline?.deadlineType &&
+        data.timeline.deadlineType.trim().length > 0
+      )
       return {
         isValid: valid,
         errorEn: valid
           ? undefined
           : "Please select your target completion timeline.",
-        errorAr: valid
-          ? undefined
-          : "يرجى تحديد الموعد المستهدف للتسليم.",
-      };
+        errorAr: valid ? undefined : "يرجى تحديد الموعد المستهدف للتسليم.",
+      }
     }
 
     case 10: {
       // Step 10: Drawings / Documents (Optional)
-      return { isValid: true };
+      return { isValid: true }
     }
 
     case 11: {
       // Step 11: Review & Submit (All steps 1 through 10 must pass)
       for (let s = 1; s <= 10; s++) {
-        const res = validateStep(s, data);
+        const res = validateStep(s, data)
         if (!res.isValid) {
           return {
             isValid: false,
             errorEn: `Step ${s} is incomplete: ${res.errorEn}`,
             errorAr: `الخطوة ${s} غير مكتملة: ${res.errorAr}`,
-          };
+          }
         }
       }
-      return { isValid: true };
+      return { isValid: true }
     }
 
     default:
-      return { isValid: true };
+      return { isValid: true }
   }
 }
 
@@ -256,98 +269,78 @@ export function validateStep(
  */
 export function getMaxUnlockedStep(data: WizardFormData): number {
   for (let s = 1; s <= 10; s++) {
-    const res = validateStep(s, data);
+    const res = validateStep(s, data)
     if (!res.isValid) {
-      return s;
+      return s
     }
   }
-  return 11;
+  return 11
 }
 
 /**
- * Default spaces template for fresh real customers and demo showcase.
+ * Default spaces template for fresh real customers .
  */
 export const DEFAULT_SPACES_LIST: SpaceEntity[] = [
-  { id: "living", spaceType: "living", customName: "Living Room & Salon", included: false, quantity: 0 },
-  { id: "dining", spaceType: "dining", customName: "Formal Dining Area", included: false, quantity: 0 },
-  { id: "kitchen", spaceType: "kitchen", customName: "Chef Kitchen & Pantry", included: false, quantity: 0 },
-  { id: "master_bedroom", spaceType: "master_bedroom", customName: "Master Suite", included: false, quantity: 0 },
-  { id: "guest_bedrooms", spaceType: "guest_bedrooms", customName: "Guest Bedrooms", included: false, quantity: 0 },
-  { id: "bathrooms", spaceType: "bathrooms", customName: "Bathrooms & Spa", included: false, quantity: 0 },
-  { id: "terrace", spaceType: "terrace", customName: "Private Terrace & Loggia", included: false, quantity: 0 },
-  { id: "office", spaceType: "office", customName: "Home Office & Library", included: false, quantity: 0 },
-];
+  {
+    id: "living",
+    spaceType: "living",
+    customName: "Living Room & Salon",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "dining",
+    spaceType: "dining",
+    customName: "Formal Dining Area",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "kitchen",
+    spaceType: "kitchen",
+    customName: "Chef Kitchen & Pantry",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "master_bedroom",
+    spaceType: "master_bedroom",
+    customName: "Master Suite",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "guest_bedrooms",
+    spaceType: "guest_bedrooms",
+    customName: "Guest Bedrooms",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "bathrooms",
+    spaceType: "bathrooms",
+    customName: "Bathrooms & Spa",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "terrace",
+    spaceType: "terrace",
+    customName: "Private Terrace & Loggia",
+    included: false,
+    quantity: 0,
+  },
+  {
+    id: "office",
+    spaceType: "office",
+    customName: "Home Office & Library",
+    included: false,
+    quantity: 0,
+  },
+]
 
 /**
  * Showcase pre-filled state for Demo/Mock mode.
- */
-export const DEMO_SHOWCASE_WIZARD_STATE: WizardFormData = {
-  propertyType: "villa",
-  primaryStyleId: "japandi",
-  pendingStyles: [
-    {
-      targetSpaceKey: "general",
-      styleId: "japandi",
-      styleName: "Japandi & Warm Minimal",
-      referenceImages: [
-        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=85",
-      ],
-      notes: "",
-    },
-  ],
-  spaces: [
-    { id: "living", spaceType: "living", customName: "Living Room & Salon", included: true, quantity: 1 },
-    { id: "dining", spaceType: "dining", customName: "Formal Dining Area", included: true, quantity: 1 },
-    { id: "kitchen", spaceType: "kitchen", customName: "Chef Kitchen & Pantry", included: true, quantity: 1 },
-    { id: "master_bedroom", spaceType: "master_bedroom", customName: "Master Suite", included: true, quantity: 1 },
-    { id: "guest_bedrooms", spaceType: "guest_bedrooms", customName: "Guest Bedrooms", included: true, quantity: 3 },
-    { id: "bathrooms", spaceType: "bathrooms", customName: "Bathrooms & Spa", included: true, quantity: 4 },
-    { id: "terrace", spaceType: "terrace", customName: "Private Terrace & Loggia", included: true, quantity: 2 },
-    { id: "office", spaceType: "office", customName: "Home Office & Library", included: false, quantity: 0 },
-  ],
-  property: {
-    propertyType: "villa",
-    compound: "Palm Hills Golf Extensions",
-    city: "New Cairo",
-    areaSqm: 480,
-    floors: 2,
-    condition: "semi_finished",
-    accessibilityNotes: "",
-  },
-  customerLocation: {
-    country: "Egypt",
-    countryCode: "EG",
-    city: "Cairo",
-    timezone: "Africa/Cairo (GMT+2)",
-    phone: "+20 100 123 4567",
-    phoneCountryCode: "+20",
-  },
-  representative: {
-    hasRepresentative: false,
-    valentiaManagedDirectly: true,
-    phone: "",
-    phoneCountryCode: "+20",
-  },
-  scope: {
-    scopeType: "full_fitout",
-    customDetails: "",
-  },
-  budget: {
-    budgetType: "range",
-    minAmount: 2500000,
-    maxAmount: 4500000,
-    currency: "EGP",
-  },
-  timeline: {
-    deadlineType: "duration",
-    durationDescription: "6 Months (Standard)",
-  },
-  documents: [],
-};
-
-/**
- * Initial empty state for real customer in API mode.
- * Required fields begin empty so Step 1 is the first incomplete step.
  */
 export const INITIAL_REAL_WIZARD_STATE: WizardFormData = {
   propertyType: "" as unknown as PropertyType,
@@ -390,12 +383,11 @@ export const INITIAL_REAL_WIZARD_STATE: WizardFormData = {
     durationDescription: "",
   },
   documents: [],
-};
+}
 
 /**
- * Centralized initial state selector based on runtime flag.
+ * Centralized initial state selector for new project forms.
  */
 export function getInitialWizardState(): WizardFormData {
-  const isMockEnabled = process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === "true";
-  return isMockEnabled ? DEMO_SHOWCASE_WIZARD_STATE : INITIAL_REAL_WIZARD_STATE;
+  return structuredClone(INITIAL_REAL_WIZARD_STATE)
 }

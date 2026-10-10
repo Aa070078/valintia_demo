@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  Get,
   Post,
   Param,
   ParseIntPipe,
@@ -35,6 +36,20 @@ export class UsersController {
   constructor(
     @Inject(UsersService) private readonly usersService: UsersService,
   ) {}
+
+  @Get()
+  @Roles(Role.ADMINISTRATOR)
+  @ApiOperation({
+    summary: 'List internal staff and onboarding status (Admin only)',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Safe account metadata; no password hashes or onboarding secrets',
+  })
+  listInternalUsers() {
+    return this.usersService.listInternalUsers();
+  }
 
   @Post()
   @Roles(Role.ADMINISTRATOR)

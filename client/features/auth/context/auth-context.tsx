@@ -35,7 +35,6 @@ interface AuthContextValue {
   ) => Promise<boolean>
   refreshCurrentUser: () => Promise<User | null>
   refreshUser: () => Promise<User | null>
-  devSwitchRole: (role: UserRole) => Promise<{ redirectUrl?: string }>
 }
 
 const AuthContext = React.createContext<AuthContextValue | null>(null)
@@ -149,19 +148,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const devSwitchRole = async (
-    role: UserRole
-  ): Promise<{ redirectUrl?: string }> => {
-    setIsLoading(true)
-    try {
-      const switchedUser = await authApi.switchRoleDev(role)
-      setUser(switchedUser)
-      return handleRoleRedirection(switchedUser.role)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   const value: AuthContextValue = {
     onboardingSession,
     user,
@@ -180,7 +166,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     changePassword,
     refreshCurrentUser,
     refreshUser: refreshCurrentUser,
-    devSwitchRole,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
